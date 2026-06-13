@@ -22,6 +22,7 @@
 #include "MaterialType.hpp"
 #include "Model.hpp"
 #include "format.hpp"
+#include "LocalesUtils.hpp"
 #include <float.h>
 
 #include <algorithm>
@@ -389,6 +390,7 @@ bool Print::invalidate_state_by_config_options(const ConfigOptionResolver & /* n
             || opt_key == "prime_volume"
             || opt_key == "flush_into_infill"
             || opt_key == "flush_into_support"
+            || opt_key == "belt_purge_tower_width"
             || opt_key == "initial_layer_infill_speed"
             || opt_key == "travel_speed"
             || opt_key == "travel_speed_z"
@@ -1473,6 +1475,15 @@ StringObjectException Print::validate(std::vector<StringObjectException> *warnin
     }
 
     if (m_config.enable_prime_tower) {
+        if (m_config.belt_printer.value && m_config.print_sequence == PrintSequence::ByObject
+            && extruders.size() > 1 && warning != nullptr) {
+            StringObjectException warningtemp;
+            warningtemp.string     = L("The belt purge tower is not generated in \"By object\" print sequence; "
+                                       "filament changes will not be purged.");
+            warningtemp.opt_key    = "enable_prime_tower";
+            warningtemp.is_warning = true;
+            *warning               = warningtemp;
+        }
         for (const PrintObject* object : m_objects) {
             if (object->config().precise_z_height.value) {
                 warn(L("Enabling both precise Z height and the prime tower may cause slicing errors."), "precise_z_height");
@@ -1596,7 +1607,7 @@ StringObjectException Print::validate(std::vector<StringObjectException> *warnin
                     return {_u8L("Variable layer height is not supported with Organic supports.") };
         }
 
-    if (this->has_wipe_tower() && ! m_objects.empty()) {
+    if ((this->has_wipe_tower() || this->has_belt_purge_tower()) && ! m_objects.empty()) {
         // Make sure all extruders use same diameter filament and have the same nozzle diameter
         // EPSILON comparison is used for nozzles and 10 % tolerance is used for filaments
         double first_nozzle_diam = m_config.nozzle_diameter.get_at(extruders.front());
@@ -1612,12 +1623,17 @@ StringObjectException Print::validate(std::vector<StringObjectException> *warnin
                 }
         }
 
-        if (! m_config.use_relative_e_distances)
-            return { L("The Wipe Tower is currently only supported with the relative extruder addressing (use_relative_e_distances=1).") };
+        // The following two constraints come from the classic wipe tower G-code
+        // generator; purging into the belt purge prism uses normal object
+        // extrusions and does not need them.
+        if (this->has_wipe_tower()) {
+            if (! m_config.use_relative_e_distances)
+                return { L("The Wipe Tower is currently only supported with the relative extruder addressing (use_relative_e_distances=1).") };
 
-        if (m_config.ooze_prevention && m_config.single_extruder_multi_material)
-            return {L("Ooze prevention is only supported with the wipe tower when 'single_extruder_multi_material' is off.")};
-            
+            if (m_config.ooze_prevention && m_config.single_extruder_multi_material)
+                return {L("Ooze prevention is only supported with the wipe tower when 'single_extruder_multi_material' is off.")};
+        }
+
 #if 0
         if (m_config.gcode_flavor != gcfRepRapSprinter && m_config.gcode_flavor != gcfRepRapFirmware &&
             m_config.gcode_flavor != gcfRepetier && m_config.gcode_flavor != gcfMarlinLegacy && m_config.gcode_flavor != gcfMarlinFirmware)
@@ -2708,7 +2724,10 @@ void Print::process(long long *time_cost_with_cache, bool use_cache)
 
         m_wipe_tower_data.clear();
         m_tool_ordering.clear();
-        if (this->has_wipe_tower()) {
+        if (this->has_belt_purge_tower() && this->config().print_sequence != PrintSequence::ByObject) {
+            this->_plan_belt_purge();
+        }
+        else if (this->has_wipe_tower()) {
             this->_make_wipe_tower();
         }
         else if (this->config().print_sequence != PrintSequence::ByObject) {
@@ -4085,6 +4104,13 @@ int Print::get_config_index(int filament_id, int layer_id, const std::vector<std
 // Wipe tower support.
 bool Print::has_wipe_tower() const
 {
+    // Belt printers never get the classic wipe tower: its G-code is generated
+    // directly in machine XY coordinates and bypasses the belt rotation
+    // transform. Purging is routed into the belt purge prism instead
+    // (see has_belt_purge_tower() / _plan_belt_purge()).
+    if (m_config.belt_printer.value)
+        return false;
+
     if (m_config.enable_prime_tower.value == true) {
         if (m_config.enable_wrapping_detection.value && m_config.wrapping_exclude_area.values.size() > 2)
             return true;
@@ -4095,6 +4121,16 @@ bool Print::has_wipe_tower() const
         return !m_config.spiral_mode.value && m_config.filament_diameter.values.size() > 1;
     }
     return false;
+}
+
+// Belt purge prism: purging after filament changes is routed into a sliced
+// prism object via the flush-into-objects machinery instead of a wipe tower.
+bool Print::has_belt_purge_tower() const
+{
+    return m_config.belt_printer.value
+        && m_config.enable_prime_tower.value
+        && !m_config.spiral_mode.value
+        && m_config.filament_diameter.values.size() > 1;
 }
 
 const WipeTowerData &Print::wipe_tower_data(size_t filaments_cnt) const
@@ -4181,6 +4217,179 @@ const WipeTowerData &Print::wipe_tower_data(size_t filaments_cnt) const
 bool Print::enable_timelapse_print() const
 {
     return m_config.timelapse_type.value == TimelapseType::tlSmooth;
+}
+
+// Belt mode: snap the purge prism's layer grid onto the printed objects' grid.
+// After belt slicing every object's layer print_z carries a per-object global
+// z offset (mesh-vertex-scan belt_z_shift + instance-Y-dependent terms), so
+// objects at different belt-Y positions do not share a layer grid. Purge
+// marking looks absorbers up with get_layer_at_printz(lt.print_z, EPSILON),
+// so the prism only absorbs purge at toolchange print_z values that coincide
+// with one of its own layers. Shifting the prism by at most half a layer
+// (a sub-layer-height displacement along the belt) makes its grid residue
+// match the reference object's; both grids step by the same layer height
+// (enforced by validate()), so matching residues means exact layer matches.
+void Print::_align_belt_purge_layers()
+{
+    PrintObject *prism = nullptr;
+    for (PrintObject *po : m_objects)
+        if (po->config().belt_purge_tower_object.value) {
+            prism = po;
+            break;
+        }
+    if (prism == nullptr || prism->layers().empty())
+        return;
+
+    const double h = prism->config().layer_height.value;
+    if (h <= EPSILON)
+        return;
+
+    // Grid residue of an object's layer grid: identical for all of an object's
+    // layers above the first since they step by h.
+    auto grid_offset = [h](const PrintObject *po) {
+        const double z = po->layers().front()->print_z;
+        return z - std::floor(z / h) * h; // in [0, h)
+    };
+
+    // Reference grid: the tallest non-prism object (proxy for the object with
+    // the most toolchange layers).
+    const PrintObject *ref     = nullptr;
+    double             ref_top = -std::numeric_limits<double>::max();
+    for (const PrintObject *po : m_objects) {
+        if (po->config().belt_purge_tower_object.value || po->layers().empty())
+            continue;
+        const double top = po->layers().back()->print_z;
+        if (top > ref_top) {
+            ref_top = top;
+            ref     = po;
+        }
+    }
+    if (ref == nullptr)
+        return;
+
+    const double ref_offset     = grid_offset(ref);
+    bool         grids_mismatch = false;
+    for (const PrintObject *po : m_objects) {
+        if (po == ref || po->config().belt_purge_tower_object.value || po->layers().empty())
+            continue;
+        double d = std::abs(grid_offset(po) - ref_offset);
+        d        = std::min(d, h - d);
+        if (d > 5. * EPSILON) {
+            grids_mismatch = true;
+            break;
+        }
+    }
+
+    // Shift normalized to (-h/2, h/2].
+    double delta = ref_offset - grid_offset(prism);
+    if (delta > 0.5 * h)
+        delta -= h;
+    else if (delta <= -0.5 * h)
+        delta += h;
+
+    BOOST_LOG_TRIVIAL(debug) << "[BELT-DEBUG] purge prism grid snap"
+        << " ref=" << ref->model_object()->name
+        << " ref_offset=" << ref_offset
+        << " prism_offset=" << grid_offset(prism)
+        << " delta=" << delta
+        << " grids_mismatch=" << grids_mismatch;
+
+    prism->belt_shift_layer_grid(delta);
+
+    if (grids_mismatch)
+        this->active_step_add_warning(
+            PrintStateBase::WarningLevel::NON_CRITICAL,
+            _u8L("Objects on the plate are sliced on different layer grids; the belt purge tower can only follow "
+                 "one of them. Filament changes on layers of the other objects may not be fully purged."));
+}
+
+// Belt mode replacement for _make_wipe_tower(): plan filament-change purging
+// into the belt purge prism (and any other flush_into_* object) using the
+// flush-into-objects machinery, without generating classic wipe tower G-code.
+// The toolchange itself is emitted by GCode::set_extruder() via the
+// change_filament_gcode macro; the overrides marked here make the new
+// filament's first extrusions land in the purge prism.
+void Print::_plan_belt_purge()
+{
+    m_wipe_tower_data.clear();
+
+    // Must run before ToolOrdering is built: LayerTools merge per-object layer
+    // print_z values, and the prism only absorbs purge where its (snapped)
+    // layers coincide with the toolchange layers.
+    this->_align_belt_purge_layers();
+
+    const unsigned int number_of_extruders = (unsigned int) m_config.filament_colour.values.size();
+
+    // No initial priming extrusions: there is no tower to prime on.
+    m_wipe_tower_data.tool_ordering = ToolOrdering(*this, (unsigned int) -1, false);
+    m_wipe_tower_data.tool_ordering.sort_and_build_data(*this, (unsigned int) -1, false);
+
+    if (m_wipe_tower_data.tool_ordering.empty() || m_wipe_tower_data.tool_ordering.last_extruder() == unsigned(-1))
+        throw Slic3r::SlicingError("The print is empty. The model is not printable with current print settings.");
+
+    if (!m_wipe_tower_data.tool_ordering.has_wipe_tower())
+        // No toolchanges anywhere, nothing to purge.
+        return;
+
+    this->throw_if_canceled();
+
+    // Flush volumes per filament pair, mirroring the generic wipe tower path:
+    // full flush matrix for single extruder multi material with purging enabled,
+    // plain prime volume otherwise.
+    std::vector<float> flush_matrix(cast<float>(
+        get_flush_volumes_matrix(m_config.flush_volumes_matrix.values, 0, m_config.nozzle_diameter.values.size())));
+    std::vector<std::vector<float>> wipe_volumes;
+    for (unsigned int i = 0; i < number_of_extruders; ++i)
+        wipe_volumes.push_back(std::vector<float>(flush_matrix.begin() + i * number_of_extruders,
+                                                  flush_matrix.begin() + (i + 1) * number_of_extruders));
+    const bool  use_flush_matrix = m_config.purge_in_prime_tower && m_config.single_extruder_multi_material;
+    const float flush_multiplier = (float) m_config.flush_multiplier.get_at(0);
+
+    float  total_leftover      = 0.f;
+    float  worst_layer_leftover = 0.f;
+    double worst_layer_z       = 0.;
+
+    unsigned int current_extruder_id = m_wipe_tower_data.tool_ordering.first_extruder();
+    for (auto &layer_tools : m_wipe_tower_data.tool_ordering.layer_tools()) {
+        float layer_leftover = 0.f;
+        for (const unsigned int extruder_id : layer_tools.extruders) {
+            if (extruder_id == current_extruder_id)
+                continue;
+            float volume_to_wipe = use_flush_matrix ?
+                wipe_volumes[current_extruder_id][extruder_id] * flush_multiplier :
+                (float) m_config.prime_volume;
+            float leftover = layer_tools.wiping_extrusions().mark_wiping_extrusions(*this, current_extruder_id, extruder_id,
+                                                                                    volume_to_wipe);
+            BOOST_LOG_TRIVIAL(trace) << "[BELT-DEBUG] purge toolchange print_z=" << layer_tools.print_z
+                << " filament " << current_extruder_id << "->" << extruder_id
+                << " requested=" << volume_to_wipe
+                << " absorbed=" << volume_to_wipe - leftover
+                << " leftover=" << leftover;
+            layer_leftover += leftover;
+            current_extruder_id = extruder_id;
+        }
+        layer_tools.wiping_extrusions().ensure_perimeters_infills_order(*this);
+        if (layer_leftover > 0.f) {
+            total_leftover += layer_leftover;
+            if (layer_leftover > worst_layer_leftover) {
+                worst_layer_leftover = layer_leftover;
+                worst_layer_z        = layer_tools.print_z;
+            }
+        }
+        this->throw_if_canceled();
+    }
+
+    if (total_leftover > 1.f) {
+        this->active_step_add_warning(
+            PrintStateBase::WarningLevel::CRITICAL,
+            Slic3r::format(_u8L("The belt purge tower cannot absorb the full purge volume: %1% mm³ in total could not "
+                                "be purged (worst layer: %2% mm³ at height %3%). The print may show color bleeding. "
+                                "Increase the belt purge tower width, or reduce flushing volumes."),
+                           int(std::ceil(total_leftover)), int(std::ceil(worst_layer_leftover)),
+                           Slic3r::float_to_string_decimal_point(worst_layer_z, 2)));
+        BOOST_LOG_TRIVIAL(warning) << "[BELT-DEBUG] purge planning leftover total=" << total_leftover
+            << " worst_layer=" << worst_layer_leftover << " at print_z=" << worst_layer_z;
+    }
 }
 
 void Print::_make_wipe_tower()

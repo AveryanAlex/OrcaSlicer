@@ -1228,6 +1228,9 @@ PRINT_CONFIG_CLASS_DEFINE(
     // BBS
     ((ConfigOptionBool,                flush_into_infill))
     ((ConfigOptionBool,                flush_into_support))
+    // Marker for the auto-generated belt purge prism; identifies the object to
+    // the auto-manager (GUI) and the layer-grid alignment step (backend).
+    ((ConfigOptionBool,                belt_purge_tower_object))
     // BBS
     ((ConfigOptionFloat,              tree_support_branch_distance))
     ((ConfigOptionFloat,              tree_support_tip_diameter))
@@ -1802,6 +1805,8 @@ PRINT_CONFIG_CLASS_DERIVED_DEFINE(
     ((ConfigOptionFloat,                          belt_support_floor_offset))
     ((ConfigOptionEnum<BeltSupportFloorMode>,     belt_support_floor_mode))
     ((ConfigOptionEnum<BeltSupportZOffsetMode>,   belt_support_z_offset_mode))
+    // Width (machine X, across the belt) of the auto-generated belt purge prism.
+    ((ConfigOptionFloat,                          belt_purge_tower_width))
     //BBS
     ((ConfigOptionInts,               additional_cooling_fan_speed))
     ((ConfigOptionInts,               close_additional_fan_first_x_layers))

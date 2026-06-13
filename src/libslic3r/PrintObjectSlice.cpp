@@ -1392,6 +1392,27 @@ void apply_fuzzy_skin_segmentation(PrintObject &print_object, ThrowOnCancel thro
     }); // end of parallel_for
 }
 
+// Belt mode: shift the sliced layer grid by delta. Mirrors the global_z_offset
+// application in slice() — layer print_z and belt_floor_z_shift move together
+// so belt floor clipping stays consistent with the shifted grid. Used by
+// Print::_align_belt_purge_layers() to snap the purge prism onto the printed
+// objects' layer grid; |delta| <= half a layer height, i.e. a sub-layer shift
+// of the prism along the belt.
+void PrintObject::belt_shift_layer_grid(double delta)
+{
+    if (std::abs(delta) < EPSILON)
+        return;
+    for (Layer *layer : m_layers)
+        layer->print_z += delta;
+    for (SupportLayer *layer : m_support_layers)
+        layer->print_z += delta;
+    m_slicing_params.belt_floor_z_shift += delta;
+    BOOST_LOG_TRIVIAL(trace) << "[BELT-DEBUG] belt_shift_layer_grid"
+        << " obj=" << this->model_object()->name
+        << " delta=" << delta
+        << " first_layer.print_z=" << (m_layers.empty() ? 0. : m_layers.front()->print_z);
+}
+
 // 1) Decides Z positions of the layers,
 // 2) Initializes layers and their regions
 // 3) Slices the object meshes

@@ -558,6 +558,10 @@ private:
     std::vector<std::set<int>> detect_extruder_geometric_unprintables() const;
 
     void slice_volumes();
+    // Belt mode: shift the sliced layer grid (layer print_z and the belt floor
+    // clipping shift) by delta, used by Print::_align_belt_purge_layers() to
+    // snap the purge prism's layers onto the printed objects' layer grid.
+    void belt_shift_layer_grid(double delta);
     //BBS
     ExPolygons _shrink_contour_holes(double contour_delta, double hole_delta, const ExPolygons& polys) const;
     // BBS
@@ -1085,6 +1089,8 @@ public:
 
     // Wipe tower support.
     bool                        has_wipe_tower() const;
+    // Belt purge prism (belt-mode replacement for the wipe tower).
+    bool                        has_belt_purge_tower() const;
     const WipeTowerData&        wipe_tower_data(size_t filaments_cnt = 0) const;
     const ToolOrdering& 		tool_ordering() const { return m_tool_ordering; }
 
@@ -1330,6 +1336,12 @@ private:
 
     void                _make_skirt();
     void                _make_wipe_tower();
+    // Belt mode: route filament-change purging into the belt purge prism
+    // (flush-into-objects) without generating a classic wipe tower.
+    void                _plan_belt_purge();
+    // Belt mode: shift the purge prism's layer grid to match the printed
+    // objects' grid so toolchange layers find prism layers to purge into.
+    void                _align_belt_purge_layers();
     void                finalize_first_layer_convex_hull();
     void                update_filament_self_index_cache();
     // Deduplicates, per filament, the (extruder type x volume type) variants the grouping

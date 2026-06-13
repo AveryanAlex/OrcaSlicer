@@ -2866,7 +2866,13 @@ void GLCanvas3D::reload_scene(bool refresh_immediately, bool force_full_scene_re
             need_wipe_tower |= dynamic_cast<const ConfigOptionBool*>(dconfig.option("enable_wrapping_detection"))->value;
         }
 
-        if (wt && (need_wipe_tower || filaments_count > 1) && !wxGetApp().plater()->only_gcode_mode() && !wxGetApp().plater()->is_gcode_3mf()) {
+        // Belt printers replace the classic wipe tower with the auto-generated
+        // belt purge prism (a real model object), so never draw the tower widget.
+        bool is_belt_printer = false;
+        if (const auto *belt_opt = wxGetApp().preset_bundle->printers.get_edited_preset().config.option<ConfigOptionBool>("belt_printer"))
+            is_belt_printer = belt_opt->value;
+
+        if (wt && !is_belt_printer && (need_wipe_tower || filaments_count > 1) && !wxGetApp().plater()->only_gcode_mode() && !wxGetApp().plater()->is_gcode_3mf()) {
             for (int plate_id = 0; plate_id < n_plates; plate_id++) {
                 // If print ByObject and there is only one object in the plate, the wipe tower is allowed to be generated.
                 PartPlate* part_plate = ppl.get_plate(plate_id);

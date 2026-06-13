@@ -971,11 +971,16 @@ void ConfigManipulation::toggle_print_fff_options(DynamicPrintConfig *config, in
     toggle_line("preheat_steps", have_ooze_prevention && (preheat_steps > 0));
 
     bool have_prime_tower = config->opt_bool("enable_prime_tower");
+    // ORCA-Belt: belt printers replace the classic wipe tower with the
+    // auto-generated belt purge prism — only its width is tunable; the
+    // classic tower geometry options do not apply. (is_belt_printer is
+    // computed at the top of this function.)
+    toggle_line("belt_purge_tower_width", have_prime_tower && is_belt_printer);
     for (auto el : {"prime_tower_width", "prime_tower_brim_width", "prime_tower_skip_points", "wipe_tower_wall_type", "prime_tower_infill_gap","prime_tower_enable_framework", "enable_tower_interface_features"})
-        toggle_line(el, have_prime_tower);
+        toggle_line(el, have_prime_tower && !is_belt_printer);
 
     toggle_line("enable_tower_interface_cooldown_during_tower",
-                have_prime_tower && config->opt_bool("enable_tower_interface_features"));
+                have_prime_tower && !is_belt_printer && config->opt_bool("enable_tower_interface_features"));
 
     bool purge_in_primetower = preset_bundle->printers.get_edited_preset().config.opt_bool("purge_in_prime_tower");
 
@@ -983,17 +988,17 @@ void ConfigManipulation::toggle_print_fff_options(DynamicPrintConfig *config, in
                     "wipe_tower_extra_spacing", "wipe_tower_max_purge_speed",
                     "wipe_tower_bridging", "wipe_tower_extra_flow",
                     "wipe_tower_no_sparse_layers"})
-            toggle_line(el, have_prime_tower && supports_wipe_tower_2);
+            toggle_line(el, have_prime_tower && supports_wipe_tower_2 && !is_belt_printer);
 
     WipeTowerWallType wipe_tower_wall_type = config->opt_enum<WipeTowerWallType>("wipe_tower_wall_type");
-    bool have_rib_wall = (wipe_tower_wall_type == WipeTowerWallType::wtwRib)&&have_prime_tower;
-    toggle_line("wipe_tower_cone_angle", have_prime_tower && supports_wipe_tower_2 && wipe_tower_wall_type == WipeTowerWallType::wtwCone);
+    bool have_rib_wall = (wipe_tower_wall_type == WipeTowerWallType::wtwRib)&&have_prime_tower&&!is_belt_printer;
+    toggle_line("wipe_tower_cone_angle", have_prime_tower && supports_wipe_tower_2 && !is_belt_printer && wipe_tower_wall_type == WipeTowerWallType::wtwCone);
     toggle_line("wipe_tower_extra_rib_length", have_rib_wall);
     toggle_line("wipe_tower_rib_width", have_rib_wall);
     toggle_line("wipe_tower_fillet_wall", have_rib_wall);
     toggle_field("prime_tower_width", have_prime_tower && !have_rib_wall);
 
-    toggle_line("single_extruder_multi_material_priming", !bSEMM && have_prime_tower && supports_wipe_tower_2);
+    toggle_line("single_extruder_multi_material_priming", !bSEMM && have_prime_tower && supports_wipe_tower_2 && !is_belt_printer);
 
     toggle_line("prime_volume",have_prime_tower && (!purge_in_primetower || !bSEMM));
 

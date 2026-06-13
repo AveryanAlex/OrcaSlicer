@@ -1160,6 +1160,8 @@ static std::vector<std::string> s_Preset_print_options{
     "prime_volume",
     "prime_tower_infill_gap",
     "prime_tower_flat_ironing",
+    "belt_purge_tower_width",
+    "belt_purge_tower_object",
     "enable_tower_interface_features",
     "enable_tower_interface_cooldown_during_tower",
     "wipe_tower_no_sparse_layers",
