@@ -9021,7 +9021,13 @@ bool Plater::priv::ensure_belt_purge_tower()
     // Worst-case purge volume of one layer: up to (filament count - 1)
     // toolchanges, each needing the worst flush matrix entry (mirrors the
     // volume selection in Print::_plan_belt_purge()).
-    const bool use_matrix = (print_config.has("purge_in_prime_tower") && print_config.opt_bool("purge_in_prime_tower"))
+    // NOTE: both purge_in_prime_tower and single_extruder_multi_material are
+    // PRINTER options (Preset.cpp s_Preset_printer_options) — read them from the
+    // printer preset. Reading purge_in_prime_tower from the print preset returns
+    // has()==false, collapsing use_matrix to false and sizing the tower for the
+    // small prime_volume instead of the real color-change flush. This must match
+    // the backend Print::_plan_belt_purge() which reads both from the merged config.
+    const bool use_matrix = (printer_config.has("purge_in_prime_tower") && printer_config.opt_bool("purge_in_prime_tower"))
         && (printer_config.has("single_extruder_multi_material") && printer_config.opt_bool("single_extruder_multi_material"));
     double max_flush = print_config.has("prime_volume") ? print_config.opt_float("prime_volume") : 45.;
     if (use_matrix) {
