@@ -9090,15 +9090,18 @@ bool Plater::priv::ensure_belt_purge_tower()
     const double length      = std::max(belt_end - belt_start, 10.);
     const double belt_center = 0.5 * (belt_start + belt_end);
 
-    // Across-belt: flush against the bed's maximum edge (small inset), falling
-    // back to just past the parts if the bed shape is unavailable.
-    const Vec3d  plate_origin = plate->get_origin();
+    // Across-belt: flush against the bed's maximum edge, inset by half the bar
+    // width so the bar's far edge sits on the boundary and the whole bar stays
+    // on the bed (otherwise the center lands on the edge and half the bar hangs
+    // off → "objects laid over the boundary" → no slicing). Coordinates are in
+    // the printable_area / instance frame (do NOT add plate origin — the belt
+    // calibration objects are positioned the same way, see _calib_temp_belt_*).
     const double inset      = 1.;
-    double       lat_center = lat_max + 5. + 0.5 * width;
+    double       lat_center = lat_max + 5. + 0.5 * width; // fallback: just past the parts
     if (const auto *bed_opt = printer_config.option<ConfigOptionPoints>("printable_area");
         bed_opt != nullptr && !bed_opt->values.empty()) {
         const BoundingBoxf bed_ext     = get_extents(bed_opt->values);
-        const double       bed_lat_max = plate_origin[belt_is_y ? 0 : 1] + (belt_is_y ? bed_ext.max.x() : bed_ext.max.y());
+        const double       bed_lat_max = belt_is_y ? bed_ext.max.x() : bed_ext.max.y();
         lat_center = bed_lat_max - inset - 0.5 * width;
     }
 
