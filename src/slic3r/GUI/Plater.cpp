@@ -9010,7 +9010,6 @@ bool Plater::priv::ensure_belt_purge_tower()
     if ((rot == BeltRotationAxis::X || rot == BeltRotationAxis::Y) && angle_opt != nullptr && std::abs(angle_opt->value) > EPSILON)
         theta = std::clamp(Geometry::deg2rad(std::abs(angle_opt->value)), Geometry::deg2rad(5.), M_PI / 2.);
     const double sin_t = std::sin(theta);
-    const double cot_t = std::cos(theta) / sin_t;
 
     // Parts' extent along the belt-travel axis and the lateral (across-belt) axis.
     const double belt_min = belt_is_y ? y_min : x_min;
@@ -9075,35 +9074,45 @@ bool Plater::priv::ensure_belt_purge_tower()
         return false; // already up to date — do not touch the model
 
     // --- Position ----------------------------------------------------------
-    // Default belt-printer placement (per user request):
-    //  - belt-travel axis: anchored at the parts' belt-axis MINIMUM (the belt
-    //    entry / parts' min Y for an X-rotation belt) so the tower leads in.
-    //  - across-belt axis: parked right up against the bed's MAXIMUM edge
-    //    (max X for an X-rotation belt), out of the way of the parts.
-    // The bar extends from the parts' belt minimum past the parts; a tilted
-    // slicing plane through a part of height z reaches belt position
-    // y + z*cot(theta), so the trailing end covers the tallest part's upper
-    // toolchanges plus the bar's own tilt span.
+    // Belt-travel axis: anchor the bar at the parts' belt-axis MINIMUM and span
+    // just the parts' belt extent (+ small margin). Filament changes happen
+    // over the parts' belt band, so the bar must sit there to absorb them;
+    // extending it far up the belt moves its body away from the toolchange
+    // layers and the purge goes unabsorbed (empirically, moving the tower
+    // toward the parts' Y-min clears the "cannot absorb" warning).
     const double margin      = 5.;
-    const double belt_start  = belt_min;                                     // parts' belt-axis minimum
-    const double belt_end    = belt_max + (z_max + height) * cot_t + margin; // trailing tilt allowance
+    const double belt_start  = belt_min;                 // parts' belt-axis minimum
+    const double belt_end    = belt_max + margin;        // just past the parts — stay low / near the parts
     const double length      = std::max(belt_end - belt_start, 10.);
     const double belt_center = 0.5 * (belt_start + belt_end);
 
     // Across-belt: flush against the bed's maximum edge, inset by half the bar
     // width so the bar's far edge sits on the boundary and the whole bar stays
-    // on the bed (otherwise the center lands on the edge and half the bar hangs
-    // off → "objects laid over the boundary" → no slicing). Coordinates are in
-    // the printable_area / instance frame (do NOT add plate origin — the belt
-    // calibration objects are positioned the same way, see _calib_temp_belt_*).
-    const double inset      = 1.;
-    double       lat_center = lat_max + 5. + 0.5 * width; // fallback: just past the parts
+    // on the bed. The bed (printable_area) is plate-local but model instances
+    // live in the plate's world frame, so add the plate origin's lateral
+    // component (plate-origin compensation is needed throughout the belt
+    // pipeline). lat_min/lat_max come from instance_bounding_box (world frame).
+    const Vec3d  plate_origin = plate->get_origin();
+    const double lat_origin   = plate_origin[belt_is_y ? 0 : 1];
+    const double inset        = 1.;
+    double       lat_center   = lat_max + 5. + 0.5 * width; // fallback: just past the parts
+    BoundingBoxf bed_ext_dbg;
     if (const auto *bed_opt = printer_config.option<ConfigOptionPoints>("printable_area");
         bed_opt != nullptr && !bed_opt->values.empty()) {
         const BoundingBoxf bed_ext     = get_extents(bed_opt->values);
+        bed_ext_dbg = bed_ext;
         const double       bed_lat_max = belt_is_y ? bed_ext.max.x() : bed_ext.max.y();
-        lat_center = bed_lat_max - inset - 0.5 * width;
+        lat_center = lat_origin + bed_lat_max - inset - 0.5 * width;
     }
+
+    // Ground-truth diagnostic for placement frames (warning level so it lands
+    // in the GUI debug log): plate origin, bed extents, parts bbox, result.
+    BOOST_LOG_TRIVIAL(warning) << "[BELT-DEBUG] purge place"
+        << " plate_origin=(" << plate_origin.x() << "," << plate_origin.y() << ")"
+        << " parts_x=[" << x_min << "," << x_max << "] parts_y=[" << y_min << "," << y_max << "] z_max=" << z_max
+        << " bed_ext=[" << bed_ext_dbg.min.x() << "," << bed_ext_dbg.min.y()
+        << " -> " << bed_ext_dbg.max.x() << "," << bed_ext_dbg.max.y() << "]"
+        << " lat_center=" << lat_center << " belt=[" << belt_start << "," << belt_end << "]";
 
     // Orient the bar: long axis = belt travel, width = lateral, height = Z.
     const double size_x = belt_is_y ? width  : length;
