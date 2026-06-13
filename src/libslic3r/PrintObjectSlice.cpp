@@ -1392,51 +1392,6 @@ void apply_fuzzy_skin_segmentation(PrintObject &print_object, ThrowOnCancel thro
     }); // end of parallel_for
 }
 
-// Belt mode: shift the sliced layer grid by delta. Mirrors the global_z_offset
-// application in slice() — layer print_z and belt_floor_z_shift move together
-// so belt floor clipping stays consistent with the shifted grid. Used by
-// Print::_align_belt_purge_layers() to snap the purge prism onto the printed
-// objects' layer grid; |delta| <= half a layer height, i.e. a sub-layer shift
-// of the prism along the belt.
-void PrintObject::belt_shift_layer_grid(double delta)
-{
-    if (std::abs(delta) < EPSILON)
-        return;
-    for (Layer *layer : m_layers)
-        layer->print_z += delta;
-    for (SupportLayer *layer : m_support_layers)
-        layer->print_z += delta;
-    m_slicing_params.belt_floor_z_shift += delta;
-    BOOST_LOG_TRIVIAL(trace) << "[BELT-DEBUG] belt_shift_layer_grid"
-        << " obj=" << this->model_object()->name
-        << " delta=" << delta
-        << " first_layer.print_z=" << (m_layers.empty() ? 0. : m_layers.front()->print_z);
-}
-
-// Belt mode: drop layers strictly above z (used to cancel the purge prism early
-// once there are no more toolchanges above z, so the tower stops at the last
-// color swap instead of wasting filament up the rest of the belt). Each layer's
-// cross-section is already sliced, so removing upper layers does not affect the
-// last toolchange's coverage. Deletes the Layer objects and clears the new top
-// layer's upper-layer link. Returns the number of layers removed.
-size_t PrintObject::belt_truncate_layers_above(coordf_t z)
-{
-    size_t keep = m_layers.size();
-    while (keep > 0 && m_layers[keep - 1]->print_z > z + EPSILON)
-        --keep;
-    if (keep >= m_layers.size())
-        return 0;
-    const size_t removed = m_layers.size() - keep;
-    for (size_t i = keep; i < m_layers.size(); ++i)
-        delete m_layers[i];
-    m_layers.resize(keep);
-    if (!m_layers.empty())
-        m_layers.back()->upper_layer = nullptr;
-    BOOST_LOG_TRIVIAL(debug) << "[BELT-DEBUG] truncate purge prism above print_z=" << z
-        << " kept=" << keep << " removed=" << removed
-        << " new_top=" << (m_layers.empty() ? 0. : m_layers.back()->print_z);
-    return removed;
-}
 
 // 1) Decides Z positions of the layers,
 // 2) Initializes layers and their regions
