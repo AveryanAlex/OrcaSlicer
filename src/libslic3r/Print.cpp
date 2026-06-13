@@ -4345,6 +4345,27 @@ void Print::_plan_belt_purge()
     const bool  use_flush_matrix = m_config.purge_in_prime_tower && m_config.single_extruder_multi_material;
     const float flush_multiplier = (float) m_config.flush_multiplier.get_at(0);
 
+    // Cancel the purge prism early: pre-scan the tool ordering for the highest
+    // print_z that actually has a toolchange, then drop the prism's layers above
+    // it so the tower stops at the last color swap (saves filament/time). This
+    // MUST happen before the marking loop below: ensure_perimeters_infills_order
+    // force-overrides the prism's extrusions on every layer (it is a dedicated
+    // flush object), so truncating afterwards would leave dangling overrides
+    // pointing into deleted layers.
+    {
+        double       last_tc_z   = -1.;
+        unsigned int cur_ext     = m_wipe_tower_data.tool_ordering.first_extruder();
+        for (const auto &lt : m_wipe_tower_data.tool_ordering.layer_tools())
+            for (const unsigned int e : lt.extruders)
+                if (e != cur_ext) { last_tc_z = lt.print_z; cur_ext = e; }
+        if (last_tc_z >= 0.)
+            for (PrintObject *po : m_objects)
+                if (po->config().belt_purge_tower_object.value) {
+                    po->belt_truncate_layers_above(last_tc_z);
+                    break;
+                }
+    }
+
     // Diagnostic: the prism only absorbs purge at toolchange layers whose
     // print_z coincides with one of its own layers. Compare the prism's layer
     // print_z range to the toolchange print_z range and count how many

@@ -1413,6 +1413,31 @@ void PrintObject::belt_shift_layer_grid(double delta)
         << " first_layer.print_z=" << (m_layers.empty() ? 0. : m_layers.front()->print_z);
 }
 
+// Belt mode: drop layers strictly above z (used to cancel the purge prism early
+// once there are no more toolchanges above z, so the tower stops at the last
+// color swap instead of wasting filament up the rest of the belt). Each layer's
+// cross-section is already sliced, so removing upper layers does not affect the
+// last toolchange's coverage. Deletes the Layer objects and clears the new top
+// layer's upper-layer link. Returns the number of layers removed.
+size_t PrintObject::belt_truncate_layers_above(coordf_t z)
+{
+    size_t keep = m_layers.size();
+    while (keep > 0 && m_layers[keep - 1]->print_z > z + EPSILON)
+        --keep;
+    if (keep >= m_layers.size())
+        return 0;
+    const size_t removed = m_layers.size() - keep;
+    for (size_t i = keep; i < m_layers.size(); ++i)
+        delete m_layers[i];
+    m_layers.resize(keep);
+    if (!m_layers.empty())
+        m_layers.back()->upper_layer = nullptr;
+    BOOST_LOG_TRIVIAL(debug) << "[BELT-DEBUG] truncate purge prism above print_z=" << z
+        << " kept=" << keep << " removed=" << removed
+        << " new_top=" << (m_layers.empty() ? 0. : m_layers.back()->print_z);
+    return removed;
+}
+
 // 1) Decides Z positions of the layers,
 // 2) Initializes layers and their regions
 // 3) Slices the object meshes

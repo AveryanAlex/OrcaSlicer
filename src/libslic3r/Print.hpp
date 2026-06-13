@@ -562,6 +562,9 @@ private:
     // clipping shift) by delta, used by Print::_align_belt_purge_layers() to
     // snap the purge prism's layers onto the printed objects' layer grid.
     void belt_shift_layer_grid(double delta);
+    // Belt mode: remove layers above z (cancel the purge prism past the last
+    // toolchange). Returns how many layers were dropped.
+    size_t belt_truncate_layers_above(coordf_t z);
     //BBS
     ExPolygons _shrink_contour_holes(double contour_delta, double hole_delta, const ExPolygons& polys) const;
     // BBS
