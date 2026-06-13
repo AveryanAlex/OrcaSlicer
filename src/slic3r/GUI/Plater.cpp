@@ -9010,6 +9010,7 @@ bool Plater::priv::ensure_belt_purge_tower()
     if ((rot == BeltRotationAxis::X || rot == BeltRotationAxis::Y) && angle_opt != nullptr && std::abs(angle_opt->value) > EPSILON)
         theta = std::clamp(Geometry::deg2rad(std::abs(angle_opt->value)), Geometry::deg2rad(5.), M_PI / 2.);
     const double sin_t = std::sin(theta);
+    const double cot_t = std::cos(theta) / sin_t;
 
     // Parts' extent along the belt-travel axis and the lateral (across-belt) axis.
     const double belt_min = belt_is_y ? y_min : x_min;
@@ -9074,20 +9075,22 @@ bool Plater::priv::ensure_belt_purge_tower()
         return false; // already up to date — do not touch the model
 
     // --- Position ----------------------------------------------------------
-    // Belt-travel axis: span the parts' belt band, extended at BOTH tilted ends
-    // by the ramp allowance. The bar's tilted ends are triangular ramps where a
-    // slicing plane cuts less than the full height, so those layers can't hold a
-    // full purge. Pull the leading edge toward Y=0 below the parts' minimum and
-    // push the trailing edge past the parts' maximum, each by height/sin(theta)
-    // (= sqrt(2)*height at 45 deg), so the full-cross-section region covers the
-    // whole parts' band and every toolchange layer gets a full slice of the bar.
-    // (Filament changes happen over the parts' belt band — empirically the tower
-    // must sit there, anchored near the parts' Y-min, to clear the "cannot
-    // absorb" warning.)
+    // Belt-travel axis. With the mesh rotated by theta before slicing, a machine
+    // point (y,z) maps to slicing-Z = y*sin(theta) + z*cos(theta). The parts
+    // occupy slicing-Z in [y_min*sin, y_max*sin + z_max*cos], and the bar's
+    // FULL-cross-section region (the part not in a triangular end ramp) spans
+    // slicing-Z [belt_start*sin + H*cos, belt_end*sin]. Covering the parts'
+    // whole band therefore needs:
+    //   - leading edge  belt_start <= y_min - H*cot(theta)      (bar's own ramp)
+    //   - trailing edge belt_end   >= y_max + z_max*cot(theta)  (parts' top
+    //     features print further up the belt, so the bar must reach there).
+    // The leading side uses the bar-ramp allowance height/sin (>= H*cot, slight
+    // over-cover); the trailing side adds the parts' height projection
+    // z_max*cot, which dominates the bar's own ramp.
     const double margin            = 5.;
     const double ramp_compensation = height / sin_t;
-    const double belt_start   = std::max(0.0, belt_min - ramp_compensation);  // leading ramp, toward Y=0
-    const double belt_end     = belt_max + margin + ramp_compensation;        // trailing ramp, past the parts
+    const double belt_start   = std::max(0.0, belt_min - ramp_compensation);             // leading ramp, toward Y=0
+    const double belt_end     = belt_max + margin + ramp_compensation + z_max * cot_t;   // + parts' top-feature belt reach
     const double length       = std::max(belt_end - belt_start, 10.);
     const double belt_center  = 0.5 * (belt_start + belt_end);
 
