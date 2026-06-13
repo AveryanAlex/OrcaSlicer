@@ -9074,17 +9074,22 @@ bool Plater::priv::ensure_belt_purge_tower()
         return false; // already up to date — do not touch the model
 
     // --- Position ----------------------------------------------------------
-    // Belt-travel axis: anchor the bar at the parts' belt-axis MINIMUM and span
-    // just the parts' belt extent (+ small margin). Filament changes happen
-    // over the parts' belt band, so the bar must sit there to absorb them;
-    // extending it far up the belt moves its body away from the toolchange
-    // layers and the purge goes unabsorbed (empirically, moving the tower
-    // toward the parts' Y-min clears the "cannot absorb" warning).
-    const double margin      = 5.;
-    const double belt_start  = belt_min;                 // parts' belt-axis minimum
-    const double belt_end    = belt_max + margin;        // just past the parts — stay low / near the parts
-    const double length      = std::max(belt_end - belt_start, 10.);
-    const double belt_center = 0.5 * (belt_start + belt_end);
+    // Belt-travel axis: span the parts' belt band, extended at BOTH tilted ends
+    // by the ramp allowance. The bar's tilted ends are triangular ramps where a
+    // slicing plane cuts less than the full height, so those layers can't hold a
+    // full purge. Pull the leading edge toward Y=0 below the parts' minimum and
+    // push the trailing edge past the parts' maximum, each by height/sin(theta)
+    // (= sqrt(2)*height at 45 deg), so the full-cross-section region covers the
+    // whole parts' band and every toolchange layer gets a full slice of the bar.
+    // (Filament changes happen over the parts' belt band — empirically the tower
+    // must sit there, anchored near the parts' Y-min, to clear the "cannot
+    // absorb" warning.)
+    const double margin            = 5.;
+    const double ramp_compensation = height / sin_t;
+    const double belt_start   = std::max(0.0, belt_min - ramp_compensation);  // leading ramp, toward Y=0
+    const double belt_end     = belt_max + margin + ramp_compensation;        // trailing ramp, past the parts
+    const double length       = std::max(belt_end - belt_start, 10.);
+    const double belt_center  = 0.5 * (belt_start + belt_end);
 
     // Across-belt: flush against the bed's maximum edge, inset by half the bar
     // width so the bar's far edge sits on the boundary and the whole bar stays
