@@ -9041,12 +9041,19 @@ bool Plater::priv::ensure_belt_purge_tower()
     }
     const double v_layer = double(filaments.size() - 1) * max_flush;
 
-    // One tilted slicing plane cuts a width x (height/sin) rectangle out of
-    // the prism interior; one layer slab absorbs that area x layer height.
-    const double eta    = 0.85; // perimeters/infill packing safety factor
-    double       height = v_layer * sin_t / (width * layer_h * eta);
+    // Height from the per-layer purge demand. A tilted slicing plane cuts a
+    // width x (height/sin) rectangle out of the bar, so one layer slab absorbs
+    // width * (height/sin) * layer_height of purge. Solve for the height that
+    // holds the worst-case per-layer purge, with:
+    //   eta    - infill/perimeter packing (not all of the cross-section is solid)
+    //   safety - margin for the tilt ramp at the bar ends and layer-grid
+    //            alignment slop, where a layer cuts less than the full section
+    // and a minimum so the tower is a real printable body rather than a sliver.
+    const double eta    = 0.85;
+    const double safety = 1.6;
     const double printable_height = printer_config.has("printable_height") ? printer_config.opt_float("printable_height") : 250.;
-    height = std::clamp(height, 2. * layer_h, std::max(2. * layer_h, printable_height));
+    double       height = safety * v_layer * sin_t / (width * layer_h * eta);
+    height = std::clamp(height, 8.0, std::max(8.0, printable_height));
 
     // --- Idempotence (input-keyed) ----------------------------------------
     // Key on the generation inputs, NOT the prism's resulting bbox: plate
@@ -9068,28 +9075,31 @@ bool Plater::priv::ensure_belt_purge_tower()
         return false; // already up to date — do not touch the model
 
     // --- Position ----------------------------------------------------------
-    // Lay the bar along the belt, anchored at the parts' belt-axis minimum so
-    // it leads the print at the belt entry. A tilted slicing plane through a
-    // part of height z reaches belt position y + z*cot(theta), so extend the
-    // trailing end to cover the tallest part's upper toolchanges plus the
-    // prism's own tilt span.
+    // Default belt-printer placement (per user request):
+    //  - belt-travel axis: anchored at the parts' belt-axis MINIMUM (the belt
+    //    entry / parts' min Y for an X-rotation belt) so the tower leads in.
+    //  - across-belt axis: parked right up against the bed's MAXIMUM edge
+    //    (max X for an X-rotation belt), out of the way of the parts.
+    // The bar extends from the parts' belt minimum past the parts; a tilted
+    // slicing plane through a part of height z reaches belt position
+    // y + z*cot(theta), so the trailing end covers the tallest part's upper
+    // toolchanges plus the bar's own tilt span.
     const double margin      = 5.;
-    const double belt_start  = belt_min - margin;                            // anchored at parts' belt minimum
+    const double belt_start  = belt_min;                                     // parts' belt-axis minimum
     const double belt_end    = belt_max + (z_max + height) * cot_t + margin; // trailing tilt allowance
     const double length      = std::max(belt_end - belt_start, 10.);
     const double belt_center = 0.5 * (belt_start + belt_end);
 
-    // Lateral placement: just beside the parts (the -lateral side by default,
-    // flipping to the +lateral side if that would fall off the bed).
+    // Across-belt: flush against the bed's maximum edge (small inset), falling
+    // back to just past the parts if the bed shape is unavailable.
     const Vec3d  plate_origin = plate->get_origin();
-    const double gap        = 5.;
-    double       lat_center = lat_min - gap - 0.5 * width;
+    const double inset      = 1.;
+    double       lat_center = lat_max + 5. + 0.5 * width;
     if (const auto *bed_opt = printer_config.option<ConfigOptionPoints>("printable_area");
         bed_opt != nullptr && !bed_opt->values.empty()) {
-        const BoundingBoxf bed_ext   = get_extents(bed_opt->values);
-        const double       bed_lat_min = plate_origin[belt_is_y ? 0 : 1] + (belt_is_y ? bed_ext.min.x() : bed_ext.min.y());
-        if (lat_center - 0.5 * width < bed_lat_min)
-            lat_center = lat_max + gap + 0.5 * width; // not enough room on the -lateral side
+        const BoundingBoxf bed_ext     = get_extents(bed_opt->values);
+        const double       bed_lat_max = plate_origin[belt_is_y ? 0 : 1] + (belt_is_y ? bed_ext.max.x() : bed_ext.max.y());
+        lat_center = bed_lat_max - inset - 0.5 * width;
     }
 
     // Orient the bar: long axis = belt travel, width = lateral, height = Z.

@@ -4345,6 +4345,21 @@ void Print::_plan_belt_purge()
     const bool  use_flush_matrix = m_config.purge_in_prime_tower && m_config.single_extruder_multi_material;
     const float flush_multiplier = (float) m_config.flush_multiplier.get_at(0);
 
+    // Diagnostic: the prism only absorbs purge at toolchange layers whose
+    // print_z coincides with one of its own layers. Compare the prism's layer
+    // print_z range to the toolchange print_z range and count how many
+    // toolchange layers actually land on a prism layer. This distinguishes a
+    // range/grid-alignment failure (no coverage) from a capacity shortfall
+    // (covered but not enough cross-section).
+    const PrintObject *diag_prism = nullptr;
+    for (const PrintObject *po : m_objects)
+        if (po->config().belt_purge_tower_object.value && !po->layers().empty()) { diag_prism = po; break; }
+    if (diag_prism != nullptr)
+        BOOST_LOG_TRIVIAL(warning) << "[BELT-DEBUG] purge prism layer range print_z=["
+            << diag_prism->layers().front()->print_z << ", " << diag_prism->layers().back()->print_z
+            << "] nlayers=" << diag_prism->layers().size();
+    int tc_layers = 0, tc_layers_covered = 0;
+
     float  total_leftover      = 0.f;
     float  worst_layer_leftover = 0.f;
     double worst_layer_z       = 0.;
@@ -4352,9 +4367,16 @@ void Print::_plan_belt_purge()
     unsigned int current_extruder_id = m_wipe_tower_data.tool_ordering.first_extruder();
     for (auto &layer_tools : m_wipe_tower_data.tool_ordering.layer_tools()) {
         float layer_leftover = 0.f;
+        bool  layer_has_tc   = false;
         for (const unsigned int extruder_id : layer_tools.extruders) {
             if (extruder_id == current_extruder_id)
                 continue;
+            if (!layer_has_tc) {
+                layer_has_tc = true;
+                ++tc_layers;
+                if (diag_prism != nullptr && diag_prism->get_layer_at_printz(layer_tools.print_z, EPSILON) != nullptr)
+                    ++tc_layers_covered;
+            }
             float volume_to_wipe = use_flush_matrix ?
                 wipe_volumes[current_extruder_id][extruder_id] * flush_multiplier :
                 (float) m_config.prime_volume;
@@ -4378,6 +4400,11 @@ void Print::_plan_belt_purge()
         }
         this->throw_if_canceled();
     }
+
+    BOOST_LOG_TRIVIAL(warning) << "[BELT-DEBUG] purge coverage: " << tc_layers_covered << "/" << tc_layers
+        << " toolchange layers land on a prism layer"
+        << (tc_layers > 0 && tc_layers_covered == 0 ? " (RANGE/GRID MISALIGNMENT — prism absorbs nothing)" :
+            tc_layers_covered < tc_layers ? " (partial coverage)" : " (full coverage)");
 
     if (total_leftover > 1.f) {
         this->active_step_add_warning(
