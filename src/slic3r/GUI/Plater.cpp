@@ -5479,6 +5479,21 @@ struct Plater::priv
     // config and plate contents. Returns true when the model was mutated
     // (caller should refresh the scene).
     bool ensure_belt_purge_tower();
+    // Inputs of the last belt purge prism generation. Idempotence is keyed on
+    // these (not the prism's resulting bbox): the prism gets nudged by plate
+    // assignment after creation, so comparing its bbox would falsely detect a
+    // change and regenerate it on every background-process tick — which would
+    // re-invalidate a freshly sliced result and make the preview unreachable.
+    struct BeltPurgeSignature {
+        bool   valid = false;
+        int    filament_count = 0;
+        long   key[7] = {0};   // rounded geometry inputs (0.1 mm units)
+        bool operator==(const BeltPurgeSignature &o) const {
+            if (valid != o.valid || filament_count != o.filament_count) return false;
+            for (int i = 0; i < 7; ++i) if (key[i] != o.key[i]) return false;
+            return true;
+        }
+    } m_belt_purge_sig;
     void delete_all_objects_from_model();
     void reset(bool apply_presets_change = false);
     void center_selection();
@@ -8933,6 +8948,8 @@ bool Plater::priv::ensure_belt_purge_tower()
     // current plate (1-based filament ids; volume extruder 0 = object default).
     PartPlate    *plate = partplate_list.get_curr_plate();
     std::set<int> filaments;
+    double        x_min = std::numeric_limits<double>::max();
+    double        x_max = -std::numeric_limits<double>::max();
     double        y_min = std::numeric_limits<double>::max();
     double        y_max = -std::numeric_limits<double>::max();
     double        z_max = 0.;
@@ -8951,6 +8968,8 @@ bool Plater::priv::ensure_belt_purge_tower()
                     continue;
                 any_instance_on_plate = true;
                 const BoundingBoxf3 bb = mo->instance_bounding_box(inst_idx);
+                x_min = std::min(x_min, bb.min.x());
+                x_max = std::max(x_max, bb.max.x());
                 y_min = std::min(y_min, bb.min.y());
                 y_max = std::max(y_max, bb.max.y());
                 z_max = std::max(z_max, bb.max.z());
@@ -8966,10 +8985,11 @@ bool Plater::priv::ensure_belt_purge_tower()
 
     const bool wanted = belt && prime_tower_enabled && !by_object && have_objects && filaments.size() > 1;
     if (!wanted) {
+        m_belt_purge_sig = BeltPurgeSignature{};
         if (prism_idxs.empty())
             return false;
         remove_prisms(prism_idxs);
-        BOOST_LOG_TRIVIAL(info) << "[BELT-DEBUG] belt purge tower removed (conditions not met)";
+        BOOST_LOG_TRIVIAL(warning) << "[BELT-DEBUG] belt purge tower removed (conditions not met)";
         return true;
     }
 
@@ -8977,16 +8997,26 @@ bool Plater::priv::ensure_belt_purge_tower()
     const double width   = print_config.has("belt_purge_tower_width") ? std::max(1., print_config.opt_float("belt_purge_tower_width")) : 35.;
     const double layer_h = print_config.has("layer_height") ? print_config.opt_float("layer_height") : 0.2;
 
-    // Belt tilt: standard belt printers rotate about X. For other axes (or no
-    // rotation) fall back to vertical slicing geometry (theta = 90 deg); the
-    // backend leftover warning catches any resulting under-absorption.
-    double      theta    = M_PI / 2.;
-    const auto *axis_opt = printer_config.option<ConfigOptionEnum<BeltRotationAxis>>("belt_slice_rotation");
+    // Belt geometry. The rotation axis is the gantry tilt axis; the belt
+    // travels along the *other* horizontal axis (X-rotation -> belt along Y,
+    // the CR-30 default). The purge prism is a long bar laid along the belt
+    // travel direction, beside the parts. For no/Z rotation we fall back to
+    // vertical slicing geometry (theta = 90 deg).
+    const auto *axis_opt  = printer_config.option<ConfigOptionEnum<BeltRotationAxis>>("belt_slice_rotation");
     const auto *angle_opt = printer_config.option<ConfigOptionFloat>("belt_slice_rotation_angle");
-    if (axis_opt != nullptr && axis_opt->value == BeltRotationAxis::X && angle_opt != nullptr && std::abs(angle_opt->value) > EPSILON)
+    const BeltRotationAxis rot = axis_opt != nullptr ? axis_opt->value : BeltRotationAxis::X;
+    const bool   belt_is_y = (rot != BeltRotationAxis::Y); // X / None / Z -> belt along Y
+    double       theta     = M_PI / 2.;
+    if ((rot == BeltRotationAxis::X || rot == BeltRotationAxis::Y) && angle_opt != nullptr && std::abs(angle_opt->value) > EPSILON)
         theta = std::clamp(Geometry::deg2rad(std::abs(angle_opt->value)), Geometry::deg2rad(5.), M_PI / 2.);
     const double sin_t = std::sin(theta);
     const double cot_t = std::cos(theta) / sin_t;
+
+    // Parts' extent along the belt-travel axis and the lateral (across-belt) axis.
+    const double belt_min = belt_is_y ? y_min : x_min;
+    const double belt_max = belt_is_y ? y_max : x_max;
+    const double lat_min  = belt_is_y ? x_min : y_min;
+    const double lat_max  = belt_is_y ? x_max : y_max;
 
     // Worst-case purge volume of one layer: up to (filament count - 1)
     // toolchanges, each needing the worst flush matrix entry (mirrors the
@@ -9018,41 +9048,56 @@ bool Plater::priv::ensure_belt_purge_tower()
     const double printable_height = printer_config.has("printable_height") ? printer_config.opt_float("printable_height") : 250.;
     height = std::clamp(height, 2. * layer_h, std::max(2. * layer_h, printable_height));
 
-    // Length along the belt: cover the objects' Y extent; a slicing plane
-    // spans height*cot(theta) of belt travel, so pad both ends with the full
-    // lead-in (tilt sign is padded symmetrically) plus the objects' top
-    // overhang along the belt.
-    const double margin  = 10.;
-    const double lead    = height * cot_t;
-    double       y_start = y_min - lead - margin;
-    double       y_end   = y_max + (z_max + height) * cot_t + margin;
+    // --- Idempotence (input-keyed) ----------------------------------------
+    // Key on the generation inputs, NOT the prism's resulting bbox: plate
+    // assignment nudges the prism after creation, so a bbox comparison sees a
+    // "change" every tick and regenerates the prism, which re-invalidates any
+    // freshly sliced result and makes the G-code preview unreachable.
+    auto q = [](double v) { return std::lround(v * 10.0); }; // 0.1 mm quantization
+    BeltPurgeSignature sig;
+    sig.valid          = true;
+    sig.filament_count = (int) filaments.size();
+    sig.key[0] = q(width);
+    sig.key[1] = q(layer_h);
+    sig.key[2] = q(height);
+    sig.key[3] = q(belt_min);
+    sig.key[4] = q(belt_max);
+    sig.key[5] = q(lat_min);
+    sig.key[6] = q(z_max);
+    if (prism_idxs.size() == 1 && sig == m_belt_purge_sig)
+        return false; // already up to date — do not touch the model
 
-    const Vec3d plate_origin = plate->get_origin();
-    const auto *bed_opt      = printer_config.option<ConfigOptionPoints>("printable_area");
-    const bool  infinite_y   = printer_config.has("belt_printer_infinite_y") && printer_config.opt_bool("belt_printer_infinite_y");
-    double      lane_x       = plate_origin.x() + 5.; // fallback left lane
-    if (bed_opt != nullptr && !bed_opt->values.empty()) {
-        const BoundingBoxf bed_ext = get_extents(bed_opt->values);
-        lane_x = plate_origin.x() + bed_ext.min.x() + 5.;
-        if (!infinite_y) {
-            y_start = std::max(y_start, plate_origin.y() + bed_ext.min.y() + 1.);
-            y_end   = std::min(y_end, plate_origin.y() + bed_ext.max.y() - 1.);
-        }
+    // --- Position ----------------------------------------------------------
+    // Lay the bar along the belt, anchored at the parts' belt-axis minimum so
+    // it leads the print at the belt entry. A tilted slicing plane through a
+    // part of height z reaches belt position y + z*cot(theta), so extend the
+    // trailing end to cover the tallest part's upper toolchanges plus the
+    // prism's own tilt span.
+    const double margin      = 5.;
+    const double belt_start  = belt_min - margin;                            // anchored at parts' belt minimum
+    const double belt_end    = belt_max + (z_max + height) * cot_t + margin; // trailing tilt allowance
+    const double length      = std::max(belt_end - belt_start, 10.);
+    const double belt_center = 0.5 * (belt_start + belt_end);
+
+    // Lateral placement: just beside the parts (the -lateral side by default,
+    // flipping to the +lateral side if that would fall off the bed).
+    const Vec3d  plate_origin = plate->get_origin();
+    const double gap        = 5.;
+    double       lat_center = lat_min - gap - 0.5 * width;
+    if (const auto *bed_opt = printer_config.option<ConfigOptionPoints>("printable_area");
+        bed_opt != nullptr && !bed_opt->values.empty()) {
+        const BoundingBoxf bed_ext   = get_extents(bed_opt->values);
+        const double       bed_lat_min = plate_origin[belt_is_y ? 0 : 1] + (belt_is_y ? bed_ext.min.x() : bed_ext.min.y());
+        if (lat_center - 0.5 * width < bed_lat_min)
+            lat_center = lat_max + gap + 0.5 * width; // not enough room on the -lateral side
     }
-    const double length = std::max(y_end - y_start, 10.);
 
-    const Vec3d desired_size(width, length, height);
-    const Vec3d desired_center(lane_x + 0.5 * width, y_start + 0.5 * length, 0.5 * height);
-
-    // --- Idempotence check -------------------------------------------------
-    // Coarse tolerances so object nudges and sizing jitter do not regenerate
-    // the prism on every background-process tick.
-    if (prism_idxs.size() == 1) {
-        const ModelObject  *prism = model.objects[prism_idxs.front()];
-        const BoundingBoxf3 bb    = prism->bounding_box_exact();
-        if ((bb.size() - desired_size).cwiseAbs().maxCoeff() < 5. && (bb.center() - desired_center).cwiseAbs().maxCoeff() < 5.)
-            return false;
-    }
+    // Orient the bar: long axis = belt travel, width = lateral, height = Z.
+    const double size_x = belt_is_y ? width  : length;
+    const double size_y = belt_is_y ? length : width;
+    const Vec3d  desired_center(belt_is_y ? lat_center : belt_center,
+                                belt_is_y ? belt_center : lat_center,
+                                0.5 * height);
 
     // --- (Re)create ---------------------------------------------------------
     if (!prism_idxs.empty())
@@ -9061,7 +9106,7 @@ bool Plater::priv::ensure_belt_purge_tower()
     ModelObject *new_object = model.add_object();
     new_object->name        = _u8L("Belt Purge Tower");
     new_object->add_instance();
-    ModelVolume *new_volume = new_object->add_volume(make_cube(width, length, height));
+    ModelVolume *new_volume = new_object->add_volume(make_cube(size_x, size_y, height));
     new_volume->name        = new_object->name;
 
     auto &cfg = new_object->config;
@@ -9093,12 +9138,17 @@ bool Plater::priv::ensure_belt_purge_tower()
     // selection is left untouched (auto-managed object).
     sidebar->obj_list()->add_object_to_list(obj_idx, /*call_selection_changed=*/false);
 
-    BOOST_LOG_TRIVIAL(info) << "[BELT-DEBUG] belt purge tower generated"
+    // Record the inputs that produced this prism so subsequent ticks are no-ops
+    // until the parts/config actually change.
+    m_belt_purge_sig = sig;
+
+    BOOST_LOG_TRIVIAL(warning) << "[BELT-DEBUG] belt purge tower generated"
+        << " belt_is_y=" << belt_is_y
         << " W=" << width << " L=" << length << " H=" << height
         << " v_layer=" << v_layer << " max_flush=" << max_flush
         << " filaments=" << filaments.size()
         << " theta_deg=" << Geometry::rad2deg(theta)
-        << " center=(" << desired_center.x() << "," << desired_center.y() << ")";
+        << " center=(" << desired_center.x() << "," << desired_center.y() << "," << desired_center.z() << ")";
     return true;
 }
 
