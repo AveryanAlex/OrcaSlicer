@@ -972,10 +972,13 @@ void ConfigManipulation::toggle_print_fff_options(DynamicPrintConfig *config, in
 
     bool have_prime_tower = config->opt_bool("enable_prime_tower");
     // ORCA-Belt: belt printers replace the classic wipe tower with the
-    // auto-generated belt purge prism — only its width is tunable; the
-    // classic tower geometry options do not apply. (is_belt_printer is
-    // computed at the top of this function.)
-    toggle_line("belt_purge_tower_width", have_prime_tower && is_belt_printer);
+    // auto-generated belt purge prism, enabled by the belt-only printer option
+    // enable_belt_purge_tower. Its width (a process option) is only relevant
+    // then. (is_belt_printer is computed at the top of this function.)
+    const bool have_belt_purge_tower = is_belt_printer
+        && preset_bundle->printers.get_edited_preset().config.has("enable_belt_purge_tower")
+        && preset_bundle->printers.get_edited_preset().config.opt_bool("enable_belt_purge_tower");
+    toggle_line("belt_purge_tower_width", have_belt_purge_tower);
     for (auto el : {"prime_tower_width", "prime_tower_brim_width", "prime_tower_skip_points", "wipe_tower_wall_type", "prime_tower_infill_gap","prime_tower_enable_framework", "enable_tower_interface_features"})
         toggle_line(el, have_prime_tower && !is_belt_printer);
 

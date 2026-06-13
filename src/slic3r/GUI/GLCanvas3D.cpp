@@ -2948,6 +2948,28 @@ void GLCanvas3D::reload_scene(bool refresh_immediately, bool force_full_scene_re
     }
 
     update_volumes_colors_by_extruder();
+
+    // ORCA-Belt: render the auto-generated belt purge prism like a wipe tower —
+    // semi-transparent, in its (filament) color. It is a real sliced object, so
+    // the G-code preview already shows the actual per-layer purge colors; here in
+    // the editor we just make the block translucent so it reads as a purge tower
+    // rather than a solid part. update_colors_by_extruder() preserves alpha when
+    // not updating alpha, so lowering it once sticks across recolors.
+    if (m_model != nullptr) {
+        for (GLVolume *volume : m_volumes.volumes) {
+            if (volume == nullptr || volume->volume_idx() < 0)
+                continue;
+            const int obj_idx = volume->object_idx();
+            if (obj_idx < 0 || obj_idx >= (int) m_model->objects.size())
+                continue;
+            const ConfigOption *opt = m_model->objects[obj_idx]->config.option("belt_purge_tower_object");
+            if (opt != nullptr && opt->getBool()) {
+                volume->color.a(0.66f);
+                volume->force_transparent = true;
+            }
+        }
+    }
+
 	// Update selection indices based on the old/new GLVolumeCollection.
     if (m_selection.get_mode() == Selection::Instance)
         m_selection.instances_changed(instance_ids_selected);

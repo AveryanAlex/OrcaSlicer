@@ -7321,6 +7321,17 @@ void PrintConfigDef::init_fff_params()
         def->set_default_value(new ConfigOptionEnum<BeltSupportZOffsetMode>(BeltSupportZOffsetMode::Unconditional));
     }
 
+    def = this->add("enable_belt_purge_tower", coBool);
+    def->label = L("Enable belt purge tower");
+    def->category = L("Multimaterial");
+    def->tooltip = L("Belt-printer replacement for the wipe/prime tower. When enabled on a belt "
+                     "printer, a purge prism is automatically generated next to the printed parts "
+                     "and filament-change purging is routed into it (the classic wipe tower cannot "
+                     "be used on belt printers because its G-code bypasses the belt transform). "
+                     "Only available on belt printers.");
+    def->mode = comAdvanced;
+    def->set_default_value(new ConfigOptionBool(false));
+
     def = this->add("belt_purge_tower_width", coFloat);
     def->label = L("Belt purge tower width");
     def->category = L("Printable space");

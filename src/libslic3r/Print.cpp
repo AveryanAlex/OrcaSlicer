@@ -359,6 +359,7 @@ bool Print::invalidate_state_by_config_options(const ConfigOptionResolver & /* n
             || opt_key == "hot_plate_temp"
             || opt_key == "textured_plate_temp"
             || opt_key == "enable_prime_tower"
+            || opt_key == "enable_belt_purge_tower"
             || opt_key == "enable_wrapping_detection"
             || opt_key == "prime_tower_enable_framework"
             || opt_key == "prime_tower_width"
@@ -1474,16 +1475,18 @@ StringObjectException Print::validate(std::vector<StringObjectException> *warnin
             add_warning(layer_warning);
     }
 
+    if (m_config.belt_printer.value && m_config.enable_belt_purge_tower.value
+        && m_config.print_sequence == PrintSequence::ByObject
+        && extruders.size() > 1 && warning != nullptr) {
+        StringObjectException warningtemp;
+        warningtemp.string     = L("The belt purge tower is not generated in \"By object\" print sequence; "
+                                   "filament changes will not be purged.");
+        warningtemp.opt_key    = "enable_belt_purge_tower";
+        warningtemp.is_warning = true;
+        *warning               = warningtemp;
+    }
+
     if (m_config.enable_prime_tower) {
-        if (m_config.belt_printer.value && m_config.print_sequence == PrintSequence::ByObject
-            && extruders.size() > 1 && warning != nullptr) {
-            StringObjectException warningtemp;
-            warningtemp.string     = L("The belt purge tower is not generated in \"By object\" print sequence; "
-                                       "filament changes will not be purged.");
-            warningtemp.opt_key    = "enable_prime_tower";
-            warningtemp.is_warning = true;
-            *warning               = warningtemp;
-        }
         for (const PrintObject* object : m_objects) {
             if (object->config().precise_z_height.value) {
                 warn(L("Enabling both precise Z height and the prime tower may cause slicing errors."), "precise_z_height");
@@ -4127,8 +4130,10 @@ bool Print::has_wipe_tower() const
 // prism object via the flush-into-objects machinery instead of a wipe tower.
 bool Print::has_belt_purge_tower() const
 {
+    // Its own purge-tower "type", gated by the belt-only enable_belt_purge_tower
+    // option (not the classic enable_prime_tower).
     return m_config.belt_printer.value
-        && m_config.enable_prime_tower.value
+        && m_config.enable_belt_purge_tower.value
         && !m_config.spiral_mode.value
         && m_config.filament_diameter.values.size() > 1;
 }

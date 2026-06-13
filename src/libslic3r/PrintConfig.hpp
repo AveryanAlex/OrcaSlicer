@@ -1807,6 +1807,9 @@ PRINT_CONFIG_CLASS_DERIVED_DEFINE(
     ((ConfigOptionEnum<BeltSupportZOffsetMode>,   belt_support_z_offset_mode))
     // Width (machine X, across the belt) of the auto-generated belt purge prism.
     ((ConfigOptionFloat,                          belt_purge_tower_width))
+    // Belt-printer-only "type" of purge tower: enables the auto-generated belt
+    // purge prism (the belt replacement for the classic wipe/prime tower).
+    ((ConfigOptionBool,                           enable_belt_purge_tower))
     //BBS
     ((ConfigOptionInts,               additional_cooling_fan_speed))
     ((ConfigOptionInts,               close_additional_fan_first_x_layers))
