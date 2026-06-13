@@ -9148,11 +9148,18 @@ bool Plater::priv::ensure_belt_purge_tower()
     cfg.set_key_value("seam_slope_type", new ConfigOptionEnum<SeamScarfType>(SeamScarfType::None));
     cfg.set_key_value("precise_z_height", new ConfigOptionBool(false));
 
+    // Position by the belt-calibration pattern: drop to the bed, then translate
+    // the instance by the delta between the object's ACTUAL bbox center and the
+    // target. Setting the instance offset directly is unreliable here — the
+    // freshly added cube's local frame is not centered, so set_offset() lands
+    // the min corner (not the center) on the target, leaving the bar centered
+    // on the bed edge with half of it hanging off.
     new_object->invalidate_bounding_box();
-    const BoundingBoxf3 mesh_bb = new_volume->mesh().bounding_box();
-    new_object->translate(-mesh_bb.center());
-    new_object->instances.front()->set_offset(desired_center);
     new_object->ensure_on_bed();
+    const BoundingBoxf3 cur = new_object->bounding_box_exact();
+    new_object->translate_instances(Vec3d(desired_center.x() - cur.center().x(),
+                                          desired_center.y() - cur.center().y(),
+                                          0.0));
     new_object->instances.front()->set_assemble_transformation(new_object->instances.front()->get_transformation());
 
     const size_t obj_idx = model.objects.size() - 1;
@@ -9170,7 +9177,9 @@ bool Plater::priv::ensure_belt_purge_tower()
         << " v_layer=" << v_layer << " max_flush=" << max_flush
         << " filaments=" << filaments.size()
         << " theta_deg=" << Geometry::rad2deg(theta)
-        << " center=(" << desired_center.x() << "," << desired_center.y() << "," << desired_center.z() << ")";
+        << " desired_center=(" << desired_center.x() << "," << desired_center.y() << "," << desired_center.z() << ")"
+        << " achieved_center=(" << new_object->bounding_box_exact().center().x() << ","
+        << new_object->bounding_box_exact().center().y() << ")";
     return true;
 }
 
