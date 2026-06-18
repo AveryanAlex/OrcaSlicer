@@ -55,9 +55,34 @@ bool ensure_belt_purge_tower(Model &model, PartPlateList &partplate_list, Object
         }
     };
 
-    const auto &printer_config = wxGetApp().preset_bundle->printers.get_edited_preset().config;
-    const auto &print_config   = wxGetApp().preset_bundle->prints.get_edited_preset().config;
-    auto       &project_config = wxGetApp().preset_bundle->project_config;
+    // Cheap early-out for non-belt printers: only belt printers ever get a belt
+    // purge tower, and this runs on every background-process tick — so avoid the
+    // full_config() merge below unless this is actually a belt printer. (Also
+    // tidies up a stale prism if the user switched away from a belt printer.)
+    {
+        const auto *belt_pre = wxGetApp().preset_bundle->printers.get_edited_preset().config.option<ConfigOptionBool>("belt_printer");
+        if (belt_pre == nullptr || !belt_pre->value) {
+            sig = BeltPurgeSignature{};
+            if (prism_idxs.empty())
+                return false;
+            remove_prisms(prism_idxs);
+            return true;
+        }
+    }
+
+    // Read every sizing input from the MERGED full config — the exact same
+    // config the backend slices with (BackgroundSlicingProcess::apply uses
+    // preset_bundle->full_config()). Reading from the individual presets caused
+    // GUI/backend mismatches: e.g. purge_in_prime_tower or a populated
+    // flush_volumes_matrix present in the merged config but false/empty in the
+    // preset the GUI happened to read, so the tower was sized for the small
+    // prime_volume instead of the real color-change flush and could not absorb
+    // it. The three names below alias the one merged config so the rest of the
+    // function is unchanged.
+    const DynamicPrintConfig  full_cfg       = wxGetApp().preset_bundle->full_config();
+    const DynamicPrintConfig &printer_config = full_cfg;
+    const DynamicPrintConfig &print_config   = full_cfg;
+    const DynamicPrintConfig &project_config = full_cfg;
 
     const auto *belt_opt = printer_config.option<ConfigOptionBool>("belt_printer");
     const bool  belt     = belt_opt != nullptr && belt_opt->value;
@@ -238,21 +263,44 @@ bool ensure_belt_purge_tower(Model &model, PartPlateList &partplate_list, Object
         << " -> " << bed_ext_dbg.max.x() << "," << bed_ext_dbg.max.y() << "]"
         << " lat_center=" << lat_center << " belt=[" << belt_start << "," << belt_end << "]";
 
-    // Orient the bar: long axis = belt travel, width = lateral, height = Z.
-    const double size_x = belt_is_y ? width  : length;
-    const double size_y = belt_is_y ? length : width;
     const Vec3d  desired_center(belt_is_y ? lat_center : belt_center,
                                 belt_is_y ? belt_center : lat_center,
                                 0.5 * height);
+
+    // Build the prism as N DISCONNECTED sub-bars side by side across the belt,
+    // N = (filaments - 1) = the worst-case number of toolchanges on one layer.
+    // Why: mark_wiping_extrusions overrides whole extrusion-entity COLLECTIONS,
+    // and each disconnected island slices into its own infill collection. With a
+    // single solid box there is one collection per layer, so the FIRST toolchange
+    // on a layer grabs the entire collection (consuming all of it for one swap)
+    // and any further swaps on that layer find nothing left and go unabsorbed
+    // (the classic wipe tower hides this by spilling leftover into the real
+    // tower; the belt prism has no fallback). One island per simultaneous swap
+    // lets each swap claim its own island. Total lateral footprint stays `width`
+    // (each island width/N wide, separated by a small gap), so per-layer capacity
+    // per island ~= max_flush, matching the height sizing.
+    const int    n_islands = std::max(1, (int) filaments.size() - 1);
+    const double gap       = 2.0;
+    const double w_sub     = std::max(1.0, (width - (n_islands - 1) * gap) / n_islands);
 
     // --- (Re)create ---------------------------------------------------------
     if (!prism_idxs.empty())
         remove_prisms(prism_idxs);
 
+    TriangleMesh prism_mesh;
+    for (int i = 0; i < n_islands; ++i) {
+        const double lat_off = i * (w_sub + gap);
+        // Box dims: lateral = w_sub, along-belt = length, vertical = height.
+        TriangleMesh box = belt_is_y ? make_cube(w_sub, length, height)   // X = lateral, Y = belt
+                                     : make_cube(length, w_sub, height);  // X = belt,    Y = lateral
+        box.translate(belt_is_y ? Vec3f((float) lat_off, 0.f, 0.f) : Vec3f(0.f, (float) lat_off, 0.f));
+        prism_mesh.merge(box);
+    }
+
     ModelObject *new_object = model.add_object();
     new_object->name        = _u8L("Belt Purge Tower");
     new_object->add_instance();
-    ModelVolume *new_volume = new_object->add_volume(make_cube(size_x, size_y, height));
+    ModelVolume *new_volume = new_object->add_volume(std::move(prism_mesh));
     new_volume->name        = new_object->name;
 
     auto &cfg = new_object->config;

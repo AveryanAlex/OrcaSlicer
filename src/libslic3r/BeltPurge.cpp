@@ -21,6 +21,8 @@
 #include "Exception.hpp"
 #include "GCode/ToolOrdering.hpp"
 #include "Layer.hpp"
+#include "ExtrusionEntity.hpp"
+#include "ExtrusionEntityCollection.hpp"
 #include "I18N.hpp"
 #include "format.hpp"
 #include "LocalesUtils.hpp"
@@ -46,16 +48,28 @@ bool Print::has_belt_purge_tower() const
         && m_config.filament_diameter.values.size() > 1;
 }
 
-// Belt mode: snap the purge prism's layer grid onto the printed objects' grid.
-// After belt slicing every object's layer print_z carries a per-object global
-// z offset (mesh-vertex-scan belt_z_shift + instance-Y-dependent terms), so
-// objects at different belt-Y positions do not share a layer grid. Purge
-// marking looks absorbers up with get_layer_at_printz(lt.print_z, EPSILON),
-// so the prism only absorbs purge at toolchange print_z values that coincide
-// with one of its own layers. Shifting the prism by at most half a layer
-// (a sub-layer-height displacement along the belt) makes its grid residue
-// match the reference object's; both grids step by the same layer height
-// (enforced by validate()), so matching residues means exact layer matches.
+// Belt mode: align ALL objects on the plate (the printed objects AND the purge
+// prism) onto one common layer grid, so the prism can absorb every toolchange.
+//
+// After belt slicing each object's layer print_z carries a per-object global z
+// offset (mesh-vertex-scan belt_z_shift + instance-Y-dependent terms), so
+// objects at different belt-Y positions get layer grids with DIFFERENT residues
+// (mod layer height). Purge marking looks absorbers up with
+// get_layer_at_printz(lt.print_z, EPSILON), so a toolchange on object B only
+// absorbs into the prism if the prism has a layer at B's print_z. Snapping only
+// the prism to one object therefore worked for a single (assembled) multi-color
+// object but failed with multiple separate objects — the prism could follow only
+// one grid, and toolchanges on the others went unabsorbed ("multiple layer
+// grids" warning).
+//
+// Fix: pick one reference grid (the tallest object) and shift every object onto
+// it. Each shift is at most half a layer height — a sub-100µm move along the
+// belt, the very same mechanism the per-object global_z_offset already uses, and
+// it keeps each object internally consistent (belt_shift_layer_grid moves the
+// object's layers, its support layers, and its belt floor together). Equal layer
+// height across objects is enforced by Print::validate(), so once residues match
+// every object steps on the same lattice {ref_offset + k*h} and every toolchange
+// layer coincides with a prism layer.
 void Print::_align_belt_purge_layers()
 {
     PrintObject *prism = nullptr;
@@ -73,13 +87,15 @@ void Print::_align_belt_purge_layers()
 
     // Grid residue of an object's layer grid: identical for all of an object's
     // layers above the first since they step by h.
-    auto grid_offset = [h](const PrintObject *po) {
+    auto grid_offset = [h](const PrintObject *po) -> double {
+        if (po->layers().empty())
+            return 0.;
         const double z = po->layers().front()->print_z;
         return z - std::floor(z / h) * h; // in [0, h)
     };
 
     // Reference grid: the tallest non-prism object (proxy for the object with
-    // the most toolchange layers).
+    // the most toolchange layers — minimizes how far the rest must move).
     const PrintObject *ref     = nullptr;
     double             ref_top = -std::numeric_limits<double>::max();
     for (const PrintObject *po : m_objects) {
@@ -94,40 +110,23 @@ void Print::_align_belt_purge_layers()
     if (ref == nullptr)
         return;
 
-    const double ref_offset     = grid_offset(ref);
-    bool         grids_mismatch = false;
-    for (const PrintObject *po : m_objects) {
-        if (po == ref || po->config().belt_purge_tower_object.value || po->layers().empty())
+    const double ref_offset = grid_offset(ref);
+
+    // Snap every object (printed objects AND the prism) onto the reference grid.
+    for (PrintObject *po : m_objects) {
+        if (po->layers().empty())
             continue;
-        double d = std::abs(grid_offset(po) - ref_offset);
-        d        = std::min(d, h - d);
-        if (d > 5. * EPSILON) {
-            grids_mismatch = true;
-            break;
-        }
+        double delta = ref_offset - grid_offset(po);
+        if (delta > 0.5 * h)
+            delta -= h;
+        else if (delta <= -0.5 * h)
+            delta += h;
+        po->belt_shift_layer_grid(delta); // no-op for the reference object (delta ~ 0)
     }
 
-    // Shift normalized to (-h/2, h/2].
-    double delta = ref_offset - grid_offset(prism);
-    if (delta > 0.5 * h)
-        delta -= h;
-    else if (delta <= -0.5 * h)
-        delta += h;
-
-    BOOST_LOG_TRIVIAL(debug) << "[BELT-DEBUG] purge prism grid snap"
-        << " ref=" << ref->model_object()->name
-        << " ref_offset=" << ref_offset
-        << " prism_offset=" << grid_offset(prism)
-        << " delta=" << delta
-        << " grids_mismatch=" << grids_mismatch;
-
-    prism->belt_shift_layer_grid(delta);
-
-    if (grids_mismatch)
-        this->active_step_add_warning(
-            PrintStateBase::WarningLevel::NON_CRITICAL,
-            _u8L("Objects on the plate are sliced on different layer grids; the belt purge tower can only follow "
-                 "one of them. Filament changes on layers of the other objects may not be fully purged."));
+    BOOST_LOG_TRIVIAL(debug) << "[BELT-DEBUG] purge grid align: snapped " << m_objects.size()
+        << " objects onto ref grid offset=" << ref_offset
+        << " (ref=" << ref->model_object()->name << ")";
 }
 
 // Belt mode replacement for _make_wipe_tower(): plan filament-change purging
@@ -228,8 +227,37 @@ void Print::_plan_belt_purge()
             float volume_to_wipe = use_flush_matrix ?
                 wipe_volumes[current_extruder_id][extruder_id] * flush_multiplier :
                 (float) m_config.prime_volume;
+            // DIAGNOSTIC (first dozen toolchanges, warning level): how much
+            // extrudable volume does the prism actually have at this layer, and
+            // how much of the requested purge did it absorb? Distinguishes "prism
+            // layer found but tiny/empty" from "found with geometry but marking
+            // didn't consume it".
+            const int swap_idx_on_layer = [&]{ int n = 0; for (unsigned int e : layer_tools.extruders) { if (e == extruder_id) break; ++n; } return n; }();
+            double prism_vol = -1.;
+            {
+                if (const Layer *pl = diag_prism != nullptr ? diag_prism->get_layer_at_printz(layer_tools.print_z, EPSILON) : nullptr) {
+                    prism_vol = 0.;
+                    for (const LayerRegion *lr : pl->regions()) {
+                        for (const ExtrusionEntity *ee : lr->fills.entities)       prism_vol += ee->total_volume();
+                        for (const ExtrusionEntity *ee : lr->perimeters.entities)  prism_vol += ee->total_volume();
+                    }
+                }
+            }
             float leftover = layer_tools.wiping_extrusions().mark_wiping_extrusions(*this, current_extruder_id, extruder_id,
                                                                                     volume_to_wipe);
+            // DIAGNOSTIC: log the toolchanges that FAIL to fully absorb (warning,
+            // capped) — these are the ones causing the leftover.
+            static thread_local int dbg_fail = 0;
+            if (leftover > 0.01f && dbg_fail < 20) {
+                ++dbg_fail;
+                BOOST_LOG_TRIVIAL(warning) << "[BELT-DEBUG] purge UNABSORBED print_z=" << layer_tools.print_z
+                    << " filament " << current_extruder_id << "->" << extruder_id
+                    << " swap#" << swap_idx_on_layer << " of " << layer_tools.extruders.size() << " extruders"
+                    << " requested=" << volume_to_wipe
+                    << " absorbed=" << volume_to_wipe - leftover
+                    << " leftover=" << leftover
+                    << " prism_layer_extrudable_vol=" << prism_vol;
+            }
             BOOST_LOG_TRIVIAL(trace) << "[BELT-DEBUG] purge toolchange print_z=" << layer_tools.print_z
                 << " filament " << current_extruder_id << "->" << extruder_id
                 << " requested=" << volume_to_wipe
