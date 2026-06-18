@@ -280,7 +280,13 @@ bool ensure_belt_purge_tower(Model &model, PartPlateList &partplate_list, Object
     // (each island width/N wide, separated by a small gap), so per-layer capacity
     // per island ~= max_flush, matching the height sizing.
     const int    n_islands = std::max(1, (int) filaments.size() - 1);
-    const double gap       = 2.0;
+    // Minimal gap between sub-bars: they must stay just-separated so the slicer
+    // keeps them as distinct islands (hence distinct infill collections, one per
+    // simultaneous swap). Zero gap would union them into one collection and
+    // reintroduce the multi-swap-per-layer absorption bug; a hair over ~2 line
+    // widths also keeps gap-fill from bridging them. 1 mm is about as close as
+    // they can butt up while staying individually purgeable.
+    const double gap       = 1.0;
     const double w_sub     = std::max(1.0, (width - (n_islands - 1) * gap) / n_islands);
 
     // --- (Re)create ---------------------------------------------------------

@@ -198,9 +198,10 @@ void Print::_plan_belt_purge()
     // toolchange layers actually land on a prism layer. This distinguishes a
     // range/grid-alignment failure (no coverage) from a capacity shortfall
     // (covered but not enough cross-section).
-    const PrintObject *diag_prism = nullptr;
-    for (const PrintObject *po : m_objects)
-        if (po->config().belt_purge_tower_object.value && !po->layers().empty()) { diag_prism = po; break; }
+    PrintObject *prism_po = nullptr;
+    for (PrintObject *po : m_objects)
+        if (po->config().belt_purge_tower_object.value && !po->layers().empty()) { prism_po = po; break; }
+    const PrintObject *diag_prism = prism_po;
     if (diag_prism != nullptr)
         BOOST_LOG_TRIVIAL(warning) << "[BELT-DEBUG] purge prism layer range print_z=["
             << diag_prism->layers().front()->print_z << ", " << diag_prism->layers().back()->print_z
@@ -227,37 +228,8 @@ void Print::_plan_belt_purge()
             float volume_to_wipe = use_flush_matrix ?
                 wipe_volumes[current_extruder_id][extruder_id] * flush_multiplier :
                 (float) m_config.prime_volume;
-            // DIAGNOSTIC (first dozen toolchanges, warning level): how much
-            // extrudable volume does the prism actually have at this layer, and
-            // how much of the requested purge did it absorb? Distinguishes "prism
-            // layer found but tiny/empty" from "found with geometry but marking
-            // didn't consume it".
-            const int swap_idx_on_layer = [&]{ int n = 0; for (unsigned int e : layer_tools.extruders) { if (e == extruder_id) break; ++n; } return n; }();
-            double prism_vol = -1.;
-            {
-                if (const Layer *pl = diag_prism != nullptr ? diag_prism->get_layer_at_printz(layer_tools.print_z, EPSILON) : nullptr) {
-                    prism_vol = 0.;
-                    for (const LayerRegion *lr : pl->regions()) {
-                        for (const ExtrusionEntity *ee : lr->fills.entities)       prism_vol += ee->total_volume();
-                        for (const ExtrusionEntity *ee : lr->perimeters.entities)  prism_vol += ee->total_volume();
-                    }
-                }
-            }
             float leftover = layer_tools.wiping_extrusions().mark_wiping_extrusions(*this, current_extruder_id, extruder_id,
                                                                                     volume_to_wipe);
-            // DIAGNOSTIC: log the toolchanges that FAIL to fully absorb (warning,
-            // capped) — these are the ones causing the leftover.
-            static thread_local int dbg_fail = 0;
-            if (leftover > 0.01f && dbg_fail < 20) {
-                ++dbg_fail;
-                BOOST_LOG_TRIVIAL(warning) << "[BELT-DEBUG] purge UNABSORBED print_z=" << layer_tools.print_z
-                    << " filament " << current_extruder_id << "->" << extruder_id
-                    << " swap#" << swap_idx_on_layer << " of " << layer_tools.extruders.size() << " extruders"
-                    << " requested=" << volume_to_wipe
-                    << " absorbed=" << volume_to_wipe - leftover
-                    << " leftover=" << leftover
-                    << " prism_layer_extrudable_vol=" << prism_vol;
-            }
             BOOST_LOG_TRIVIAL(trace) << "[BELT-DEBUG] purge toolchange print_z=" << layer_tools.print_z
                 << " filament " << current_extruder_id << "->" << extruder_id
                 << " requested=" << volume_to_wipe
@@ -266,6 +238,33 @@ void Print::_plan_belt_purge()
             layer_leftover += leftover;
             current_extruder_id = extruder_id;
         }
+
+        // Plastic saving: drop the prism's infill that no toolchange on this
+        // layer claimed. At this point (after the real-purge marking, before the
+        // force-override pass below) the prism's OVERRIDDEN fills are exactly the
+        // purge; the rest is infill that would otherwise print as the prism's own
+        // filament for nothing — which is most of the prism on layers with little
+        // or no purge. We keep perimeters so the bar's wall shell stays
+        // continuous along the belt. (Must run before ensure_perimeters_infills_
+        // order, which force-overrides every remaining fill and would make them
+        // all look "claimed".)
+        if (prism_po != nullptr) {
+            if (Layer *pl = prism_po->get_layer_at_printz(layer_tools.print_z, EPSILON)) {
+                const auto &we = layer_tools.wiping_extrusions();
+                for (LayerRegion *lr : pl->regions()) {
+                    auto  &ents = lr->fills.entities;
+                    size_t keep = 0;
+                    for (size_t r = 0; r < ents.size(); ++r) {
+                        if (we.is_entity_overridden(ents[r], prism_po, 0))
+                            ents[keep++] = ents[r];
+                        else
+                            delete ents[r];
+                    }
+                    ents.resize(keep);
+                }
+            }
+        }
+
         layer_tools.wiping_extrusions().ensure_perimeters_infills_order(*this);
         if (layer_leftover > 0.f) {
             total_leftover += layer_leftover;

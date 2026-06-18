@@ -45,6 +45,14 @@ public:
 
     void ensure_perimeters_infills_order(const Print& print);
 
+    // Returns true if entity is not printed with its usual extruder for a given copy
+    // (i.e. it was claimed as a wiping/purge extrusion). Used by the belt purge
+    // tower to tell which prism fills carry purge vs. which are unclaimed waste.
+    bool is_entity_overridden(const ExtrusionEntity* entity, const PrintObject *object, size_t copy_id) const {
+        auto it = entity_map.find(std::make_tuple(entity, object));
+        return it == entity_map.end() ? false : it->second[copy_id] != -1;
+    }
+
     bool is_overriddable(const ExtrusionEntityCollection& ee, const PrintConfig& print_config, const PrintObject& object, const PrintRegion& region) const;
     bool is_overriddable_and_mark(const ExtrusionEntityCollection& ee, const PrintConfig& print_config, const PrintObject& object, const PrintRegion& region) {
     	bool out = this->is_overriddable(ee, print_config, object, region);
@@ -79,12 +87,6 @@ private:
     // BBS
     void set_support_extruder_override(const PrintObject* object, size_t copy_id, int extruder, size_t num_of_copies);
     void set_support_interface_extruder_override(const PrintObject* object, size_t copy_id, int extruder, size_t num_of_copies);
-
-    // Returns true in case that entity is not printed with its usual extruder for a given copy:
-    bool is_entity_overridden(const ExtrusionEntity* entity, const PrintObject *object, size_t copy_id) const {
-        auto it = entity_map.find(std::make_tuple(entity, object));
-        return it == entity_map.end() ? false : it->second[copy_id] != -1;
-    }
 
     std::map<std::tuple<const ExtrusionEntity*, const PrintObject *>, ExtruderPerCopy> entity_map;  // to keep track of who prints what
     // BBS
