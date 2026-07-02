@@ -1178,59 +1178,14 @@
   "Prusa/Prusament rPLA @CORE One 0.6",
   "Prusa/Prusament rPLA @CORE One 0.8",
   "Qidi/Bambu PETG",
-  "Qidi/Bambu PETG @Qidi Q1 Pro 0.2 nozzle",
-  "Qidi/Bambu PETG @Qidi Q1 Pro 0.4 nozzle",
-  "Qidi/Bambu PETG @Qidi Q1 Pro 0.6 nozzle",
-  "Qidi/Bambu PETG @Qidi Q1 Pro 0.8 nozzle",
-  "Qidi/Bambu PETG @Qidi X-Plus 4 0.2 nozzle",
-  "Qidi/Bambu PETG @Qidi X-Plus 4 0.4 nozzle",
-  "Qidi/Bambu PETG @Qidi X-Plus 4 0.6 nozzle",
-  "Qidi/Bambu PETG @Qidi X-Plus 4 0.8 nozzle",
   "Qidi/Bambu PLA",
-  "Qidi/Bambu PLA @Qidi Q1 Pro 0.2 nozzle",
-  "Qidi/Bambu PLA @Qidi Q1 Pro 0.4 nozzle",
-  "Qidi/Bambu PLA @Qidi Q1 Pro 0.6 nozzle",
-  "Qidi/Bambu PLA @Qidi Q1 Pro 0.8 nozzle",
-  "Qidi/Bambu PLA @Qidi X-Plus 4 0.2 nozzle",
-  "Qidi/Bambu PLA @Qidi X-Plus 4 0.4 nozzle",
-  "Qidi/Bambu PLA @Qidi X-Plus 4 0.6 nozzle",
-  "Qidi/Bambu PLA @Qidi X-Plus 4 0.8 nozzle",
   "Qidi/HATCHBOX PETG @Qidi",
-  "Qidi/HATCHBOX PETG @Qidi Q1 Pro 0.2 nozzle",
-  "Qidi/HATCHBOX PETG @Qidi Q1 Pro 0.4 nozzle",
-  "Qidi/HATCHBOX PETG @Qidi Q1 Pro 0.6 nozzle",
-  "Qidi/HATCHBOX PETG @Qidi Q1 Pro 0.8 nozzle",
-  "Qidi/HATCHBOX PETG @Qidi X-Plus 4 0.2 nozzle",
-  "Qidi/HATCHBOX PETG @Qidi X-Plus 4 0.4 nozzle",
-  "Qidi/HATCHBOX PETG @Qidi X-Plus 4 0.6 nozzle",
-  "Qidi/HATCHBOX PETG @Qidi X-Plus 4 0.8 nozzle",
   "Qidi/HATCHBOX PLA @Qidi",
-  "Qidi/HATCHBOX PLA @Qidi Q1 Pro 0.2 nozzle",
-  "Qidi/HATCHBOX PLA @Qidi Q1 Pro 0.4 nozzle",
-  "Qidi/HATCHBOX PLA @Qidi Q1 Pro 0.6 nozzle",
-  "Qidi/HATCHBOX PLA @Qidi Q1 Pro 0.8 nozzle",
-  "Qidi/HATCHBOX PLA @Qidi X-Plus 4 0.2 nozzle",
-  "Qidi/HATCHBOX PLA @Qidi X-Plus 4 0.4 nozzle",
-  "Qidi/HATCHBOX PLA @Qidi X-Plus 4 0.6 nozzle",
-  "Qidi/HATCHBOX PLA @Qidi X-Plus 4 0.8 nozzle",
   "Qidi/Overture PLA @Qidi",
-  "Qidi/Overture PLA @Qidi Q1 Pro 0.2 nozzle",
-  "Qidi/Overture PLA @Qidi Q1 Pro 0.4 nozzle",
-  "Qidi/Overture PLA @Qidi Q1 Pro 0.6 nozzle",
-  "Qidi/Overture PLA @Qidi Q1 Pro 0.8 nozzle",
-  "Qidi/Overture PLA @Qidi X-Plus 4 0.2 nozzle",
-  "Qidi/Overture PLA @Qidi X-Plus 4 0.4 nozzle",
-  "Qidi/Overture PLA @Qidi X-Plus 4 0.6 nozzle",
-  "Qidi/Overture PLA @Qidi X-Plus 4 0.8 nozzle",
   "Qidi/PolyLite PLA @Qidi",
-  "Qidi/PolyLite PLA @Qidi Q1 Pro 0.2 nozzle",
-  "Qidi/PolyLite PLA @Qidi Q1 Pro 0.4 nozzle",
-  "Qidi/PolyLite PLA @Qidi Q1 Pro 0.6 nozzle",
-  "Qidi/PolyLite PLA @Qidi Q1 Pro 0.8 nozzle",
-  "Qidi/PolyLite PLA @Qidi X-Plus 4 0.2 nozzle",
-  "Qidi/PolyLite PLA @Qidi X-Plus 4 0.4 nozzle",
-  "Qidi/PolyLite PLA @Qidi X-Plus 4 0.6 nozzle",
-  "Qidi/PolyLite PLA @Qidi X-Plus 4 0.8 nozzle",
+  "Qidi/QIDI ABS Rapido 0.2 nozzle",
+  "Qidi/QIDI ABS Rapido 0.6 nozzle",
+  "Qidi/QIDI ABS Rapido 0.8 nozzle",
   "Qidi/QIDI ASA-CF @Qidi Q1 Pro 0.4 nozzle",
   "Qidi/QIDI ASA-CF @Qidi Q1 Pro 0.6 nozzle",
   "Qidi/QIDI ASA-CF @Qidi Q1 Pro 0.8 nozzle",
@@ -1244,162 +1199,101 @@
   "Qidi/QIDI ASA-CF @Qidi X-Smart 3 0.6 nozzle",
   "Qidi/QIDI ASA-CF @Qidi X-Smart 3 0.8 nozzle",
   "Qidi/QIDI PA-Ultra",
-  "Qidi/QIDI PA-Ultra @Qidi Q1 Pro 0.4 nozzle",
-  "Qidi/QIDI PA-Ultra @Qidi Q1 Pro 0.6 nozzle",
-  "Qidi/QIDI PA-Ultra @Qidi Q1 Pro 0.8 nozzle",
   "Qidi/QIDI PA-Ultra @Qidi X-Plus 4 0.4 nozzle",
   "Qidi/QIDI PA-Ultra @Qidi X-Plus 4 0.6 nozzle",
   "Qidi/QIDI PA-Ultra @Qidi X-Plus 4 0.8 nozzle",
   "Qidi/QIDI PA12-CF",
-  "Qidi/QIDI PA12-CF @Qidi Q1 Pro 0.4 nozzle",
-  "Qidi/QIDI PA12-CF @Qidi Q1 Pro 0.6 nozzle",
-  "Qidi/QIDI PA12-CF @Qidi Q1 Pro 0.8 nozzle",
   "Qidi/QIDI PA12-CF @Qidi X-Plus 4 0.4 nozzle",
   "Qidi/QIDI PA12-CF @Qidi X-Plus 4 0.6 nozzle",
   "Qidi/QIDI PA12-CF @Qidi X-Plus 4 0.8 nozzle",
   "Qidi/QIDI PAHT-CF",
-  "Qidi/QIDI PAHT-CF @Qidi Q1 Pro 0.4 nozzle",
-  "Qidi/QIDI PAHT-CF @Qidi Q1 Pro 0.6 nozzle",
-  "Qidi/QIDI PAHT-CF @Qidi Q1 Pro 0.8 nozzle",
   "Qidi/QIDI PAHT-CF @Qidi X-Plus 4 0.4 nozzle",
   "Qidi/QIDI PAHT-CF @Qidi X-Plus 4 0.6 nozzle",
   "Qidi/QIDI PAHT-CF @Qidi X-Plus 4 0.8 nozzle",
   "Qidi/QIDI PAHT-GF",
-  "Qidi/QIDI PAHT-GF @0.6 nozzle",
-  "Qidi/QIDI PAHT-GF @0.8 nozzle",
-  "Qidi/QIDI PAHT-GF @Qidi Q1 Pro 0.4 nozzle",
-  "Qidi/QIDI PAHT-GF @Qidi Q1 Pro 0.6 nozzle",
-  "Qidi/QIDI PAHT-GF @Qidi Q1 Pro 0.8 nozzle",
   "Qidi/QIDI PAHT-GF @Qidi X-Plus 4 0.4 nozzle",
   "Qidi/QIDI PAHT-GF @Qidi X-Plus 4 0.6 nozzle",
   "Qidi/QIDI PAHT-GF @Qidi X-Plus 4 0.8 nozzle",
   "Qidi/QIDI PEBA 95A @Qidi Q1 Pro 0.4 nozzle",
   "Qidi/QIDI PEBA 95A @Qidi Q1 Pro 0.6 nozzle",
   "Qidi/QIDI PET-CF",
-  "Qidi/QIDI PET-CF @Qidi Q1 Pro 0.4 nozzle",
-  "Qidi/QIDI PET-CF @Qidi Q1 Pro 0.6 nozzle",
-  "Qidi/QIDI PET-CF @Qidi Q1 Pro 0.8 nozzle",
   "Qidi/QIDI PET-CF @Qidi X-Plus 4 0.4 nozzle",
   "Qidi/QIDI PET-CF @Qidi X-Plus 4 0.6 nozzle",
   "Qidi/QIDI PET-CF @Qidi X-Plus 4 0.8 nozzle",
   "Qidi/QIDI PET-GF",
-  "Qidi/QIDI PET-GF @0.6 nozzle",
-  "Qidi/QIDI PET-GF @0.8 nozzle",
-  "Qidi/QIDI PET-GF @Qidi Q1 Pro 0.4 nozzle",
-  "Qidi/QIDI PET-GF @Qidi Q1 Pro 0.6 nozzle",
-  "Qidi/QIDI PET-GF @Qidi Q1 Pro 0.8 nozzle",
   "Qidi/QIDI PET-GF @Qidi X-Plus 4 0.4 nozzle",
   "Qidi/QIDI PET-GF @Qidi X-Plus 4 0.6 nozzle",
   "Qidi/QIDI PET-GF @Qidi X-Plus 4 0.8 nozzle",
   "Qidi/QIDI PETG Basic",
-  "Qidi/QIDI PETG Basic @Qidi Q1 Pro 0.2 nozzle",
-  "Qidi/QIDI PETG Basic @Qidi Q1 Pro 0.4 nozzle",
-  "Qidi/QIDI PETG Basic @Qidi Q1 Pro 0.6 nozzle",
-  "Qidi/QIDI PETG Basic @Qidi Q1 Pro 0.8 nozzle",
   "Qidi/QIDI PETG Basic @Qidi X-Plus 4 0.2 nozzle",
   "Qidi/QIDI PETG Basic @Qidi X-Plus 4 0.4 nozzle",
   "Qidi/QIDI PETG Basic @Qidi X-Plus 4 0.6 nozzle",
   "Qidi/QIDI PETG Basic @Qidi X-Plus 4 0.8 nozzle",
   "Qidi/QIDI PETG Rapido",
-  "Qidi/QIDI PETG Rapido @Qidi Q1 Pro 0.2 nozzle",
-  "Qidi/QIDI PETG Rapido @Qidi Q1 Pro 0.4 nozzle",
-  "Qidi/QIDI PETG Rapido @Qidi Q1 Pro 0.6 nozzle",
-  "Qidi/QIDI PETG Rapido @Qidi Q1 Pro 0.8 nozzle",
   "Qidi/QIDI PETG Rapido @Qidi X-Plus 4 0.2 nozzle",
   "Qidi/QIDI PETG Rapido @Qidi X-Plus 4 0.4 nozzle",
   "Qidi/QIDI PETG Rapido @Qidi X-Plus 4 0.6 nozzle",
   "Qidi/QIDI PETG Rapido @Qidi X-Plus 4 0.8 nozzle",
   "Qidi/QIDI PETG Tough",
-  "Qidi/QIDI PETG Tough @Qidi Q1 Pro 0.2 nozzle",
-  "Qidi/QIDI PETG Tough @Qidi Q1 Pro 0.4 nozzle",
-  "Qidi/QIDI PETG Tough @Qidi Q1 Pro 0.6 nozzle",
-  "Qidi/QIDI PETG Tough @Qidi Q1 Pro 0.8 nozzle",
+  "Qidi/QIDI PETG Tough 0.2 nozzle",
+  "Qidi/QIDI PETG Tough 0.6 nozzle",
+  "Qidi/QIDI PETG Tough 0.8 nozzle",
   "Qidi/QIDI PETG Tough @Qidi X-Plus 4 0.2 nozzle",
   "Qidi/QIDI PETG Tough @Qidi X-Plus 4 0.4 nozzle",
   "Qidi/QIDI PETG Tough @Qidi X-Plus 4 0.6 nozzle",
   "Qidi/QIDI PETG Tough @Qidi X-Plus 4 0.8 nozzle",
   "Qidi/QIDI PETG Translucent",
-  "Qidi/QIDI PETG Translucent @Qidi Q1 Pro 0.2 nozzle",
-  "Qidi/QIDI PETG Translucent @Qidi Q1 Pro 0.4 nozzle",
-  "Qidi/QIDI PETG Translucent @Qidi Q1 Pro 0.6 nozzle",
-  "Qidi/QIDI PETG Translucent @Qidi Q1 Pro 0.8 nozzle",
   "Qidi/QIDI PETG Translucent @Qidi X-Plus 4 0.2 nozzle",
   "Qidi/QIDI PETG Translucent @Qidi X-Plus 4 0.4 nozzle",
   "Qidi/QIDI PETG Translucent @Qidi X-Plus 4 0.6 nozzle",
   "Qidi/QIDI PETG Translucent @Qidi X-Plus 4 0.8 nozzle",
   "Qidi/QIDI PETG-CF",
-  "Qidi/QIDI PETG-CF @Qidi Q1 Pro 0.4 nozzle",
-  "Qidi/QIDI PETG-CF @Qidi Q1 Pro 0.6 nozzle",
-  "Qidi/QIDI PETG-CF @Qidi Q1 Pro 0.8 nozzle",
   "Qidi/QIDI PETG-CF @Qidi X-Plus 4 0.4 nozzle",
   "Qidi/QIDI PETG-CF @Qidi X-Plus 4 0.6 nozzle",
   "Qidi/QIDI PETG-CF @Qidi X-Plus 4 0.8 nozzle",
   "Qidi/QIDI PETG-GF",
-  "Qidi/QIDI PETG-GF @Qidi Q1 Pro 0.4 nozzle",
-  "Qidi/QIDI PETG-GF @Qidi Q1 Pro 0.6 nozzle",
-  "Qidi/QIDI PETG-GF @Qidi Q1 Pro 0.8 nozzle",
   "Qidi/QIDI PETG-GF @Qidi X-Plus 4 0.4 nozzle",
   "Qidi/QIDI PETG-GF @Qidi X-Plus 4 0.6 nozzle",
   "Qidi/QIDI PETG-GF @Qidi X-Plus 4 0.8 nozzle",
   "Qidi/QIDI PLA Basic",
-  "Qidi/QIDI PLA Basic @Qidi Q1 Pro 0.2 nozzle",
-  "Qidi/QIDI PLA Basic @Qidi Q1 Pro 0.4 nozzle",
-  "Qidi/QIDI PLA Basic @Qidi Q1 Pro 0.6 nozzle",
-  "Qidi/QIDI PLA Basic @Qidi Q1 Pro 0.8 nozzle",
   "Qidi/QIDI PLA Basic @Qidi X-Plus 4 0.2 nozzle",
   "Qidi/QIDI PLA Basic @Qidi X-Plus 4 0.4 nozzle",
   "Qidi/QIDI PLA Basic @Qidi X-Plus 4 0.6 nozzle",
   "Qidi/QIDI PLA Basic @Qidi X-Plus 4 0.8 nozzle",
   "Qidi/QIDI PLA Matte Basic",
-  "Qidi/QIDI PLA Matte Basic @Qidi Q1 Pro 0.2 nozzle",
-  "Qidi/QIDI PLA Matte Basic @Qidi Q1 Pro 0.4 nozzle",
-  "Qidi/QIDI PLA Matte Basic @Qidi Q1 Pro 0.6 nozzle",
-  "Qidi/QIDI PLA Matte Basic @Qidi Q1 Pro 0.8 nozzle",
   "Qidi/QIDI PLA Matte Basic @Qidi X-Plus 4 0.2 nozzle",
   "Qidi/QIDI PLA Matte Basic @Qidi X-Plus 4 0.4 nozzle",
   "Qidi/QIDI PLA Matte Basic @Qidi X-Plus 4 0.6 nozzle",
   "Qidi/QIDI PLA Matte Basic @Qidi X-Plus 4 0.8 nozzle",
   "Qidi/QIDI PLA Rapido",
-  "Qidi/QIDI PLA Rapido @Qidi Q1 Pro 0.2 nozzle",
-  "Qidi/QIDI PLA Rapido @Qidi Q1 Pro 0.4 nozzle",
-  "Qidi/QIDI PLA Rapido @Qidi Q1 Pro 0.6 nozzle",
-  "Qidi/QIDI PLA Rapido @Qidi Q1 Pro 0.8 nozzle",
+  "Qidi/QIDI PLA Rapido 0.2 nozzle",
+  "Qidi/QIDI PLA Rapido 0.8 nozzle",
   "Qidi/QIDI PLA Rapido @Qidi X-Plus 4 0.2 nozzle",
   "Qidi/QIDI PLA Rapido @Qidi X-Plus 4 0.4 nozzle",
   "Qidi/QIDI PLA Rapido @Qidi X-Plus 4 0.6 nozzle",
   "Qidi/QIDI PLA Rapido @Qidi X-Plus 4 0.8 nozzle",
   "Qidi/QIDI PLA Rapido Matte",
-  "Qidi/QIDI PLA Rapido Matte @Qidi Q1 Pro 0.2 nozzle",
-  "Qidi/QIDI PLA Rapido Matte @Qidi Q1 Pro 0.4 nozzle",
-  "Qidi/QIDI PLA Rapido Matte @Qidi Q1 Pro 0.6 nozzle",
-  "Qidi/QIDI PLA Rapido Matte @Qidi Q1 Pro 0.8 nozzle",
   "Qidi/QIDI PLA Rapido Matte @Qidi X-Plus 4 0.2 nozzle",
   "Qidi/QIDI PLA Rapido Matte @Qidi X-Plus 4 0.4 nozzle",
   "Qidi/QIDI PLA Rapido Matte @Qidi X-Plus 4 0.6 nozzle",
   "Qidi/QIDI PLA Rapido Matte @Qidi X-Plus 4 0.8 nozzle",
   "Qidi/QIDI PLA Rapido Metal",
-  "Qidi/QIDI PLA Rapido Metal @Qidi Q1 Pro 0.2 nozzle",
-  "Qidi/QIDI PLA Rapido Metal @Qidi Q1 Pro 0.4 nozzle",
-  "Qidi/QIDI PLA Rapido Metal @Qidi Q1 Pro 0.6 nozzle",
-  "Qidi/QIDI PLA Rapido Metal @Qidi Q1 Pro 0.8 nozzle",
   "Qidi/QIDI PLA Rapido Metal @Qidi X-Plus 4 0.2 nozzle",
   "Qidi/QIDI PLA Rapido Metal @Qidi X-Plus 4 0.4 nozzle",
   "Qidi/QIDI PLA Rapido Metal @Qidi X-Plus 4 0.6 nozzle",
   "Qidi/QIDI PLA Rapido Metal @Qidi X-Plus 4 0.8 nozzle",
   "Qidi/QIDI PLA Rapido Silk",
-  "Qidi/QIDI PLA Rapido Silk @Qidi Q1 Pro 0.4 nozzle",
-  "Qidi/QIDI PLA Rapido Silk @Qidi Q1 Pro 0.6 nozzle",
   "Qidi/QIDI PLA Rapido Silk @Qidi X-Plus 4 0.4 nozzle",
   "Qidi/QIDI PLA Rapido Silk @Qidi X-Plus 4 0.6 nozzle",
+  "Qidi/QIDI PLA-CF @0.6 nozzle",
+  "Qidi/QIDI PLA-CF @0.8 nozzle",
+  "Qidi/QIDI PLA-CF @Qidi Q1 Pro 0.4 nozzle",
+  "Qidi/QIDI PLA-CF @Qidi Q1 Pro 0.6 nozzle",
+  "Qidi/QIDI PLA-CF @Qidi Q1 Pro 0.8 nozzle",
   "Qidi/QIDI PLA-CF @Qidi X-Plus 4 0.4 nozzle",
   "Qidi/QIDI PLA-CF @Qidi X-Plus 4 0.6 nozzle",
   "Qidi/QIDI PLA-CF @Qidi X-Plus 4 0.8 nozzle",
   "Qidi/QIDI PPS-CF",
-  "Qidi/QIDI PPS-CF @0.6 nozzle",
-  "Qidi/QIDI PPS-CF @0.8 nozzle",
-  "Qidi/QIDI PPS-CF @Qidi Q1 Pro 0.4 nozzle",
-  "Qidi/QIDI PPS-CF @Qidi Q1 Pro 0.6 nozzle",
-  "Qidi/QIDI PPS-CF @Qidi Q1 Pro 0.8 nozzle",
   "Qidi/QIDI PPS-CF @Qidi X-Plus 4 0.4 nozzle",
   "Qidi/QIDI PPS-CF @Qidi X-Plus 4 0.6 nozzle",
   "Qidi/QIDI PPS-CF @Qidi X-Plus 4 0.8 nozzle",
@@ -1415,24 +1309,16 @@
   "Qidi/QIDI Support For PET/PA @Qidi X-Plus 4 0.4 nozzle",
   "Qidi/QIDI Support For PET/PA @Qidi X-Plus 4 0.6 nozzle",
   "Qidi/QIDI Support For PET/PA @Qidi X-Plus 4 0.8 nozzle",
-  "Qidi/QIDI TPU-Aero @Qidi Q1 Pro 0.4 nozzle",
-  "Qidi/QIDI TPU-Aero @Qidi Q1 Pro 0.6 nozzle",
   "Qidi/QIDI TPU-Aero @Qidi X-Plus 4 0.4 nozzle",
   "Qidi/QIDI TPU-Aero @Qidi X-Plus 4 0.6 nozzle",
   "Qidi/QIDI TPU-GF @Qidi Q1 Pro 0.4 nozzle",
   "Qidi/QIDI TPU-GF @Qidi Q1 Pro 0.6 nozzle",
   "Qidi/QIDI TPU-GF @Qidi Q1 Pro 0.8 nozzle",
   "Qidi/QIDI UltraPA-CF25",
-  "Qidi/QIDI UltraPA-CF25 @Qidi Q1 Pro 0.4 nozzle",
-  "Qidi/QIDI UltraPA-CF25 @Qidi Q1 Pro 0.6 nozzle",
-  "Qidi/QIDI UltraPA-CF25 @Qidi Q1 Pro 0.8 nozzle",
   "Qidi/QIDI UltraPA-CF25 @Qidi X-Plus 4 0.4 nozzle",
   "Qidi/QIDI UltraPA-CF25 @Qidi X-Plus 4 0.6 nozzle",
   "Qidi/QIDI UltraPA-CF25 @Qidi X-Plus 4 0.8 nozzle",
   "Qidi/QIDI WOOD Rapido",
-  "Qidi/QIDI WOOD Rapido @Qidi Q1 Pro 0.4 nozzle",
-  "Qidi/QIDI WOOD Rapido @Qidi Q1 Pro 0.6 nozzle",
-  "Qidi/QIDI WOOD Rapido @Qidi Q1 Pro 0.8 nozzle",
   "Qidi/QIDI WOOD Rapido @Qidi X-Plus 4 0.4 nozzle",
   "Qidi/QIDI WOOD Rapido @Qidi X-Plus 4 0.6 nozzle",
   "Qidi/QIDI WOOD Rapido @Qidi X-Plus 4 0.8 nozzle",
@@ -1440,28 +1326,19 @@
   "Qidi/Qidi Generic PA-CF",
   "Qidi/Qidi Generic PC",
   "Qidi/Qidi Generic PETG",
-  "Qidi/Qidi Generic PETG @Qidi Q1 Pro 0.4 nozzle",
-  "Qidi/Qidi Generic PETG @Qidi X-Plus 4 0.4 nozzle",
   "Qidi/Qidi Generic PETG-CF",
   "Qidi/Qidi Generic PLA",
-  "Qidi/Qidi Generic PLA @Qidi Q1 Pro 0.4 nozzle",
-  "Qidi/Qidi Generic PLA @Qidi X-Plus 4 0.4 nozzle",
+  "Qidi/Qidi Generic PLA High Speed @Qidi X-Plus 4 0.2 nozzle",
   "Qidi/Qidi Generic PLA High Speed @Qidi X-Plus 4 0.4 nozzle",
+  "Qidi/Qidi Generic PLA High Speed @Qidi X-Plus 4 0.6 nozzle",
+  "Qidi/Qidi Generic PLA High Speed @Qidi X-Plus 4 0.8 nozzle",
   "Qidi/Qidi Generic PLA Silk",
   "Qidi/Qidi Generic PLA+",
-  "Qidi/Qidi Generic PLA+ @Qidi Q1 Pro 0.4 nozzle",
-  "Qidi/Qidi Generic PLA+ @Qidi X-Plus 4 0.4 nozzle",
   "Qidi/Qidi Generic PLA-CF",
-  "Qidi/Qidi Generic TPU 95A @Qidi Q1 Pro 0.8 nozzle",
-  "Qidi/Qidi Generic TPU 95A @Qidi X-Plus 4 0.8 nozzle",
-  "Qidi/Qidi Generic TPU @Qidi Q1 Pro 0.4 nozzle",
-  "Qidi/Qidi Generic TPU @Qidi X-Plus 4 0.4 nozzle",
   "Qidi/Qidi PC-ABS-FR @Qidi X-Plus 4 0.4 nozzle",
   "Qidi/Qidi PC-ABS-FR @Qidi X-Plus 4 0.6 nozzle",
   "Qidi/Qidi PC-ABS-FR @Qidi X-Plus 4 0.8 nozzle",
   "Qidi/Qidi PLA-CF",
-  "Qidi/Qidi TPU 95A-HF @Qidi Q1 Pro 0.4 nozzle",
-  "Qidi/Qidi TPU 95A-HF @Qidi Q1 Pro 0.8 nozzle",
   "Qidi/Qidi TPU 95A-HF @Qidi X-Plus 4 0.4 nozzle",
   "Qidi/Qidi TPU 95A-HF @Qidi X-Plus 4 0.8 nozzle",
   "Qidi/Tinmorry PETG-ECO",
@@ -3028,62 +2905,7 @@
    "OrcaArena/OrcaArena Generic ABS",
    "Prusa/Prusa Generic ABS",
    "Prusa/Prusa Generic ABS HF",
-   "Qidi/Bambu ABS",
-   "Qidi/Bambu PETG",
-   "Qidi/Bambu PLA",
-   "Qidi/HATCHBOX ABS",
-   "Qidi/HATCHBOX PETG",
-   "Qidi/HATCHBOX PLA",
-   "Qidi/Overture ABS",
-   "Qidi/Overture PLA",
-   "Qidi/PolyLite ABS",
-   "Qidi/PolyLite PLA",
-   "Qidi/QIDI ABS Odorless",
-   "Qidi/QIDI ABS Rapido",
-   "Qidi/QIDI ABS Rapido 0.2 nozzle",
-   "Qidi/QIDI ABS Rapido 0.6 nozzle",
-   "Qidi/QIDI ABS Rapido 0.8 nozzle",
-   "Qidi/QIDI ABS Rapido Metal",
-   "Qidi/QIDI ABS-GF",
-   "Qidi/QIDI ABS-GF10",
-   "Qidi/QIDI ABS-GF25",
-   "Qidi/QIDI ASA",
-   "Qidi/QIDI ASA-CF",
-   "Qidi/QIDI PA-Ultra",
-   "Qidi/QIDI PA12-CF",
-   "Qidi/QIDI PAHT-CF",
-   "Qidi/QIDI PAHT-GF",
-   "Qidi/QIDI PEBA 95A",
-   "Qidi/QIDI PET-CF",
-   "Qidi/QIDI PET-GF",
-   "Qidi/QIDI PETG Basic",
-   "Qidi/QIDI PETG Rapido",
-   "Qidi/QIDI PETG Tough",
-   "Qidi/QIDI PETG Translucent",
-   "Qidi/QIDI PETG-CF",
-   "Qidi/QIDI PETG-GF",
-   "Qidi/QIDI PLA Basic",
-   "Qidi/QIDI PLA Matte Basic",
-   "Qidi/QIDI PLA Rapido",
-   "Qidi/QIDI PLA Rapido Matte",
-   "Qidi/QIDI PLA Rapido Metal",
-   "Qidi/QIDI PLA Rapido Silk",
-   "Qidi/QIDI PPS-CF",
-   "Qidi/QIDI PPS-GF",
-   "Qidi/QIDI TPU-Aero",
-   "Qidi/QIDI TPU-GF",
-   "Qidi/QIDI UltraPA-CF25",
-   "Qidi/QIDI WOOD Rapido",
-   "Qidi/Qidi ASA-Aero",
    "Qidi/Qidi Generic ABS",
-   "Qidi/Qidi Generic ASA",
-   "Qidi/Qidi Generic PETG",
-   "Qidi/Qidi Generic PLA",
-   "Qidi/Qidi Generic PLA+",
-   "Qidi/Qidi Generic TPU",
-   "Qidi/Qidi Generic TPU 95A",
-   "Qidi/Qidi PC-ABS-FR",
-   "Qidi/Qidi TPU 95A-HF",
    "Ratrig/RatRig BigNozzle ABS",
    "Ratrig/RatRig Generic ABS",
    "Ratrig/RatRig PunkFil ABS",
@@ -3287,17 +3109,7 @@
    "Lulzbot/Lulzbot 2.85mm PETG",
    "MagicMaker/MM Generic PEEK",
    "OrcaArena/OrcaArena Generic PETG",
-   "Qidi/Bambu PETG",
-   "Qidi/HATCHBOX PETG",
-   "Qidi/QIDI PETG Basic",
-   "Qidi/QIDI PETG Rapido",
-   "Qidi/QIDI PETG Tough",
-   "Qidi/QIDI PETG Tough 0.2 nozzle",
-   "Qidi/QIDI PETG Tough 0.6 nozzle",
-   "Qidi/QIDI PETG Tough 0.8 nozzle",
-   "Qidi/QIDI PETG Translucent",
    "Qidi/Qidi Generic PETG",
-   "Qidi/Tinmorry PETG-ECO",
    "Ratrig/RatRig BigNozzle PETG",
    "Ratrig/RatRig Generic PETG",
    "SecKit/SecKit Generic PETG",
@@ -3556,10 +3368,7 @@
    "Custom/Generic PLA-CF",
    "FLSun/FLSun Generic PLA-CF",
    "OrcaArena/OrcaArena Generic PLA-CF",
-   "Qidi/QIDI PAHT-GF",
-   "Qidi/QIDI PLA-CF",
    "Qidi/Qidi Generic PLA-CF",
-   "Qidi/Qidi PLA-CF",
    "Ratrig/RatRig Generic PLA-CF",
    "SecKit/SecKit Generic PLA-CF",
    "Tiertime/Tiertime Generic PLA-CF",
@@ -3697,23 +3506,7 @@
    "Prusa/Prusa Generic PLA-CF",
    "Prusa/Prusament PLA",
    "Prusa/Prusament rPLA",
-   "Qidi/Bambu PLA",
-   "Qidi/Generic PLA+",
-   "Qidi/HATCHBOX PLA",
-   "Qidi/Overture PLA",
-   "Qidi/PolyLite PLA",
-   "Qidi/QIDI PLA Basic",
-   "Qidi/QIDI PLA Matte Basic",
-   "Qidi/QIDI PLA Rapido",
-   "Qidi/QIDI PLA Rapido 0.2 nozzle",
-   "Qidi/QIDI PLA Rapido 0.8 nozzle",
-   "Qidi/QIDI PLA Rapido Matte",
-   "Qidi/QIDI PLA Rapido Metal",
-   "Qidi/QIDI PLA Rapido Silk",
-   "Qidi/QIDI WOOD Rapido",
    "Qidi/Qidi Generic PLA",
-   "Qidi/Qidi Generic PLA High Speed",
-   "Qidi/Qidi Generic PLA+",
    "Ratrig/RatRig BigNozzle PLA",
    "Ratrig/RatRig BigNozzle TPU",
    "Ratrig/RatRig Generic PLA",
@@ -3842,17 +3635,6 @@
    "InfiMech/Other PA-CF",
    "OrcaArena/OrcaArena Generic PA-CF",
    "Prusa/Prusament PA-CF",
-   "Qidi/QIDI PA12-CF",
-   "Qidi/QIDI PAHT-CF",
-   "Qidi/QIDI PAHT-GF",
-   "Qidi/QIDI PET-CF",
-   "Qidi/QIDI PET-GF",
-   "Qidi/QIDI PETG-CF",
-   "Qidi/QIDI PETG-GF",
-   "Qidi/QIDI PPS-CF",
-   "Qidi/QIDI Support For PAHT",
-   "Qidi/QIDI Support For PET/PA",
-   "Qidi/QIDI UltraPA-CF25",
    "Qidi/Qidi Generic PA-CF",
    "Ratrig/RatRig Generic PA-CF",
    "SecKit/SecKit Generic PA-CF",
@@ -3884,7 +3666,6 @@
    "OrcaArena/OrcaArena Generic PA",
    "Prusa/Prusa Generic PA",
    "Prusa/Prusa Generic PA-CF",
-   "Qidi/QIDI PA-Ultra",
    "Qidi/Qidi Generic PA",
    "Ratrig/RatRig Generic PA",
    "SecKit/SecKit Generic PA",
@@ -4395,10 +4176,7 @@
    "Prusa/Prusa Generic FLEX",
    "Prusa/Prusa Generic TPU",
    "Prusa/Prusa Generic TPU HF",
-   "Qidi/QIDI TPU-Aero",
    "Qidi/Qidi Generic TPU",
-   "Qidi/Qidi Generic TPU 95A",
-   "Qidi/Qidi TPU 95A-HF",
    "Ratrig/RatRig Generic TPU",
    "SecKit/SecKit Generic TPU",
    "Tiertime/Tiertime Generic TPU",
@@ -4611,23 +4389,71 @@
   "OF0M6QAQ": [
    "OrcaFilamentLibrary/Elegoo PLA Galaxy"
   ],
+  "OF0TjJ0G": [
+   "Qidi/Qidi ASA-Aero"
+  ],
+  "OF0Y5MLd": [
+   "Qidi/QIDI PETG-GF"
+  ],
+  "OF0z1XpN": [
+   "Qidi/QIDI PLA Rapido Silk"
+  ],
   "OF102WKM": [
    "OrcaFilamentLibrary/Elegoo PETG PRO"
+  ],
+  "OF1Zypyy": [
+   "Qidi/QIDI PETG Tough"
+  ],
+  "OF2UFmOo": [
+   "Qidi/Bambu PLA"
   ],
   "OF3GKs2i": [
    "OrcaFilamentLibrary/eSUN PLA-Matte"
   ],
+  "OF3XeEuV": [
+   "Qidi/QIDI PET-GF"
+  ],
+  "OF48G7He": [
+   "Qidi/QIDI PETG Tough 0.8 nozzle"
+  ],
   "OF4fgpse": [
    "OrcaFilamentLibrary/Elegoo PLA Marble"
+  ],
+  "OF4gzzE4": [
+   "Qidi/QIDI PET-CF"
+  ],
+  "OF5UUaUM": [
+   "Qidi/Qidi Generic PLA High Speed"
+  ],
+  "OF6EOy1A": [
+   "Qidi/Bambu PETG"
   ],
   "OF79FFkO": [
    "OrcaFilamentLibrary/Elegoo PC-FR"
   ],
+  "OF7cv1Ub": [
+   "Qidi/QIDI PLA-CF"
+  ],
   "OF8HQmJD": [
    "OrcaFilamentLibrary/Elegoo PLA Sparkle"
   ],
+  "OF8WvPVL": [
+   "Qidi/QIDI ABS Rapido 0.8 nozzle"
+  ],
   "OF9qvJxV": [
    "OrcaFilamentLibrary/Elegoo PLA Translucent2"
+  ],
+  "OFAUDGEQ": [
+   "Qidi/QIDI PLA Rapido Matte"
+  ],
+  "OFAdAYYk": [
+   "Qidi/QIDI PPS-CF"
+  ],
+  "OFAnyzjN": [
+   "Qidi/HATCHBOX PETG"
+  ],
+  "OFC2FSsV": [
+   "Qidi/Overture PLA"
   ],
   "OFD5e0sH": [
    "OrcaFilamentLibrary/Elegoo Rapid PLA+"
@@ -4640,6 +4466,12 @@
   ],
   "OFDNiRTx": [
    "OrcaFilamentLibrary/Elegoo PLA+"
+  ],
+  "OFFIL5pD": [
+   "Qidi/QIDI PA12-CF"
+  ],
+  "OFG8vHw8": [
+   "Qidi/Qidi Generic ASA"
   ],
   "OFICPchn": [
    "OrcaFilamentLibrary/Elegoo PLA Basic"
@@ -4656,6 +4488,12 @@
   "OFJsqMzx": [
    "OrcaFilamentLibrary/Generic PLA Matte"
   ],
+  "OFK820gS": [
+   "Qidi/QIDI ASA"
+  ],
+  "OFKjlAbC": [
+   "Qidi/QIDI UltraPA-CF25"
+  ],
   "OFLSBS99": [
    "OrcaFilamentLibrary/Generic SBS"
   ],
@@ -4664,6 +4502,30 @@
   ],
   "OFMQJToc": [
    "OrcaFilamentLibrary/Elegoo PETG-GF"
+  ],
+  "OFN0X7oN": [
+   "Qidi/QIDI PLA Basic"
+  ],
+  "OFN0pBpo": [
+   "Qidi/Qidi Generic TPU 95A"
+  ],
+  "OFNX5uRT": [
+   "Qidi/QIDI TPU-Aero"
+  ],
+  "OFOW9K96": [
+   "Qidi/Qidi TPU 95A-HF"
+  ],
+  "OFOysPuE": [
+   "Qidi/QIDI TPU-GF"
+  ],
+  "OFPokkKe": [
+   "Qidi/QIDI PETG-CF"
+  ],
+  "OFPwi9X0": [
+   "Qidi/HATCHBOX ABS"
+  ],
+  "OFQZINrX": [
+   "Qidi/QIDI ABS-GF10"
   ],
   "OFQhLoxN": [
    "OrcaFilamentLibrary/Elegoo PLA Wood"
@@ -4674,39 +4536,132 @@
   "OFRS2Ggt": [
    "OrcaFilamentLibrary/Generic PP-CF"
   ],
+  "OFSSuKRr": [
+   "Qidi/QIDI PETG Basic"
+  ],
   "OFT3TqB6": [
    "OrcaFilamentLibrary/Elas ASA"
+  ],
+  "OFToBodi": [
+   "Qidi/QIDI ABS Rapido Metal"
+  ],
+  "OFUJw3Lx": [
+   "Qidi/QIDI PEBA 95A"
+  ],
+  "OFUkpobY": [
+   "Qidi/QIDI PAHT-CF"
+  ],
+  "OFV4hD1o": [
+   "Qidi/QIDI PLA Rapido Metal"
   ],
   "OFVLuVmD": [
    "OrcaFilamentLibrary/Elegoo Rapid PETG"
   ],
+  "OFVhG0yM": [
+   "Qidi/QIDI ABS Odorless"
+  ],
+  "OFW8UdlP": [
+   "Qidi/QIDI ABS Rapido"
+  ],
+  "OFWkCAdc": [
+   "Qidi/QIDI PETG Tough 0.2 nozzle"
+  ],
+  "OFWyCd0Y": [
+   "Qidi/QIDI Support For PET/PA"
+  ],
+  "OFXNO5Of": [
+   "Qidi/QIDI PLA Rapido 0.2 nozzle"
+  ],
+  "OFXcfTEb": [
+   "Qidi/Tinmorry PETG-ECO"
+  ],
+  "OFXkwkn6": [
+   "Qidi/QIDI PA-Ultra"
+  ],
   "OFXmQgno": [
    "OrcaFilamentLibrary/eSUN PLA-Marble"
+  ],
+  "OFYH00jV": [
+   "Qidi/QIDI ABS-GF"
+  ],
+  "OFZAkPHG": [
+   "Qidi/QIDI PPS-GF"
   ],
   "OFZhdVnP": [
    "OrcaFilamentLibrary/eSUN PLA-Basic"
   ],
+  "OFa5cFqE": [
+   "Qidi/QIDI Support For PAHT"
+  ],
+  "OFa6L3Of": [
+   "Qidi/Qidi PC-ABS-FR"
+  ],
+  "OFbS9rjH": [
+   "Qidi/QIDI PETG Rapido"
+  ],
   "OFbgt3u3": [
    "OrcaFilamentLibrary/Elas PLA Basic"
   ],
+  "OFceJcLf": [
+   "Qidi/PolyLite PLA"
+  ],
   "OFenGPBR": [
    "OrcaFilamentLibrary/Elegoo PETG Translucent"
+  ],
+  "OFeybQvK": [
+   "Qidi/QIDI ABS Rapido 0.2 nozzle"
   ],
   "OFfB1QKi": [
    "Flashforge/Flashforge HS PETG",
    "OrcaFilamentLibrary/Generic PETG HF"
   ],
+  "OFfJoIgg": [
+   "Qidi/QIDI PAHT-GF"
+  ],
+  "OFfdxQok": [
+   "Qidi/Generic PLA+"
+  ],
+  "OFiJYDPC": [
+   "Qidi/HATCHBOX PLA"
+  ],
+  "OFidJLn8": [
+   "Qidi/PolyLite ABS"
+  ],
+  "OFjohFkg": [
+   "Qidi/QIDI PETG Translucent"
+  ],
+  "OFmF1xL9": [
+   "Qidi/QIDI ASA-CF"
+  ],
+  "OFmKNi3f": [
+   "Qidi/QIDI PLA Rapido"
+  ],
   "OFmeQjRP": [
    "OrcaFilamentLibrary/Elegoo Rapid TPU 95A"
+  ],
+  "OFnj7bPm": [
+   "Qidi/QIDI ABS Rapido 0.6 nozzle"
+  ],
+  "OFnsWQTp": [
+   "Qidi/QIDI WOOD Rapido"
   ],
   "OFpwg2Qh": [
    "OrcaFilamentLibrary/Elegoo ASA-CF"
   ],
+  "OFqPp2yL": [
+   "Qidi/QIDI PETG Tough 0.6 nozzle"
+  ],
   "OFqh1Ngp": [
    "OrcaFilamentLibrary/Elegoo PLA-CF"
   ],
+  "OFqyIUDi": [
+   "Qidi/Qidi PLA-CF"
+  ],
   "OFrgQ1Ns": [
    "OrcaFilamentLibrary/Elas PLA Pro"
+  ],
+  "OFs1CbB1": [
+   "Qidi/QIDI PLA Rapido 0.8 nozzle"
   ],
   "OFs6lLH7": [
    "OrcaFilamentLibrary/Elegoo PLA Silk"
@@ -4717,11 +4672,26 @@
   "OFsNZcid": [
    "OrcaFilamentLibrary/PolyLite Dual PLA"
   ],
+  "OFuTFxVP": [
+   "Qidi/Overture ABS"
+  ],
+  "OFuidAEg": [
+   "Qidi/Bambu ABS"
+  ],
   "OFutwD6f": [
    "OrcaFilamentLibrary/Elegoo PLA Glow"
   ],
+  "OFv2NHLC": [
+   "Qidi/QIDI ABS-GF25"
+  ],
+  "OFvN3117": [
+   "Qidi/QIDI PLA Matte Basic"
+  ],
   "OFw4OHWE": [
    "OrcaFilamentLibrary/Elas PETG Basic"
+  ],
+  "OFwHPTvy": [
+   "Qidi/Qidi Generic PLA+"
   ],
   "OFzrWlH5": [
    "OrcaFilamentLibrary/Elegoo PETG HF"
