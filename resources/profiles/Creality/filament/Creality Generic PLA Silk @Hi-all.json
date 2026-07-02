@@ -4,6 +4,7 @@
 	"inherits": "Creality Generic PLA @Hi-all",
 	"from": "system",
 	"setting_id": "RPDVqZcn8EZizd1U",
+	"filament_id": "OFTszIHE",
 	"instantiation": "true",
 	"filament_flow_ratio": [
 		"0.97"

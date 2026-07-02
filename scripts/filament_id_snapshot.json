@@ -42,6 +42,7 @@
   "Anycubic/Anycubic PET-CF @Anycubic Kobra S1 Max 0.4 nozzle",
   "Anycubic/Anycubic PET-CF @Anycubic Kobra S1 Max 0.6 nozzle",
   "Anycubic/Anycubic PET-CF @Anycubic Kobra S1 Max 0.8 nozzle",
+  "Anycubic/Anycubic PETG @Anycubic Kobra 3 0.4 nozzle",
   "Anycubic/Anycubic PETG @Anycubic Kobra 3 Max 0.4 nozzle",
   "Anycubic/Anycubic PETG @Anycubic Kobra 3 Max 0.6 nozzle",
   "Anycubic/Anycubic PETG @Anycubic Kobra 3 Max 0.8 nozzle",
@@ -55,11 +56,17 @@
   "Anycubic/Anycubic PETG-CF @Anycubic Kobra S1 Max 0.6 nozzle",
   "Anycubic/Anycubic PETG-CF @Anycubic Kobra S1 Max 0.8 nozzle",
   "Anycubic/Anycubic PLA @Anycubic Kobra 2 Max 0.4 nozzle",
+  "Anycubic/Anycubic PLA @Anycubic Kobra 2 Neo 0.4 nozzle",
   "Anycubic/Anycubic PLA @Anycubic Kobra 2 Plus 0.4 nozzle",
   "Anycubic/Anycubic PLA @Anycubic Kobra 2 Pro 0.4 nozzle",
+  "Anycubic/Anycubic PLA @Anycubic Kobra 3 0.2 nozzle",
+  "Anycubic/Anycubic PLA @Anycubic Kobra 3 0.4 nozzle",
+  "Anycubic/Anycubic PLA @Anycubic Kobra 3 0.6 nozzle",
+  "Anycubic/Anycubic PLA @Anycubic Kobra 3 0.8 nozzle",
   "Anycubic/Anycubic PLA @Anycubic Kobra 3 Max 0.4 nozzle",
   "Anycubic/Anycubic PLA @Anycubic Kobra 3 Max 0.6 nozzle",
   "Anycubic/Anycubic PLA @Anycubic Kobra 3 Max 0.8 nozzle",
+  "Anycubic/Anycubic PLA @Anycubic Kobra Neo 0.4 nozzle",
   "Anycubic/Anycubic PLA @Anycubic Kobra S1 0.4 nozzle",
   "Anycubic/Anycubic PLA @Anycubic Kobra S1 Max 0.25 nozzle",
   "Anycubic/Anycubic PLA @Anycubic Kobra S1 Max 0.4 nozzle",
@@ -105,15 +112,49 @@
   "Anycubic/Anycubic PLA-CF @Anycubic Kobra S1 Max 0.6 nozzle",
   "Anycubic/Anycubic PLA-CF @Anycubic Kobra S1 Max 0.8 nozzle",
   "Anycubic/Fiberon PA6-CF20 @Anycubic Kobra S1",
+  "Anycubic/Generic ABS @Anycubic Kobra 3 0.4 nozzle",
   "Anycubic/Generic PETG @Anycubic Kobra S1 Max 0.4 nozzle",
   "Anycubic/Generic PETG @Anycubic Kobra X 0.4 nozzle",
   "Anycubic/Generic PETG Basic @Anycubic Kobra 3 Max 0.4 nozzle",
+  "Anycubic/Generic TPU @Anycubic Kobra 3 0.4 nozzle",
   "Anycubic/Panchroma PLA @Anycubic Kobra S1",
   "Anycubic/Polymaker PLA Pro @Anycubic Kobra S1",
   "Anycubic/Polymaker PLA Pro Metallic @Anycubic Kobra S1",
+  "Artillery/Artillery ABS",
+  "Artillery/Artillery ABS @Artillery M1 Pro 0.4 nozzle",
+  "Artillery/Artillery ASA @Artillery M1 Pro 0.4 nozzle",
   "Artillery/Artillery Generic PETG",
   "Artillery/Artillery Generic PLA",
   "Artillery/Artillery Generic PLA-CF",
+  "Artillery/Artillery PA @Artillery M1 Pro 0.4 nozzle",
+  "Artillery/Artillery PA-CF @Artillery M1 Pro 0.4 nozzle",
+  "Artillery/Artillery PC @Artillery M1 Pro 0.4 nozzle",
+  "Artillery/Artillery PET @Artillery M1 Pro 0.4 nozzle",
+  "Artillery/Artillery PETG",
+  "Artillery/Artillery PETG @Artillery M1 Pro 0.4 nozzle",
+  "Artillery/Artillery PETG Basic @Artillery M1 Pro 0.4 nozzle",
+  "Artillery/Artillery PETG-CF @Artillery M1 Pro 0.4 nozzle",
+  "Artillery/Artillery PLA Basic",
+  "Artillery/Artillery PLA Basic @Artillery M1 Pro 0.2 nozzle",
+  "Artillery/Artillery PLA Basic @Artillery M1 Pro 0.4 nozzle",
+  "Artillery/Artillery PLA Basic @Artillery M1 Pro 0.6 nozzle",
+  "Artillery/Artillery PLA Basic @Artillery M1 Pro 0.8 nozzle",
+  "Artillery/Artillery PLA Basic+ @Artillery M1 Pro 0.4 nozzle",
+  "Artillery/Artillery PLA Matte",
+  "Artillery/Artillery PLA Matte @Artillery M1 Pro 0.2 nozzle",
+  "Artillery/Artillery PLA Matte @Artillery M1 Pro 0.4 nozzle",
+  "Artillery/Artillery PLA Matte @Artillery M1 Pro 0.6 nozzle",
+  "Artillery/Artillery PLA Matte @Artillery M1 Pro 0.8 nozzle",
+  "Artillery/Artillery PLA Silk",
+  "Artillery/Artillery PLA Silk @Artillery M1 Pro 0.2 nozzle",
+  "Artillery/Artillery PLA Silk @Artillery M1 Pro 0.4 nozzle",
+  "Artillery/Artillery PLA Silk @Artillery M1 Pro 0.6 nozzle",
+  "Artillery/Artillery PLA Silk @Artillery M1 Pro 0.8 nozzle",
+  "Artillery/Artillery PLA Tough",
+  "Artillery/Artillery PLA-CF @Artillery M1 Pro 0.4 nozzle",
+  "Artillery/Artillery PVA @Artillery M1 Pro 0.4 nozzle",
+  "Artillery/Artillery TPU",
+  "Artillery/Artillery TPU @Artillery M1 Pro 0.4 nozzle",
   "BBL/BETA HIPS @base",
   "BBL/BETA PAHT-CF @base",
   "BBL/BETA PETG @base",
@@ -349,10 +390,25 @@
   "Creality/CR-Wood @K1C_CFS-C-all",
   "Creality/CR-Wood @K1_CFS-C-all",
   "Creality/CR-Wood @K2 Plus-all",
+  "Creality/Creality Generic ASA-CF @Hi-all",
   "Creality/Creality Generic PA-CF",
   "Creality/Creality Generic PC",
   "Creality/Creality Generic PETG",
+  "Creality/Creality Generic PETG-CF @Hi-all",
   "Creality/Creality Generic PLA",
+  "Creality/Creality Generic PLA High Speed @Ender-3V3-all",
+  "Creality/Creality Generic PLA High Speed @Hi-all",
+  "Creality/Creality Generic PLA High Speed @K1-all",
+  "Creality/Creality Generic PLA High Speed @K2-all",
+  "Creality/Creality Generic PLA Matte @Ender-3V3-all",
+  "Creality/Creality Generic PLA Matte @Hi-all",
+  "Creality/Creality Generic PLA Matte @K1-all",
+  "Creality/Creality Generic PLA Matte @K2-all",
+  "Creality/Creality Generic PLA Silk @Ender-3V3-all",
+  "Creality/Creality Generic PLA Silk @Hi-all",
+  "Creality/Creality Generic PLA Silk @K1-all",
+  "Creality/Creality Generic PLA Silk @K2-all",
+  "Creality/Creality Generic PLA Wood @Hi-all",
   "Creality/Creality Generic PLA-CF",
   "Creality/Creality HF Generic PLA",
   "Creality/Creality HF Generic Speed PLA",
@@ -601,6 +657,9 @@
   "DeltaMaker/DeltaMaker Generic PETG",
   "DeltaMaker/DeltaMaker Generic PLA",
   "Dremel/Dremel Generic PLA",
+  "Dremel/Dremel Generic PLA @3D20 all",
+  "Dremel/Dremel Generic PLA @3D40 all",
+  "Dremel/Dremel Generic PLA @3D45 all",
   "Elegoo/Elegoo ASA-CF @base",
   "Elegoo/Elegoo PAHT @base",
   "Elegoo/Elegoo PC @base",
@@ -3117,9 +3176,6 @@
    "CoLiDo/CoLiDo PLA Silk",
    "CoLiDo/CoLiDo PLA+"
   ],
-  "GFABS": [
-   "Anycubic/Anycubic ABS"
-  ],
   "GFASA": [
    "Anycubic/Anycubic ASA"
   ],
@@ -3169,7 +3225,6 @@
    "Artillery/Artillery Generic ASA",
    "BBL/Generic ASA",
    "Creality/Creality Generic ASA",
-   "Creality/Creality Generic ASA-CF",
    "FLSun/FLSun Generic ASA",
    "FLSun/FLSun S1 ASA",
    "FLSun/FLSun T1 ASA",
@@ -3208,9 +3263,7 @@
    "Anker/Anker Generic ABS",
    "Anker/Anker Generic ABS 0.2 nozzle",
    "Anker/Anker Generic ABS 0.25 nozzle",
-   "Anycubic/Anycubic ABS",
    "Anycubic/Anycubic Generic ABS",
-   "Anycubic/Generic ABS",
    "Artillery/Artillery Generic ABS",
    "BBL/Generic ABS",
    "Chuanying/Chuanying ABS",
@@ -3230,9 +3283,7 @@
    "FlyingBear/FlyingBear ABS",
    "FlyingBear/FlyingBear Generic ABS",
    "FlyingBear/Other ABS",
-   "InfiMech/InfiMech ABS",
    "InfiMech/InfiMech Generic ABS",
-   "InfiMech/Other ABS",
    "Lulzbot/Lulzbot 2.85mm ABS",
    "OrcaArena/OrcaArena Generic ABS",
    "Prusa/Prusa Generic ABS",
@@ -3301,8 +3352,6 @@
    "FlyingBear/FlyingBear PC",
    "FlyingBear/Other PC",
    "InfiMech/InfiMech Generic PC",
-   "InfiMech/InfiMech PC",
-   "InfiMech/Other PC",
    "OrcaArena/OrcaArena Generic PC",
    "Prusa/Prusa Generic PC",
    "Prusa/Prusament PC Blend",
@@ -3393,8 +3442,6 @@
    "Anker/Anker Generic PETG 0.2 nozzle",
    "Anker/Anker Generic PETG 0.25 nozzle",
    "Anycubic/Anycubic Generic PETG",
-   "Anycubic/Anycubic PETG",
-   "Anycubic/Generic PETG Basic",
    "Artillery/Artillery Generic PETG",
    "BBL/Generic PETG",
    "CONSTRUCT3D/C1 Generic High Flow PETG",
@@ -3407,7 +3454,6 @@
    "CoLiDo/CoLiDo PETG",
    "Comgrow/Comgrow Generic PETG",
    "Creality/Creality Generic PETG",
-   "Creality/Creality Generic PETG-CF",
    "Custom/Generic PETG",
    "DeltaMaker/DeltaMaker Generic PETG",
    "FLSun/FLSun Generic PETG",
@@ -3420,8 +3466,6 @@
    "FlyingBear/FlyingBear PETG Basic",
    "FlyingBear/Other PETG",
    "InfiMech/InfiMech Generic PETG",
-   "InfiMech/InfiMech PETG",
-   "InfiMech/Other PETG",
    "Lulzbot/Lulzbot 2.85mm PETG",
    "MagicMaker/MM Generic PEEK",
    "OrcaArena/OrcaArena Generic PETG",
@@ -3640,12 +3684,6 @@
    "Anycubic/Polymaker PLA Pro Metallic",
    "Snapmaker/Polymaker PLA Pro Metallic"
   ],
-  "GFL92": [
-   "Anycubic/Anycubic PLA"
-  ],
-  "GFL93": [
-   "Anycubic/Anycubic PLA+"
-  ],
   "GFL94": [
    "Anycubic/Anycubic PLA Slik"
   ],
@@ -3653,7 +3691,6 @@
    "Anker/Anker Generic PLA+",
    "Anker/Anker Generic PLA+ 0.2 nozzle",
    "Anker/Anker Generic PLA+ 0.25 nozzle",
-   "Anycubic/Anycubic PLA Matte",
    "BBL/Generic PLA High Speed",
    "Tiertime/Tiertime Generic PLA High Speed"
   ],
@@ -3664,7 +3701,6 @@
    "Anker/Anker Generic PLA Silk",
    "Anker/Anker Generic PLA Silk 0.2 nozzle",
    "Anker/Anker Generic PLA Silk 0.25 nozzle",
-   "Anycubic/Anycubic PLA High Speed",
    "BBL/Generic PLA Silk",
    "Tiertime/Tiertime Generic PLA Silk"
   ],
@@ -3710,30 +3746,7 @@
    "Anker/Anker Generic PLA 0.2 nozzle",
    "Anker/Anker Generic PLA 0.25 nozzle",
    "Anycubic/Anycubic Generic PLA",
-   "Anycubic/Anycubic PLA",
-   "Anycubic/Anycubic PLA High Speed",
-   "Anycubic/Anycubic PLA Luminous",
-   "Anycubic/Anycubic PLA Matte",
-   "Anycubic/Anycubic PLA Silk",
-   "Anycubic/Anycubic PLA+",
-   "Artillery/Artillery ABS",
-   "Artillery/Artillery ASA",
    "Artillery/Artillery Generic PLA",
-   "Artillery/Artillery PA",
-   "Artillery/Artillery PA-CF",
-   "Artillery/Artillery PC",
-   "Artillery/Artillery PET",
-   "Artillery/Artillery PETG",
-   "Artillery/Artillery PETG Basic",
-   "Artillery/Artillery PETG-CF",
-   "Artillery/Artillery PLA Basic",
-   "Artillery/Artillery PLA Basic+",
-   "Artillery/Artillery PLA Matte",
-   "Artillery/Artillery PLA Silk",
-   "Artillery/Artillery PLA Tough",
-   "Artillery/Artillery PLA-CF",
-   "Artillery/Artillery PVA",
-   "Artillery/Artillery TPU",
    "BBL/Generic PLA",
    "CONSTRUCT3D/C1 Generic PLA",
    "Chuanying/Chuanying ASA",
@@ -3752,12 +3765,6 @@
    "Comgrow/Comgrow Generic PLA",
    "Comgrow/Comgrow T300 PLA",
    "Creality/Creality Generic PLA",
-   "Creality/Creality Generic PLA High Speed",
-   "Creality/Creality Generic PLA Matte",
-   "Creality/Creality Generic PLA Silk",
-   "Creality/Creality Generic PLA Wood",
-   "Creality/Creality HF Generic PLA",
-   "Creality/Creality HF Generic Speed PLA",
    "Custom/Generic PLA",
    "DeltaMaker/DeltaMaker Brand PLA",
    "DeltaMaker/DeltaMaker Generic PLA",
@@ -3778,11 +3785,6 @@
    "FlyingBear/Other PLA",
    "FlyingBear/Other PLA Hyper",
    "InfiMech/InfiMech Generic PLA",
-   "InfiMech/InfiMech PLA",
-   "InfiMech/InfiMech PLA Basic",
-   "InfiMech/InfiMech PLA Hyper",
-   "InfiMech/Other PLA",
-   "InfiMech/Other PLA Hyper",
    "Lulzbot/Lulzbot 2.85mm PLA",
    "OrcaArena/OrcaArena Generic PLA",
    "Peopoly/Peopoly Generic PLA",
@@ -3917,8 +3919,6 @@
    "FlyingBear/FlyingBear PA-CF",
    "FlyingBear/Other PA-CF",
    "InfiMech/InfiMech Generic PA-CF",
-   "InfiMech/InfiMech PA-CF",
-   "InfiMech/Other PA-CF",
    "OrcaArena/OrcaArena Generic PA-CF",
    "Prusa/Prusament PA-CF",
    "Qidi/Qidi Generic PA-CF",
@@ -4071,7 +4071,6 @@
    "Anycubic/Anycubic PET-CF"
   ],
   "GFPETG": [
-   "Anycubic/Anycubic PETG",
    "Anycubic/Generic PETG"
   ],
   "GFPETG-1": [
@@ -4080,26 +4079,11 @@
   "GFPETG-CF": [
    "Anycubic/Anycubic PETG-CF"
   ],
-  "GFPLA": [
-   "Anycubic/Anycubic PLA"
-  ],
   "GFPLA Glow": [
    "Anycubic/Anycubic PLA Glow"
   ],
-  "GFPLA High Speed": [
-   "Anycubic/Anycubic PLA High Speed"
-  ],
-  "GFPLA Matte": [
-   "Anycubic/Anycubic PLA Matte"
-  ],
-  "GFPLA Silk": [
-   "Anycubic/Anycubic PLA Silk"
-  ],
   "GFPLA Translucent": [
    "Anycubic/Anycubic PLA Translucent"
-  ],
-  "GFPLA+": [
-   "Anycubic/Anycubic PLA+"
   ],
   "GFPLA-CF": [
    "Anycubic/Anycubic PLA-CF"
@@ -4435,9 +4419,6 @@
   "GFU99": [
    "Anker/Anker Generic TPU",
    "Anycubic/Anycubic Generic TPU",
-   "Anycubic/Anycubic PEBA 95A",
-   "Anycubic/Anycubic TPU",
-   "Anycubic/Generic TPU",
    "Artillery/Artillery Generic TPU",
    "BBL/Generic TPU",
    "CoLiDo/CoLiDo Generic TPU",
@@ -4451,9 +4432,7 @@
    "FlyingBear/FlyingBear TPU Basic",
    "FlyingBear/Other TPU",
    "InfiMech/InfiMech Generic TPU",
-   "InfiMech/InfiMech TPU",
    "InfiMech/InfiMech TPU Basic",
-   "InfiMech/Other TPU",
    "OrcaArena/OrcaArena Generic TPU",
    "Prusa/Prusa Generic FLEX",
    "Prusa/Prusa Generic TPU",
@@ -4713,6 +4692,9 @@
   "OF41QVDH": [
    "Flashforge/Flashforge Generic PLA-Silk"
   ],
+  "OF43idK2": [
+   "Creality/Creality Generic PLA Matte"
+  ],
   "OF48G7He": [
    "Qidi/QIDI PETG Tough 0.8 nozzle"
   ],
@@ -4727,6 +4709,9 @@
   ],
   "OF4m9A5w": [
    "Flashforge/Flashforge Generic HIPS"
+  ],
+  "OF57IbZT": [
+   "Artillery/Artillery PLA Basic"
   ],
   "OF5T1Y9R": [
    "Flashforge/Flashforge ABS Basic"
@@ -4776,6 +4761,9 @@
   "OF9sr3Vn": [
    "Flashforge/Flashforge PLA Sparkle"
   ],
+  "OF9vnvM8": [
+   "Artillery/Artillery PETG-CF"
+  ],
   "OFAEqlWa": [
    "Flashforge/Flashforge Generic PLA-SILK"
   ],
@@ -4784,6 +4772,9 @@
   ],
   "OFAHagT9": [
    "Elegoo/Elegoo Rapid PLA+"
+  ],
+  "OFAK2XjZ": [
+   "InfiMech/Other ABS"
   ],
   "OFAUDGEQ": [
    "Qidi/QIDI PLA Rapido Matte"
@@ -4836,17 +4827,32 @@
   "OFE22Uba": [
    "Flashforge/Flashforge TPU-90A"
   ],
+  "OFEYKrjb": [
+   "Artillery/Artillery PETG"
+  ],
+  "OFEdyZqS": [
+   "Anycubic/Anycubic PLA Luminous"
+  ],
   "OFFIL5pD": [
    "Qidi/QIDI PA12-CF"
   ],
+  "OFFrbsvQ": [
+   "InfiMech/Other TPU"
+  ],
   "OFG8vHw8": [
    "Qidi/Qidi Generic ASA"
+  ],
+  "OFGb4hPY": [
+   "Anycubic/Anycubic PEBA 95A"
   ],
   "OFGfdP6J": [
    "Flashforge/FusRock Generic S-Multi"
   ],
   "OFHBTqyD": [
    "Flashforge/Flashforge PLA Basic"
+  ],
+  "OFHL32M0": [
+   "Anycubic/Anycubic TPU"
   ],
   "OFHtQDC9": [
    "Elegoo/Elegoo PLA Basic"
@@ -4872,6 +4878,9 @@
   "OFK820gS": [
    "Qidi/QIDI ASA"
   ],
+  "OFKDnrjL": [
+   "Artillery/Artillery PLA Matte"
+  ],
   "OFKWVi10": [
    "Flashforge/Flashforge Generic PLA-CF10"
   ],
@@ -4880,6 +4889,9 @@
   ],
   "OFKjlAbC": [
    "Qidi/QIDI UltraPA-CF25"
+  ],
+  "OFKzh9lx": [
+   "InfiMech/InfiMech PLA"
   ],
   "OFL4KniM": [
    "Elegoo/Elegoo Rapid TPU 95A"
@@ -4892,6 +4904,9 @@
   ],
   "OFLeFaUO": [
    "Flashforge/Flashforge Generic PVA"
+  ],
+  "OFLriDvE": [
+   "Creality/Creality Generic PLA High Speed"
   ],
   "OFLxO2Oc": [
    "Flashforge/FusRock PET"
@@ -4914,8 +4929,14 @@
   "OFN0pBpo": [
    "Qidi/Qidi Generic TPU 95A"
   ],
+  "OFNRgSch": [
+   "Artillery/Artillery PC"
+  ],
   "OFNX5uRT": [
    "Qidi/QIDI TPU-Aero"
+  ],
+  "OFNbajj9": [
+   "Creality/Creality Generic ASA-CF"
   ],
   "OFOSzSuh": [
    "Flashforge/Flashforge PA-CF"
@@ -4925,6 +4946,9 @@
   ],
   "OFOkTA0C": [
    "Elegoo/Elegoo PETG Translucent"
+  ],
+  "OFOp3Oef": [
+   "Anycubic/Generic ABS"
   ],
   "OFOysPuE": [
    "Qidi/QIDI TPU-GF"
@@ -4968,6 +4992,9 @@
   "OFRgDMDJ": [
    "Flashforge/Flashforge PETG Transparent"
   ],
+  "OFS3HrR1": [
+   "InfiMech/Other PLA"
+  ],
   "OFSCm6pJ": [
    "Elegoo/Elegoo PET-CF"
   ],
@@ -4977,23 +5004,41 @@
   "OFSdF3B1": [
    "Flashforge/FusRock PAHT-CF"
   ],
+  "OFSpTWdv": [
+   "InfiMech/Other PA-CF"
+  ],
   "OFT3TqB6": [
    "OrcaFilamentLibrary/Elas ASA"
   ],
   "OFTa6gPH": [
    "Flashforge/Flashforge PLA Pro"
   ],
+  "OFTbsWVg": [
+   "Artillery/Artillery TPU"
+  ],
   "OFToBodi": [
    "Qidi/QIDI ABS Rapido Metal"
   ],
+  "OFTsGps3": [
+   "InfiMech/InfiMech PC"
+  ],
+  "OFTszIHE": [
+   "Creality/Creality Generic PLA Silk"
+  ],
   "OFUJw3Lx": [
    "Qidi/QIDI PEBA 95A"
+  ],
+  "OFUYjPc4": [
+   "Dremel/Dremel Generic PLA"
   ],
   "OFUkpobY": [
    "Qidi/QIDI PAHT-CF"
   ],
   "OFV4hD1o": [
    "Qidi/QIDI PLA Rapido Metal"
+  ],
+  "OFVBNoov": [
+   "InfiMech/InfiMech ABS"
   ],
   "OFVLuVmD": [
    "OrcaFilamentLibrary/Elegoo Rapid PETG"
@@ -5015,6 +5060,9 @@
   ],
   "OFWyCd0Y": [
    "Qidi/QIDI Support For PET/PA"
+  ],
+  "OFXA8vy9": [
+   "Artillery/Artillery PLA Basic+"
   ],
   "OFXNO5Of": [
    "Qidi/QIDI PLA Rapido 0.2 nozzle"
@@ -5058,6 +5106,9 @@
   "OFZhdVnP": [
    "OrcaFilamentLibrary/eSUN PLA-Basic"
   ],
+  "OFZjZ1k7": [
+   "Creality/Creality HF Generic PLA"
+  ],
   "OFa5cFqE": [
    "Qidi/QIDI Support For PAHT"
   ],
@@ -5066,6 +5117,12 @@
   ],
   "OFaKIoH2": [
    "Elegoo/Elegoo PLA Sparkle"
+  ],
+  "OFaKZ6JI": [
+   "Anycubic/Generic PETG Basic"
+  ],
+  "OFb3UzMZ": [
+   "InfiMech/InfiMech PA-CF"
   ],
   "OFbK5wve": [
    "Prusa/Prusa Generic TPU HF"
@@ -5079,6 +5136,9 @@
   "OFbgt3u3": [
    "OrcaFilamentLibrary/Elas PLA Basic"
   ],
+  "OFc2SnEp": [
+   "Artillery/Artillery PVA"
+  ],
   "OFceJcLf": [
    "Qidi/PolyLite PLA"
   ],
@@ -5088,8 +5148,14 @@
   "OFcy60o4": [
    "Flashforge/Flashforge ASA Basic"
   ],
+  "OFdLGn0R": [
+   "Creality/Creality Generic PLA Wood"
+  ],
   "OFdNORGt": [
    "Flashforge/Flashforge ASA-GF"
+  ],
+  "OFdSGkUG": [
+   "Anycubic/Anycubic PETG"
   ],
   "OFdhVJql": [
    "Flashforge/Flashforge PLA Buint Ti"
@@ -5100,11 +5166,17 @@
   "OFeWMAGH": [
    "Flashforge/Flashforge HS PLA Burnt Ti"
   ],
+  "OFefhSuj": [
+   "InfiMech/InfiMech PLA Hyper"
+  ],
   "OFenGPBR": [
    "OrcaFilamentLibrary/Elegoo PETG Translucent"
   ],
   "OFeybQvK": [
    "Qidi/QIDI ABS Rapido 0.2 nozzle"
+  ],
+  "OFf2b9wu": [
+   "Anycubic/Anycubic ABS"
   ],
   "OFfB1QKi": [
    "OrcaFilamentLibrary/Generic PETG HF"
@@ -5115,11 +5187,23 @@
   "OFfdxQok": [
    "Qidi/Generic PLA+"
   ],
+  "OFfkPhrJ": [
+   "Creality/Creality HF Generic Speed PLA"
+  ],
   "OFftQOek": [
    "Flashforge/Flashforge PLA  Matte"
   ],
   "OFgJX0Fc": [
    "Flashforge/FlashForge PPS"
+  ],
+  "OFgK2Xvv": [
+   "Anycubic/Anycubic PLA"
+  ],
+  "OFgSK1hL": [
+   "Anycubic/Anycubic PLA High Speed"
+  ],
+  "OFgrGfPy": [
+   "Anycubic/Anycubic PLA+"
   ],
   "OFh5GUhZ": [
    "Elegoo/Elegoo PLA Wood"
@@ -5147,6 +5231,9 @@
   ],
   "OFjFPhUC": [
    "Prusa/Prusament rPLA"
+  ],
+  "OFjdTQd6": [
+   "Anycubic/Anycubic PLA Silk"
   ],
   "OFjepy6j": [
    "Flashforge/FusRock Generic S-PAHT"
@@ -5190,6 +5277,9 @@
   "OFmOWC74": [
    "Elegoo/Elegoo PETG PRO"
   ],
+  "OFmcJsqt": [
+   "InfiMech/InfiMech TPU"
+  ],
   "OFmduKVr": [
    "Flashforge/FlashForge PPS-CF"
   ],
@@ -5199,11 +5289,20 @@
   "OFmgesco": [
    "Flashforge/Flashforge TPU 65D"
   ],
+  "OFnLnZQo": [
+   "Cubicon/Cubicon PC"
+  ],
+  "OFnY9ovF": [
+   "Artillery/Artillery PA-CF"
+  ],
   "OFnj7bPm": [
    "Qidi/QIDI ABS Rapido 0.6 nozzle"
   ],
   "OFnsWQTp": [
    "Qidi/QIDI WOOD Rapido"
+  ],
+  "OFnyirh9": [
+   "Artillery/Artillery PLA Silk"
   ],
   "OFo4VB3w": [
    "Elegoo/Generic ABS-CF"
@@ -5222,6 +5321,9 @@
   ],
   "OFp8lkYD": [
    "Flashforge/Flashforge PPA-GF"
+  ],
+  "OFp90N8a": [
+   "Artillery/Artillery PA"
   ],
   "OFpHq9gJ": [
    "Prusa/Prusament PETG"
@@ -5244,6 +5346,9 @@
   "OFqyIUDi": [
    "Qidi/Qidi PLA-CF"
   ],
+  "OFrbbq6E": [
+   "InfiMech/Other PLA Hyper"
+  ],
   "OFrgQ1Ns": [
    "OrcaFilamentLibrary/Elas PLA Pro"
   ],
@@ -5252,6 +5357,9 @@
   ],
   "OFs6lLH7": [
    "OrcaFilamentLibrary/Elegoo PLA Silk"
+  ],
+  "OFsCOJv7": [
+   "Anycubic/Generic TPU"
   ],
   "OFsKqcQW": [
    "OrcaFilamentLibrary/Elegoo PLA PRO"
@@ -5265,6 +5373,9 @@
   "OFsgANe3": [
    "Flashforge/Flashforge PAHT-CF"
   ],
+  "OFt5bvKK": [
+   "Artillery/Artillery PETG Basic"
+  ],
   "OFt9AiN5": [
    "Flashforge/Polymaker CoPA"
   ],
@@ -5273,6 +5384,12 @@
   ],
   "OFtJMczs": [
    "Flashforge/Flashforge TPU-64D"
+  ],
+  "OFtXBjvb": [
+   "Artillery/Artillery PLA Tough"
+  ],
+  "OFtmT4Nd": [
+   "Artillery/Artillery ASA"
   ],
   "OFuPC4S8": [
    "Elegoo/Elegoo PLA-CF"
@@ -5285,6 +5402,9 @@
   ],
   "OFuidAEg": [
    "Qidi/Bambu ABS"
+  ],
+  "OFuq9tqb": [
+   "InfiMech/InfiMech PLA Basic"
   ],
   "OFuswXlp": [
    "Flashforge/Generic TPU 85A"
@@ -5301,14 +5421,35 @@
   "OFv8SRZh": [
    "Prusa/Prusa Generic PLA-CF"
   ],
+  "OFvGSn0l": [
+   "Creality/Creality Generic PETG-CF"
+  ],
   "OFvN3117": [
    "Qidi/QIDI PLA Matte Basic"
+  ],
+  "OFvYfHPB": [
+   "Anycubic/Anycubic PLA Matte"
+  ],
+  "OFvaXhYD": [
+   "InfiMech/InfiMech PETG"
   ],
   "OFviQ9lH": [
    "Flashforge/Flashforge Generic TPU"
   ],
   "OFvsS7Fb": [
    "Flashforge/Generic TPU-64D"
+  ],
+  "OFvxvkAd": [
+   "Artillery/Artillery PLA-CF"
+  ],
+  "OFw05rkF": [
+   "InfiMech/Other PETG"
+  ],
+  "OFw0qp7w": [
+   "Artillery/Artillery PET"
+  ],
+  "OFw1S8lL": [
+   "Artillery/Artillery ABS"
   ],
   "OFw4OHWE": [
    "OrcaFilamentLibrary/Elas PETG Basic"
@@ -5327,6 +5468,9 @@
   ],
   "OFxjFYxE": [
    "Elegoo/Elegoo PETG HF"
+  ],
+  "OFyD1Zo8": [
+   "InfiMech/Other PC"
   ],
   "OFyoW5W2": [
    "Flashforge/Flashforge PLA Color Change"
@@ -5693,19 +5837,6 @@
   "P1004": [
    "Creality/PolySonic PLA"
   ],
-  "P11851ba": [
-   "Artillery/Artillery PET"
-  ],
-  "P284941e": [
-   "Artillery/Artillery PETG",
-   "Artillery/Artillery PETG Basic"
-  ],
-  "P2fbf0c0": [
-   "Artillery/Artillery TPU"
-  ],
-  "P39db358": [
-   "Artillery/Artillery ABS"
-  ],
   "P510cfa0": [
    "Cubicon/Cubicon PLA"
   ],
@@ -5728,24 +5859,14 @@
    "Cubicon/Cubicon PETG"
   ],
   "P510cfd0": [
-   "Cubicon/Cubicon PA-CF",
-   "Cubicon/Cubicon PC"
+   "Cubicon/Cubicon PA-CF"
   ],
   "P510eff9": [
    "Ginger Additive/Ginger Generic PETG",
    "Ginger Additive/Ginger Generic PLA"
   ],
-  "P8163162": [
-   "Artillery/Artillery PVA"
-  ],
-  "P87436f6": [
-   "Artillery/Artillery ASA"
-  ],
   "Pfcf9c4c": [
-   "Artillery/Artillery PLA",
-   "Artillery/Artillery PLA Basic",
-   "Artillery/Artillery PLA Matte",
-   "Artillery/Artillery PLA Silk"
+   "Artillery/Artillery PLA"
   ],
   "Prusa Generic ABS @CORE One": [
    "Prusa/Prusa Generic ABS"
@@ -6661,10 +6782,13 @@
   "Anycubic/Panchroma PLA @Anycubic Kobra S1",
   "Anycubic/Polymaker PLA Pro @Anycubic Kobra S1",
   "Anycubic/Polymaker PLA Pro Metallic @Anycubic Kobra S1",
+  "Artillery/Artillery ABS",
   "Artillery/Artillery ABS @Artillery M1 Pro 0.2 nozzle",
+  "Artillery/Artillery ABS @Artillery M1 Pro 0.4 nozzle",
   "Artillery/Artillery ABS @Artillery M1 Pro 0.6 nozzle",
   "Artillery/Artillery ABS @Artillery M1 Pro 0.8 nozzle",
   "Artillery/Artillery ASA @Artillery M1 Pro 0.2 nozzle",
+  "Artillery/Artillery ASA @Artillery M1 Pro 0.4 nozzle",
   "Artillery/Artillery ASA @Artillery M1 Pro 0.6 nozzle",
   "Artillery/Artillery ASA @Artillery M1 Pro 0.8 nozzle",
   "Artillery/Artillery Generic ABS",
@@ -6673,21 +6797,50 @@
   "Artillery/Artillery Generic PLA",
   "Artillery/Artillery Generic PLA-CF",
   "Artillery/Artillery Generic TPU",
+  "Artillery/Artillery PA @Artillery M1 Pro 0.4 nozzle",
+  "Artillery/Artillery PA-CF @Artillery M1 Pro 0.4 nozzle",
+  "Artillery/Artillery PC @Artillery M1 Pro 0.4 nozzle",
   "Artillery/Artillery PET @Artillery M1 Pro 0.2 nozzle",
+  "Artillery/Artillery PET @Artillery M1 Pro 0.4 nozzle",
   "Artillery/Artillery PET @Artillery M1 Pro 0.6 nozzle",
   "Artillery/Artillery PET @Artillery M1 Pro 0.8 nozzle",
+  "Artillery/Artillery PETG",
   "Artillery/Artillery PETG @Artillery M1 Pro 0.2 nozzle",
+  "Artillery/Artillery PETG @Artillery M1 Pro 0.4 nozzle",
   "Artillery/Artillery PETG @Artillery M1 Pro 0.6 nozzle",
   "Artillery/Artillery PETG @Artillery M1 Pro 0.8 nozzle",
   "Artillery/Artillery PETG Basic @Artillery M1 Pro 0.2 nozzle",
+  "Artillery/Artillery PETG Basic @Artillery M1 Pro 0.4 nozzle",
   "Artillery/Artillery PETG Basic @Artillery M1 Pro 0.6 nozzle",
   "Artillery/Artillery PETG Basic @Artillery M1 Pro 0.8 nozzle",
+  "Artillery/Artillery PETG-CF @Artillery M1 Pro 0.4 nozzle",
   "Artillery/Artillery PLA @Artillery M1 Pro 0.2 nozzle",
   "Artillery/Artillery PLA @Artillery M1 Pro 0.6 nozzle",
   "Artillery/Artillery PLA @Artillery M1 Pro 0.8 nozzle",
+  "Artillery/Artillery PLA Basic",
+  "Artillery/Artillery PLA Basic @Artillery M1 Pro 0.2 nozzle",
+  "Artillery/Artillery PLA Basic @Artillery M1 Pro 0.4 nozzle",
+  "Artillery/Artillery PLA Basic @Artillery M1 Pro 0.6 nozzle",
+  "Artillery/Artillery PLA Basic @Artillery M1 Pro 0.8 nozzle",
+  "Artillery/Artillery PLA Basic+ @Artillery M1 Pro 0.4 nozzle",
+  "Artillery/Artillery PLA Matte",
+  "Artillery/Artillery PLA Matte @Artillery M1 Pro 0.2 nozzle",
+  "Artillery/Artillery PLA Matte @Artillery M1 Pro 0.4 nozzle",
+  "Artillery/Artillery PLA Matte @Artillery M1 Pro 0.6 nozzle",
+  "Artillery/Artillery PLA Matte @Artillery M1 Pro 0.8 nozzle",
+  "Artillery/Artillery PLA Silk",
+  "Artillery/Artillery PLA Silk @Artillery M1 Pro 0.2 nozzle",
+  "Artillery/Artillery PLA Silk @Artillery M1 Pro 0.4 nozzle",
+  "Artillery/Artillery PLA Silk @Artillery M1 Pro 0.6 nozzle",
+  "Artillery/Artillery PLA Silk @Artillery M1 Pro 0.8 nozzle",
+  "Artillery/Artillery PLA Tough",
+  "Artillery/Artillery PLA-CF @Artillery M1 Pro 0.4 nozzle",
   "Artillery/Artillery PVA @Artillery M1 Pro 0.2 nozzle",
+  "Artillery/Artillery PVA @Artillery M1 Pro 0.4 nozzle",
   "Artillery/Artillery PVA @Artillery M1 Pro 0.6 nozzle",
   "Artillery/Artillery PVA @Artillery M1 Pro 0.8 nozzle",
+  "Artillery/Artillery TPU",
+  "Artillery/Artillery TPU @Artillery M1 Pro 0.4 nozzle",
   "Artillery/Artillery TPU @Artillery M1 Pro 0.6 nozzle",
   "Artillery/Artillery TPU @Artillery M1 Pro 0.8 nozzle",
   "BBL/Generic SBS",
@@ -6837,12 +6990,27 @@
   "Creality/Creality Generic ABS @Ender-5Max-all",
   "Creality/Creality Generic ASA",
   "Creality/Creality Generic ASA @Ender-5Max-all",
+  "Creality/Creality Generic ASA-CF @Hi-all",
   "Creality/Creality Generic PA @Ender-5Max-all",
   "Creality/Creality Generic PA-CF",
   "Creality/Creality Generic PETG",
   "Creality/Creality Generic PETG @Ender-5Max-all",
+  "Creality/Creality Generic PETG-CF @Hi-all",
   "Creality/Creality Generic PLA",
   "Creality/Creality Generic PLA @Ender-5Max-all",
+  "Creality/Creality Generic PLA High Speed @Ender-3V3-all",
+  "Creality/Creality Generic PLA High Speed @Hi-all",
+  "Creality/Creality Generic PLA High Speed @K1-all",
+  "Creality/Creality Generic PLA High Speed @K2-all",
+  "Creality/Creality Generic PLA Matte @Ender-3V3-all",
+  "Creality/Creality Generic PLA Matte @Hi-all",
+  "Creality/Creality Generic PLA Matte @K1-all",
+  "Creality/Creality Generic PLA Matte @K2-all",
+  "Creality/Creality Generic PLA Silk @Ender-3V3-all",
+  "Creality/Creality Generic PLA Silk @Hi-all",
+  "Creality/Creality Generic PLA Silk @K1-all",
+  "Creality/Creality Generic PLA Silk @K2-all",
+  "Creality/Creality Generic PLA Wood @Hi-all",
   "Creality/Creality Generic PLA-CF",
   "Creality/Creality Generic TPU",
   "Creality/Creality Generic TPU @Ender-5Max-all",
@@ -7238,15 +7406,6 @@
   "Creality/eSUN PLA-Lite @K2 Plus-all",
   "Creality/eSUN PLA-Matte @K2 Plus-all",
   "Creality/eSUN PLA-Silk @K2 Plus-all",
-  "Cubicon/Cubicon ABS @base",
-  "Cubicon/Cubicon ABS-A100 @base",
-  "Cubicon/Cubicon ABSk @base",
-  "Cubicon/Cubicon PA-CF @base",
-  "Cubicon/Cubicon PC @base",
-  "Cubicon/Cubicon PETG @base",
-  "Cubicon/Cubicon PLA @base",
-  "Cubicon/Cubicon PLA+ @base",
-  "Cubicon/Cubicon PLAi21 @base",
   "Custom/Generic PC @MyToolChanger",
   "Custom/Generic PETG @MyToolChanger",
   "Custom/Generic PLA @MyToolChanger",
@@ -7258,6 +7417,9 @@
   "DeltaMaker/DeltaMaker Generic PLA",
   "DeltaMaker/DeltaMaker Generic TPU",
   "Dremel/Dremel Generic PLA",
+  "Dremel/Dremel Generic PLA @3D20 all",
+  "Dremel/Dremel Generic PLA @3D40 all",
+  "Dremel/Dremel Generic PLA @3D45 all",
   "Elegoo/Generic ABS-CF @Elegoo Centauri",
   "Elegoo/Generic PA6-CF @Elegoo",
   "Elegoo/Generic PC-CF @Elegoo",

@@ -4,6 +4,7 @@
 	"inherits": "Creality Generic PETG @Hi-all",
 	"from": "system",
 	"setting_id": "G4ZIJDNOpQvutOfs",
+	"filament_id": "OFvGSn0l",
 	"instantiation": "true",
 	"filament_max_volumetric_speed": [
 		"9"

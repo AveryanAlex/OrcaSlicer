@@ -4,6 +4,7 @@
 	"inherits": "Dremel Generic PLA",
 	"from": "system",
 	"setting_id": "weKWPiNIe3TmOXRn",
+	"filament_id": "OFUYjPc4",
 	"instantiation": "true",
 	"filament_max_volumetric_speed": [
 		"9"

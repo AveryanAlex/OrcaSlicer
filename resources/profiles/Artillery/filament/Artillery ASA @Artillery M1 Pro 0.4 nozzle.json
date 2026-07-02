@@ -4,6 +4,7 @@
 	"inherits": "Artillery Generic PLA",
 	"from": "system",
 	"setting_id": "eSwM3ZfSBWqR8Gcf",
+	"filament_id": "OFtmT4Nd",
 	"instantiation": "true",
 	"chamber_temperature": [
 		"55"

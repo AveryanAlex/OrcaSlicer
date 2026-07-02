@@ -4,6 +4,7 @@
 	"inherits": "Creality Generic PLA @Ender-3V3-all",
 	"from": "system",
 	"setting_id": "4F3dZWvsniH9QHtr",
+	"filament_id": "OFLriDvE",
 	"instantiation": "true",
 	"filament_max_volumetric_speed": [
 		"23"
