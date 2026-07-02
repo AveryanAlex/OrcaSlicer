@@ -4,7 +4,6 @@
 	"inherits": "Chuanying Generic PLA-Silk",
 	"from": "system",
 	"setting_id": "kph5feBjhPi0oo0G",
-	"filament_id": "GFL99",
 	"instantiation": "true",
 	"compatible_printers": [
 		"Chuanying X1 0.25 Nozzle"

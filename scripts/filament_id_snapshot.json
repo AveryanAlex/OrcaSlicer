@@ -314,6 +314,7 @@
   "CONSTRUCT3D/C1 Generic High Flow PETG",
   "CONSTRUCT3D/C1 Generic PETG",
   "CONSTRUCT3D/C1 Generic PLA",
+  "Chuanying/Chuanying Generic HIPS",
   "Chuanying/Chuanying Generic HS PLA",
   "Chuanying/Chuanying Generic PETG",
   "Chuanying/Chuanying Generic PETG-CF10",
@@ -321,7 +322,10 @@
   "Chuanying/Chuanying Generic PLA-CF10",
   "Chuanying/Chuanying Generic PLA-Silk",
   "Chuanying/Chuanying Generic PVA",
+  "Co Print/CoPrint Generic ABS",
+  "Co Print/CoPrint Generic PETG",
   "Co Print/CoPrint Generic PLA",
+  "Co Print/CoPrint Generic TPU",
   "CoLiDo/CoLiDo Generic PETG @CoLiDo DIY 4.0",
   "CoLiDo/CoLiDo Generic PETG @CoLiDo X16",
   "CoLiDo/CoLiDo Generic PLA @CoLiDo DIY 4.0",
@@ -704,6 +708,10 @@
   "FLSun/FLSun Generic PETG",
   "FLSun/FLSun Generic PLA",
   "FLSun/FLSun Generic PLA-CF",
+  "FLSun/FLSun S1 PLA High Speed",
+  "FLSun/FLSun S1 PLA Silk",
+  "FLSun/FLSun T1 PLA High Speed",
+  "FLSun/FLSun T1 PLA Silk",
   "Flashforge/FlashForge PC @FF G4 0.6 HF nozzle",
   "Flashforge/FlashForge PC @FF G4 0.6 nozzle",
   "Flashforge/FlashForge PC @FF G4 0.8 HF nozzle",
@@ -2645,7 +2653,6 @@
    "Blocks/Blocks Generic PVA"
   ],
   "BSFI010": [
-   "Blocks/Blocks Generic ASA-CF",
    "Blocks/Blocks Generic PLA-CF"
   ],
   "BTUB00": [
@@ -2786,8 +2793,7 @@
    "Eryone/Eryone PLA-CF"
   ],
   "EFL43": [
-   "Eryone/Eryone PETG-CF",
-   "Eryone/Eryone PP"
+   "Eryone/Eryone PETG-CF"
   ],
   "EFL71": [
    "Eryone/Eryone PA"
@@ -3095,7 +3101,6 @@
   ],
   "GFA00_01": [
    "Afinia/Afinia PLA",
-   "Afinia/Afinia Value PLA",
    "Tiertime/Tiertime PLA"
   ],
   "GFA01": [
@@ -3114,7 +3119,6 @@
   "GFA05": [
    "BBL/Bambu PLA Silk",
    "OrcaArena/Arena PLA Silk",
-   "OrcaArena/OrcaArena Generic PLA Silk",
    "Qidi/Qidi Generic PLA Silk",
    "WonderMaker/WonderMaker PLA Silk"
   ],
@@ -3170,8 +3174,6 @@
   "GFA99": [
    "Anycubic/Anycubic ASA",
    "CoLiDo/CoLiDo Generic PLA",
-   "CoLiDo/CoLiDo PLA",
-   "CoLiDo/CoLiDo PLA Silk",
    "CoLiDo/CoLiDo PLA+"
   ],
   "GFASA": [
@@ -3188,8 +3190,6 @@
   ],
   "GFB00_01": [
    "Afinia/Afinia ABS",
-   "Afinia/Afinia ABS+",
-   "Afinia/Afinia Value ABS",
    "Tiertime/Tiertime ABS"
   ],
   "GFB01": [
@@ -3229,7 +3229,6 @@
    "OrcaArena/OrcaArena Generic ASA",
    "Prusa/Prusa Generic ASA",
    "Prusa/Prusament ASA",
-   "Ratrig/RatRig BigNozzle ASA",
    "Ratrig/RatRig Generic ASA",
    "SecKit/SecKit Generic ASA",
    "Tiertime/Tiertime Generic ASA",
@@ -3266,8 +3265,6 @@
    "BBL/Generic ABS",
    "Chuanying/Chuanying ABS",
    "Chuanying/Chuanying Generic ABS",
-   "Chuanying/Chuanying Generic HIPS",
-   "Chuanying/Chuanying Generic PVA",
    "CoLiDo/CoLiDo ABS",
    "CoLiDo/CoLiDo Generic ABS",
    "Comgrow/Comgrow Generic ABS",
@@ -3284,19 +3281,11 @@
    "OrcaArena/OrcaArena Generic ABS",
    "Prusa/Prusa Generic ABS",
    "Qidi/Qidi Generic ABS",
-   "Ratrig/RatRig BigNozzle ABS",
    "Ratrig/RatRig Generic ABS",
-   "Ratrig/RatRig PunkFil ABS",
-   "Ratrig/RatRig PunkFil PETG",
-   "Ratrig/RatRig PunkFil PETG CF",
    "SecKit/SecKit Generic ABS",
    "Tiertime/Tiertime Generic ABS",
    "Volumic/Volumic ABS Ultra",
    "Volumic/Volumic ABS Ultra (Performance)",
-   "Volumic/Volumic ASA Ultra",
-   "Volumic/Volumic ASA Ultra (Performance)",
-   "Volumic/Volumic PP Ultra",
-   "Volumic/Volumic PP Ultra (Performance)",
    "Vzbot/Vzbot Generic ABS"
   ],
   "GFB99_01": [
@@ -3350,9 +3339,7 @@
    "Prusa/Prusa Generic PC",
    "Prusa/Prusament PC Blend",
    "Qidi/Qidi Generic PC",
-   "Ratrig/RatRig BigNozzle PCTG",
    "Ratrig/RatRig Generic PC",
-   "Ratrig/RatRig Generic PCTG",
    "SecKit/SecKit Generic PC",
    "Tiertime/Tiertime Generic PC",
    "Volumic/Volumic PC",
@@ -3438,11 +3425,8 @@
    "Anycubic/Anycubic Generic PETG",
    "Artillery/Artillery Generic PETG",
    "BBL/Generic PETG",
-   "CONSTRUCT3D/C1 Generic High Flow PETG",
    "CONSTRUCT3D/C1 Generic PETG",
    "Chuanying/Chuanying Generic PETG",
-   "Chuanying/Chuanying Generic PETG-CF10",
-   "Chuanying/Chuanying Generic TPU",
    "Chuanying/Chuanying PETG",
    "CoLiDo/CoLiDo Generic PETG",
    "CoLiDo/CoLiDo PETG",
@@ -3462,12 +3446,9 @@
    "MagicMaker/MM Generic PEEK",
    "OrcaArena/OrcaArena Generic PETG",
    "Qidi/Qidi Generic PETG",
-   "Ratrig/RatRig BigNozzle PETG",
    "Ratrig/RatRig Generic PETG",
    "SecKit/SecKit Generic PETG",
    "Tiertime/Tiertime Generic PETG",
-   "Volumic/PETG ESD (Performance)",
-   "Volumic/Volumic PCTG Ultra (Performance)",
    "Volumic/Volumic PETG Ultra",
    "Volumic/Volumic PETG Ultra (Performance)",
    "Vzbot/Vzbot Generic PETG",
@@ -3741,33 +3722,18 @@
    "Artillery/Artillery Generic PLA",
    "BBL/Generic PLA",
    "CONSTRUCT3D/C1 Generic PLA",
-   "Chuanying/Chuanying ASA",
-   "Chuanying/Chuanying Generic ASA",
-   "Chuanying/Chuanying Generic HS PLA",
    "Chuanying/Chuanying Generic PLA",
-   "Chuanying/Chuanying Generic PLA-CF10",
-   "Chuanying/Chuanying Generic PLA-Silk",
-   "Chuanying/Chuanying HS PLA",
    "Chuanying/Chuanying PLA",
-   "Chuanying/Chuanying PLA-SILK",
-   "Co Print/CoPrint Generic ABS",
-   "Co Print/CoPrint Generic PETG",
    "Co Print/CoPrint Generic PLA",
-   "Co Print/CoPrint Generic TPU",
    "Comgrow/Comgrow Generic PLA",
    "Comgrow/Comgrow T300 PLA",
    "Creality/Creality Generic PLA",
    "Custom/Generic PLA",
-   "DeltaMaker/DeltaMaker Brand PLA",
    "DeltaMaker/DeltaMaker Generic PLA",
    "Dremel/Dremel Generic PLA",
    "FLSun/FLSun Generic PLA",
    "FLSun/FLSun S1 PLA Generic",
-   "FLSun/FLSun S1 PLA High Speed",
-   "FLSun/FLSun S1 PLA Silk",
    "FLSun/FLSun T1 PLA Generic",
-   "FLSun/FLSun T1 PLA High Speed",
-   "FLSun/FLSun T1 PLA Silk",
    "Flashforge/Generic PLA",
    "Flashforge/Generic PLA High Speed",
    "FlyingBear/FlyingBear Generic PLA",
@@ -3775,30 +3741,20 @@
    "Lulzbot/Lulzbot 2.85mm PLA",
    "OrcaArena/OrcaArena Generic PLA",
    "Peopoly/Peopoly Generic PLA",
-   "Peopoly/Peopoly Lancer ABS-GF",
-   "Peopoly/Peopoly Lancer PET-CF",
-   "Peopoly/Peopoly Lancer PETG-C",
-   "Peopoly/Peopoly Lancer PLA-C",
    "Phrozen/Phrozen PLA",
    "Prusa/Prusa Generic PLA",
    "Qidi/Qidi Generic PLA",
-   "Ratrig/RatRig BigNozzle PLA",
-   "Ratrig/RatRig BigNozzle TPU",
    "Ratrig/RatRig Generic PLA",
    "SecKit/SecKit Generic PLA",
    "Sovol/Sovol SV07 PLA",
    "Tiertime/Tiertime Generic PLA",
-   "Tiertime/Tiertime Generic SBS",
    "Volumic/Volumic PLA Ultra",
    "Volumic/Volumic PLA Ultra (Performance)",
-   "Volumic/Volumic UNIVERSAL Ultra",
-   "Volumic/Volumic UNIVERSAL Ultra (Performance)",
    "Vzbot/Vzbot Generic PLA",
    "re3D/re3D PLA"
   ],
   "GFL99_01": [
-   "Tiertime/Tiertime Generic PLA",
-   "Tiertime/Tiertime Generic SBS"
+   "Tiertime/Tiertime Generic PLA"
   ],
   "GFL99_2": [
    "Prusa/Prusa Generic PLA"
@@ -3911,8 +3867,6 @@
    "Ratrig/RatRig Generic PA",
    "SecKit/SecKit Generic PA",
    "Tiertime/Tiertime Generic PA",
-   "Volumic/PA6 CF20 (Performance)",
-   "Volumic/PPS Carbone (Performance)",
    "Volumic/Volumic NYLON Ultra",
    "Volumic/Volumic NYLON Ultra (Performance)",
    "Vzbot/Vzbot Generic PA"
@@ -4526,8 +4480,7 @@
    "RH3D/Generic TPU"
   ],
   "IQM1": [
-   "iQ/Fiberthree PACF Pro P1",
-   "iQ/Grauts HPP4GF25 P1"
+   "iQ/Fiberthree PACF Pro P1"
   ],
   "IQM1011": [
    "iQ/VXL90 TiQ2 P2"
@@ -4637,6 +4590,9 @@
   "OF22AxCm": [
    "Sovol/Polymaker PETG"
   ],
+  "OF2Psxdc": [
+   "Co Print/CoPrint Generic TPU"
+  ],
   "OF2UFmOo": [
    "Qidi/Bambu PLA"
   ],
@@ -4651,6 +4607,9 @@
   ],
   "OF3XeEuV": [
    "Qidi/QIDI PET-GF"
+  ],
+  "OF3YOOOs": [
+   "Chuanying/Chuanying Generic PETG-CF10"
   ],
   "OF3arl18": [
    "Elegoo/Elegoo Rapid PETG"
@@ -4727,8 +4686,18 @@
   "OF79FFkO": [
    "OrcaFilamentLibrary/Elegoo PC-FR"
   ],
+  "OF7M9vy4": [
+   "Ratrig/RatRig BigNozzle PLA"
+  ],
   "OF7cv1Ub": [
    "Qidi/QIDI PLA-CF"
+  ],
+  "OF7f0eUZ": [
+   "Volumic/Volumic ASA Ultra"
+  ],
+  "OF7tgL9c": [
+   "Chuanying/Chuanying ASA",
+   "Chuanying/Chuanying Generic ASA"
   ],
   "OF8HQmJD": [
    "OrcaFilamentLibrary/Elegoo PLA Sparkle"
@@ -4745,11 +4714,17 @@
   "OF9sr3Vn": [
    "Flashforge/Flashforge PLA Sparkle"
   ],
+  "OF9tjFbj": [
+   "Peopoly/Peopoly Lancer PLA-C"
+  ],
   "OF9vnvM8": [
    "Artillery/Artillery PETG-CF"
   ],
   "OFAEqlWa": [
    "Flashforge/Flashforge Generic PLA-SILK"
+  ],
+  "OFAGqTQG": [
+   "Volumic/Volumic PP Ultra"
   ],
   "OFAGrVjP": [
    "Flashforge/Flashforge PLA Silk"
@@ -4762,6 +4737,9 @@
   ],
   "OFAUDGEQ": [
    "Qidi/QIDI PLA Rapido Matte"
+  ],
+  "OFAUX5fB": [
+   "CONSTRUCT3D/C1 Generic High Flow PETG"
   ],
   "OFAbsMuV": [
    "Snapmaker/Snapmaker Dual TPE"
@@ -4783,6 +4761,9 @@
   ],
   "OFBGxHgT": [
    "FlyingBear/FlyingBear PLA"
+  ],
+  "OFBRSZom": [
+   "Volumic/PPS Carbone (Performance)"
   ],
   "OFBvxnjM": [
    "Elegoo/Elegoo PETG-GF"
@@ -4820,6 +4801,9 @@
   "OFDkABjZ": [
    "Flashforge/Generic TPU-90A"
   ],
+  "OFDramZ2": [
+   "Co Print/CoPrint Generic PETG"
+  ],
   "OFE22Uba": [
    "Flashforge/Flashforge TPU-90A"
   ],
@@ -4831,6 +4815,9 @@
   ],
   "OFFIL5pD": [
    "Qidi/QIDI PA12-CF"
+  ],
+  "OFFenwbU": [
+   "FLSun/FLSun S1 PLA Silk"
   ],
   "OFFmJ8aR": [
    "FlyingBear/Other PLA Hyper"
@@ -4853,6 +4840,9 @@
   "OFHBTqyD": [
    "Flashforge/Flashforge PLA Basic"
   ],
+  "OFHDaMut": [
+   "Volumic/PA6 CF20 (Performance)"
+  ],
   "OFHL32M0": [
    "Anycubic/Anycubic TPU"
   ],
@@ -4867,6 +4857,9 @@
   ],
   "OFIl3ar9": [
    "Sovol/Sovol SV08 PETG"
+  ],
+  "OFIzguhB": [
+   "Volumic/Volumic UNIVERSAL Ultra"
   ],
   "OFJIImD5": [
    "OrcaFilamentLibrary/Elegoo PET-CF"
@@ -4904,8 +4897,14 @@
   "OFKzh9lx": [
    "InfiMech/InfiMech PLA"
   ],
+  "OFL4BLAC": [
+   "iQ/Grauts HPP4GF25 P1"
+  ],
   "OFL4KniM": [
    "Elegoo/Elegoo Rapid TPU 95A"
+  ],
+  "OFL7U2MV": [
+   "Ratrig/RatRig PunkFil ABS"
   ],
   "OFL7vEML": [
    "Flashforge/FlashForge PC"
@@ -4915,6 +4914,9 @@
   ],
   "OFLeFaUO": [
    "Flashforge/Flashforge Generic PVA"
+  ],
+  "OFLhOFQk": [
+   "Volumic/Volumic ASA Ultra (Performance)"
   ],
   "OFLiTjQK": [
    "FlyingBear/Other PA-CF"
@@ -4952,8 +4954,14 @@
   "OFNbajj9": [
    "Creality/Creality Generic ASA-CF"
   ],
+  "OFNvrbnf": [
+   "Co Print/CoPrint Generic ABS"
+  ],
   "OFNz8rrn": [
    "FlyingBear/FlyingBear PLA Hyper"
+  ],
+  "OFO3IOWM": [
+   "Volumic/PETG ESD (Performance)"
   ],
   "OFO5R9KJ": [
    "Sovol/Sovol Zero TPU"
@@ -4976,17 +4984,26 @@
   "OFP4poIv": [
    "Sovol/Sovol Zero PLA Silk HS Nozzle"
   ],
+  "OFPGelMX": [
+   "Volumic/Volumic PP Ultra (Performance)"
+  ],
   "OFPJJxkF": [
    "Flashforge/Flashforge PET-CF"
   ],
   "OFPJrlC3": [
    "Flashforge/Flashforge PLA-CF"
   ],
+  "OFPeGtB1": [
+   "Volumic/Volumic UNIVERSAL Ultra (Performance)"
+  ],
   "OFPokkKe": [
    "Qidi/QIDI PETG-CF"
   ],
   "OFPwi9X0": [
    "Qidi/HATCHBOX ABS"
+  ],
+  "OFQ5xAKf": [
+   "Chuanying/Chuanying Generic PVA"
   ],
   "OFQ9dI8j": [
    "Prusa/Prusa Generic PC HF"
@@ -5003,6 +5020,9 @@
   "OFQkWxJy": [
    "OrcaFilamentLibrary/Elegoo PLA Matte"
   ],
+  "OFR8dTVW": [
+   "FLSun/FLSun S1 PLA High Speed"
+  ],
   "OFRNU58t": [
    "Flashforge/Flashforge TPU 95A"
   ],
@@ -5015,6 +5035,9 @@
   "OFRgDMDJ": [
    "Flashforge/Flashforge PETG Transparent"
   ],
+  "OFS1ekCg": [
+   "Ratrig/RatRig BigNozzle PCTG"
+  ],
   "OFS3HrR1": [
    "InfiMech/Other PLA"
   ],
@@ -5026,6 +5049,9 @@
   ],
   "OFSdF3B1": [
    "Flashforge/FusRock PAHT-CF"
+  ],
+  "OFSkBwxf": [
+   "Ratrig/RatRig BigNozzle ASA"
   ],
   "OFSoZBK2": [
    "Sovol/Sovol SV06 Plus ACE PLA"
@@ -5063,6 +5089,12 @@
   "OFUkpobY": [
    "Qidi/QIDI PAHT-CF"
   ],
+  "OFUqBrgf": [
+   "Chuanying/Chuanying Generic TPU"
+  ],
+  "OFV1szQh": [
+   "Peopoly/Peopoly Lancer PETG-C"
+  ],
   "OFV4hD1o": [
    "Qidi/QIDI PLA Rapido Metal"
   ],
@@ -5099,6 +5131,9 @@
   "OFXNO5Of": [
    "Qidi/QIDI PLA Rapido 0.2 nozzle"
   ],
+  "OFXQX0tr": [
+   "Ratrig/RatRig PunkFil PETG CF"
+  ],
   "OFXcfTEb": [
    "Qidi/Tinmorry PETG-ECO"
   ],
@@ -5117,6 +5152,9 @@
   "OFY1U4uM": [
    "Sovol/Sovol SV08 TPU"
   ],
+  "OFYG2Gfy": [
+   "Afinia/Afinia ABS+"
+  ],
   "OFYH00jV": [
    "Qidi/QIDI ABS-GF"
   ],
@@ -5128,6 +5166,9 @@
   ],
   "OFYZs7dN": [
    "Flashforge/Flashforge Generic HS PLA"
+  ],
+  "OFYehFGr": [
+   "Ratrig/RatRig BigNozzle TPU"
   ],
   "OFYfZgxU": [
    "FlyingBear/FlyingBear TPU"
@@ -5219,6 +5260,9 @@
   "OFeybQvK": [
    "Qidi/QIDI ABS Rapido 0.2 nozzle"
   ],
+  "OFf0JIqs": [
+   "Eryone/Eryone PP"
+  ],
   "OFf2b9wu": [
    "Anycubic/Anycubic ABS"
   ],
@@ -5231,8 +5275,15 @@
   "OFfdxQok": [
    "Qidi/Generic PLA+"
   ],
+  "OFfiN1Lw": [
+   "Chuanying/Chuanying Generic HS PLA",
+   "Chuanying/Chuanying HS PLA"
+  ],
   "OFfkPhrJ": [
    "Creality/Creality HF Generic Speed PLA"
+  ],
+  "OFfoA8kJ": [
+   "CoLiDo/CoLiDo PLA"
   ],
   "OFftQOek": [
    "Flashforge/Flashforge PLA  Matte"
@@ -5303,6 +5354,9 @@
   "OFjepy6j": [
    "Flashforge/FusRock Generic S-PAHT"
   ],
+  "OFjj9Yiz": [
+   "Ratrig/RatRig BigNozzle PETG"
+  ],
   "OFjohFkg": [
    "Qidi/QIDI PETG Translucent"
   ],
@@ -5333,11 +5387,21 @@
   "OFkoT6jl": [
    "Prusa/Prusament PLA"
   ],
+  "OFlN56xW": [
+   "Chuanying/Chuanying Generic PLA-Silk",
+   "Chuanying/Chuanying PLA-SILK"
+  ],
   "OFlNKZLP": [
    "Flashforge/Flashforge PLA  Metal"
   ],
   "OFlbn4FY": [
    "Snapmaker/Snapmaker PLA Matte"
+  ],
+  "OFlxnxDx": [
+   "Tiertime/Tiertime Generic SBS"
+  ],
+  "OFlzQ0IS": [
+   "Peopoly/Peopoly Lancer PET-CF"
   ],
   "OFm1VZed": [
    "Flashforge/Flashforge Generic PLA-CF"
@@ -5368,6 +5432,9 @@
   ],
   "OFnMW5jr": [
    "FlyingBear/FlyingBear ABS"
+  ],
+  "OFnRTkEq": [
+   "Ratrig/RatRig PunkFil PETG"
   ],
   "OFnY9ovF": [
    "Artillery/Artillery PA-CF"
@@ -5417,8 +5484,14 @@
   "OFqRWRU6": [
    "Flashforge/Flashforge ABS-GF"
   ],
+  "OFqSTJ3I": [
+   "OrcaArena/OrcaArena Generic PLA Silk"
+  ],
   "OFqh1Ngp": [
    "OrcaFilamentLibrary/Elegoo PLA-CF"
+  ],
+  "OFqkcvDI": [
+   "Peopoly/Peopoly Lancer ABS-GF"
   ],
   "OFqyIUDi": [
    "Qidi/Qidi PLA-CF"
@@ -5453,6 +5526,9 @@
   "OFsmPFwh": [
    "Sovol/Sovol SV06 Plus ACE TPU"
   ],
+  "OFt1YdX8": [
+   "FLSun/FLSun T1 PLA Silk"
+  ],
   "OFt5bvKK": [
    "Artillery/Artillery PETG Basic"
   ],
@@ -5470,6 +5546,9 @@
   ],
   "OFtXBjvb": [
    "Artillery/Artillery PLA Tough"
+  ],
+  "OFtcTs1o": [
+   "Ratrig/RatRig BigNozzle ABS"
   ],
   "OFtemzzw": [
    "Sovol/Sovol SV06 ACE ABS"
@@ -5494,6 +5573,9 @@
   ],
   "OFuXkYly": [
    "Elegoo/Elegoo PLA Glow"
+  ],
+  "OFuYvNS3": [
+   "Afinia/Afinia Value ABS"
   ],
   "OFuidAEg": [
    "Qidi/Bambu ABS"
@@ -5537,6 +5619,9 @@
   "OFvsS7Fb": [
    "Flashforge/Generic TPU-64D"
   ],
+  "OFvw0owy": [
+   "Afinia/Afinia Value PLA"
+  ],
   "OFvxvkAd": [
    "Artillery/Artillery PLA-CF"
   ],
@@ -5564,11 +5649,26 @@
   "OFxLeRyT": [
    "Prusa/Prusa Generic PVA HF"
   ],
+  "OFxVzzn4": [
+   "Chuanying/Chuanying Generic PLA-CF10"
+  ],
+  "OFxfCy9m": [
+   "Volumic/Volumic PCTG Ultra (Performance)"
+  ],
   "OFxjFYxE": [
    "Elegoo/Elegoo PETG HF"
   ],
+  "OFxlch4V": [
+   "CoLiDo/CoLiDo PLA Silk"
+  ],
+  "OFxodd2u": [
+   "DeltaMaker/DeltaMaker Brand PLA"
+  ],
   "OFxxa5yn": [
    "Snapmaker/Snapmaker Dual ABS Benchy"
+  ],
+  "OFy7oQ1g": [
+   "Blocks/Blocks Generic ASA-CF"
   ],
   "OFyD1Zo8": [
    "InfiMech/Other PC"
@@ -5579,11 +5679,23 @@
   "OFypQeKR": [
    "Elegoo/Generic PC-CF"
   ],
+  "OFyt23xJ": [
+   "FLSun/FLSun T1 PLA High Speed"
+  ],
   "OFyxAbO4": [
    "Flashforge/Flashforge TPU-95A"
   ],
   "OFzFbFcl": [
    "Elegoo/Elegoo PC-FR"
+  ],
+  "OFzQQeCi": [
+   "Chuanying/Chuanying Generic HIPS"
+  ],
+  "OFzb2BLs": [
+   "Ratrig/RatRig Generic PCTG"
+  ],
+  "OFziUL2X": [
+   "Ginger Additive/Ginger Generic PLA"
   ],
   "OFzrWlH5": [
    "OrcaFilamentLibrary/Elegoo PETG HF"
@@ -5968,8 +6080,7 @@
    "Cubicon/Cubicon PA-CF"
   ],
   "P510eff9": [
-   "Ginger Additive/Ginger Generic PETG",
-   "Ginger Additive/Ginger Generic PLA"
+   "Ginger Additive/Ginger Generic PETG"
   ],
   "Pfcf9c4c": [
    "Artillery/Artillery PLA"
@@ -6965,7 +7076,6 @@
   "CONSTRUCT3D/C1 Generic PETG",
   "CONSTRUCT3D/C1 Generic PLA",
   "Chuanying/Chuanying ABS @Chuanying X1 0.25 Nozzle",
-  "Chuanying/Chuanying ASA @Chuanying X1 0.25 Nozzle",
   "Chuanying/Chuanying Generic ABS",
   "Chuanying/Chuanying Generic ASA",
   "Chuanying/Chuanying Generic HIPS",
@@ -6977,9 +7087,7 @@
   "Chuanying/Chuanying Generic PLA-Silk",
   "Chuanying/Chuanying Generic PVA",
   "Chuanying/Chuanying Generic TPU",
-  "Chuanying/Chuanying HS PLA @Chuanying X1 0.25 Nozzle",
   "Chuanying/Chuanying PETG @Chuanying X1 0.25 Nozzle",
-  "Chuanying/Chuanying PLA-SILK @Chuanying X1 0.25 Nozzle",
   "Co Print/CoPrint Generic ABS",
   "Co Print/CoPrint Generic PETG",
   "Co Print/CoPrint Generic PLA",
@@ -8122,6 +8230,8 @@
   "FlyingBear/Other PLA @S1",
   "FlyingBear/Other PLA Hyper @S1",
   "FlyingBear/Other TPU @S1",
+  "Ginger Additive/Ginger Generic PETG",
+  "Ginger Additive/Ginger Generic PLA",
   "InfiMech/InfiMech ABS @EX",
   "InfiMech/InfiMech ABS @EX+APS",
   "InfiMech/InfiMech ABS @HSN",
