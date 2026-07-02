@@ -643,13 +643,40 @@
   "Creality/eSUN PLA-Lite @K2 Plus-all",
   "Creality/eSUN PLA-Matte @K2 Plus-all",
   "Creality/eSUN PLA-Silk @K2 Plus-all",
+  "Cubicon/Cubicon ABS @Cubicon xCeler-I 0.4 nozzle",
+  "Cubicon/Cubicon ABS @Cubicon xCeler-Mini 0.4 nozzle",
+  "Cubicon/Cubicon ABS @Cubicon xCeler-Plus 0.4 nozzle",
+  "Cubicon/Cubicon ABS-A100 @Cubicon xCeler-I 0.4 nozzle",
+  "Cubicon/Cubicon ABS-A100 @Cubicon xCeler-Mini 0.4 nozzle",
+  "Cubicon/Cubicon ABS-A100 @Cubicon xCeler-Plus 0.4 nozzle",
   "Cubicon/Cubicon ABS-A100 @base",
+  "Cubicon/Cubicon ABSk @Cubicon xCeler-I 0.4 nozzle",
+  "Cubicon/Cubicon ABSk @Cubicon xCeler-Mini 0.4 nozzle",
+  "Cubicon/Cubicon ABSk @Cubicon xCeler-Plus 0.4 nozzle",
   "Cubicon/Cubicon ABSk @base",
+  "Cubicon/Cubicon PA-CF @Cubicon xCeler-I 0.4 nozzle",
+  "Cubicon/Cubicon PA-CF @Cubicon xCeler-Mini 0.4 nozzle",
+  "Cubicon/Cubicon PA-CF @Cubicon xCeler-Plus 0.4 nozzle",
   "Cubicon/Cubicon PA-CF @base",
+  "Cubicon/Cubicon PC @Cubicon xCeler-I 0.4 nozzle",
+  "Cubicon/Cubicon PC @Cubicon xCeler-Mini 0.4 nozzle",
+  "Cubicon/Cubicon PC @Cubicon xCeler-Plus 0.4 nozzle",
   "Cubicon/Cubicon PC @base",
+  "Cubicon/Cubicon PETG @Cubicon xCeler-I 0.4 nozzle",
+  "Cubicon/Cubicon PETG @Cubicon xCeler-Mini 0.4 nozzle",
+  "Cubicon/Cubicon PETG @Cubicon xCeler-Plus 0.4 nozzle",
   "Cubicon/Cubicon PETG @base",
+  "Cubicon/Cubicon PLA @Cubicon xCeler-I 0.4 nozzle",
+  "Cubicon/Cubicon PLA @Cubicon xCeler-Mini 0.4 nozzle",
+  "Cubicon/Cubicon PLA @Cubicon xCeler-Plus 0.4 nozzle",
   "Cubicon/Cubicon PLA @base",
+  "Cubicon/Cubicon PLA+ @Cubicon xCeler-I 0.4 nozzle",
+  "Cubicon/Cubicon PLA+ @Cubicon xCeler-Mini 0.4 nozzle",
+  "Cubicon/Cubicon PLA+ @Cubicon xCeler-Plus 0.4 nozzle",
   "Cubicon/Cubicon PLA+ @base",
+  "Cubicon/Cubicon PLAi21 @Cubicon xCeler-I 0.4 nozzle",
+  "Cubicon/Cubicon PLAi21 @Cubicon xCeler-Mini 0.4 nozzle",
+  "Cubicon/Cubicon PLAi21 @Cubicon xCeler-Plus 0.4 nozzle",
   "Cubicon/Cubicon PLAi21 @base",
   "Custom/Generic PC @MyToolChanger",
   "Custom/Generic PETG @MyToolChanger",
@@ -4569,6 +4596,9 @@
   "OF0UbONm": [
    "Flashforge/FusRock S-PAHT"
   ],
+  "OF0VEdLB": [
+   "Cubicon/Cubicon PETG"
+  ],
   "OF0Y5MLd": [
    "Qidi/QIDI PETG-GF"
   ],
@@ -4589,6 +4619,9 @@
   ],
   "OF22AxCm": [
    "Sovol/Polymaker PETG"
+  ],
+  "OF2HQqTC": [
+   "Cubicon/Cubicon PLA+"
   ],
   "OF2Psxdc": [
    "Co Print/CoPrint Generic TPU"
@@ -4679,6 +4712,9 @@
   ],
   "OF6XIeUW": [
    "Flashforge/Generic PLA-CF10"
+  ],
+  "OF6XuVQE": [
+   "Cubicon/Cubicon ABS"
   ],
   "OF70DKqH": [
    "Snapmaker/Snapmaker TPE"
@@ -4945,6 +4981,9 @@
   "OFN0pBpo": [
    "Qidi/Qidi Generic TPU 95A"
   ],
+  "OFNQHqAV": [
+   "Cubicon/Cubicon ABSk"
+  ],
   "OFNRgSch": [
    "Artillery/Artillery PC"
   ],
@@ -4965,6 +5004,9 @@
   ],
   "OFO5R9KJ": [
    "Sovol/Sovol Zero TPU"
+  ],
+  "OFOJUJAS": [
+   "Cubicon/Cubicon PA-CF"
   ],
   "OFOSzSuh": [
    "Flashforge/Flashforge PA-CF"
@@ -5200,6 +5242,9 @@
   "OFaKZ6JI": [
    "Anycubic/Generic PETG Basic"
   ],
+  "OFaxQnfz": [
+   "Cubicon/Cubicon PC"
+  ],
   "OFb3UzMZ": [
    "InfiMech/InfiMech PA-CF"
   ],
@@ -5217,6 +5262,9 @@
   ],
   "OFc2SnEp": [
    "Artillery/Artillery PVA"
+  ],
+  "OFcZZWnB": [
+   "Cubicon/Cubicon ABS-A100"
   ],
   "OFceJcLf": [
    "Qidi/PolyLite PLA"
@@ -5478,6 +5526,9 @@
   "OFpwg2Qh": [
    "OrcaFilamentLibrary/Elegoo ASA-CF"
   ],
+  "OFq6IhFg": [
+   "Cubicon/Cubicon PLA"
+  ],
   "OFqPp2yL": [
    "Qidi/QIDI PETG Tough 0.6 nozzle"
   ],
@@ -5555,6 +5606,9 @@
   ],
   "OFtet8ui": [
    "Snapmaker/Snapmaker TPU High-Flow"
+  ],
+  "OFti31HS": [
+   "Cubicon/Cubicon PLAi21"
   ],
   "OFtmT4Nd": [
    "Artillery/Artillery ASA"
@@ -7620,6 +7674,42 @@
   "Creality/eSUN PLA-Lite @K2 Plus-all",
   "Creality/eSUN PLA-Matte @K2 Plus-all",
   "Creality/eSUN PLA-Silk @K2 Plus-all",
+  "Cubicon/Cubicon ABS @Cubicon xCeler-I 0.4 nozzle",
+  "Cubicon/Cubicon ABS @Cubicon xCeler-Mini 0.4 nozzle",
+  "Cubicon/Cubicon ABS @Cubicon xCeler-Plus 0.4 nozzle",
+  "Cubicon/Cubicon ABS @base",
+  "Cubicon/Cubicon ABS-A100 @Cubicon xCeler-I 0.4 nozzle",
+  "Cubicon/Cubicon ABS-A100 @Cubicon xCeler-Mini 0.4 nozzle",
+  "Cubicon/Cubicon ABS-A100 @Cubicon xCeler-Plus 0.4 nozzle",
+  "Cubicon/Cubicon ABS-A100 @base",
+  "Cubicon/Cubicon ABSk @Cubicon xCeler-I 0.4 nozzle",
+  "Cubicon/Cubicon ABSk @Cubicon xCeler-Mini 0.4 nozzle",
+  "Cubicon/Cubicon ABSk @Cubicon xCeler-Plus 0.4 nozzle",
+  "Cubicon/Cubicon ABSk @base",
+  "Cubicon/Cubicon PA-CF @Cubicon xCeler-I 0.4 nozzle",
+  "Cubicon/Cubicon PA-CF @Cubicon xCeler-Mini 0.4 nozzle",
+  "Cubicon/Cubicon PA-CF @Cubicon xCeler-Plus 0.4 nozzle",
+  "Cubicon/Cubicon PA-CF @base",
+  "Cubicon/Cubicon PC @Cubicon xCeler-I 0.4 nozzle",
+  "Cubicon/Cubicon PC @Cubicon xCeler-Mini 0.4 nozzle",
+  "Cubicon/Cubicon PC @Cubicon xCeler-Plus 0.4 nozzle",
+  "Cubicon/Cubicon PC @base",
+  "Cubicon/Cubicon PETG @Cubicon xCeler-I 0.4 nozzle",
+  "Cubicon/Cubicon PETG @Cubicon xCeler-Mini 0.4 nozzle",
+  "Cubicon/Cubicon PETG @Cubicon xCeler-Plus 0.4 nozzle",
+  "Cubicon/Cubicon PETG @base",
+  "Cubicon/Cubicon PLA @Cubicon xCeler-I 0.4 nozzle",
+  "Cubicon/Cubicon PLA @Cubicon xCeler-Mini 0.4 nozzle",
+  "Cubicon/Cubicon PLA @Cubicon xCeler-Plus 0.4 nozzle",
+  "Cubicon/Cubicon PLA @base",
+  "Cubicon/Cubicon PLA+ @Cubicon xCeler-I 0.4 nozzle",
+  "Cubicon/Cubicon PLA+ @Cubicon xCeler-Mini 0.4 nozzle",
+  "Cubicon/Cubicon PLA+ @Cubicon xCeler-Plus 0.4 nozzle",
+  "Cubicon/Cubicon PLA+ @base",
+  "Cubicon/Cubicon PLAi21 @Cubicon xCeler-I 0.4 nozzle",
+  "Cubicon/Cubicon PLAi21 @Cubicon xCeler-Mini 0.4 nozzle",
+  "Cubicon/Cubicon PLAi21 @Cubicon xCeler-Plus 0.4 nozzle",
+  "Cubicon/Cubicon PLAi21 @base",
   "Custom/Generic PC @MyToolChanger",
   "Custom/Generic PETG @MyToolChanger",
   "Custom/Generic PLA @MyToolChanger",
