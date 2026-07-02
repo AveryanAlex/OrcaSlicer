@@ -826,10 +826,33 @@
   "OrcaFilamentLibrary/Elas PETG Basic @base",
   "OrcaFilamentLibrary/Elas PLA Basic @base",
   "OrcaFilamentLibrary/Elas PLA Pro @base",
+  "OrcaFilamentLibrary/Elegoo ASA-CF @base",
   "OrcaFilamentLibrary/Elegoo PAHT @base",
   "OrcaFilamentLibrary/Elegoo PC @base",
+  "OrcaFilamentLibrary/Elegoo PC-FR @base",
+  "OrcaFilamentLibrary/Elegoo PET-CF @base",
   "OrcaFilamentLibrary/Elegoo PETG @base",
+  "OrcaFilamentLibrary/Elegoo PETG HF @base",
+  "OrcaFilamentLibrary/Elegoo PETG PRO @base",
+  "OrcaFilamentLibrary/Elegoo PETG Translucent @base",
+  "OrcaFilamentLibrary/Elegoo PETG-CF @base",
+  "OrcaFilamentLibrary/Elegoo PETG-GF @base",
   "OrcaFilamentLibrary/Elegoo PLA @base",
+  "OrcaFilamentLibrary/Elegoo PLA Basic @base",
+  "OrcaFilamentLibrary/Elegoo PLA Galaxy @base",
+  "OrcaFilamentLibrary/Elegoo PLA Glow @base",
+  "OrcaFilamentLibrary/Elegoo PLA Marble @base",
+  "OrcaFilamentLibrary/Elegoo PLA Matte @base",
+  "OrcaFilamentLibrary/Elegoo PLA PRO @base",
+  "OrcaFilamentLibrary/Elegoo PLA Silk @base",
+  "OrcaFilamentLibrary/Elegoo PLA Sparkle @base",
+  "OrcaFilamentLibrary/Elegoo PLA Translucent2 @base",
+  "OrcaFilamentLibrary/Elegoo PLA Wood @base",
+  "OrcaFilamentLibrary/Elegoo PLA+ @base",
+  "OrcaFilamentLibrary/Elegoo PLA-CF @base",
+  "OrcaFilamentLibrary/Elegoo Rapid PETG @base",
+  "OrcaFilamentLibrary/Elegoo Rapid PLA+ @base",
+  "OrcaFilamentLibrary/Elegoo Rapid TPU 95A @base",
   "OrcaFilamentLibrary/Eolas Prints PETG @System",
   "OrcaFilamentLibrary/Eolas Prints PETG Transition @System",
   "OrcaFilamentLibrary/Eolas Prints PETG UV Resistant @System",
@@ -924,8 +947,14 @@
   "OrcaFilamentLibrary/FilAr PLA-mate Verde",
   "OrcaFilamentLibrary/FilAr PLA-mate Violeta",
   "OrcaFilamentLibrary/Generic PA-CF @System",
+  "OrcaFilamentLibrary/Generic PE-CF @base",
+  "OrcaFilamentLibrary/Generic PETG HF @base",
+  "OrcaFilamentLibrary/Generic PETG-CF @base",
   "OrcaFilamentLibrary/Generic PLA High Speed @System",
+  "OrcaFilamentLibrary/Generic PLA Matte @base",
   "OrcaFilamentLibrary/Generic PLA-CF @System",
+  "OrcaFilamentLibrary/Generic PP-CF @base",
+  "OrcaFilamentLibrary/Generic PP-GF @base",
   "OrcaFilamentLibrary/Generic PPA-GF @System",
   "OrcaFilamentLibrary/GreenGate3D PETG @base",
   "OrcaFilamentLibrary/NIT PETG @base",
@@ -955,6 +984,7 @@
   "OrcaFilamentLibrary/Panchroma PLA Temp Shift @base",
   "OrcaFilamentLibrary/Panchroma PLA Translucent @base",
   "OrcaFilamentLibrary/Panchroma PLA UV Shift @base",
+  "OrcaFilamentLibrary/PolyLite Dual PLA @base",
   "OrcaFilamentLibrary/PolyLite PETG @base",
   "OrcaFilamentLibrary/PolyLite PLA @base",
   "OrcaFilamentLibrary/PolyLite PLA Pro @base",
@@ -4561,53 +4591,143 @@
    "OrcaFilamentLibrary/Elegoo ABS"
   ],
   "OEASAB00": [
-   "OrcaFilamentLibrary/Elegoo ASA",
-   "OrcaFilamentLibrary/Elegoo ASA-CF"
+   "OrcaFilamentLibrary/Elegoo ASA"
   ],
   "OEPAHTB0": [
    "OrcaFilamentLibrary/Elegoo PAHT-CF"
   ],
   "OEPCB00": [
-   "OrcaFilamentLibrary/Elegoo PC",
-   "OrcaFilamentLibrary/Elegoo PC-FR"
+   "OrcaFilamentLibrary/Elegoo PC"
   ],
   "OEPETGB0": [
-   "OrcaFilamentLibrary/Elegoo PET-CF",
-   "OrcaFilamentLibrary/Elegoo PETG",
-   "OrcaFilamentLibrary/Elegoo PETG HF",
-   "OrcaFilamentLibrary/Elegoo PETG PRO",
-   "OrcaFilamentLibrary/Elegoo PETG Translucent",
-   "OrcaFilamentLibrary/Elegoo PETG-CF",
-   "OrcaFilamentLibrary/Elegoo PETG-GF",
-   "OrcaFilamentLibrary/Elegoo Rapid PETG"
+   "OrcaFilamentLibrary/Elegoo PETG"
   ],
   "OEPLAB00": [
-   "OrcaFilamentLibrary/Elegoo PLA",
-   "OrcaFilamentLibrary/Elegoo PLA Basic",
-   "OrcaFilamentLibrary/Elegoo PLA Galaxy",
-   "OrcaFilamentLibrary/Elegoo PLA Glow",
-   "OrcaFilamentLibrary/Elegoo PLA Marble",
-   "OrcaFilamentLibrary/Elegoo PLA Matte",
-   "OrcaFilamentLibrary/Elegoo PLA PRO",
-   "OrcaFilamentLibrary/Elegoo PLA Silk",
-   "OrcaFilamentLibrary/Elegoo PLA Sparkle",
-   "OrcaFilamentLibrary/Elegoo PLA Translucent2",
-   "OrcaFilamentLibrary/Elegoo PLA Wood",
-   "OrcaFilamentLibrary/Elegoo PLA+",
-   "OrcaFilamentLibrary/Elegoo PLA-CF",
-   "OrcaFilamentLibrary/Elegoo Rapid PLA+"
+   "OrcaFilamentLibrary/Elegoo PLA"
   ],
   "OETPUB00": [
-   "OrcaFilamentLibrary/Elegoo Rapid TPU 95A",
    "OrcaFilamentLibrary/Elegoo TPU 95A"
+  ],
+  "OF0M6QAQ": [
+   "OrcaFilamentLibrary/Elegoo PLA Galaxy"
+  ],
+  "OF102WKM": [
+   "OrcaFilamentLibrary/Elegoo PETG PRO"
+  ],
+  "OF3GKs2i": [
+   "OrcaFilamentLibrary/eSUN PLA-Matte"
+  ],
+  "OF4fgpse": [
+   "OrcaFilamentLibrary/Elegoo PLA Marble"
+  ],
+  "OF79FFkO": [
+   "OrcaFilamentLibrary/Elegoo PC-FR"
+  ],
+  "OF8HQmJD": [
+   "OrcaFilamentLibrary/Elegoo PLA Sparkle"
+  ],
+  "OF9qvJxV": [
+   "OrcaFilamentLibrary/Elegoo PLA Translucent2"
+  ],
+  "OFD5e0sH": [
+   "OrcaFilamentLibrary/Elegoo Rapid PLA+"
+  ],
+  "OFDCk0cz": [
+   "Flashforge/Flashforge PET-CF",
+   "Flashforge/Flashforge PETG-CF",
+   "Flashforge/FusRock S-Multi",
+   "OrcaFilamentLibrary/Generic PETG-CF"
+  ],
+  "OFDNiRTx": [
+   "OrcaFilamentLibrary/Elegoo PLA+"
+  ],
+  "OFICPchn": [
+   "OrcaFilamentLibrary/Elegoo PLA Basic"
+  ],
+  "OFIGHU7W": [
+   "OrcaFilamentLibrary/Elegoo PETG-CF"
+  ],
+  "OFJIImD5": [
+   "OrcaFilamentLibrary/Elegoo PET-CF"
+  ],
+  "OFJfx0Cl": [
+   "OrcaFilamentLibrary/Generic PE-CF"
+  ],
+  "OFJsqMzx": [
+   "OrcaFilamentLibrary/Generic PLA Matte"
   ],
   "OFLSBS99": [
    "OrcaFilamentLibrary/Generic SBS"
   ],
-  "OGFA00": [
-   "OrcaFilamentLibrary/Bambu PLA Basic",
-   "OrcaFilamentLibrary/Elas PLA Basic",
+  "OFMCMXSG": [
+   "OrcaFilamentLibrary/Generic PP-GF"
+  ],
+  "OFMQJToc": [
+   "OrcaFilamentLibrary/Elegoo PETG-GF"
+  ],
+  "OFQhLoxN": [
+   "OrcaFilamentLibrary/Elegoo PLA Wood"
+  ],
+  "OFQkWxJy": [
+   "OrcaFilamentLibrary/Elegoo PLA Matte"
+  ],
+  "OFRS2Ggt": [
+   "OrcaFilamentLibrary/Generic PP-CF"
+  ],
+  "OFT3TqB6": [
+   "OrcaFilamentLibrary/Elas ASA"
+  ],
+  "OFVLuVmD": [
+   "OrcaFilamentLibrary/Elegoo Rapid PETG"
+  ],
+  "OFXmQgno": [
+   "OrcaFilamentLibrary/eSUN PLA-Marble"
+  ],
+  "OFZhdVnP": [
+   "OrcaFilamentLibrary/eSUN PLA-Basic"
+  ],
+  "OFbgt3u3": [
+   "OrcaFilamentLibrary/Elas PLA Basic"
+  ],
+  "OFenGPBR": [
+   "OrcaFilamentLibrary/Elegoo PETG Translucent"
+  ],
+  "OFfB1QKi": [
+   "Flashforge/Flashforge HS PETG",
+   "OrcaFilamentLibrary/Generic PETG HF"
+  ],
+  "OFmeQjRP": [
+   "OrcaFilamentLibrary/Elegoo Rapid TPU 95A"
+  ],
+  "OFpwg2Qh": [
+   "OrcaFilamentLibrary/Elegoo ASA-CF"
+  ],
+  "OFqh1Ngp": [
+   "OrcaFilamentLibrary/Elegoo PLA-CF"
+  ],
+  "OFrgQ1Ns": [
    "OrcaFilamentLibrary/Elas PLA Pro"
+  ],
+  "OFs6lLH7": [
+   "OrcaFilamentLibrary/Elegoo PLA Silk"
+  ],
+  "OFsKqcQW": [
+   "OrcaFilamentLibrary/Elegoo PLA PRO"
+  ],
+  "OFsNZcid": [
+   "OrcaFilamentLibrary/PolyLite Dual PLA"
+  ],
+  "OFutwD6f": [
+   "OrcaFilamentLibrary/Elegoo PLA Glow"
+  ],
+  "OFw4OHWE": [
+   "OrcaFilamentLibrary/Elas PETG Basic"
+  ],
+  "OFzrWlH5": [
+   "OrcaFilamentLibrary/Elegoo PETG HF"
+  ],
+  "OGFA00": [
+   "OrcaFilamentLibrary/Bambu PLA Basic"
   ],
   "OGFA01": [
    "OrcaFilamentLibrary/Bambu PLA Matte"
@@ -4655,8 +4775,7 @@
    "OrcaFilamentLibrary/Bambu ABS"
   ],
   "OGFB01": [
-   "OrcaFilamentLibrary/Bambu ASA",
-   "OrcaFilamentLibrary/Elas ASA"
+   "OrcaFilamentLibrary/Bambu ASA"
   ],
   "OGFB02": [
    "OrcaFilamentLibrary/Bambu ASA-Aero"
@@ -4696,8 +4815,7 @@
    "OrcaFilamentLibrary/Generic PC"
   ],
   "OGFG00": [
-   "OrcaFilamentLibrary/Bambu PETG Basic",
-   "OrcaFilamentLibrary/Elas PETG Basic"
+   "OrcaFilamentLibrary/Bambu PETG Basic"
   ],
   "OGFG01": [
    "OrcaFilamentLibrary/Bambu PETG Translucent"
@@ -4715,21 +4833,14 @@
    "OrcaFilamentLibrary/Generic PCTG"
   ],
   "OGFG99": [
-   "Flashforge/Flashforge HS PETG",
-   "Flashforge/Flashforge PET-CF",
    "Flashforge/Flashforge PETG Pro",
    "Flashforge/Flashforge PETG Transparent",
-   "Flashforge/Flashforge PETG-CF",
-   "Flashforge/FusRock S-Multi",
-   "OrcaFilamentLibrary/Generic PETG",
-   "OrcaFilamentLibrary/Generic PETG HF",
-   "OrcaFilamentLibrary/Generic PETG-CF"
+   "OrcaFilamentLibrary/Generic PETG"
   ],
   "OGFGG300": [
    "OrcaFilamentLibrary/GreenGate3D PETG"
   ],
   "OGFL00": [
-   "OrcaFilamentLibrary/PolyLite Dual PLA",
    "OrcaFilamentLibrary/PolyLite PLA"
   ],
   "OGFL00-1": [
@@ -4745,16 +4856,13 @@
    "OrcaFilamentLibrary/eSUN PLA+"
   ],
   "OGFL04": [
-   "OrcaFilamentLibrary/Overture PLA",
-   "OrcaFilamentLibrary/eSUN PLA-Basic"
+   "OrcaFilamentLibrary/Overture PLA"
   ],
   "OGFL05": [
-   "OrcaFilamentLibrary/Overture Matte PLA",
-   "OrcaFilamentLibrary/eSUN PLA-Matte"
+   "OrcaFilamentLibrary/Overture Matte PLA"
   ],
   "OGFL06": [
-   "OrcaFilamentLibrary/Fiberon PETG-ESD",
-   "OrcaFilamentLibrary/eSUN PLA-Marble"
+   "OrcaFilamentLibrary/Fiberon PETG-ESD"
   ],
   "OGFL50": [
    "OrcaFilamentLibrary/Fiberon PA6-CF"
@@ -4796,8 +4904,7 @@
    "Flashforge/Flashforge PLA Galaxy",
    "Flashforge/Flashforge PLA Luminous",
    "Flashforge/Generic PLA",
-   "OrcaFilamentLibrary/Generic PLA",
-   "OrcaFilamentLibrary/Generic PLA Matte"
+   "OrcaFilamentLibrary/Generic PLA"
   ],
   "OGFLC99": [
    "OrcaFilamentLibrary/Generic CoPE"
@@ -4841,13 +4948,10 @@
    "OrcaFilamentLibrary/Numakers PLA+"
   ],
   "OGFP97": [
-   "OrcaFilamentLibrary/Generic PP",
-   "OrcaFilamentLibrary/Generic PP-CF",
-   "OrcaFilamentLibrary/Generic PP-GF"
+   "OrcaFilamentLibrary/Generic PP"
   ],
   "OGFP99": [
-   "OrcaFilamentLibrary/Generic PE",
-   "OrcaFilamentLibrary/Generic PE-CF"
+   "OrcaFilamentLibrary/Generic PE"
   ],
   "OGFPM001": [
    "OrcaFilamentLibrary/Panchroma PLA"
