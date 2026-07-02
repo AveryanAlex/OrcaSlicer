@@ -601,15 +601,44 @@
   "DeltaMaker/DeltaMaker Generic PETG",
   "DeltaMaker/DeltaMaker Generic PLA",
   "Dremel/Dremel Generic PLA",
+  "Elegoo/Elegoo ASA-CF @base",
   "Elegoo/Elegoo PAHT @base",
   "Elegoo/Elegoo PC @base",
+  "Elegoo/Elegoo PC-FR @base",
+  "Elegoo/Elegoo PET-CF @base",
   "Elegoo/Elegoo PETG @base",
+  "Elegoo/Elegoo PETG HF @base",
+  "Elegoo/Elegoo PETG PRO @base",
+  "Elegoo/Elegoo PETG Translucent @base",
+  "Elegoo/Elegoo PETG-CF @base",
+  "Elegoo/Elegoo PETG-GF @base",
   "Elegoo/Elegoo PLA @base",
+  "Elegoo/Elegoo PLA Basic @base",
+  "Elegoo/Elegoo PLA Galaxy @base",
+  "Elegoo/Elegoo PLA Glow @base",
+  "Elegoo/Elegoo PLA Marble @base",
+  "Elegoo/Elegoo PLA Matte @base",
+  "Elegoo/Elegoo PLA PRO @base",
+  "Elegoo/Elegoo PLA Silk @base",
+  "Elegoo/Elegoo PLA Sparkle @base",
+  "Elegoo/Elegoo PLA Translucent2 @base",
+  "Elegoo/Elegoo PLA Wood @base",
+  "Elegoo/Elegoo PLA+ @base",
+  "Elegoo/Elegoo PLA-CF @base",
+  "Elegoo/Elegoo Rapid PETG @base",
+  "Elegoo/Elegoo Rapid PLA+ @base",
+  "Elegoo/Elegoo Rapid TPU 95A @base",
+  "Elegoo/Generic ABS-CF @Elegoo Centauri",
   "Elegoo/Generic PA @base",
+  "Elegoo/Generic PA6-CF @Elegoo",
   "Elegoo/Generic PC @base",
+  "Elegoo/Generic PC-CF @Elegoo",
   "Elegoo/Generic PET @base",
+  "Elegoo/Generic PET-CF @Elegoo Centauri",
   "Elegoo/Generic PETG @base",
+  "Elegoo/Generic PETG PRO @Elegoo",
   "Elegoo/Generic PLA @base",
+  "Elegoo/Generic PLA Matte @Elegoo",
   "FLSun/FLSun Generic PA",
   "FLSun/FLSun Generic PA-CF",
   "FLSun/FLSun Generic PC",
@@ -2698,8 +2727,7 @@
    "Elegoo/Elegoo ABS"
   ],
   "EASAB00": [
-   "Elegoo/Elegoo ASA",
-   "Elegoo/Elegoo ASA-CF"
+   "Elegoo/Elegoo ASA"
   ],
   "EFL33": [
    "Eryone/Eryone PP-CF"
@@ -2748,34 +2776,13 @@
    "Elegoo/Elegoo PAHT-CF"
   ],
   "EPCB00": [
-   "Elegoo/Elegoo PC",
-   "Elegoo/Elegoo PC-FR"
+   "Elegoo/Elegoo PC"
   ],
   "EPETGB00": [
-   "Elegoo/Elegoo PET-CF",
-   "Elegoo/Elegoo PETG",
-   "Elegoo/Elegoo PETG HF",
-   "Elegoo/Elegoo PETG PRO",
-   "Elegoo/Elegoo PETG Translucent",
-   "Elegoo/Elegoo PETG-CF",
-   "Elegoo/Elegoo PETG-GF",
-   "Elegoo/Elegoo Rapid PETG"
+   "Elegoo/Elegoo PETG"
   ],
   "EPLAB00": [
-   "Elegoo/Elegoo PLA",
-   "Elegoo/Elegoo PLA Basic",
-   "Elegoo/Elegoo PLA Galaxy",
-   "Elegoo/Elegoo PLA Glow",
-   "Elegoo/Elegoo PLA Marble",
-   "Elegoo/Elegoo PLA Matte",
-   "Elegoo/Elegoo PLA PRO",
-   "Elegoo/Elegoo PLA Silk",
-   "Elegoo/Elegoo PLA Sparkle",
-   "Elegoo/Elegoo PLA Translucent2",
-   "Elegoo/Elegoo PLA Wood",
-   "Elegoo/Elegoo PLA+",
-   "Elegoo/Elegoo PLA-CF",
-   "Elegoo/Elegoo Rapid PLA+"
+   "Elegoo/Elegoo PLA"
   ],
   "ESN02": [
    "OrcaFilamentLibrary/eSUN ePLA-LW"
@@ -2784,7 +2791,6 @@
    "OrcaFilamentLibrary/eSUN PETG"
   ],
   "ETPUB00": [
-   "Elegoo/Elegoo Rapid TPU 95A",
    "Elegoo/Elegoo TPU 95A"
   ],
   "FDPLAST01": [
@@ -3023,8 +3029,7 @@
    "OrcaFilamentLibrary/FILL3D PETG CF"
   ],
   "GABSB00": [
-   "Elegoo/Generic ABS",
-   "Elegoo/Generic ABS-CF"
+   "Elegoo/Generic ABS"
   ],
   "GASAB00": [
    "Elegoo/Generic ASA",
@@ -4492,25 +4497,20 @@
    "Prusa/Prusa Generic TPU HF"
   ],
   "GPAB00": [
-   "Elegoo/Generic PA",
-   "Elegoo/Generic PA6-CF"
+   "Elegoo/Generic PA"
   ],
   "GPCB00": [
-   "Elegoo/Generic PC",
-   "Elegoo/Generic PC-CF"
+   "Elegoo/Generic PC"
   ],
   "GPETB00": [
-   "Elegoo/Generic PET",
-   "Elegoo/Generic PET-CF"
+   "Elegoo/Generic PET"
   ],
   "GPETGB00": [
    "Elegoo/Generic PETG",
-   "Elegoo/Generic PETG PRO",
    "Elegoo/Generic PETG-CF"
   ],
   "GPLAB00": [
-   "Elegoo/Generic PLA",
-   "Elegoo/Generic PLA Matte"
+   "Elegoo/Generic PLA"
   ],
   "Generic ABS @E3NG v1.2S": [
    "RH3D/Generic ABS"
@@ -4681,11 +4681,17 @@
   "OETPUB00": [
    "OrcaFilamentLibrary/Elegoo TPU 95A"
   ],
+  "OF09vOcG": [
+   "Elegoo/Elegoo PLA Galaxy"
+  ],
   "OF0M6QAQ": [
    "OrcaFilamentLibrary/Elegoo PLA Galaxy"
   ],
   "OF0SyJhk": [
    "Flashforge/Flashforge PA6-CF"
+  ],
+  "OF0TODnN": [
+   "Elegoo/Generic PET-CF"
   ],
   "OF0TjJ0G": [
    "Qidi/Qidi ASA-Aero"
@@ -4719,6 +4725,9 @@
   ],
   "OF3XeEuV": [
    "Qidi/QIDI PET-GF"
+  ],
+  "OF3arl18": [
+   "Elegoo/Elegoo Rapid PETG"
   ],
   "OF41QVDH": [
    "Flashforge/Flashforge Generic PLA-Silk"
@@ -4792,6 +4801,9 @@
   "OFAGrVjP": [
    "Flashforge/Flashforge PLA Silk"
   ],
+  "OFAHagT9": [
+   "Elegoo/Elegoo Rapid PLA+"
+  ],
   "OFAUDGEQ": [
    "Qidi/QIDI PLA Rapido Matte"
   ],
@@ -4801,11 +4813,17 @@
   "OFAdZFD1": [
    "Flashforge/FusRock Generic PET-GF"
   ],
+  "OFAiqi5v": [
+   "Elegoo/Elegoo ASA-CF"
+  ],
   "OFAnyzjN": [
    "Qidi/HATCHBOX PETG"
   ],
   "OFAtydxE": [
    "Flashforge/FusRock S-Multi"
+  ],
+  "OFBvxnjM": [
+   "Elegoo/Elegoo PETG-GF"
   ],
   "OFC2FSsV": [
    "Qidi/Overture PLA"
@@ -4821,6 +4839,9 @@
   ],
   "OFDCk0cz": [
    "OrcaFilamentLibrary/Generic PETG-CF"
+  ],
+  "OFDMWB6t": [
+   "Elegoo/Elegoo PLA+"
   ],
   "OFDNiRTx": [
    "OrcaFilamentLibrary/Elegoo PLA+"
@@ -4842,6 +4863,9 @@
   ],
   "OFHBTqyD": [
    "Flashforge/Flashforge PLA Basic"
+  ],
+  "OFHtQDC9": [
+   "Elegoo/Elegoo PLA Basic"
   ],
   "OFICPchn": [
    "OrcaFilamentLibrary/Elegoo PLA Basic"
@@ -4872,6 +4896,9 @@
   ],
   "OFKjlAbC": [
    "Qidi/QIDI UltraPA-CF25"
+  ],
+  "OFL4KniM": [
+   "Elegoo/Elegoo Rapid TPU 95A"
   ],
   "OFL7vEML": [
    "Flashforge/FlashForge PC"
@@ -4912,6 +4939,9 @@
   "OFOW9K96": [
    "Qidi/Qidi TPU 95A-HF"
   ],
+  "OFOkTA0C": [
+   "Elegoo/Elegoo PETG Translucent"
+  ],
   "OFOysPuE": [
    "Qidi/QIDI TPU-GF"
   ],
@@ -4950,6 +4980,9 @@
   ],
   "OFRgDMDJ": [
    "Flashforge/Flashforge PETG Transparent"
+  ],
+  "OFSCm6pJ": [
+   "Elegoo/Elegoo PET-CF"
   ],
   "OFSSuKRr": [
    "Qidi/QIDI PETG Basic"
@@ -5041,14 +5074,23 @@
   "OFa6L3Of": [
    "Qidi/Qidi PC-ABS-FR"
   ],
+  "OFaKIoH2": [
+   "Elegoo/Elegoo PLA Sparkle"
+  ],
   "OFbS9rjH": [
    "Qidi/QIDI PETG Rapido"
+  ],
+  "OFbYP6Wb": [
+   "Elegoo/Elegoo PLA Marble"
   ],
   "OFbgt3u3": [
    "OrcaFilamentLibrary/Elas PLA Basic"
   ],
   "OFceJcLf": [
    "Qidi/PolyLite PLA"
+  ],
+  "OFcqs5g7": [
+   "Elegoo/Elegoo PLA Translucent2"
   ],
   "OFcy60o4": [
    "Flashforge/Flashforge ASA Basic"
@@ -5086,6 +5128,12 @@
   "OFgJX0Fc": [
    "Flashforge/FlashForge PPS"
   ],
+  "OFh5GUhZ": [
+   "Elegoo/Elegoo PLA Wood"
+  ],
+  "OFhKNHC8": [
+   "Elegoo/Generic PETG PRO"
+  ],
   "OFhzHd2Y": [
    "Flashforge/Flashforge HIPS"
   ],
@@ -5098,6 +5146,9 @@
   "OFidJLn8": [
    "Qidi/PolyLite ABS"
   ],
+  "OFiyGNbI": [
+   "Elegoo/Elegoo PETG-CF"
+  ],
   "OFjepy6j": [
    "Flashforge/FusRock Generic S-PAHT"
   ],
@@ -5107,8 +5158,17 @@
   "OFjqPjjl": [
    "Flashforge/Generic PET"
   ],
+  "OFk388hR": [
+   "Elegoo/Generic PA6-CF"
+  ],
   "OFkaDtKx": [
    "Flashforge/Flashforge PA66-CF"
+  ],
+  "OFkfK62J": [
+   "Elegoo/Elegoo PLA Silk"
+  ],
+  "OFklg4aM": [
+   "Elegoo/Elegoo PLA PRO"
   ],
   "OFlNKZLP": [
    "Flashforge/Flashforge PLA  Metal"
@@ -5121,6 +5181,9 @@
   ],
   "OFmKNi3f": [
    "Qidi/QIDI PLA Rapido"
+  ],
+  "OFmOWC74": [
+   "Elegoo/Elegoo PETG PRO"
   ],
   "OFmduKVr": [
    "Flashforge/FlashForge PPS-CF"
@@ -5136,6 +5199,9 @@
   ],
   "OFnsWQTp": [
    "Qidi/QIDI WOOD Rapido"
+  ],
+  "OFo4VB3w": [
+   "Elegoo/Generic ABS-CF"
   ],
   "OFo9EwvK": [
    "Flashforge/Generic PETG-CF10"
@@ -5179,6 +5245,9 @@
   "OFsKqcQW": [
    "OrcaFilamentLibrary/Elegoo PLA PRO"
   ],
+  "OFsLkLw6": [
+   "Elegoo/Generic PLA Matte"
+  ],
   "OFsNZcid": [
    "OrcaFilamentLibrary/PolyLite Dual PLA"
   ],
@@ -5194,8 +5263,14 @@
   "OFtJMczs": [
    "Flashforge/Flashforge TPU-64D"
   ],
+  "OFuPC4S8": [
+   "Elegoo/Elegoo PLA-CF"
+  ],
   "OFuTFxVP": [
    "Qidi/Overture ABS"
+  ],
+  "OFuXkYly": [
+   "Elegoo/Elegoo PLA Glow"
   ],
   "OFuidAEg": [
    "Qidi/Bambu ABS"
@@ -5230,11 +5305,23 @@
   "OFwf0oWp": [
    "Flashforge/Flashforge PLA Luminous"
   ],
+  "OFwyqcGn": [
+   "Elegoo/Elegoo PLA Matte"
+  ],
+  "OFxjFYxE": [
+   "Elegoo/Elegoo PETG HF"
+  ],
   "OFyoW5W2": [
    "Flashforge/Flashforge PLA Color Change"
   ],
+  "OFypQeKR": [
+   "Elegoo/Generic PC-CF"
+  ],
   "OFyxAbO4": [
    "Flashforge/Flashforge TPU-95A"
+  ],
+  "OFzFbFcl": [
+   "Elegoo/Elegoo PC-FR"
   ],
   "OFzrWlH5": [
    "OrcaFilamentLibrary/Elegoo PETG HF"
@@ -7154,6 +7241,12 @@
   "DeltaMaker/DeltaMaker Generic PLA",
   "DeltaMaker/DeltaMaker Generic TPU",
   "Dremel/Dremel Generic PLA",
+  "Elegoo/Generic ABS-CF @Elegoo Centauri",
+  "Elegoo/Generic PA6-CF @Elegoo",
+  "Elegoo/Generic PC-CF @Elegoo",
+  "Elegoo/Generic PET-CF @Elegoo Centauri",
+  "Elegoo/Generic PETG PRO @Elegoo",
+  "Elegoo/Generic PLA Matte @Elegoo",
   "Eryone/Eryone ABS",
   "Eryone/Eryone ABS-CF",
   "Eryone/Eryone ASA",
