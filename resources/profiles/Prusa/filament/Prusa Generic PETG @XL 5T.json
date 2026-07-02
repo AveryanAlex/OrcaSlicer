@@ -1,7 +1,7 @@
 {
 	"type": "filament",
 	"name": "Prusa Generic PETG @XL 5T",
-	"inherits": "fdm_filament_pet",
+	"inherits": "Prusa Generic PETG @base",
 	"from": "system",
 	"setting_id": "FbtB9og6yXm2ZktD",
 	"instantiation": "true",

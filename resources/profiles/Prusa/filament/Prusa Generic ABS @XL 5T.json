@@ -1,7 +1,7 @@
 {
 	"type": "filament",
 	"name": "Prusa Generic ABS @XL 5T",
-	"inherits": "fdm_filament_abs",
+	"inherits": "Prusa Generic ABS @base",
 	"from": "system",
 	"setting_id": "BVYagI9PtDtO1Jhu",
 	"instantiation": "true",

@@ -1447,27 +1447,18 @@
   "Peopoly/Peopoly Generic PLA",
   "Peopoly/Peopoly Lancer PLA-C",
   "Phrozen/Phrozen PLA @Phrozen Arco 0.4 nozzle",
-  "Prusa/Prusa Generic ABS @CORE One",
   "Prusa/Prusa Generic ABS @CORE One 0.6",
   "Prusa/Prusa Generic ABS @CORE One 0.8",
   "Prusa/Prusa Generic ABS @CORE One HF 0.4",
   "Prusa/Prusa Generic ABS @CORE One HF 0.5",
   "Prusa/Prusa Generic ABS @CORE One HF 0.6",
   "Prusa/Prusa Generic ABS @CORE One HF 0.8",
-  "Prusa/Prusa Generic ABS @MK3.5",
-  "Prusa/Prusa Generic ABS @MK3.5 0.25",
-  "Prusa/Prusa Generic ABS @MK3.5 0.6",
-  "Prusa/Prusa Generic ABS @MK3.5 0.8",
-  "Prusa/Prusa Generic ABS @MK4S",
   "Prusa/Prusa Generic ABS @MK4S 0.6",
   "Prusa/Prusa Generic ABS @MK4S 0.8",
   "Prusa/Prusa Generic ABS @MK4S HF0.4",
   "Prusa/Prusa Generic ABS @MK4S HF0.5",
   "Prusa/Prusa Generic ABS @MK4S HF0.6",
   "Prusa/Prusa Generic ABS @MK4S HF0.8",
-  "Prusa/Prusa Generic ABS HF @MK3.5",
-  "Prusa/Prusa Generic ABS HF @MK3.5 0.6",
-  "Prusa/Prusa Generic ABS HF @MK3.5 0.8",
   "Prusa/Prusa Generic ASA @CORE One",
   "Prusa/Prusa Generic ASA @CORE One 0.6",
   "Prusa/Prusa Generic ASA @CORE One 0.8",
@@ -1489,14 +1480,17 @@
   "Prusa/Prusa Generic ASA HF @MK3.5",
   "Prusa/Prusa Generic ASA HF @MK3.5 0.6",
   "Prusa/Prusa Generic ASA HF @MK3.5 0.8",
+  "Prusa/Prusa Generic ASA HF @base",
   "Prusa/Prusa Generic PA @MK3.5",
   "Prusa/Prusa Generic PA @MK3.5 0.25",
   "Prusa/Prusa Generic PA @MK3.5 0.6",
   "Prusa/Prusa Generic PA @MK3.5 0.8",
+  "Prusa/Prusa Generic PA @base",
   "Prusa/Prusa Generic PA-CF @MK3.5",
   "Prusa/Prusa Generic PA-CF @MK3.5 0.25",
   "Prusa/Prusa Generic PA-CF @MK3.5 0.6",
   "Prusa/Prusa Generic PA-CF @MK3.5 0.8",
+  "Prusa/Prusa Generic PA-CF @base",
   "Prusa/Prusa Generic PC @MK3.5",
   "Prusa/Prusa Generic PC @MK3.5 0.25",
   "Prusa/Prusa Generic PC @MK3.5 0.6",
@@ -1504,6 +1498,7 @@
   "Prusa/Prusa Generic PC HF @MK3.5",
   "Prusa/Prusa Generic PC HF @MK3.5 0.6",
   "Prusa/Prusa Generic PC HF @MK3.5 0.8",
+  "Prusa/Prusa Generic PC HF @base",
   "Prusa/Prusa Generic PETG @CORE One",
   "Prusa/Prusa Generic PETG @CORE One 0.6",
   "Prusa/Prusa Generic PETG @CORE One 0.8",
@@ -1522,9 +1517,11 @@
   "Prusa/Prusa Generic PETG @MK4S HF0.5",
   "Prusa/Prusa Generic PETG @MK4S HF0.6",
   "Prusa/Prusa Generic PETG @MK4S HF0.8",
+  "Prusa/Prusa Generic PETG @base",
   "Prusa/Prusa Generic PETG HF @MK3.5",
   "Prusa/Prusa Generic PETG HF @MK3.5 0.6",
   "Prusa/Prusa Generic PETG HF @MK3.5 0.8",
+  "Prusa/Prusa Generic PETG HF @base",
   "Prusa/Prusa Generic PLA @CORE One",
   "Prusa/Prusa Generic PLA @CORE One 0.6",
   "Prusa/Prusa Generic PLA @CORE One 0.8",
@@ -1543,9 +1540,11 @@
   "Prusa/Prusa Generic PLA @MK4S HF0.5",
   "Prusa/Prusa Generic PLA @MK4S HF0.6",
   "Prusa/Prusa Generic PLA @MK4S HF0.8",
+  "Prusa/Prusa Generic PLA @base",
   "Prusa/Prusa Generic PLA HF @MK3.5",
   "Prusa/Prusa Generic PLA HF @MK3.5 0.6",
   "Prusa/Prusa Generic PLA HF @MK3.5 0.8",
+  "Prusa/Prusa Generic PLA HF @base",
   "Prusa/Prusa Generic PLA Silk @CORE One",
   "Prusa/Prusa Generic PLA Silk @CORE One 0.6",
   "Prusa/Prusa Generic PLA Silk @CORE One 0.8",
@@ -1556,21 +1555,12 @@
   "Prusa/Prusa Generic PLA-CF @MK3.5 0.25",
   "Prusa/Prusa Generic PLA-CF @MK3.5 0.6",
   "Prusa/Prusa Generic PLA-CF @MK3.5 0.8",
-  "Prusa/Prusa Generic PVA @MK3.5",
-  "Prusa/Prusa Generic PVA @MK3.5 0.25",
-  "Prusa/Prusa Generic PVA @MK3.5 0.6",
-  "Prusa/Prusa Generic PVA @MK3.5 0.8",
-  "Prusa/Prusa Generic PVA HF @MK3.5",
-  "Prusa/Prusa Generic PVA HF @MK3.5 0.6",
-  "Prusa/Prusa Generic PVA HF @MK3.5 0.8",
+  "Prusa/Prusa Generic PLA-CF @base",
   "Prusa/Prusa Generic TPU @CORE One",
   "Prusa/Prusa Generic TPU @CORE One 0.6",
   "Prusa/Prusa Generic TPU @CORE One 0.8",
-  "Prusa/Prusa Generic TPU @MK3.5",
-  "Prusa/Prusa Generic TPU @MK4S",
   "Prusa/Prusa Generic TPU @MK4S 0.6",
   "Prusa/Prusa Generic TPU @MK4S 0.8",
-  "Prusa/Prusa Generic TPU HF @MK3.5",
   "Prusa/Prusament ASA @CORE One",
   "Prusa/Prusament ASA @CORE One 0.6",
   "Prusa/Prusament ASA @CORE One 0.8",
@@ -1598,6 +1588,7 @@
   "Prusa/Prusament PETG @CORE One HF 0.5",
   "Prusa/Prusament PETG @CORE One HF 0.6",
   "Prusa/Prusament PETG @CORE One HF 0.8",
+  "Prusa/Prusament PETG @base",
   "Prusa/Prusament PLA @CORE One",
   "Prusa/Prusament PLA @CORE One 0.6",
   "Prusa/Prusament PLA @CORE One 0.8",
@@ -1605,12 +1596,14 @@
   "Prusa/Prusament PLA @CORE One HF 0.5",
   "Prusa/Prusament PLA @CORE One HF 0.6",
   "Prusa/Prusament PLA @CORE One HF 0.8",
+  "Prusa/Prusament PLA @base",
   "Prusa/Prusament PVB @CORE One",
   "Prusa/Prusament PVB @CORE One 0.6",
   "Prusa/Prusament PVB @CORE One 0.8",
   "Prusa/Prusament rPLA @CORE One",
   "Prusa/Prusament rPLA @CORE One 0.6",
   "Prusa/Prusament rPLA @CORE One 0.8",
+  "Prusa/Prusament rPLA @base",
   "Qidi/Bambu PETG",
   "Qidi/Bambu PLA",
   "Qidi/HATCHBOX PETG @Qidi",
@@ -3182,7 +3175,6 @@
    "FLSun/FLSun T1 ASA",
    "OrcaArena/OrcaArena Generic ASA",
    "Prusa/Prusa Generic ASA",
-   "Prusa/Prusa Generic ASA HF",
    "Prusa/Prusament ASA",
    "Ratrig/RatRig BigNozzle ASA",
    "Ratrig/RatRig Generic ASA",
@@ -3244,7 +3236,6 @@
    "Lulzbot/Lulzbot 2.85mm ABS",
    "OrcaArena/OrcaArena Generic ABS",
    "Prusa/Prusa Generic ABS",
-   "Prusa/Prusa Generic ABS HF",
    "Qidi/Qidi Generic ABS",
    "Ratrig/RatRig BigNozzle ABS",
    "Ratrig/RatRig Generic ABS",
@@ -3314,7 +3305,6 @@
    "InfiMech/Other PC",
    "OrcaArena/OrcaArena Generic PC",
    "Prusa/Prusa Generic PC",
-   "Prusa/Prusa Generic PC HF",
    "Prusa/Prusament PC Blend",
    "Qidi/Qidi Generic PC",
    "Ratrig/RatRig BigNozzle PCTG",
@@ -3802,10 +3792,6 @@
    "Peopoly/Peopoly Lancer PLA-C",
    "Phrozen/Phrozen PLA",
    "Prusa/Prusa Generic PLA",
-   "Prusa/Prusa Generic PLA HF",
-   "Prusa/Prusa Generic PLA-CF",
-   "Prusa/Prusament PLA",
-   "Prusa/Prusament rPLA",
    "Qidi/Qidi Generic PLA",
    "Ratrig/RatRig BigNozzle PLA",
    "Ratrig/RatRig BigNozzle TPU",
@@ -3965,7 +3951,6 @@
    "FLSun/FLSun Generic PA",
    "OrcaArena/OrcaArena Generic PA",
    "Prusa/Prusa Generic PA",
-   "Prusa/Prusa Generic PA-CF",
    "Qidi/Qidi Generic PA",
    "Ratrig/RatRig Generic PA",
    "SecKit/SecKit Generic PA",
@@ -4273,7 +4258,6 @@
    "FLSun/FLSun Generic PVA",
    "OrcaArena/OrcaArena Generic PVA",
    "Prusa/Prusa Generic PVA",
-   "Prusa/Prusa Generic PVA HF",
    "Qidi/Qidi Generic PVA",
    "Ratrig/RatRig Generic PVA",
    "SecKit/SecKit Generic PVA",
@@ -4400,9 +4384,7 @@
   ],
   "GFT02": [
    "BBL/Bambu PPS-CF",
-   "Prusa/Prusa Generic PETG",
-   "Prusa/Prusa Generic PETG HF",
-   "Prusa/Prusament PETG"
+   "Prusa/Prusa Generic PETG"
   ],
   "GFT97": [
    "BBL/Generic PPS",
@@ -4475,7 +4457,6 @@
    "OrcaArena/OrcaArena Generic TPU",
    "Prusa/Prusa Generic FLEX",
    "Prusa/Prusa Generic TPU",
-   "Prusa/Prusa Generic TPU HF",
    "Qidi/Qidi Generic TPU",
    "Ratrig/RatRig Generic TPU",
    "SecKit/SecKit Generic TPU",
@@ -4834,6 +4815,9 @@
   "OFCJaXZS": [
    "Flashforge/Flashforge PPS"
   ],
+  "OFCgpxn2": [
+   "Prusa/Prusa Generic ABS HF"
+  ],
   "OFD5e0sH": [
    "OrcaFilamentLibrary/Elegoo Rapid PLA+"
   ],
@@ -4957,6 +4941,9 @@
   "OFPwi9X0": [
    "Qidi/HATCHBOX ABS"
   ],
+  "OFQ9dI8j": [
+   "Prusa/Prusa Generic PC HF"
+  ],
   "OFQCAYAt": [
    "Flashforge/Flashforge PPA-CF"
   ],
@@ -5035,6 +5022,9 @@
   "OFXcfTEb": [
    "Qidi/Tinmorry PETG-ECO"
   ],
+  "OFXfgh61": [
+   "Prusa/Prusa Generic PA-CF"
+  ],
   "OFXkwkn6": [
    "Qidi/QIDI PA-Ultra"
   ],
@@ -5076,6 +5066,9 @@
   ],
   "OFaKIoH2": [
    "Elegoo/Elegoo PLA Sparkle"
+  ],
+  "OFbK5wve": [
+   "Prusa/Prusa Generic TPU HF"
   ],
   "OFbS9rjH": [
    "Qidi/QIDI PETG Rapido"
@@ -5143,11 +5136,17 @@
   "OFiJYDPC": [
    "Qidi/HATCHBOX PLA"
   ],
+  "OFicxmSa": [
+   "Prusa/Prusa Generic PLA HF"
+  ],
   "OFidJLn8": [
    "Qidi/PolyLite ABS"
   ],
   "OFiyGNbI": [
    "Elegoo/Elegoo PETG-CF"
+  ],
+  "OFjFPhUC": [
+   "Prusa/Prusament rPLA"
   ],
   "OFjepy6j": [
    "Flashforge/FusRock Generic S-PAHT"
@@ -5164,11 +5163,17 @@
   "OFkaDtKx": [
    "Flashforge/Flashforge PA66-CF"
   ],
+  "OFkeeluv": [
+   "Prusa/Prusa Generic ASA HF"
+  ],
   "OFkfK62J": [
    "Elegoo/Elegoo PLA Silk"
   ],
   "OFklg4aM": [
    "Elegoo/Elegoo PLA PRO"
+  ],
+  "OFkoT6jl": [
+   "Prusa/Prusament PLA"
   ],
   "OFlNKZLP": [
    "Flashforge/Flashforge PLA  Metal"
@@ -5217,6 +5222,12 @@
   ],
   "OFp8lkYD": [
    "Flashforge/Flashforge PPA-GF"
+  ],
+  "OFpHq9gJ": [
+   "Prusa/Prusament PETG"
+  ],
+  "OFphFSUJ": [
+   "Prusa/Prusa Generic PETG HF"
   ],
   "OFpwg2Qh": [
    "OrcaFilamentLibrary/Elegoo ASA-CF"
@@ -5287,6 +5298,9 @@
   "OFv2NHLC": [
    "Qidi/QIDI ABS-GF25"
   ],
+  "OFv8SRZh": [
+   "Prusa/Prusa Generic PLA-CF"
+  ],
   "OFvN3117": [
    "Qidi/QIDI PLA Matte Basic"
   ],
@@ -5307,6 +5321,9 @@
   ],
   "OFwyqcGn": [
    "Elegoo/Elegoo PLA Matte"
+  ],
+  "OFxLeRyT": [
+   "Prusa/Prusa Generic PVA HF"
   ],
   "OFxjFYxE": [
    "Elegoo/Elegoo PETG HF"

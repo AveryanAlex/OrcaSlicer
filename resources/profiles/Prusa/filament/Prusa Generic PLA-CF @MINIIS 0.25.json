@@ -1,7 +1,7 @@
 {
 	"type": "filament",
 	"name": "Prusa Generic PLA-CF @MINIIS 0.25",
-	"inherits": "fdm_filament_pla",
+	"inherits": "Prusa Generic PLA-CF @base",
 	"from": "system",
 	"setting_id": "Sv0IcpOJBk95F94d",
 	"instantiation": "true",

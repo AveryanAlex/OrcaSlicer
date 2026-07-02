@@ -1,7 +1,7 @@
 {
 	"type": "filament",
 	"name": "Prusa Generic PVA @MINIIS 0.25",
-	"inherits": "fdm_filament_pva",
+	"inherits": "Prusa Generic PVA @base",
 	"from": "system",
 	"setting_id": "B0Dmo1DvtrwBwM7U",
 	"instantiation": "true",

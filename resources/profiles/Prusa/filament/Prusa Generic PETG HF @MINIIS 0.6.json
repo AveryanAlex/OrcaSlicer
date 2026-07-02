@@ -1,7 +1,7 @@
 {
 	"type": "filament",
 	"name": "Prusa Generic PETG HF @MINIIS 0.6",
-	"inherits": "fdm_filament_pet",
+	"inherits": "Prusa Generic PETG HF @base",
 	"from": "system",
 	"setting_id": "tt7C6k90F51Q17NL",
 	"instantiation": "true",

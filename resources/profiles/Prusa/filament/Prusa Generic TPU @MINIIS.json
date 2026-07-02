@@ -1,7 +1,7 @@
 {
 	"type": "filament",
 	"name": "Prusa Generic TPU @MINIIS",
-	"inherits": "fdm_filament_tpu",
+	"inherits": "Prusa Generic TPU @base",
 	"from": "system",
 	"setting_id": "TUqkAb8i9HpFdiCy",
 	"instantiation": "true",

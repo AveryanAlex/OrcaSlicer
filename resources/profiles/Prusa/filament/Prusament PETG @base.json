@@ -1,0 +1,8 @@
+{
+	"type": "filament",
+	"name": "Prusament PETG @base",
+	"inherits": "fdm_filament_pet",
+	"from": "system",
+	"filament_id": "OFpHq9gJ",
+	"instantiation": "false"
+}

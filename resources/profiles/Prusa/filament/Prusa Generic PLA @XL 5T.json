@@ -1,7 +1,7 @@
 {
 	"type": "filament",
 	"name": "Prusa Generic PLA @XL 5T",
-	"inherits": "fdm_filament_pla",
+	"inherits": "Prusa Generic PLA @base",
 	"from": "system",
 	"setting_id": "orBUSq1sDBeMGMON",
 	"instantiation": "true",

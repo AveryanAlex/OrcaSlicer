@@ -1,7 +1,7 @@
 {
 	"type": "filament",
 	"name": "Prusa Generic PA @MINIIS",
-	"inherits": "fdm_filament_pa",
+	"inherits": "Prusa Generic PA @base",
 	"from": "system",
 	"setting_id": "hda5VGcBTJOFu6B0",
 	"instantiation": "true",
