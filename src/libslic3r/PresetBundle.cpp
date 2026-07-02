@@ -3109,6 +3109,24 @@ void PresetBundle::update_num_filaments(unsigned int to_del_flament_id)
 }
 
 
+// Orca: the AMS lookups below resolve a tray's filament_id to the FIRST compatible base
+// preset. When several presets match the same id for the selected printer the pick is
+// arbitrary (a profile bug - see the validator's check_duplicate_filament_subtypes), so
+// scan past a successful match and warn about the runners-up. Behavior is unchanged.
+static void warn_ambiguous_filament_id_match(const PresetCollection &filaments, PresetCollection::ConstIterator match, const std::string &filament_id)
+{
+    if (match == filaments.end())
+        return;
+    std::string others;
+    for (auto it = std::next(match); it != filaments.end(); ++it)
+        if (it->is_compatible && filaments.get_preset_base(*it) == &*it && it->filament_id == filament_id)
+            others += (others.empty() ? "\"" : ", \"") + it->name + "\"";
+    if (!others.empty())
+        BOOST_LOG_TRIVIAL(warning) << "Ambiguous AMS filament match: filament_id \"" << filament_id
+                                   << "\" matches multiple presets compatible with the selected printer; picked \"" << match->name
+                                   << "\", also matches " << others;
+}
+
 void PresetBundle::get_ams_cobox_infos(AMSComboInfo& combox_info)
 {
     combox_info.clear();
@@ -3131,6 +3149,7 @@ void PresetBundle::get_ams_cobox_infos(AMSComboInfo& combox_info)
         }
         auto iter = std::find_if(filaments.begin(), filaments.end(),
                                  [this, &filament_id](auto &f) { return f.is_compatible && filaments.get_preset_base(f) == &f && f.filament_id == filament_id; });
+        warn_ambiguous_filament_id_match(filaments, iter, filament_id);
         if (iter == filaments.end()) {
             BOOST_LOG_TRIVIAL(warning) << __FUNCTION__ << boost::format(": filament_id %1% not found or system or compatible") % filament_id;
             auto filament_type = ams.opt_string("filament_type", 0u);
@@ -3233,6 +3252,7 @@ unsigned int PresetBundle::sync_ams_list(std::vector<std::pair<DynamicPrintConfi
         auto iter = std::find_if(filaments.begin(), filaments.end(), [this, &filament_id, &has_type, filament_type](auto &f) {
             has_type |= f.config.opt_string("filament_type", 0u) == filament_type;
             return f.is_compatible && filaments.get_preset_base(f) == &f && f.filament_id == filament_id; });
+        warn_ambiguous_filament_id_match(filaments, iter, filament_id);
         if (iter == filaments.end()) {
             BOOST_LOG_TRIVIAL(info) << __FUNCTION__ << boost::format(": filament_id %1% not found or system or compatible") % filament_id;
             if (!filament_type.empty()) {
@@ -5657,7 +5677,11 @@ bool PresetBundle::check_duplicate_filament_subtypes() const
     // inherited from its @base at load time), grouped by vendor so we only test a
     // printer against its own vendor's filaments. A vendor's compatible_printers
     // only names that vendor's printers, so same-vendor scoping is correctness
-    // preserving and avoids an O(all printers x all filaments) sweep.
+    // preserving and avoids an O(all printers x all filaments) sweep. The one
+    // exception is the Orca Filament Library: its presets have empty
+    // compatible_printers (= compatible with every printer, minus the alias-shadowing
+    // exclusions that is_compatible_with_printer checks via m_excluded_from), so they
+    // are tested against every vendor's printers as well.
     std::map<std::string, std::vector<const Preset *>> filaments_by_vendor;
     for (const auto &preset : filaments) {
         if (!preset.is_system || preset.filament_id.empty() || preset.vendor == nullptr)
@@ -5665,20 +5689,29 @@ bool PresetBundle::check_duplicate_filament_subtypes() const
         filaments_by_vendor[preset.vendor->name].push_back(&preset);
     }
 
+    const std::vector<const Preset *> no_filaments;
+    const auto library_it = filaments_by_vendor.find(ORCA_FILAMENT_LIBRARY);
+    const std::vector<const Preset *> &library_filaments = library_it == filaments_by_vendor.end() ? no_filaments : library_it->second;
+
     bool found_duplicates = false;
     for (const auto &printer : printers) {
         if (!printer.is_system || printer.vendor == nullptr)
             continue;
         auto vendor_it = filaments_by_vendor.find(printer.vendor->name);
-        if (vendor_it == filaments_by_vendor.end())
+        const std::vector<const Preset *> &vendor_filaments = vendor_it == filaments_by_vendor.end() ? no_filaments : vendor_it->second;
+        if (vendor_filaments.empty() && library_filaments.empty())
             continue;
 
         const PresetWithVendorProfile active_printer = printers.get_preset_with_vendor_profile(printer);
         // std::map keeps the reported errors in a deterministic (sorted) order.
         std::map<std::string, std::vector<const Preset *>> by_filament_id;
-        for (const Preset *fil : vendor_it->second)
+        for (const Preset *fil : vendor_filaments)
             if (is_compatible_with_printer(filaments.get_preset_with_vendor_profile(*fil), active_printer))
                 by_filament_id[fil->filament_id].push_back(fil);
+        if (&vendor_filaments != &library_filaments)
+            for (const Preset *fil : library_filaments)
+                if (is_compatible_with_printer(filaments.get_preset_with_vendor_profile(*fil), active_printer))
+                    by_filament_id[fil->filament_id].push_back(fil);
 
         for (const auto &entry : by_filament_id) {
             if (entry.second.size() < 2)
@@ -5686,9 +5719,15 @@ bool PresetBundle::check_duplicate_filament_subtypes() const
             found_duplicates = true;
             // List each conflicting preset with a clickable file:// URI on its own
             // line, so the profile author can jump straight to the files to fix.
+            // A preset from another bundle (the Orca Filament Library) is tagged with
+            // its vendor so the source bundle is obvious.
             std::string presets;
-            for (const Preset *p : entry.second)
-                presets += "\n    - " + p->name + "\n      " + preset_file_uri(p->file);
+            for (const Preset *p : entry.second) {
+                presets += "\n    - " + p->name;
+                if (p->vendor != nullptr && p->vendor->name != printer.vendor->name)
+                    presets += " [" + p->vendor->name + "]";
+                presets += "\n      " + preset_file_uri(p->file);
+            }
             BOOST_LOG_TRIVIAL(error)
                 << "Ambiguous AMS filament match: " << entry.second.size()
                 << " filament presets share filament_id \"" << entry.first

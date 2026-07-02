@@ -4,6 +4,7 @@ import argparse
 from pathlib import Path
 
 from assign_vendor_setting_ids import generate_preset_setting_id
+from assign_filament_ids import check_filament_ids
 
 OBSOLETE_KEYS = {
     "acceleration", "scale", "rotate", "duplicate", "duplicate_grid",
@@ -288,6 +289,12 @@ def check_name_consistency(profiles_dir, vendor_name):
 def check_filament_id(vendor, vendor_folder):
     """
     Make sure filament_id is not longer than 8 characters, otherwise AMS won't work properly
+
+    NOTE: superseded by check_filament_ids (assign_filament_ids.py) for non-BBL/OFL
+    vendors, which validates format/uniqueness/structure tree-wide against the
+    grandfather snapshot. This length check stays scoped to BBL/OFL because other
+    vendors ship grandfathered >8-char ids (e.g. Prusa's 36-char name-ids), so it
+    cannot simply go tree-wide.
     """
     if vendor not in ('BBL', 'OrcaFilamentLibrary'):
         return 0
@@ -605,6 +612,11 @@ def main():
     # Global (cross-vendor) check: setting_id must be unique and stay in-namespace.
     # Runs once over the whole tree regardless of the --vendor filter.
     errors_found += check_setting_id_uniqueness(profiles_dir)
+
+    # Global filament_id check (see scripts/assign_filament_ids.py): effective ids
+    # are resolved loader-faithfully and validated against the sanctioned snapshot
+    # (scripts/filament_id_snapshot.json). Runs once over the whole tree.
+    errors_found += check_filament_ids(profiles_dir)
 
     # ✨ Output finale in stile "compilatore"
     print("\n==================== SUMMARY ====================")
