@@ -1,76 +1,5 @@
 {
- "alias_exceptions": [
-  "Flashforge/Flashforge ABS Basic @FF C5",
-  "Flashforge/Flashforge ABS Basic @FF C5P",
-  "Flashforge/Flashforge ABS-GF @FF C5",
-  "Flashforge/Flashforge ABS-GF @FF C5P",
-  "Flashforge/Flashforge ASA Basic @FF C5",
-  "Flashforge/Flashforge ASA Basic @FF C5P",
-  "Flashforge/Flashforge ASA-CF @FF C5",
-  "Flashforge/Flashforge ASA-CF @FF C5P",
-  "Flashforge/Flashforge ASA-GF @FF C5",
-  "Flashforge/Flashforge ASA-GF @FF C5P",
-  "Flashforge/Flashforge HIPS @FF C5",
-  "Flashforge/Flashforge HIPS @FF C5P",
-  "Flashforge/Flashforge HS PETG @FF C5",
-  "Flashforge/Flashforge HS PETG @FF C5P",
-  "Flashforge/Flashforge HS PLA @FF C5",
-  "Flashforge/Flashforge HS PLA @FF C5P",
-  "Flashforge/Flashforge PA-CF @FF C5",
-  "Flashforge/Flashforge PA-CF @FF C5P",
-  "Flashforge/Flashforge PAHT-CF @FF C5",
-  "Flashforge/Flashforge PAHT-CF @FF C5P",
-  "Flashforge/Flashforge PET-CF @FF C5",
-  "Flashforge/Flashforge PET-CF @FF C5P",
-  "Flashforge/Flashforge PETG Pro @FF C5",
-  "Flashforge/Flashforge PETG Pro @FF C5P",
-  "Flashforge/Flashforge PETG Transparent @FF C5",
-  "Flashforge/Flashforge PETG Transparent @FF C5P",
-  "Flashforge/Flashforge PETG-CF @FF C5",
-  "Flashforge/Flashforge PETG-CF @FF C5P",
-  "Flashforge/Flashforge PLA  Matte @FF C5",
-  "Flashforge/Flashforge PLA  Matte @FF C5P",
-  "Flashforge/Flashforge PLA  Metal @FF C5",
-  "Flashforge/Flashforge PLA  Metal @FF C5P",
-  "Flashforge/Flashforge PLA  Pro @FF C5",
-  "Flashforge/Flashforge PLA  Pro @FF C5P",
-  "Flashforge/Flashforge PLA Basic @FF C5",
-  "Flashforge/Flashforge PLA Basic @FF C5P",
-  "Flashforge/Flashforge PLA Color Change @FF C5",
-  "Flashforge/Flashforge PLA Color Change @FF C5P",
-  "Flashforge/Flashforge PLA Galaxy @FF C5",
-  "Flashforge/Flashforge PLA Galaxy @FF C5P",
-  "Flashforge/Flashforge PLA Luminous @FF C5",
-  "Flashforge/Flashforge PLA Luminous @FF C5P",
-  "Flashforge/Flashforge PLA Silk @FF C5",
-  "Flashforge/Flashforge PLA Silk @FF C5P",
-  "Flashforge/Flashforge PLA-CF @FF C5",
-  "Flashforge/Flashforge PLA-CF @FF C5P",
-  "Flashforge/Flashforge PPA-CF @FF C5",
-  "Flashforge/Flashforge PPA-CF @FF C5P",
-  "Flashforge/Flashforge PPS-CF @FF C5",
-  "Flashforge/Flashforge PPS-CF @FF C5P",
-  "Flashforge/Flashforge PVA @FF C5",
-  "Flashforge/Flashforge PVA @FF C5P",
-  "Flashforge/Flashforge TPU-64D @FF C5",
-  "Flashforge/Flashforge TPU-64D @FF C5P",
-  "Flashforge/Flashforge TPU-90A @FF C5",
-  "Flashforge/Flashforge TPU-90A @FF C5P",
-  "Flashforge/Flashforge TPU-95A @FF C5",
-  "Flashforge/Flashforge TPU-95A @FF C5P",
-  "Flashforge/FusRock PAHT-CF @FF C5",
-  "Flashforge/FusRock PAHT-CF @FF C5P",
-  "Flashforge/FusRock S-Multi @FF C5",
-  "Flashforge/FusRock S-Multi @FF C5P",
-  "Flashforge/FusRock S-PAHT @FF C5",
-  "Flashforge/FusRock S-PAHT @FF C5P",
-  "Flashforge/Generic TPU-64D @FF C5",
-  "Flashforge/Generic TPU-64D @FF C5P",
-  "Flashforge/Generic TPU-90A @FF C5",
-  "Flashforge/Generic TPU-90A @FF C5P",
-  "Flashforge/Generic TPU-95A @FF C5",
-  "Flashforge/Generic TPU-95A @FF C5P"
- ],
+ "alias_exceptions": [],
  "id_overrides": [
   "Afinia/Afinia PLA",
   "Afinia/Afinia PLA@HS",
@@ -687,12 +616,79 @@
   "FLSun/FLSun Generic PETG",
   "FLSun/FLSun Generic PLA",
   "FLSun/FLSun Generic PLA-CF",
-  "Flashforge/Flashforge Generic ASA @G3U 0.6 Nozzle",
+  "Flashforge/FlashForge PC @FF G4 0.6 HF nozzle",
+  "Flashforge/FlashForge PC @FF G4 0.6 nozzle",
+  "Flashforge/FlashForge PC @FF G4 0.8 HF nozzle",
+  "Flashforge/FlashForge PC @FF G4P 0.6 HF nozzle",
+  "Flashforge/FlashForge PC @FF G4P 0.6 nozzle",
+  "Flashforge/FlashForge PC @FF G4P 0.8 HF nozzle",
+  "Flashforge/FlashForge PPS @FF G4 0.6 HF nozzle",
+  "Flashforge/FlashForge PPS @FF G4 0.6 nozzle",
+  "Flashforge/FlashForge PPS @FF G4 0.8 HF nozzle",
+  "Flashforge/FlashForge PPS @FF G4P 0.6 HF nozzle",
+  "Flashforge/FlashForge PPS @FF G4P 0.6 nozzle",
+  "Flashforge/FlashForge PPS @FF G4P 0.8 HF nozzle",
+  "Flashforge/FlashForge PPS-CF @FF G4 0.6 nozzle",
+  "Flashforge/FlashForge PPS-CF @FF G4P 0.6 nozzle",
+  "Flashforge/Flashforge ABS Basic",
+  "Flashforge/Flashforge ABS Basic @FF AD5M 0.25 nozzle",
+  "Flashforge/Flashforge ABS Basic @FF AD5X",
+  "Flashforge/Flashforge ABS Basic @FF AD5X 0.25 nozzle",
+  "Flashforge/Flashforge ABS Basic @FF AD5X 0.6 nozzle",
+  "Flashforge/Flashforge ABS Basic @FF AD5X 0.8 nozzle",
+  "Flashforge/Flashforge ABS Basic @FF C5",
+  "Flashforge/Flashforge ABS Basic @FF C5P",
+  "Flashforge/Flashforge ABS Basic @FF G4",
+  "Flashforge/Flashforge ABS Basic @FF G4 0.25 nozzle",
+  "Flashforge/Flashforge ABS Basic @FF G4 0.6 HF nozzle",
+  "Flashforge/Flashforge ABS Basic @FF G4 0.6 nozzle",
+  "Flashforge/Flashforge ABS Basic @FF G4 0.8 HF nozzle",
+  "Flashforge/Flashforge ABS Basic @FF G4 HF",
+  "Flashforge/Flashforge ABS Basic @FF G4P",
+  "Flashforge/Flashforge ABS Basic @FF G4P 0.25 nozzle",
+  "Flashforge/Flashforge ABS Basic @FF G4P 0.6 HF nozzle",
+  "Flashforge/Flashforge ABS Basic @FF G4P 0.6 nozzle",
+  "Flashforge/Flashforge ABS Basic @FF G4P 0.8 HF nozzle",
+  "Flashforge/Flashforge ABS Basic @FF G4P HF",
+  "Flashforge/Flashforge ABS-CF @FF G4",
+  "Flashforge/Flashforge ABS-CF @FF G4 0.6 nozzle",
+  "Flashforge/Flashforge ABS-CF @FF G4P",
+  "Flashforge/Flashforge ABS-CF @FF G4P 0.6 nozzle",
+  "Flashforge/Flashforge ABS-GF @FF C5",
+  "Flashforge/Flashforge ABS-GF @FF C5P",
+  "Flashforge/Flashforge ASA @FF AD5M 0.25 Nozzle",
+  "Flashforge/Flashforge ASA Basic",
+  "Flashforge/Flashforge ASA Basic @FF AD5M 0.25 nozzle",
+  "Flashforge/Flashforge ASA Basic @FF AD5X",
+  "Flashforge/Flashforge ASA Basic @FF AD5X 0.25 nozzle",
+  "Flashforge/Flashforge ASA Basic @FF AD5X 0.6 nozzle",
+  "Flashforge/Flashforge ASA Basic @FF AD5X 0.8 nozzle",
+  "Flashforge/Flashforge ASA Basic @FF C5",
+  "Flashforge/Flashforge ASA Basic @FF C5P",
+  "Flashforge/Flashforge ASA Basic @FF G4",
+  "Flashforge/Flashforge ASA Basic @FF G4 0.25 nozzle",
+  "Flashforge/Flashforge ASA Basic @FF G4 0.6 HF nozzle",
+  "Flashforge/Flashforge ASA Basic @FF G4 0.6 nozzle",
+  "Flashforge/Flashforge ASA Basic @FF G4 0.8 HF nozzle",
+  "Flashforge/Flashforge ASA Basic @FF G4 HF",
+  "Flashforge/Flashforge ASA Basic @FF G4P",
+  "Flashforge/Flashforge ASA Basic @FF G4P 0.25 nozzle",
+  "Flashforge/Flashforge ASA Basic @FF G4P 0.6 HF nozzle",
+  "Flashforge/Flashforge ASA Basic @FF G4P 0.6 nozzle",
+  "Flashforge/Flashforge ASA Basic @FF G4P 0.8 HF nozzle",
+  "Flashforge/Flashforge ASA Basic @FF G4P HF",
+  "Flashforge/Flashforge ASA-CF",
+  "Flashforge/Flashforge ASA-CF @FF C5",
+  "Flashforge/Flashforge ASA-CF @FF C5P",
+  "Flashforge/Flashforge ASA-CF @FF G4",
+  "Flashforge/Flashforge ASA-CF @FF G4P",
+  "Flashforge/Flashforge ASA-GF @FF C5",
+  "Flashforge/Flashforge ASA-GF @FF C5P",
+  "Flashforge/Flashforge Generic ASA @G3U",
+  "Flashforge/Flashforge Generic HIPS",
+  "Flashforge/Flashforge Generic HIPS @G3U 0.6 Nozzle",
   "Flashforge/Flashforge Generic HS PLA",
   "Flashforge/Flashforge Generic PETG",
-  "Flashforge/Flashforge Generic PETG @G3U",
-  "Flashforge/Flashforge Generic PETG @G3U 0.6 Nozzle",
-  "Flashforge/Flashforge Generic PETG @G3U 0.8 Nozzle",
   "Flashforge/Flashforge Generic PETG-CF @G3U",
   "Flashforge/Flashforge Generic PETG-CF @G3U 0.6 Nozzle",
   "Flashforge/Flashforge Generic PETG-CF @G3U 0.8 Nozzle",
@@ -702,21 +698,430 @@
   "Flashforge/Flashforge Generic PLA-CF @G3U 0.6 Nozzle",
   "Flashforge/Flashforge Generic PLA-CF @G3U 0.8 Nozzle",
   "Flashforge/Flashforge Generic PLA-CF10",
+  "Flashforge/Flashforge Generic PLA-SILK @FF AD5M 0.25 Nozzle",
   "Flashforge/Flashforge Generic PLA-Silk",
   "Flashforge/Flashforge Generic PVA",
+  "Flashforge/Flashforge HIPS @FF C5",
+  "Flashforge/Flashforge HIPS @FF C5P",
+  "Flashforge/Flashforge HIPS @FF G4",
+  "Flashforge/Flashforge HIPS @FF G4 0.6 HF nozzle",
+  "Flashforge/Flashforge HIPS @FF G4 0.6 nozzle",
+  "Flashforge/Flashforge HIPS @FF G4 0.8 HF nozzle",
+  "Flashforge/Flashforge HIPS @FF G4 HF",
+  "Flashforge/Flashforge HIPS @FF G4P",
+  "Flashforge/Flashforge HIPS @FF G4P 0.6 HF nozzle",
+  "Flashforge/Flashforge HIPS @FF G4P 0.6 nozzle",
+  "Flashforge/Flashforge HIPS @FF G4P 0.8 HF nozzle",
+  "Flashforge/Flashforge HIPS @FF G4P HF",
+  "Flashforge/Flashforge HS PETG",
+  "Flashforge/Flashforge HS PETG @FF AD5M 0.25 nozzle",
+  "Flashforge/Flashforge HS PETG @FF AD5X",
+  "Flashforge/Flashforge HS PETG @FF AD5X 0.25 nozzle",
+  "Flashforge/Flashforge HS PETG @FF AD5X 0.6 nozzle",
+  "Flashforge/Flashforge HS PETG @FF AD5X 0.8 nozzle",
+  "Flashforge/Flashforge HS PETG @FF C5",
+  "Flashforge/Flashforge HS PETG @FF C5P",
+  "Flashforge/Flashforge HS PETG @FF G4",
+  "Flashforge/Flashforge HS PETG @FF G4 0.25 nozzle",
+  "Flashforge/Flashforge HS PETG @FF G4 0.6 HF nozzle",
+  "Flashforge/Flashforge HS PETG @FF G4 0.6 nozzle",
+  "Flashforge/Flashforge HS PETG @FF G4 0.8 HF nozzle",
+  "Flashforge/Flashforge HS PETG @FF G4 HF",
+  "Flashforge/Flashforge HS PETG @FF G4P",
+  "Flashforge/Flashforge HS PETG @FF G4P 0.25 nozzle",
+  "Flashforge/Flashforge HS PETG @FF G4P 0.6 HF nozzle",
+  "Flashforge/Flashforge HS PETG @FF G4P 0.6 nozzle",
+  "Flashforge/Flashforge HS PETG @FF G4P 0.8 HF nozzle",
+  "Flashforge/Flashforge HS PETG @FF G4P HF",
+  "Flashforge/Flashforge HS PLA",
+  "Flashforge/Flashforge HS PLA @FF AD5M 0.25 nozzle",
+  "Flashforge/Flashforge HS PLA @FF AD5X",
+  "Flashforge/Flashforge HS PLA @FF AD5X 0.25 nozzle",
+  "Flashforge/Flashforge HS PLA @FF AD5X 0.6 nozzle",
+  "Flashforge/Flashforge HS PLA @FF AD5X 0.8 nozzle",
+  "Flashforge/Flashforge HS PLA @FF C5",
+  "Flashforge/Flashforge HS PLA @FF C5P",
+  "Flashforge/Flashforge HS PLA @FF G4",
+  "Flashforge/Flashforge HS PLA @FF G4 0.25 nozzle",
+  "Flashforge/Flashforge HS PLA @FF G4 0.6 HF nozzle",
+  "Flashforge/Flashforge HS PLA @FF G4 0.6 nozzle",
+  "Flashforge/Flashforge HS PLA @FF G4 0.8 HF nozzle",
+  "Flashforge/Flashforge HS PLA @FF G4 HF",
+  "Flashforge/Flashforge HS PLA @FF G4P",
+  "Flashforge/Flashforge HS PLA @FF G4P 0.25 nozzle",
+  "Flashforge/Flashforge HS PLA @FF G4P 0.6 HF nozzle",
+  "Flashforge/Flashforge HS PLA @FF G4P 0.6 nozzle",
+  "Flashforge/Flashforge HS PLA @FF G4P 0.8 HF nozzle",
+  "Flashforge/Flashforge HS PLA @FF G4P HF",
+  "Flashforge/Flashforge HS PLA Burnt Ti @FF G4 0.6 HF nozzle",
+  "Flashforge/Flashforge HS PLA Burnt Ti @FF G4 HF",
+  "Flashforge/Flashforge HS PLA Burnt Ti @FF G4P 0.6 HF nozzle",
+  "Flashforge/Flashforge HS PLA Burnt Ti @FF G4P HF",
+  "Flashforge/Flashforge HS PLA Burnt Ti@FF G4 0.6 nozzle",
+  "Flashforge/Flashforge HS PLA Burnt Ti@FF G4 0.8 HF nozzle",
+  "Flashforge/Flashforge HS PLA Burnt Ti@FF G4P 0.6 nozzle",
+  "Flashforge/Flashforge HS PLA Burnt Ti@FF G4P 0.8 HF nozzle",
+  "Flashforge/Flashforge PA @FF G4",
+  "Flashforge/Flashforge PA @FF G4 0.6 HF nozzle",
+  "Flashforge/Flashforge PA @FF G4 HF",
+  "Flashforge/Flashforge PA @FF G4P",
+  "Flashforge/Flashforge PA @FF G4P 0.6 HF nozzle",
+  "Flashforge/Flashforge PA @FF G4P HF",
+  "Flashforge/Flashforge PA-CF @FF C5",
+  "Flashforge/Flashforge PA-CF @FF C5P",
+  "Flashforge/Flashforge PA-CF @FF G4",
+  "Flashforge/Flashforge PA-CF @FF G4P",
+  "Flashforge/Flashforge PA12-CF",
+  "Flashforge/Flashforge PA6-CF",
+  "Flashforge/Flashforge PA66-CF",
+  "Flashforge/Flashforge PAHT-CF @FF C5",
+  "Flashforge/Flashforge PAHT-CF @FF C5P",
+  "Flashforge/Flashforge PAHT-CF @FF G4",
+  "Flashforge/Flashforge PAHT-CF @FF G4P",
+  "Flashforge/Flashforge PET-CF",
+  "Flashforge/Flashforge PET-CF @FF C5",
+  "Flashforge/Flashforge PET-CF @FF C5P",
   "Flashforge/Flashforge PETG",
+  "Flashforge/Flashforge PETG Basic",
+  "Flashforge/Flashforge PETG Basic @FF AD5M 0.25 nozzle",
+  "Flashforge/Flashforge PETG Pro",
+  "Flashforge/Flashforge PETG Pro @FF AD5M 0.25 nozzle",
+  "Flashforge/Flashforge PETG Pro @FF AD5X",
+  "Flashforge/Flashforge PETG Pro @FF AD5X 0.25 nozzle",
+  "Flashforge/Flashforge PETG Pro @FF AD5X 0.6 nozzle",
+  "Flashforge/Flashforge PETG Pro @FF AD5X 0.8 nozzle",
+  "Flashforge/Flashforge PETG Pro @FF C5",
+  "Flashforge/Flashforge PETG Pro @FF C5P",
+  "Flashforge/Flashforge PETG Pro @FF G4",
+  "Flashforge/Flashforge PETG Pro @FF G4 0.25 nozzle",
+  "Flashforge/Flashforge PETG Pro @FF G4 0.6 HF nozzle",
+  "Flashforge/Flashforge PETG Pro @FF G4 0.6 nozzle",
+  "Flashforge/Flashforge PETG Pro @FF G4 0.8 HF nozzle",
+  "Flashforge/Flashforge PETG Pro @FF G4 HF",
+  "Flashforge/Flashforge PETG Pro @FF G4P",
+  "Flashforge/Flashforge PETG Pro @FF G4P 0.25 nozzle",
+  "Flashforge/Flashforge PETG Pro @FF G4P 0.6 HF nozzle",
+  "Flashforge/Flashforge PETG Pro @FF G4P 0.6 nozzle",
+  "Flashforge/Flashforge PETG Pro @FF G4P 0.8 HF nozzle",
+  "Flashforge/Flashforge PETG Pro @FF G4P HF",
+  "Flashforge/Flashforge PETG Transparent",
+  "Flashforge/Flashforge PETG Transparent @FF AD5M 0.25 nozzle",
+  "Flashforge/Flashforge PETG Transparent @FF AD5X",
+  "Flashforge/Flashforge PETG Transparent @FF AD5X 0.25 nozzle",
+  "Flashforge/Flashforge PETG Transparent @FF AD5X 0.6 nozzle",
+  "Flashforge/Flashforge PETG Transparent @FF AD5X 0.8 nozzle",
+  "Flashforge/Flashforge PETG Transparent @FF C5",
+  "Flashforge/Flashforge PETG Transparent @FF C5P",
+  "Flashforge/Flashforge PETG Transparent @FF G4",
+  "Flashforge/Flashforge PETG Transparent @FF G4 0.25 nozzle",
+  "Flashforge/Flashforge PETG Transparent @FF G4 0.6 HF nozzle",
+  "Flashforge/Flashforge PETG Transparent @FF G4 0.6 nozzle",
+  "Flashforge/Flashforge PETG Transparent @FF G4 0.8 HF nozzle",
+  "Flashforge/Flashforge PETG Transparent @FF G4 HF",
+  "Flashforge/Flashforge PETG Transparent @FF G4P",
+  "Flashforge/Flashforge PETG Transparent @FF G4P 0.25 nozzle",
+  "Flashforge/Flashforge PETG Transparent @FF G4P 0.6 HF nozzle",
+  "Flashforge/Flashforge PETG Transparent @FF G4P 0.6 nozzle",
+  "Flashforge/Flashforge PETG Transparent @FF G4P 0.8 HF nozzle",
+  "Flashforge/Flashforge PETG Transparent @FF G4P HF",
+  "Flashforge/Flashforge PETG-CF",
+  "Flashforge/Flashforge PETG-CF @FF AD5X",
+  "Flashforge/Flashforge PETG-CF @FF AD5X 0.6 nozzle",
+  "Flashforge/Flashforge PETG-CF @FF AD5X 0.8 nozzle",
+  "Flashforge/Flashforge PETG-CF @FF C5",
+  "Flashforge/Flashforge PETG-CF @FF C5P",
+  "Flashforge/Flashforge PETG-CF @FF G4",
+  "Flashforge/Flashforge PETG-CF @FF G4 0.6 nozzle",
+  "Flashforge/Flashforge PETG-CF @FF G4P",
+  "Flashforge/Flashforge PETG-CF @FF G4P 0.6 nozzle",
   "Flashforge/Flashforge PLA",
+  "Flashforge/Flashforge PLA  Matte @FF C5",
+  "Flashforge/Flashforge PLA  Matte @FF C5P",
+  "Flashforge/Flashforge PLA  Metal @FF C5",
+  "Flashforge/Flashforge PLA  Metal @FF C5P",
+  "Flashforge/Flashforge PLA  Pro @FF C5",
+  "Flashforge/Flashforge PLA  Pro @FF C5P",
+  "Flashforge/Flashforge PLA Basic",
+  "Flashforge/Flashforge PLA Basic @FF AD5M 0.25 nozzle",
+  "Flashforge/Flashforge PLA Basic @FF AD5X",
+  "Flashforge/Flashforge PLA Basic @FF AD5X 0.25 nozzle",
+  "Flashforge/Flashforge PLA Basic @FF AD5X 0.6 nozzle",
+  "Flashforge/Flashforge PLA Basic @FF AD5X 0.8 nozzle",
+  "Flashforge/Flashforge PLA Basic @FF C5",
+  "Flashforge/Flashforge PLA Basic @FF C5P",
+  "Flashforge/Flashforge PLA Basic @FF G4",
+  "Flashforge/Flashforge PLA Basic @FF G4 0.25 nozzle",
+  "Flashforge/Flashforge PLA Basic @FF G4 0.6 HF nozzle",
+  "Flashforge/Flashforge PLA Basic @FF G4 0.6 nozzle",
+  "Flashforge/Flashforge PLA Basic @FF G4 0.8 HF nozzle",
+  "Flashforge/Flashforge PLA Basic @FF G4 HF",
+  "Flashforge/Flashforge PLA Basic @FF G4P",
+  "Flashforge/Flashforge PLA Basic @FF G4P 0.25 nozzle",
+  "Flashforge/Flashforge PLA Basic @FF G4P 0.6 HF nozzle",
+  "Flashforge/Flashforge PLA Basic @FF G4P 0.6 nozzle",
+  "Flashforge/Flashforge PLA Basic @FF G4P 0.8 HF nozzle",
+  "Flashforge/Flashforge PLA Basic @FF G4P HF",
+  "Flashforge/Flashforge PLA Buint Ti @FF G4 0.8 nozzle",
+  "Flashforge/Flashforge PLA Buint Ti @FF G4P 0.8 nozzle",
+  "Flashforge/Flashforge PLA Color Change",
+  "Flashforge/Flashforge PLA Color Change @FF AD5M 0.25 nozzle",
+  "Flashforge/Flashforge PLA Color Change @FF AD5X",
+  "Flashforge/Flashforge PLA Color Change @FF AD5X 0.25 nozzle",
+  "Flashforge/Flashforge PLA Color Change @FF AD5X 0.6 nozzle",
+  "Flashforge/Flashforge PLA Color Change @FF AD5X 0.8 nozzle",
+  "Flashforge/Flashforge PLA Color Change @FF C5",
+  "Flashforge/Flashforge PLA Color Change @FF C5P",
+  "Flashforge/Flashforge PLA Color Change @FF G4",
+  "Flashforge/Flashforge PLA Color Change @FF G4 0.25 nozzle",
+  "Flashforge/Flashforge PLA Color Change @FF G4 0.6 HF nozzle",
+  "Flashforge/Flashforge PLA Color Change @FF G4 0.6 nozzle",
+  "Flashforge/Flashforge PLA Color Change @FF G4 0.8 HF nozzle",
+  "Flashforge/Flashforge PLA Color Change @FF G4 HF",
+  "Flashforge/Flashforge PLA Color Change @FF G4P",
+  "Flashforge/Flashforge PLA Color Change @FF G4P 0.25 nozzle",
+  "Flashforge/Flashforge PLA Color Change @FF G4P 0.6 HF nozzle",
+  "Flashforge/Flashforge PLA Color Change @FF G4P 0.6 nozzle",
+  "Flashforge/Flashforge PLA Color Change @FF G4P 0.8 HF nozzle",
+  "Flashforge/Flashforge PLA Color Change @FF G4P HF",
+  "Flashforge/Flashforge PLA Galaxy",
+  "Flashforge/Flashforge PLA Galaxy @FF AD5M 0.25 nozzle",
+  "Flashforge/Flashforge PLA Galaxy @FF AD5X",
+  "Flashforge/Flashforge PLA Galaxy @FF AD5X 0.25 nozzle",
+  "Flashforge/Flashforge PLA Galaxy @FF AD5X 0.6 nozzle",
+  "Flashforge/Flashforge PLA Galaxy @FF AD5X 0.8 nozzle",
+  "Flashforge/Flashforge PLA Galaxy @FF C5",
+  "Flashforge/Flashforge PLA Galaxy @FF C5P",
+  "Flashforge/Flashforge PLA Galaxy @FF G4",
+  "Flashforge/Flashforge PLA Galaxy @FF G4 0.25 nozzle",
+  "Flashforge/Flashforge PLA Galaxy @FF G4 0.6 HF nozzle",
+  "Flashforge/Flashforge PLA Galaxy @FF G4 0.6 nozzle",
+  "Flashforge/Flashforge PLA Galaxy @FF G4 0.8 HF nozzle",
+  "Flashforge/Flashforge PLA Galaxy @FF G4 HF",
+  "Flashforge/Flashforge PLA Galaxy @FF G4P",
+  "Flashforge/Flashforge PLA Galaxy @FF G4P 0.25 nozzle",
+  "Flashforge/Flashforge PLA Galaxy @FF G4P 0.6 HF nozzle",
+  "Flashforge/Flashforge PLA Galaxy @FF G4P 0.6 nozzle",
+  "Flashforge/Flashforge PLA Galaxy @FF G4P 0.8 HF nozzle",
+  "Flashforge/Flashforge PLA Galaxy @FF G4P HF",
+  "Flashforge/Flashforge PLA Luminous",
+  "Flashforge/Flashforge PLA Luminous @FF AD5M 0.25 nozzle",
+  "Flashforge/Flashforge PLA Luminous @FF AD5X",
+  "Flashforge/Flashforge PLA Luminous @FF AD5X 0.25 nozzle",
+  "Flashforge/Flashforge PLA Luminous @FF AD5X 0.6 nozzle",
+  "Flashforge/Flashforge PLA Luminous @FF AD5X 0.8 nozzle",
+  "Flashforge/Flashforge PLA Luminous @FF C5",
+  "Flashforge/Flashforge PLA Luminous @FF C5P",
+  "Flashforge/Flashforge PLA Luminous @FF G4",
+  "Flashforge/Flashforge PLA Luminous @FF G4 0.25 nozzle",
+  "Flashforge/Flashforge PLA Luminous @FF G4 0.6 HF nozzle",
+  "Flashforge/Flashforge PLA Luminous @FF G4 0.8 HF nozzle",
+  "Flashforge/Flashforge PLA Luminous @FF G4 HF",
+  "Flashforge/Flashforge PLA Luminous @FF G4P",
+  "Flashforge/Flashforge PLA Luminous @FF G4P 0.25 nozzle",
+  "Flashforge/Flashforge PLA Luminous @FF G4P 0.6 HF nozzle",
+  "Flashforge/Flashforge PLA Luminous @FF G4P 0.8 HF nozzle",
+  "Flashforge/Flashforge PLA Luminous @FF G4P HF",
+  "Flashforge/Flashforge PLA Matte",
+  "Flashforge/Flashforge PLA Matte @FF AD5M 0.25 nozzle",
+  "Flashforge/Flashforge PLA Matte @FF AD5X",
+  "Flashforge/Flashforge PLA Matte @FF AD5X 0.25 nozzle",
+  "Flashforge/Flashforge PLA Matte @FF AD5X 0.6 nozzle",
+  "Flashforge/Flashforge PLA Matte @FF AD5X 0.8 nozzle",
+  "Flashforge/Flashforge PLA Matte @FF G4",
+  "Flashforge/Flashforge PLA Matte @FF G4 0.25 nozzle",
+  "Flashforge/Flashforge PLA Matte @FF G4 0.6 HF nozzle",
+  "Flashforge/Flashforge PLA Matte @FF G4 0.6 nozzle",
+  "Flashforge/Flashforge PLA Matte @FF G4 0.8 HF nozzle",
+  "Flashforge/Flashforge PLA Matte @FF G4 HF",
+  "Flashforge/Flashforge PLA Matte @FF G4P",
+  "Flashforge/Flashforge PLA Matte @FF G4P 0.25 nozzle",
+  "Flashforge/Flashforge PLA Matte @FF G4P 0.6 HF nozzle",
+  "Flashforge/Flashforge PLA Matte @FF G4P 0.6 nozzle",
+  "Flashforge/Flashforge PLA Matte @FF G4P 0.8 HF nozzle",
+  "Flashforge/Flashforge PLA Matte @FF G4P HF",
+  "Flashforge/Flashforge PLA Metal",
+  "Flashforge/Flashforge PLA Metal @FF AD5M 0.25 nozzle",
+  "Flashforge/Flashforge PLA Metal @FF AD5X",
+  "Flashforge/Flashforge PLA Metal @FF AD5X 0.25 nozzle",
+  "Flashforge/Flashforge PLA Metal @FF AD5X 0.6 nozzle",
+  "Flashforge/Flashforge PLA Metal @FF AD5X 0.8 nozzle",
+  "Flashforge/Flashforge PLA Metal @FF G4",
+  "Flashforge/Flashforge PLA Metal @FF G4 0.25 nozzle",
+  "Flashforge/Flashforge PLA Metal @FF G4 0.6 HF nozzle",
+  "Flashforge/Flashforge PLA Metal @FF G4 0.6 nozzle",
+  "Flashforge/Flashforge PLA Metal @FF G4 0.8 HF nozzle",
+  "Flashforge/Flashforge PLA Metal @FF G4 HF",
+  "Flashforge/Flashforge PLA Metal @FF G4P",
+  "Flashforge/Flashforge PLA Metal @FF G4P 0.25 nozzle",
+  "Flashforge/Flashforge PLA Metal @FF G4P 0.6 HF nozzle",
+  "Flashforge/Flashforge PLA Metal @FF G4P 0.6 nozzle",
+  "Flashforge/Flashforge PLA Metal @FF G4P 0.8 HF nozzle",
+  "Flashforge/Flashforge PLA Metal @FF G4P HF",
+  "Flashforge/Flashforge PLA Pro",
+  "Flashforge/Flashforge PLA Pro @FF AD5M 0.25 nozzle",
+  "Flashforge/Flashforge PLA Pro @FF AD5X",
+  "Flashforge/Flashforge PLA Pro @FF AD5X 0.25 nozzle",
+  "Flashforge/Flashforge PLA Pro @FF AD5X 0.6 nozzle",
+  "Flashforge/Flashforge PLA Pro @FF AD5X 0.8 nozzle",
+  "Flashforge/Flashforge PLA Pro @FF G4",
+  "Flashforge/Flashforge PLA Pro @FF G4 0.25 nozzle",
+  "Flashforge/Flashforge PLA Pro @FF G4 0.6 HF nozzle",
+  "Flashforge/Flashforge PLA Pro @FF G4 0.6 nozzle",
+  "Flashforge/Flashforge PLA Pro @FF G4 0.8 HF nozzle",
+  "Flashforge/Flashforge PLA Pro @FF G4 HF",
+  "Flashforge/Flashforge PLA Pro @FF G4P",
+  "Flashforge/Flashforge PLA Pro @FF G4P 0.25 nozzle",
+  "Flashforge/Flashforge PLA Pro @FF G4P 0.6 HF nozzle",
+  "Flashforge/Flashforge PLA Pro @FF G4P 0.6 nozzle",
+  "Flashforge/Flashforge PLA Pro @FF G4P 0.8 HF nozzle",
+  "Flashforge/Flashforge PLA Pro @FF G4P HF",
+  "Flashforge/Flashforge PLA Silk",
+  "Flashforge/Flashforge PLA Silk @FF AD5M 0.25 nozzle",
+  "Flashforge/Flashforge PLA Silk @FF AD5X",
+  "Flashforge/Flashforge PLA Silk @FF AD5X 0.25 nozzle",
+  "Flashforge/Flashforge PLA Silk @FF AD5X 0.6 nozzle",
+  "Flashforge/Flashforge PLA Silk @FF AD5X 0.8 nozzle",
+  "Flashforge/Flashforge PLA Silk @FF C5",
+  "Flashforge/Flashforge PLA Silk @FF C5P",
+  "Flashforge/Flashforge PLA Silk @FF G4",
+  "Flashforge/Flashforge PLA Silk @FF G4 0.25 nozzle",
+  "Flashforge/Flashforge PLA Silk @FF G4 0.6 HF nozzle",
+  "Flashforge/Flashforge PLA Silk @FF G4 0.6 nozzle",
+  "Flashforge/Flashforge PLA Silk @FF G4 0.8 HF nozzle",
+  "Flashforge/Flashforge PLA Silk @FF G4 HF",
+  "Flashforge/Flashforge PLA Silk @FF G4P",
+  "Flashforge/Flashforge PLA Silk @FF G4P 0.25 nozzle",
+  "Flashforge/Flashforge PLA Silk @FF G4P 0.6 HF nozzle",
+  "Flashforge/Flashforge PLA Silk @FF G4P 0.6 nozzle",
+  "Flashforge/Flashforge PLA Silk @FF G4P 0.8 HF nozzle",
+  "Flashforge/Flashforge PLA Silk @FF G4P HF",
+  "Flashforge/Flashforge PLA Sparkle",
+  "Flashforge/Flashforge PLA Sparkle @FF AD5M 0.25 nozzle",
+  "Flashforge/Flashforge PLA Sparkle @FF AD5X",
+  "Flashforge/Flashforge PLA Sparkle @FF AD5X 0.25 nozzle",
+  "Flashforge/Flashforge PLA Sparkle @FF AD5X 0.6 nozzle",
+  "Flashforge/Flashforge PLA Sparkle @FF AD5X 0.8 nozzle",
+  "Flashforge/Flashforge PLA Sparkle @FF G4",
+  "Flashforge/Flashforge PLA Sparkle @FF G4 0.25 nozzle",
+  "Flashforge/Flashforge PLA Sparkle @FF G4 0.6 HF nozzle",
+  "Flashforge/Flashforge PLA Sparkle @FF G4 0.6 nozzle",
+  "Flashforge/Flashforge PLA Sparkle @FF G4 HF",
+  "Flashforge/Flashforge PLA Sparkle @FF G4P",
+  "Flashforge/Flashforge PLA Sparkle @FF G4P 0.25 nozzle",
+  "Flashforge/Flashforge PLA Sparkle @FF G4P 0.6 HF nozzle",
+  "Flashforge/Flashforge PLA Sparkle @FF G4P 0.6 nozzle",
+  "Flashforge/Flashforge PLA Sparkle @FF G4P HF",
+  "Flashforge/Flashforge PLA-CF",
+  "Flashforge/Flashforge PLA-CF @FF AD5X",
+  "Flashforge/Flashforge PLA-CF @FF AD5X 0.6 nozzle",
+  "Flashforge/Flashforge PLA-CF @FF AD5X 0.8 nozzle",
+  "Flashforge/Flashforge PLA-CF @FF C5",
+  "Flashforge/Flashforge PLA-CF @FF C5P",
+  "Flashforge/Flashforge PLA-CF @FF G4",
+  "Flashforge/Flashforge PLA-CF @FF G4 0.6 nozzle",
+  "Flashforge/Flashforge PLA-CF @FF G4P",
+  "Flashforge/Flashforge PLA-CF @FF G4P 0.6 nozzle",
+  "Flashforge/Flashforge PLA-SILK @FF AD5M 0.25 Nozzle",
+  "Flashforge/Flashforge PPA-CF",
+  "Flashforge/Flashforge PPA-CF @FF C5",
+  "Flashforge/Flashforge PPA-CF @FF C5P",
+  "Flashforge/Flashforge PPA-GF",
+  "Flashforge/Flashforge PPS @FF G4",
+  "Flashforge/Flashforge PPS @FF G4P",
+  "Flashforge/Flashforge PPS-CF",
+  "Flashforge/Flashforge PPS-CF @FF C5",
+  "Flashforge/Flashforge PPS-CF @FF C5P",
+  "Flashforge/Flashforge PPS-CF @FF G4",
+  "Flashforge/Flashforge PPS-CF @FF G4P",
+  "Flashforge/Flashforge PVA @FF C5",
+  "Flashforge/Flashforge PVA @FF C5P",
+  "Flashforge/Flashforge TPU 65D @FF G4 0.6 HF nozzle",
+  "Flashforge/Flashforge TPU 65D @FF G4 0.6 nozzle",
+  "Flashforge/Flashforge TPU 65D @FF G4 0.8 HF nozzle",
+  "Flashforge/Flashforge TPU 65D @FF G4P 0.6 HF nozzle",
+  "Flashforge/Flashforge TPU 65D @FF G4P 0.6 nozzle",
+  "Flashforge/Flashforge TPU 65D @FF G4P 0.8 HF nozzle",
+  "Flashforge/Flashforge TPU 95A",
+  "Flashforge/Flashforge TPU 95A @FF AD5X",
+  "Flashforge/Flashforge TPU 95A @FF AD5X 0.6 nozzle",
+  "Flashforge/Flashforge TPU 95A @FF AD5X 0.8 nozzle",
+  "Flashforge/Flashforge TPU 95A @FF G4",
+  "Flashforge/Flashforge TPU 95A @FF G4 0.6 HF nozzle",
+  "Flashforge/Flashforge TPU 95A @FF G4 0.6 nozzle",
+  "Flashforge/Flashforge TPU 95A @FF G4 0.8 HF nozzle",
+  "Flashforge/Flashforge TPU 95A @FF G4P",
+  "Flashforge/Flashforge TPU 95A @FF G4P 0.6 HF nozzle",
+  "Flashforge/Flashforge TPU 95A @FF G4P 0.6 nozzle",
+  "Flashforge/Flashforge TPU 95A @FF G4P 0.8 HF nozzle",
+  "Flashforge/Flashforge TPU-64D @FF C5",
+  "Flashforge/Flashforge TPU-64D @FF C5P",
+  "Flashforge/Flashforge TPU-90A @FF C5",
+  "Flashforge/Flashforge TPU-90A @FF C5P",
+  "Flashforge/Flashforge TPU-95A @FF C5",
+  "Flashforge/Flashforge TPU-95A @FF C5P",
   "Flashforge/FusRock Generic NexPA-CF25",
   "Flashforge/FusRock Generic PAHT-CF",
   "Flashforge/FusRock Generic PAHT-CF @G3U 0.6 Nozzle",
+  "Flashforge/FusRock Generic PAHT-GF",
   "Flashforge/FusRock Generic PET-CF",
   "Flashforge/FusRock Generic PET-CF @G3U 0.6 Nozzle",
+  "Flashforge/FusRock Generic PET-GF",
   "Flashforge/FusRock Generic S-Multi",
   "Flashforge/FusRock Generic S-Multi @G3U 0.6 Nozzle",
   "Flashforge/FusRock Generic S-PAHT",
   "Flashforge/FusRock Generic S-PAHT @G3U 0.6 Nozzle",
+  "Flashforge/FusRock PAHT @FF G4 0.6 HF nozzle",
+  "Flashforge/FusRock PAHT @FF G4 0.6 nozzle",
+  "Flashforge/FusRock PAHT @FF G4 0.8 HF nozzle",
+  "Flashforge/FusRock PAHT @FF G4P 0.6 HF nozzle",
+  "Flashforge/FusRock PAHT @FF G4P 0.6 nozzle",
+  "Flashforge/FusRock PAHT @FF G4P 0.8 HF nozzle",
+  "Flashforge/FusRock PAHT-CF @FF C5",
+  "Flashforge/FusRock PAHT-CF @FF C5P",
+  "Flashforge/FusRock PAHT-CF @FF G4",
+  "Flashforge/FusRock PAHT-CF @FF G4 0.6 nozzle",
+  "Flashforge/FusRock PAHT-CF @FF G4P",
+  "Flashforge/FusRock PAHT-CF @FF G4P 0.6 nozzle",
+  "Flashforge/FusRock PET @FF G4P 0.8 HF nozzle",
+  "Flashforge/FusRock PET-CF @FF G4",
+  "Flashforge/FusRock PET-CF @FF G4 0.6 nozzle",
+  "Flashforge/FusRock PET-CF @FF G4P",
+  "Flashforge/FusRock PET-CF @FF G4P 0.6 nozzle",
+  "Flashforge/FusRock S-Multi @FF C5",
+  "Flashforge/FusRock S-Multi @FF C5P",
+  "Flashforge/FusRock S-PAHT @FF C5",
+  "Flashforge/FusRock S-PAHT @FF C5P",
+  "Flashforge/Generic ASA @Flashforge AD4",
+  "Flashforge/Generic PET @FF G4",
+  "Flashforge/Generic PET @FF G4 0.6 HF nozzle",
+  "Flashforge/Generic PET @FF G4 0.6 nozzle",
+  "Flashforge/Generic PET @FF G4 0.8 HF nozzle",
+  "Flashforge/Generic PET @FF G4P",
+  "Flashforge/Generic PET @FF G4P 0.6 HF nozzle",
+  "Flashforge/Generic PET @FF G4P 0.6 nozzle",
+  "Flashforge/Generic PET @FF G4P 0.8 HF nozzle",
   "Flashforge/Generic PETG @Flashforge Artemis",
+  "Flashforge/Generic PETG-CF10 @Flashforge AD4",
   "Flashforge/Generic PLA @Flashforge AD4",
+  "Flashforge/Generic PLA High Speed @Flashforge AD4",
+  "Flashforge/Generic PLA Silk @Flashforge AD4",
+  "Flashforge/Generic PLA-CF10 @Flashforge AD4",
+  "Flashforge/Generic TPU 85A @FF AD5X",
+  "Flashforge/Generic TPU 85A @FF AD5X 0.6 nozzle",
+  "Flashforge/Generic TPU 85A @FF AD5X 0.8 nozzle",
+  "Flashforge/Generic TPU @Flashforge AD4",
+  "Flashforge/Generic TPU-64D @FF C5",
+  "Flashforge/Generic TPU-64D @FF C5P",
+  "Flashforge/Generic TPU-90A @FF C5",
+  "Flashforge/Generic TPU-90A @FF C5P",
+  "Flashforge/Generic TPU-95A @FF C5",
+  "Flashforge/Generic TPU-95A @FF C5P",
+  "Flashforge/Polymaker CoPA @FF G4 0.6 HF nozzle",
+  "Flashforge/Polymaker CoPA @FF G4 0.6 nozzle",
+  "Flashforge/Polymaker CoPA @FF G4 0.8 HF nozzle",
+  "Flashforge/Polymaker CoPA @FF G4P 0.6 HF nozzle",
+  "Flashforge/Polymaker CoPA @FF G4P 0.6 nozzle",
+  "Flashforge/Polymaker CoPA @FF G4P 0.8 HF nozzle",
   "Flashforge/Polymaker Generic CoPA",
   "Flashforge/Polymaker Generic S1",
   "Flashforge/SUNLU PETG @base",
@@ -2411,22 +2816,7 @@
    "Flashforge/Generic PETG"
   ],
   "FFG01": [
-   "Flashforge/Flashforge Generic PLA",
-   "Flashforge/Flashforge HS PLA",
-   "Flashforge/Flashforge HS PLA Burnt Ti",
-   "Flashforge/Flashforge PA",
-   "Flashforge/Flashforge PLA Basic",
-   "Flashforge/Flashforge PLA Buint Ti",
-   "Flashforge/Flashforge PLA Color Change",
-   "Flashforge/Flashforge PLA Galaxy",
-   "Flashforge/Flashforge PLA Luminous",
-   "Flashforge/Flashforge PLA Matte",
-   "Flashforge/Flashforge PLA Metal",
-   "Flashforge/Flashforge PLA Pro",
-   "Flashforge/Flashforge PLA Silk",
-   "Flashforge/Flashforge PLA Sparkle",
-   "Flashforge/Flashforge TPU 65D",
-   "Flashforge/Flashforge TPU 95A"
+   "Flashforge/Flashforge Generic PLA"
   ],
   "FILAR0001": [
    "OrcaFilamentLibrary/FilAr PLA Bronce"
@@ -2838,63 +3228,8 @@
    "FLSun/FLSun Generic ABS",
    "FLSun/FLSun S1 ABS",
    "FLSun/FLSun T1 ABS",
-   "Flashforge/FlashForge PC",
-   "Flashforge/FlashForge PPS",
-   "Flashforge/FlashForge PPS-CF",
-   "Flashforge/Flashforge ABS Basic",
-   "Flashforge/Flashforge ABS-CF",
-   "Flashforge/Flashforge ASA Basic",
-   "Flashforge/Flashforge ASA-CF",
    "Flashforge/Flashforge Generic ABS",
-   "Flashforge/Flashforge Generic ASA",
-   "Flashforge/Flashforge Generic HIPS",
-   "Flashforge/Flashforge Generic PETG",
-   "Flashforge/Flashforge Generic PETG-CF",
-   "Flashforge/Flashforge Generic PLA-CF",
-   "Flashforge/Flashforge Generic PVA",
-   "Flashforge/Flashforge HIPS",
-   "Flashforge/Flashforge HS PETG",
-   "Flashforge/Flashforge HS PLA",
-   "Flashforge/Flashforge HS PLA Burnt Ti",
-   "Flashforge/Flashforge PA",
-   "Flashforge/Flashforge PA12-CF",
-   "Flashforge/Flashforge PA6-CF",
-   "Flashforge/Flashforge PA66-CF",
-   "Flashforge/Flashforge PET-CF",
-   "Flashforge/Flashforge PETG Pro",
-   "Flashforge/Flashforge PETG Transparent",
-   "Flashforge/Flashforge PETG-CF",
-   "Flashforge/Flashforge PLA Basic",
-   "Flashforge/Flashforge PLA Color Change",
-   "Flashforge/Flashforge PLA Galaxy",
-   "Flashforge/Flashforge PLA Luminous",
-   "Flashforge/Flashforge PLA Matte",
-   "Flashforge/Flashforge PLA Metal",
-   "Flashforge/Flashforge PLA Pro",
-   "Flashforge/Flashforge PLA Silk",
-   "Flashforge/Flashforge PLA Sparkle",
-   "Flashforge/Flashforge PLA-CF",
-   "Flashforge/Flashforge PPA-CF",
-   "Flashforge/Flashforge PPA-GF",
-   "Flashforge/Flashforge PPS-CF",
-   "Flashforge/Flashforge TPU 65D",
-   "Flashforge/Flashforge TPU 95A",
-   "Flashforge/FusRock Generic NexPA-CF25",
-   "Flashforge/FusRock Generic PAHT-CF",
-   "Flashforge/FusRock Generic PAHT-GF",
-   "Flashforge/FusRock Generic PET-CF",
-   "Flashforge/FusRock Generic PET-GF",
-   "Flashforge/FusRock Generic S-Multi",
-   "Flashforge/FusRock Generic S-PAHT",
-   "Flashforge/FusRock PAHT",
-   "Flashforge/FusRock PAHT-CF",
-   "Flashforge/FusRock PET",
-   "Flashforge/FusRock PET-CF",
    "Flashforge/Generic ABS",
-   "Flashforge/Generic PET",
-   "Flashforge/Polymaker CoPA",
-   "Flashforge/Polymaker Generic CoPA",
-   "Flashforge/Polymaker Generic S1",
    "FlyingBear/FlyingBear ABS",
    "FlyingBear/FlyingBear Generic ABS",
    "FlyingBear/Other ABS",
@@ -3084,21 +3419,7 @@
    "FLSun/FLSun S1 PETG",
    "FLSun/FLSun T1 PETG",
    "Flashforge/Flashforge Generic PETG",
-   "Flashforge/Flashforge Generic PETG-CF10",
-   "Flashforge/Flashforge Generic TPU",
-   "Flashforge/Flashforge HS PETG",
-   "Flashforge/Flashforge PA",
-   "Flashforge/Flashforge PETG Basic",
-   "Flashforge/Flashforge PETG Pro",
-   "Flashforge/Flashforge PETG Transparent",
-   "Flashforge/Flashforge PETG-CF",
-   "Flashforge/Flashforge TPU 95A",
-   "Flashforge/FusRock PET-CF",
-   "Flashforge/Generic PET",
    "Flashforge/Generic PETG",
-   "Flashforge/Generic PETG-CF10",
-   "Flashforge/Generic TPU",
-   "Flashforge/Generic TPU 85A",
    "FlyingBear/FlyingBear Generic PETG",
    "FlyingBear/FlyingBear PETG",
    "FlyingBear/FlyingBear PETG Basic",
@@ -3453,34 +3774,8 @@
    "FLSun/FLSun T1 PLA Generic",
    "FLSun/FLSun T1 PLA High Speed",
    "FLSun/FLSun T1 PLA Silk",
-   "Flashforge/Flashforge ASA Basic",
-   "Flashforge/Flashforge Generic ASA",
-   "Flashforge/Flashforge Generic HS PLA",
-   "Flashforge/Flashforge Generic PLA-CF10",
-   "Flashforge/Flashforge Generic PLA-SILK",
-   "Flashforge/Flashforge Generic PLA-Silk",
-   "Flashforge/Flashforge HIPS",
-   "Flashforge/Flashforge HS PLA",
-   "Flashforge/Flashforge PA-CF",
-   "Flashforge/Flashforge PAHT-CF",
-   "Flashforge/Flashforge PLA Basic",
-   "Flashforge/Flashforge PLA Color Change",
-   "Flashforge/Flashforge PLA Galaxy",
-   "Flashforge/Flashforge PLA Luminous",
-   "Flashforge/Flashforge PLA Matte",
-   "Flashforge/Flashforge PLA Metal",
-   "Flashforge/Flashforge PLA Pro",
-   "Flashforge/Flashforge PLA Silk",
-   "Flashforge/Flashforge PLA Sparkle",
-   "Flashforge/Flashforge PLA-CF",
-   "Flashforge/Flashforge PPS",
-   "Flashforge/Flashforge PPS-CF",
-   "Flashforge/FusRock PAHT-CF",
-   "Flashforge/Generic ASA",
    "Flashforge/Generic PLA",
    "Flashforge/Generic PLA High Speed",
-   "Flashforge/Generic PLA Silk",
-   "Flashforge/Generic PLA-CF10",
    "FlyingBear/FlyingBear Generic PLA",
    "FlyingBear/FlyingBear PLA",
    "FlyingBear/FlyingBear PLA Basic",
@@ -4389,11 +4684,20 @@
   "OF0M6QAQ": [
    "OrcaFilamentLibrary/Elegoo PLA Galaxy"
   ],
+  "OF0SyJhk": [
+   "Flashforge/Flashforge PA6-CF"
+  ],
   "OF0TjJ0G": [
    "Qidi/Qidi ASA-Aero"
   ],
+  "OF0UbONm": [
+   "Flashforge/FusRock S-PAHT"
+  ],
   "OF0Y5MLd": [
    "Qidi/QIDI PETG-GF"
+  ],
+  "OF0wk0Pk": [
+   "Flashforge/Flashforge PLA  Pro"
   ],
   "OF0z1XpN": [
    "Qidi/QIDI PLA Rapido Silk"
@@ -4407,14 +4711,23 @@
   "OF2UFmOo": [
    "Qidi/Bambu PLA"
   ],
+  "OF38Hyk4": [
+   "Flashforge/Flashforge PETG Pro"
+  ],
   "OF3GKs2i": [
    "OrcaFilamentLibrary/eSUN PLA-Matte"
   ],
   "OF3XeEuV": [
    "Qidi/QIDI PET-GF"
   ],
+  "OF41QVDH": [
+   "Flashforge/Flashforge Generic PLA-Silk"
+  ],
   "OF48G7He": [
    "Qidi/QIDI PETG Tough 0.8 nozzle"
+  ],
+  "OF4RKeng": [
+   "Flashforge/Flashforge Generic ASA"
   ],
   "OF4fgpse": [
    "OrcaFilamentLibrary/Elegoo PLA Marble"
@@ -4422,11 +4735,35 @@
   "OF4gzzE4": [
    "Qidi/QIDI PET-CF"
   ],
+  "OF4m9A5w": [
+   "Flashforge/Flashforge Generic HIPS"
+  ],
+  "OF5T1Y9R": [
+   "Flashforge/Flashforge ABS Basic"
+  ],
   "OF5UUaUM": [
    "Qidi/Qidi Generic PLA High Speed"
   ],
+  "OF5kwfZu": [
+   "Flashforge/FusRock Generic NexPA-CF25"
+  ],
+  "OF60Lmeq": [
+   "Flashforge/Flashforge PLA Matte"
+  ],
   "OF6EOy1A": [
    "Qidi/Bambu PETG"
+  ],
+  "OF6FM5F7": [
+   "Flashforge/FusRock PAHT"
+  ],
+  "OF6Mxzsg": [
+   "Flashforge/Generic TPU"
+  ],
+  "OF6SEkeJ": [
+   "Flashforge/FusRock PET-CF"
+  ],
+  "OF6XIeUW": [
+   "Flashforge/Generic PLA-CF10"
   ],
   "OF79FFkO": [
    "OrcaFilamentLibrary/Elegoo PC-FR"
@@ -4440,8 +4777,20 @@
   "OF8WvPVL": [
    "Qidi/QIDI ABS Rapido 0.8 nozzle"
   ],
+  "OF9RZyBz": [
+   "Flashforge/Polymaker Generic S1"
+  ],
   "OF9qvJxV": [
    "OrcaFilamentLibrary/Elegoo PLA Translucent2"
+  ],
+  "OF9sr3Vn": [
+   "Flashforge/Flashforge PLA Sparkle"
+  ],
+  "OFAEqlWa": [
+   "Flashforge/Flashforge Generic PLA-SILK"
+  ],
+  "OFAGrVjP": [
+   "Flashforge/Flashforge PLA Silk"
   ],
   "OFAUDGEQ": [
    "Qidi/QIDI PLA Rapido Matte"
@@ -4449,29 +4798,50 @@
   "OFAdAYYk": [
    "Qidi/QIDI PPS-CF"
   ],
+  "OFAdZFD1": [
+   "Flashforge/FusRock Generic PET-GF"
+  ],
   "OFAnyzjN": [
    "Qidi/HATCHBOX PETG"
   ],
+  "OFAtydxE": [
+   "Flashforge/FusRock S-Multi"
+  ],
   "OFC2FSsV": [
    "Qidi/Overture PLA"
+  ],
+  "OFC5CCeo": [
+   "Flashforge/Flashforge Generic PETG-CF"
+  ],
+  "OFCJaXZS": [
+   "Flashforge/Flashforge PPS"
   ],
   "OFD5e0sH": [
    "OrcaFilamentLibrary/Elegoo Rapid PLA+"
   ],
   "OFDCk0cz": [
-   "Flashforge/Flashforge PET-CF",
-   "Flashforge/Flashforge PETG-CF",
-   "Flashforge/FusRock S-Multi",
    "OrcaFilamentLibrary/Generic PETG-CF"
   ],
   "OFDNiRTx": [
    "OrcaFilamentLibrary/Elegoo PLA+"
+  ],
+  "OFDkABjZ": [
+   "Flashforge/Generic TPU-90A"
+  ],
+  "OFE22Uba": [
+   "Flashforge/Flashforge TPU-90A"
   ],
   "OFFIL5pD": [
    "Qidi/QIDI PA12-CF"
   ],
   "OFG8vHw8": [
    "Qidi/Qidi Generic ASA"
+  ],
+  "OFGfdP6J": [
+   "Flashforge/FusRock Generic S-Multi"
+  ],
+  "OFHBTqyD": [
+   "Flashforge/Flashforge PLA Basic"
   ],
   "OFICPchn": [
    "OrcaFilamentLibrary/Elegoo PLA Basic"
@@ -4488,17 +4858,41 @@
   "OFJsqMzx": [
    "OrcaFilamentLibrary/Generic PLA Matte"
   ],
+  "OFK39W9u": [
+   "Flashforge/Flashforge Generic PETG-CF10"
+  ],
   "OFK820gS": [
    "Qidi/QIDI ASA"
+  ],
+  "OFKWVi10": [
+   "Flashforge/Flashforge Generic PLA-CF10"
+  ],
+  "OFKZH00L": [
+   "Flashforge/FusRock Generic PET-CF"
   ],
   "OFKjlAbC": [
    "Qidi/QIDI UltraPA-CF25"
   ],
+  "OFL7vEML": [
+   "Flashforge/FlashForge PC"
+  ],
   "OFLSBS99": [
    "OrcaFilamentLibrary/Generic SBS"
   ],
+  "OFLeFaUO": [
+   "Flashforge/Flashforge Generic PVA"
+  ],
+  "OFLxO2Oc": [
+   "Flashforge/FusRock PET"
+  ],
+  "OFM3PeVe": [
+   "Flashforge/Flashforge ASA-CF"
+  ],
   "OFMCMXSG": [
    "OrcaFilamentLibrary/Generic PP-GF"
+  ],
+  "OFMHTnPP": [
+   "Flashforge/Flashforge PA12-CF"
   ],
   "OFMQJToc": [
    "OrcaFilamentLibrary/Elegoo PETG-GF"
@@ -4512,17 +4906,29 @@
   "OFNX5uRT": [
    "Qidi/QIDI TPU-Aero"
   ],
+  "OFOSzSuh": [
+   "Flashforge/Flashforge PA-CF"
+  ],
   "OFOW9K96": [
    "Qidi/Qidi TPU 95A-HF"
   ],
   "OFOysPuE": [
    "Qidi/QIDI TPU-GF"
   ],
+  "OFPJJxkF": [
+   "Flashforge/Flashforge PET-CF"
+  ],
+  "OFPJrlC3": [
+   "Flashforge/Flashforge PLA-CF"
+  ],
   "OFPokkKe": [
    "Qidi/QIDI PETG-CF"
   ],
   "OFPwi9X0": [
    "Qidi/HATCHBOX ABS"
+  ],
+  "OFQCAYAt": [
+   "Flashforge/Flashforge PPA-CF"
   ],
   "OFQZINrX": [
    "Qidi/QIDI ABS-GF10"
@@ -4533,14 +4939,29 @@
   "OFQkWxJy": [
    "OrcaFilamentLibrary/Elegoo PLA Matte"
   ],
+  "OFRNU58t": [
+   "Flashforge/Flashforge TPU 95A"
+  ],
+  "OFRR8LUh": [
+   "Flashforge/Generic ASA"
+  ],
   "OFRS2Ggt": [
    "OrcaFilamentLibrary/Generic PP-CF"
+  ],
+  "OFRgDMDJ": [
+   "Flashforge/Flashforge PETG Transparent"
   ],
   "OFSSuKRr": [
    "Qidi/QIDI PETG Basic"
   ],
+  "OFSdF3B1": [
+   "Flashforge/FusRock PAHT-CF"
+  ],
   "OFT3TqB6": [
    "OrcaFilamentLibrary/Elas ASA"
+  ],
+  "OFTa6gPH": [
+   "Flashforge/Flashforge PLA Pro"
   ],
   "OFToBodi": [
    "Qidi/QIDI ABS Rapido Metal"
@@ -4566,6 +4987,12 @@
   "OFWkCAdc": [
    "Qidi/QIDI PETG Tough 0.2 nozzle"
   ],
+  "OFWs8KIZ": [
+   "Flashforge/Flashforge ABS-CF"
+  ],
+  "OFWv6JYn": [
+   "Flashforge/Flashforge PLA Metal"
+  ],
   "OFWyCd0Y": [
    "Qidi/QIDI Support For PET/PA"
   ],
@@ -4581,11 +5008,29 @@
   "OFXmQgno": [
    "OrcaFilamentLibrary/eSUN PLA-Marble"
   ],
+  "OFXv4FUi": [
+   "Flashforge/Flashforge PLA Galaxy"
+  ],
   "OFYH00jV": [
    "Qidi/QIDI ABS-GF"
   ],
+  "OFYICbI4": [
+   "Flashforge/FusRock Generic PAHT-CF"
+  ],
+  "OFYRS7GZ": [
+   "Flashforge/Generic TPU-95A"
+  ],
+  "OFYZs7dN": [
+   "Flashforge/Flashforge Generic HS PLA"
+  ],
   "OFZAkPHG": [
    "Qidi/QIDI PPS-GF"
+  ],
+  "OFZQFvHQ": [
+   "Flashforge/Flashforge HS PETG"
+  ],
+  "OFZcrV9c": [
+   "Flashforge/Flashforge PPS-CF"
   ],
   "OFZhdVnP": [
    "OrcaFilamentLibrary/eSUN PLA-Basic"
@@ -4605,6 +5050,21 @@
   "OFceJcLf": [
    "Qidi/PolyLite PLA"
   ],
+  "OFcy60o4": [
+   "Flashforge/Flashforge ASA Basic"
+  ],
+  "OFdNORGt": [
+   "Flashforge/Flashforge ASA-GF"
+  ],
+  "OFdhVJql": [
+   "Flashforge/Flashforge PLA Buint Ti"
+  ],
+  "OFeFRwST": [
+   "Flashforge/Flashforge PVA"
+  ],
+  "OFeWMAGH": [
+   "Flashforge/Flashforge HS PLA Burnt Ti"
+  ],
   "OFenGPBR": [
    "OrcaFilamentLibrary/Elegoo PETG Translucent"
   ],
@@ -4612,7 +5072,6 @@
    "Qidi/QIDI ABS Rapido 0.2 nozzle"
   ],
   "OFfB1QKi": [
-   "Flashforge/Flashforge HS PETG",
    "OrcaFilamentLibrary/Generic PETG HF"
   ],
   "OFfJoIgg": [
@@ -4621,14 +5080,41 @@
   "OFfdxQok": [
    "Qidi/Generic PLA+"
   ],
+  "OFftQOek": [
+   "Flashforge/Flashforge PLA  Matte"
+  ],
+  "OFgJX0Fc": [
+   "Flashforge/FlashForge PPS"
+  ],
+  "OFhzHd2Y": [
+   "Flashforge/Flashforge HIPS"
+  ],
+  "OFi1ocNv": [
+   "Flashforge/Flashforge PA"
+  ],
   "OFiJYDPC": [
    "Qidi/HATCHBOX PLA"
   ],
   "OFidJLn8": [
    "Qidi/PolyLite ABS"
   ],
+  "OFjepy6j": [
+   "Flashforge/FusRock Generic S-PAHT"
+  ],
   "OFjohFkg": [
    "Qidi/QIDI PETG Translucent"
+  ],
+  "OFjqPjjl": [
+   "Flashforge/Generic PET"
+  ],
+  "OFkaDtKx": [
+   "Flashforge/Flashforge PA66-CF"
+  ],
+  "OFlNKZLP": [
+   "Flashforge/Flashforge PLA  Metal"
+  ],
+  "OFm1VZed": [
+   "Flashforge/Flashforge Generic PLA-CF"
   ],
   "OFmF1xL9": [
    "Qidi/QIDI ASA-CF"
@@ -4636,8 +5122,14 @@
   "OFmKNi3f": [
    "Qidi/QIDI PLA Rapido"
   ],
+  "OFmduKVr": [
+   "Flashforge/FlashForge PPS-CF"
+  ],
   "OFmeQjRP": [
    "OrcaFilamentLibrary/Elegoo Rapid TPU 95A"
+  ],
+  "OFmgesco": [
+   "Flashforge/Flashforge TPU 65D"
   ],
   "OFnj7bPm": [
    "Qidi/QIDI ABS Rapido 0.6 nozzle"
@@ -4645,11 +5137,29 @@
   "OFnsWQTp": [
    "Qidi/QIDI WOOD Rapido"
   ],
+  "OFo9EwvK": [
+   "Flashforge/Generic PETG-CF10"
+  ],
+  "OFoAaHcF": [
+   "Flashforge/FusRock Generic PAHT-GF"
+  ],
+  "OFoJUGj6": [
+   "Flashforge/Flashforge HS PLA"
+  ],
+  "OFoimrpo": [
+   "Flashforge/Flashforge PETG-CF"
+  ],
+  "OFp8lkYD": [
+   "Flashforge/Flashforge PPA-GF"
+  ],
   "OFpwg2Qh": [
    "OrcaFilamentLibrary/Elegoo ASA-CF"
   ],
   "OFqPp2yL": [
    "Qidi/QIDI PETG Tough 0.6 nozzle"
+  ],
+  "OFqRWRU6": [
+   "Flashforge/Flashforge ABS-GF"
   ],
   "OFqh1Ngp": [
    "OrcaFilamentLibrary/Elegoo PLA-CF"
@@ -4672,14 +5182,32 @@
   "OFsNZcid": [
    "OrcaFilamentLibrary/PolyLite Dual PLA"
   ],
+  "OFsgANe3": [
+   "Flashforge/Flashforge PAHT-CF"
+  ],
+  "OFt9AiN5": [
+   "Flashforge/Polymaker CoPA"
+  ],
+  "OFtEFtsz": [
+   "Flashforge/Polymaker Generic CoPA"
+  ],
+  "OFtJMczs": [
+   "Flashforge/Flashforge TPU-64D"
+  ],
   "OFuTFxVP": [
    "Qidi/Overture ABS"
   ],
   "OFuidAEg": [
    "Qidi/Bambu ABS"
   ],
+  "OFuswXlp": [
+   "Flashforge/Generic TPU 85A"
+  ],
   "OFutwD6f": [
    "OrcaFilamentLibrary/Elegoo PLA Glow"
+  ],
+  "OFuyJhLF": [
+   "Flashforge/Flashforge PETG Basic"
   ],
   "OFv2NHLC": [
    "Qidi/QIDI ABS-GF25"
@@ -4687,11 +5215,26 @@
   "OFvN3117": [
    "Qidi/QIDI PLA Matte Basic"
   ],
+  "OFviQ9lH": [
+   "Flashforge/Flashforge Generic TPU"
+  ],
+  "OFvsS7Fb": [
+   "Flashforge/Generic TPU-64D"
+  ],
   "OFw4OHWE": [
    "OrcaFilamentLibrary/Elas PETG Basic"
   ],
   "OFwHPTvy": [
    "Qidi/Qidi Generic PLA+"
+  ],
+  "OFwf0oWp": [
+   "Flashforge/Flashforge PLA Luminous"
+  ],
+  "OFyoW5W2": [
+   "Flashforge/Flashforge PLA Color Change"
+  ],
+  "OFyxAbO4": [
+   "Flashforge/Flashforge TPU-95A"
   ],
   "OFzrWlH5": [
    "OrcaFilamentLibrary/Elegoo PETG HF"
@@ -4768,11 +5311,6 @@
   ],
   "OGFB99": [
    "Custom/Generic ABS",
-   "Flashforge/Flashforge ABS Basic",
-   "Flashforge/Flashforge ABS-GF",
-   "Flashforge/Flashforge ASA Basic",
-   "Flashforge/Flashforge ASA-CF",
-   "Flashforge/Flashforge ASA-GF",
    "OrcaFilamentLibrary/Generic ABS"
   ],
   "OGFC00": [
@@ -4803,8 +5341,6 @@
    "OrcaFilamentLibrary/Generic PCTG"
   ],
   "OGFG99": [
-   "Flashforge/Flashforge PETG Pro",
-   "Flashforge/Flashforge PETG Transparent",
    "OrcaFilamentLibrary/Generic PETG"
   ],
   "OGFGG300": [
@@ -4856,23 +5392,13 @@
    "OrcaFilamentLibrary/Generic PLA High Speed"
   ],
   "OGFL96": [
-   "Flashforge/Flashforge PLA Silk",
    "Flashforge/Generic PLA Silk",
    "OrcaFilamentLibrary/Generic PLA Silk"
   ],
   "OGFL98": [
-   "Flashforge/Flashforge PLA-CF",
    "OrcaFilamentLibrary/Generic PLA-CF"
   ],
   "OGFL99": [
-   "Flashforge/Flashforge HS PLA",
-   "Flashforge/Flashforge PLA  Matte",
-   "Flashforge/Flashforge PLA  Metal",
-   "Flashforge/Flashforge PLA  Pro",
-   "Flashforge/Flashforge PLA Basic",
-   "Flashforge/Flashforge PLA Color Change",
-   "Flashforge/Flashforge PLA Galaxy",
-   "Flashforge/Flashforge PLA Luminous",
    "Flashforge/Generic PLA",
    "OrcaFilamentLibrary/Generic PLA"
   ],
@@ -4895,8 +5421,6 @@
    "OrcaFilamentLibrary/Bambu PA6-GF"
   ],
   "OGFN96": [
-   "Flashforge/Flashforge PPA-CF",
-   "Flashforge/Flashforge PPS-CF",
    "OrcaFilamentLibrary/Generic PPA-GF"
   ],
   "OGFN97": [
@@ -4904,10 +5428,6 @@
   ],
   "OGFN98": [
    "Custom/Generic PA-CF",
-   "Flashforge/Flashforge PA-CF",
-   "Flashforge/Flashforge PAHT-CF",
-   "Flashforge/FusRock PAHT-CF",
-   "Flashforge/FusRock S-PAHT",
    "OrcaFilamentLibrary/Generic PA-CF"
   ],
   "OGFN99": [
@@ -5015,11 +5535,9 @@
    "OrcaFilamentLibrary/Generic BVOH"
   ],
   "OGFS98": [
-   "Flashforge/Flashforge HIPS",
    "OrcaFilamentLibrary/Generic HIPS"
   ],
   "OGFS99": [
-   "Flashforge/Flashforge PVA",
    "OrcaFilamentLibrary/Generic PVA"
   ],
   "OGFSNL02": [
@@ -5054,12 +5572,6 @@
    "OrcaFilamentLibrary/Bambu TPU 95A"
   ],
   "OGFU99": [
-   "Flashforge/Flashforge TPU-64D",
-   "Flashforge/Flashforge TPU-90A",
-   "Flashforge/Flashforge TPU-95A",
-   "Flashforge/Generic TPU-64D",
-   "Flashforge/Generic TPU-90A",
-   "Flashforge/Generic TPU-95A",
    "OrcaFilamentLibrary/Generic TPU"
   ],
   "OVTABS08": [
@@ -6681,7 +7193,74 @@
   "FLSun/FLSun T1 PLA High Speed",
   "FLSun/FLSun T1 PLA Silk",
   "FLSun/FLSun T1 TPU",
+  "Flashforge/FlashForge PC @FF G4 0.6 HF nozzle",
+  "Flashforge/FlashForge PC @FF G4 0.6 nozzle",
+  "Flashforge/FlashForge PC @FF G4 0.8 HF nozzle",
+  "Flashforge/FlashForge PC @FF G4P 0.6 HF nozzle",
+  "Flashforge/FlashForge PC @FF G4P 0.6 nozzle",
+  "Flashforge/FlashForge PC @FF G4P 0.8 HF nozzle",
+  "Flashforge/FlashForge PPS @FF G4 0.6 HF nozzle",
+  "Flashforge/FlashForge PPS @FF G4 0.6 nozzle",
+  "Flashforge/FlashForge PPS @FF G4 0.8 HF nozzle",
+  "Flashforge/FlashForge PPS @FF G4P 0.6 HF nozzle",
+  "Flashforge/FlashForge PPS @FF G4P 0.6 nozzle",
+  "Flashforge/FlashForge PPS @FF G4P 0.8 HF nozzle",
+  "Flashforge/FlashForge PPS-CF @FF G4 0.6 nozzle",
+  "Flashforge/FlashForge PPS-CF @FF G4P 0.6 nozzle",
   "Flashforge/Flashforge ABS",
+  "Flashforge/Flashforge ABS Basic",
+  "Flashforge/Flashforge ABS Basic @FF AD5M 0.25 nozzle",
+  "Flashforge/Flashforge ABS Basic @FF AD5X",
+  "Flashforge/Flashforge ABS Basic @FF AD5X 0.25 nozzle",
+  "Flashforge/Flashforge ABS Basic @FF AD5X 0.6 nozzle",
+  "Flashforge/Flashforge ABS Basic @FF AD5X 0.8 nozzle",
+  "Flashforge/Flashforge ABS Basic @FF C5",
+  "Flashforge/Flashforge ABS Basic @FF C5P",
+  "Flashforge/Flashforge ABS Basic @FF G4",
+  "Flashforge/Flashforge ABS Basic @FF G4 0.25 nozzle",
+  "Flashforge/Flashforge ABS Basic @FF G4 0.6 HF nozzle",
+  "Flashforge/Flashforge ABS Basic @FF G4 0.6 nozzle",
+  "Flashforge/Flashforge ABS Basic @FF G4 0.8 HF nozzle",
+  "Flashforge/Flashforge ABS Basic @FF G4 HF",
+  "Flashforge/Flashforge ABS Basic @FF G4P",
+  "Flashforge/Flashforge ABS Basic @FF G4P 0.25 nozzle",
+  "Flashforge/Flashforge ABS Basic @FF G4P 0.6 HF nozzle",
+  "Flashforge/Flashforge ABS Basic @FF G4P 0.6 nozzle",
+  "Flashforge/Flashforge ABS Basic @FF G4P 0.8 HF nozzle",
+  "Flashforge/Flashforge ABS Basic @FF G4P HF",
+  "Flashforge/Flashforge ABS-CF @FF G4",
+  "Flashforge/Flashforge ABS-CF @FF G4 0.6 nozzle",
+  "Flashforge/Flashforge ABS-CF @FF G4P",
+  "Flashforge/Flashforge ABS-CF @FF G4P 0.6 nozzle",
+  "Flashforge/Flashforge ABS-GF @FF C5",
+  "Flashforge/Flashforge ABS-GF @FF C5P",
+  "Flashforge/Flashforge ASA Basic",
+  "Flashforge/Flashforge ASA Basic @FF AD5M 0.25 nozzle",
+  "Flashforge/Flashforge ASA Basic @FF AD5X",
+  "Flashforge/Flashforge ASA Basic @FF AD5X 0.25 nozzle",
+  "Flashforge/Flashforge ASA Basic @FF AD5X 0.6 nozzle",
+  "Flashforge/Flashforge ASA Basic @FF AD5X 0.8 nozzle",
+  "Flashforge/Flashforge ASA Basic @FF C5",
+  "Flashforge/Flashforge ASA Basic @FF C5P",
+  "Flashforge/Flashforge ASA Basic @FF G4",
+  "Flashforge/Flashforge ASA Basic @FF G4 0.25 nozzle",
+  "Flashforge/Flashforge ASA Basic @FF G4 0.6 HF nozzle",
+  "Flashforge/Flashforge ASA Basic @FF G4 0.6 nozzle",
+  "Flashforge/Flashforge ASA Basic @FF G4 0.8 HF nozzle",
+  "Flashforge/Flashforge ASA Basic @FF G4 HF",
+  "Flashforge/Flashforge ASA Basic @FF G4P",
+  "Flashforge/Flashforge ASA Basic @FF G4P 0.25 nozzle",
+  "Flashforge/Flashforge ASA Basic @FF G4P 0.6 HF nozzle",
+  "Flashforge/Flashforge ASA Basic @FF G4P 0.6 nozzle",
+  "Flashforge/Flashforge ASA Basic @FF G4P 0.8 HF nozzle",
+  "Flashforge/Flashforge ASA Basic @FF G4P HF",
+  "Flashforge/Flashforge ASA-CF",
+  "Flashforge/Flashforge ASA-CF @FF C5",
+  "Flashforge/Flashforge ASA-CF @FF C5P",
+  "Flashforge/Flashforge ASA-CF @FF G4",
+  "Flashforge/Flashforge ASA-CF @FF G4P",
+  "Flashforge/Flashforge ASA-GF @FF C5",
+  "Flashforge/Flashforge ASA-GF @FF C5P",
   "Flashforge/Flashforge Generic ABS",
   "Flashforge/Flashforge Generic ABS @FF AD5M 0.25 Nozzle",
   "Flashforge/Flashforge Generic ABS @G3U",
@@ -6713,9 +7292,363 @@
   "Flashforge/Flashforge Generic PLA-Silk",
   "Flashforge/Flashforge Generic PVA",
   "Flashforge/Flashforge Generic TPU",
+  "Flashforge/Flashforge HIPS @FF C5",
+  "Flashforge/Flashforge HIPS @FF C5P",
+  "Flashforge/Flashforge HIPS @FF G4",
+  "Flashforge/Flashforge HIPS @FF G4 0.6 HF nozzle",
+  "Flashforge/Flashforge HIPS @FF G4 0.6 nozzle",
+  "Flashforge/Flashforge HIPS @FF G4 0.8 HF nozzle",
+  "Flashforge/Flashforge HIPS @FF G4 HF",
+  "Flashforge/Flashforge HIPS @FF G4P",
+  "Flashforge/Flashforge HIPS @FF G4P 0.6 HF nozzle",
+  "Flashforge/Flashforge HIPS @FF G4P 0.6 nozzle",
+  "Flashforge/Flashforge HIPS @FF G4P 0.8 HF nozzle",
+  "Flashforge/Flashforge HIPS @FF G4P HF",
+  "Flashforge/Flashforge HS PETG",
+  "Flashforge/Flashforge HS PETG @FF AD5M 0.25 nozzle",
+  "Flashforge/Flashforge HS PETG @FF AD5X",
+  "Flashforge/Flashforge HS PETG @FF AD5X 0.25 nozzle",
+  "Flashforge/Flashforge HS PETG @FF AD5X 0.6 nozzle",
+  "Flashforge/Flashforge HS PETG @FF AD5X 0.8 nozzle",
+  "Flashforge/Flashforge HS PETG @FF C5",
+  "Flashforge/Flashforge HS PETG @FF C5P",
+  "Flashforge/Flashforge HS PETG @FF G4",
+  "Flashforge/Flashforge HS PETG @FF G4 0.25 nozzle",
+  "Flashforge/Flashforge HS PETG @FF G4 0.6 HF nozzle",
+  "Flashforge/Flashforge HS PETG @FF G4 0.6 nozzle",
+  "Flashforge/Flashforge HS PETG @FF G4 0.8 HF nozzle",
+  "Flashforge/Flashforge HS PETG @FF G4 HF",
+  "Flashforge/Flashforge HS PETG @FF G4P",
+  "Flashforge/Flashforge HS PETG @FF G4P 0.25 nozzle",
+  "Flashforge/Flashforge HS PETG @FF G4P 0.6 HF nozzle",
+  "Flashforge/Flashforge HS PETG @FF G4P 0.6 nozzle",
+  "Flashforge/Flashforge HS PETG @FF G4P 0.8 HF nozzle",
+  "Flashforge/Flashforge HS PETG @FF G4P HF",
+  "Flashforge/Flashforge HS PLA",
   "Flashforge/Flashforge HS PLA @FF AD5M 0.25 nozzle",
+  "Flashforge/Flashforge HS PLA @FF AD5X",
+  "Flashforge/Flashforge HS PLA @FF AD5X 0.25 nozzle",
+  "Flashforge/Flashforge HS PLA @FF AD5X 0.6 nozzle",
+  "Flashforge/Flashforge HS PLA @FF AD5X 0.8 nozzle",
+  "Flashforge/Flashforge HS PLA @FF C5",
+  "Flashforge/Flashforge HS PLA @FF C5P",
+  "Flashforge/Flashforge HS PLA @FF G4",
+  "Flashforge/Flashforge HS PLA @FF G4 0.25 nozzle",
+  "Flashforge/Flashforge HS PLA @FF G4 0.6 HF nozzle",
+  "Flashforge/Flashforge HS PLA @FF G4 0.6 nozzle",
+  "Flashforge/Flashforge HS PLA @FF G4 0.8 HF nozzle",
+  "Flashforge/Flashforge HS PLA @FF G4 HF",
+  "Flashforge/Flashforge HS PLA @FF G4P",
+  "Flashforge/Flashforge HS PLA @FF G4P 0.25 nozzle",
+  "Flashforge/Flashforge HS PLA @FF G4P 0.6 HF nozzle",
+  "Flashforge/Flashforge HS PLA @FF G4P 0.6 nozzle",
+  "Flashforge/Flashforge HS PLA @FF G4P 0.8 HF nozzle",
+  "Flashforge/Flashforge HS PLA @FF G4P HF",
+  "Flashforge/Flashforge HS PLA Burnt Ti @FF G4 0.6 HF nozzle",
+  "Flashforge/Flashforge HS PLA Burnt Ti @FF G4 HF",
+  "Flashforge/Flashforge HS PLA Burnt Ti @FF G4P 0.6 HF nozzle",
+  "Flashforge/Flashforge HS PLA Burnt Ti @FF G4P HF",
+  "Flashforge/Flashforge HS PLA Burnt Ti@FF G4 0.6 nozzle",
+  "Flashforge/Flashforge HS PLA Burnt Ti@FF G4 0.8 HF nozzle",
+  "Flashforge/Flashforge HS PLA Burnt Ti@FF G4P 0.6 nozzle",
+  "Flashforge/Flashforge HS PLA Burnt Ti@FF G4P 0.8 HF nozzle",
+  "Flashforge/Flashforge PA @FF G4",
+  "Flashforge/Flashforge PA @FF G4 0.6 HF nozzle",
+  "Flashforge/Flashforge PA @FF G4 HF",
+  "Flashforge/Flashforge PA @FF G4P",
+  "Flashforge/Flashforge PA @FF G4P 0.6 HF nozzle",
+  "Flashforge/Flashforge PA @FF G4P HF",
+  "Flashforge/Flashforge PA-CF @FF C5",
+  "Flashforge/Flashforge PA-CF @FF C5P",
+  "Flashforge/Flashforge PA-CF @FF G4",
+  "Flashforge/Flashforge PA-CF @FF G4P",
+  "Flashforge/Flashforge PA12-CF",
+  "Flashforge/Flashforge PA6-CF",
+  "Flashforge/Flashforge PA66-CF",
+  "Flashforge/Flashforge PAHT-CF @FF C5",
+  "Flashforge/Flashforge PAHT-CF @FF C5P",
+  "Flashforge/Flashforge PAHT-CF @FF G4",
+  "Flashforge/Flashforge PAHT-CF @FF G4P",
+  "Flashforge/Flashforge PET-CF",
+  "Flashforge/Flashforge PET-CF @FF C5",
+  "Flashforge/Flashforge PET-CF @FF C5P",
   "Flashforge/Flashforge PETG",
+  "Flashforge/Flashforge PETG Basic",
+  "Flashforge/Flashforge PETG Basic @FF AD5M 0.25 nozzle",
+  "Flashforge/Flashforge PETG Pro",
+  "Flashforge/Flashforge PETG Pro @FF AD5M 0.25 nozzle",
+  "Flashforge/Flashforge PETG Pro @FF AD5X",
+  "Flashforge/Flashforge PETG Pro @FF AD5X 0.25 nozzle",
+  "Flashforge/Flashforge PETG Pro @FF AD5X 0.6 nozzle",
+  "Flashforge/Flashforge PETG Pro @FF AD5X 0.8 nozzle",
+  "Flashforge/Flashforge PETG Pro @FF C5",
+  "Flashforge/Flashforge PETG Pro @FF C5P",
+  "Flashforge/Flashforge PETG Pro @FF G4",
+  "Flashforge/Flashforge PETG Pro @FF G4 0.25 nozzle",
+  "Flashforge/Flashforge PETG Pro @FF G4 0.6 HF nozzle",
+  "Flashforge/Flashforge PETG Pro @FF G4 0.6 nozzle",
+  "Flashforge/Flashforge PETG Pro @FF G4 0.8 HF nozzle",
+  "Flashforge/Flashforge PETG Pro @FF G4 HF",
+  "Flashforge/Flashforge PETG Pro @FF G4P",
+  "Flashforge/Flashforge PETG Pro @FF G4P 0.25 nozzle",
+  "Flashforge/Flashforge PETG Pro @FF G4P 0.6 HF nozzle",
+  "Flashforge/Flashforge PETG Pro @FF G4P 0.6 nozzle",
+  "Flashforge/Flashforge PETG Pro @FF G4P 0.8 HF nozzle",
+  "Flashforge/Flashforge PETG Pro @FF G4P HF",
+  "Flashforge/Flashforge PETG Transparent",
+  "Flashforge/Flashforge PETG Transparent @FF AD5M 0.25 nozzle",
+  "Flashforge/Flashforge PETG Transparent @FF AD5X",
+  "Flashforge/Flashforge PETG Transparent @FF AD5X 0.25 nozzle",
+  "Flashforge/Flashforge PETG Transparent @FF AD5X 0.6 nozzle",
+  "Flashforge/Flashforge PETG Transparent @FF AD5X 0.8 nozzle",
+  "Flashforge/Flashforge PETG Transparent @FF C5",
+  "Flashforge/Flashforge PETG Transparent @FF C5P",
+  "Flashforge/Flashforge PETG Transparent @FF G4",
+  "Flashforge/Flashforge PETG Transparent @FF G4 0.25 nozzle",
+  "Flashforge/Flashforge PETG Transparent @FF G4 0.6 HF nozzle",
+  "Flashforge/Flashforge PETG Transparent @FF G4 0.6 nozzle",
+  "Flashforge/Flashforge PETG Transparent @FF G4 0.8 HF nozzle",
+  "Flashforge/Flashforge PETG Transparent @FF G4 HF",
+  "Flashforge/Flashforge PETG Transparent @FF G4P",
+  "Flashforge/Flashforge PETG Transparent @FF G4P 0.25 nozzle",
+  "Flashforge/Flashforge PETG Transparent @FF G4P 0.6 HF nozzle",
+  "Flashforge/Flashforge PETG Transparent @FF G4P 0.6 nozzle",
+  "Flashforge/Flashforge PETG Transparent @FF G4P 0.8 HF nozzle",
+  "Flashforge/Flashforge PETG Transparent @FF G4P HF",
+  "Flashforge/Flashforge PETG-CF",
+  "Flashforge/Flashforge PETG-CF @FF AD5X",
+  "Flashforge/Flashforge PETG-CF @FF AD5X 0.6 nozzle",
+  "Flashforge/Flashforge PETG-CF @FF AD5X 0.8 nozzle",
+  "Flashforge/Flashforge PETG-CF @FF C5",
+  "Flashforge/Flashforge PETG-CF @FF C5P",
+  "Flashforge/Flashforge PETG-CF @FF G4",
+  "Flashforge/Flashforge PETG-CF @FF G4 0.6 nozzle",
+  "Flashforge/Flashforge PETG-CF @FF G4P",
+  "Flashforge/Flashforge PETG-CF @FF G4P 0.6 nozzle",
   "Flashforge/Flashforge PLA",
+  "Flashforge/Flashforge PLA  Matte @FF C5",
+  "Flashforge/Flashforge PLA  Matte @FF C5P",
+  "Flashforge/Flashforge PLA  Metal @FF C5",
+  "Flashforge/Flashforge PLA  Metal @FF C5P",
+  "Flashforge/Flashforge PLA  Pro @FF C5",
+  "Flashforge/Flashforge PLA  Pro @FF C5P",
+  "Flashforge/Flashforge PLA Basic",
+  "Flashforge/Flashforge PLA Basic @FF AD5M 0.25 nozzle",
+  "Flashforge/Flashforge PLA Basic @FF AD5X",
+  "Flashforge/Flashforge PLA Basic @FF AD5X 0.25 nozzle",
+  "Flashforge/Flashforge PLA Basic @FF AD5X 0.6 nozzle",
+  "Flashforge/Flashforge PLA Basic @FF AD5X 0.8 nozzle",
+  "Flashforge/Flashforge PLA Basic @FF C5",
+  "Flashforge/Flashforge PLA Basic @FF C5P",
+  "Flashforge/Flashforge PLA Basic @FF G4",
+  "Flashforge/Flashforge PLA Basic @FF G4 0.25 nozzle",
+  "Flashforge/Flashforge PLA Basic @FF G4 0.6 HF nozzle",
+  "Flashforge/Flashforge PLA Basic @FF G4 0.6 nozzle",
+  "Flashforge/Flashforge PLA Basic @FF G4 0.8 HF nozzle",
+  "Flashforge/Flashforge PLA Basic @FF G4 HF",
+  "Flashforge/Flashforge PLA Basic @FF G4P",
+  "Flashforge/Flashforge PLA Basic @FF G4P 0.25 nozzle",
+  "Flashforge/Flashforge PLA Basic @FF G4P 0.6 HF nozzle",
+  "Flashforge/Flashforge PLA Basic @FF G4P 0.6 nozzle",
+  "Flashforge/Flashforge PLA Basic @FF G4P 0.8 HF nozzle",
+  "Flashforge/Flashforge PLA Basic @FF G4P HF",
+  "Flashforge/Flashforge PLA Buint Ti @FF G4 0.8 nozzle",
+  "Flashforge/Flashforge PLA Buint Ti @FF G4P 0.8 nozzle",
+  "Flashforge/Flashforge PLA Color Change",
+  "Flashforge/Flashforge PLA Color Change @FF AD5M 0.25 nozzle",
+  "Flashforge/Flashforge PLA Color Change @FF AD5X",
+  "Flashforge/Flashforge PLA Color Change @FF AD5X 0.25 nozzle",
+  "Flashforge/Flashforge PLA Color Change @FF AD5X 0.6 nozzle",
+  "Flashforge/Flashforge PLA Color Change @FF AD5X 0.8 nozzle",
+  "Flashforge/Flashforge PLA Color Change @FF C5",
+  "Flashforge/Flashforge PLA Color Change @FF C5P",
+  "Flashforge/Flashforge PLA Color Change @FF G4",
+  "Flashforge/Flashforge PLA Color Change @FF G4 0.25 nozzle",
+  "Flashforge/Flashforge PLA Color Change @FF G4 0.6 HF nozzle",
+  "Flashforge/Flashforge PLA Color Change @FF G4 0.6 nozzle",
+  "Flashforge/Flashforge PLA Color Change @FF G4 0.8 HF nozzle",
+  "Flashforge/Flashforge PLA Color Change @FF G4 HF",
+  "Flashforge/Flashforge PLA Color Change @FF G4P",
+  "Flashforge/Flashforge PLA Color Change @FF G4P 0.25 nozzle",
+  "Flashforge/Flashforge PLA Color Change @FF G4P 0.6 HF nozzle",
+  "Flashforge/Flashforge PLA Color Change @FF G4P 0.6 nozzle",
+  "Flashforge/Flashforge PLA Color Change @FF G4P 0.8 HF nozzle",
+  "Flashforge/Flashforge PLA Color Change @FF G4P HF",
+  "Flashforge/Flashforge PLA Galaxy",
+  "Flashforge/Flashforge PLA Galaxy @FF AD5M 0.25 nozzle",
+  "Flashforge/Flashforge PLA Galaxy @FF AD5X",
+  "Flashforge/Flashforge PLA Galaxy @FF AD5X 0.25 nozzle",
+  "Flashforge/Flashforge PLA Galaxy @FF AD5X 0.6 nozzle",
+  "Flashforge/Flashforge PLA Galaxy @FF AD5X 0.8 nozzle",
+  "Flashforge/Flashforge PLA Galaxy @FF C5",
+  "Flashforge/Flashforge PLA Galaxy @FF C5P",
+  "Flashforge/Flashforge PLA Galaxy @FF G4",
+  "Flashforge/Flashforge PLA Galaxy @FF G4 0.25 nozzle",
+  "Flashforge/Flashforge PLA Galaxy @FF G4 0.6 HF nozzle",
+  "Flashforge/Flashforge PLA Galaxy @FF G4 0.6 nozzle",
+  "Flashforge/Flashforge PLA Galaxy @FF G4 0.8 HF nozzle",
+  "Flashforge/Flashforge PLA Galaxy @FF G4 HF",
+  "Flashforge/Flashforge PLA Galaxy @FF G4P",
+  "Flashforge/Flashforge PLA Galaxy @FF G4P 0.25 nozzle",
+  "Flashforge/Flashforge PLA Galaxy @FF G4P 0.6 HF nozzle",
+  "Flashforge/Flashforge PLA Galaxy @FF G4P 0.6 nozzle",
+  "Flashforge/Flashforge PLA Galaxy @FF G4P 0.8 HF nozzle",
+  "Flashforge/Flashforge PLA Galaxy @FF G4P HF",
+  "Flashforge/Flashforge PLA Luminous",
+  "Flashforge/Flashforge PLA Luminous @FF AD5M 0.25 nozzle",
+  "Flashforge/Flashforge PLA Luminous @FF AD5X",
+  "Flashforge/Flashforge PLA Luminous @FF AD5X 0.25 nozzle",
+  "Flashforge/Flashforge PLA Luminous @FF AD5X 0.6 nozzle",
+  "Flashforge/Flashforge PLA Luminous @FF AD5X 0.8 nozzle",
+  "Flashforge/Flashforge PLA Luminous @FF C5",
+  "Flashforge/Flashforge PLA Luminous @FF C5P",
+  "Flashforge/Flashforge PLA Luminous @FF G4",
+  "Flashforge/Flashforge PLA Luminous @FF G4 0.25 nozzle",
+  "Flashforge/Flashforge PLA Luminous @FF G4 0.6 HF nozzle",
+  "Flashforge/Flashforge PLA Luminous @FF G4 0.8 HF nozzle",
+  "Flashforge/Flashforge PLA Luminous @FF G4 HF",
+  "Flashforge/Flashforge PLA Luminous @FF G4P",
+  "Flashforge/Flashforge PLA Luminous @FF G4P 0.25 nozzle",
+  "Flashforge/Flashforge PLA Luminous @FF G4P 0.6 HF nozzle",
+  "Flashforge/Flashforge PLA Luminous @FF G4P 0.8 HF nozzle",
+  "Flashforge/Flashforge PLA Luminous @FF G4P HF",
+  "Flashforge/Flashforge PLA Matte",
+  "Flashforge/Flashforge PLA Matte @FF AD5M 0.25 nozzle",
+  "Flashforge/Flashforge PLA Matte @FF AD5X",
+  "Flashforge/Flashforge PLA Matte @FF AD5X 0.25 nozzle",
+  "Flashforge/Flashforge PLA Matte @FF AD5X 0.6 nozzle",
+  "Flashforge/Flashforge PLA Matte @FF AD5X 0.8 nozzle",
+  "Flashforge/Flashforge PLA Matte @FF G4",
+  "Flashforge/Flashforge PLA Matte @FF G4 0.25 nozzle",
+  "Flashforge/Flashforge PLA Matte @FF G4 0.6 HF nozzle",
+  "Flashforge/Flashforge PLA Matte @FF G4 0.6 nozzle",
+  "Flashforge/Flashforge PLA Matte @FF G4 0.8 HF nozzle",
+  "Flashforge/Flashforge PLA Matte @FF G4 HF",
+  "Flashforge/Flashforge PLA Matte @FF G4P",
+  "Flashforge/Flashforge PLA Matte @FF G4P 0.25 nozzle",
+  "Flashforge/Flashforge PLA Matte @FF G4P 0.6 HF nozzle",
+  "Flashforge/Flashforge PLA Matte @FF G4P 0.6 nozzle",
+  "Flashforge/Flashforge PLA Matte @FF G4P 0.8 HF nozzle",
+  "Flashforge/Flashforge PLA Matte @FF G4P HF",
+  "Flashforge/Flashforge PLA Metal",
+  "Flashforge/Flashforge PLA Metal @FF AD5M 0.25 nozzle",
+  "Flashforge/Flashforge PLA Metal @FF AD5X",
+  "Flashforge/Flashforge PLA Metal @FF AD5X 0.25 nozzle",
+  "Flashforge/Flashforge PLA Metal @FF AD5X 0.6 nozzle",
+  "Flashforge/Flashforge PLA Metal @FF AD5X 0.8 nozzle",
+  "Flashforge/Flashforge PLA Metal @FF G4",
+  "Flashforge/Flashforge PLA Metal @FF G4 0.25 nozzle",
+  "Flashforge/Flashforge PLA Metal @FF G4 0.6 HF nozzle",
+  "Flashforge/Flashforge PLA Metal @FF G4 0.6 nozzle",
+  "Flashforge/Flashforge PLA Metal @FF G4 0.8 HF nozzle",
+  "Flashforge/Flashforge PLA Metal @FF G4 HF",
+  "Flashforge/Flashforge PLA Metal @FF G4P",
+  "Flashforge/Flashforge PLA Metal @FF G4P 0.25 nozzle",
+  "Flashforge/Flashforge PLA Metal @FF G4P 0.6 HF nozzle",
+  "Flashforge/Flashforge PLA Metal @FF G4P 0.6 nozzle",
+  "Flashforge/Flashforge PLA Metal @FF G4P 0.8 HF nozzle",
+  "Flashforge/Flashforge PLA Metal @FF G4P HF",
+  "Flashforge/Flashforge PLA Pro",
+  "Flashforge/Flashforge PLA Pro @FF AD5M 0.25 nozzle",
+  "Flashforge/Flashforge PLA Pro @FF AD5X",
+  "Flashforge/Flashforge PLA Pro @FF AD5X 0.25 nozzle",
+  "Flashforge/Flashforge PLA Pro @FF AD5X 0.6 nozzle",
+  "Flashforge/Flashforge PLA Pro @FF AD5X 0.8 nozzle",
+  "Flashforge/Flashforge PLA Pro @FF G4",
+  "Flashforge/Flashforge PLA Pro @FF G4 0.25 nozzle",
+  "Flashforge/Flashforge PLA Pro @FF G4 0.6 HF nozzle",
+  "Flashforge/Flashforge PLA Pro @FF G4 0.6 nozzle",
+  "Flashforge/Flashforge PLA Pro @FF G4 0.8 HF nozzle",
+  "Flashforge/Flashforge PLA Pro @FF G4 HF",
+  "Flashforge/Flashforge PLA Pro @FF G4P",
+  "Flashforge/Flashforge PLA Pro @FF G4P 0.25 nozzle",
+  "Flashforge/Flashforge PLA Pro @FF G4P 0.6 HF nozzle",
+  "Flashforge/Flashforge PLA Pro @FF G4P 0.6 nozzle",
+  "Flashforge/Flashforge PLA Pro @FF G4P 0.8 HF nozzle",
+  "Flashforge/Flashforge PLA Pro @FF G4P HF",
+  "Flashforge/Flashforge PLA Silk",
+  "Flashforge/Flashforge PLA Silk @FF AD5M 0.25 nozzle",
+  "Flashforge/Flashforge PLA Silk @FF AD5X",
+  "Flashforge/Flashforge PLA Silk @FF AD5X 0.25 nozzle",
+  "Flashforge/Flashforge PLA Silk @FF AD5X 0.6 nozzle",
+  "Flashforge/Flashforge PLA Silk @FF AD5X 0.8 nozzle",
+  "Flashforge/Flashforge PLA Silk @FF C5",
+  "Flashforge/Flashforge PLA Silk @FF C5P",
+  "Flashforge/Flashforge PLA Silk @FF G4",
+  "Flashforge/Flashforge PLA Silk @FF G4 0.25 nozzle",
+  "Flashforge/Flashforge PLA Silk @FF G4 0.6 HF nozzle",
+  "Flashforge/Flashforge PLA Silk @FF G4 0.6 nozzle",
+  "Flashforge/Flashforge PLA Silk @FF G4 0.8 HF nozzle",
+  "Flashforge/Flashforge PLA Silk @FF G4 HF",
+  "Flashforge/Flashforge PLA Silk @FF G4P",
+  "Flashforge/Flashforge PLA Silk @FF G4P 0.25 nozzle",
+  "Flashforge/Flashforge PLA Silk @FF G4P 0.6 HF nozzle",
+  "Flashforge/Flashforge PLA Silk @FF G4P 0.6 nozzle",
+  "Flashforge/Flashforge PLA Silk @FF G4P 0.8 HF nozzle",
+  "Flashforge/Flashforge PLA Silk @FF G4P HF",
+  "Flashforge/Flashforge PLA Sparkle",
+  "Flashforge/Flashforge PLA Sparkle @FF AD5M 0.25 nozzle",
+  "Flashforge/Flashforge PLA Sparkle @FF AD5X",
+  "Flashforge/Flashforge PLA Sparkle @FF AD5X 0.25 nozzle",
+  "Flashforge/Flashforge PLA Sparkle @FF AD5X 0.6 nozzle",
+  "Flashforge/Flashforge PLA Sparkle @FF AD5X 0.8 nozzle",
+  "Flashforge/Flashforge PLA Sparkle @FF G4",
+  "Flashforge/Flashforge PLA Sparkle @FF G4 0.25 nozzle",
+  "Flashforge/Flashforge PLA Sparkle @FF G4 0.6 HF nozzle",
+  "Flashforge/Flashforge PLA Sparkle @FF G4 0.6 nozzle",
+  "Flashforge/Flashforge PLA Sparkle @FF G4 HF",
+  "Flashforge/Flashforge PLA Sparkle @FF G4P",
+  "Flashforge/Flashforge PLA Sparkle @FF G4P 0.25 nozzle",
+  "Flashforge/Flashforge PLA Sparkle @FF G4P 0.6 HF nozzle",
+  "Flashforge/Flashforge PLA Sparkle @FF G4P 0.6 nozzle",
+  "Flashforge/Flashforge PLA Sparkle @FF G4P HF",
+  "Flashforge/Flashforge PLA-CF",
+  "Flashforge/Flashforge PLA-CF @FF AD5X",
+  "Flashforge/Flashforge PLA-CF @FF AD5X 0.6 nozzle",
+  "Flashforge/Flashforge PLA-CF @FF AD5X 0.8 nozzle",
+  "Flashforge/Flashforge PLA-CF @FF C5",
+  "Flashforge/Flashforge PLA-CF @FF C5P",
+  "Flashforge/Flashforge PLA-CF @FF G4",
+  "Flashforge/Flashforge PLA-CF @FF G4 0.6 nozzle",
+  "Flashforge/Flashforge PLA-CF @FF G4P",
+  "Flashforge/Flashforge PLA-CF @FF G4P 0.6 nozzle",
+  "Flashforge/Flashforge PPA-CF",
+  "Flashforge/Flashforge PPA-CF @FF C5",
+  "Flashforge/Flashforge PPA-CF @FF C5P",
+  "Flashforge/Flashforge PPA-GF",
+  "Flashforge/Flashforge PPS @FF G4",
+  "Flashforge/Flashforge PPS @FF G4P",
+  "Flashforge/Flashforge PPS-CF",
+  "Flashforge/Flashforge PPS-CF @FF C5",
+  "Flashforge/Flashforge PPS-CF @FF C5P",
+  "Flashforge/Flashforge PPS-CF @FF G4",
+  "Flashforge/Flashforge PPS-CF @FF G4P",
+  "Flashforge/Flashforge PVA @FF C5",
+  "Flashforge/Flashforge PVA @FF C5P",
+  "Flashforge/Flashforge TPU 65D @FF G4 0.6 HF nozzle",
+  "Flashforge/Flashforge TPU 65D @FF G4 0.6 nozzle",
+  "Flashforge/Flashforge TPU 65D @FF G4 0.8 HF nozzle",
+  "Flashforge/Flashforge TPU 65D @FF G4P 0.6 HF nozzle",
+  "Flashforge/Flashforge TPU 65D @FF G4P 0.6 nozzle",
+  "Flashforge/Flashforge TPU 65D @FF G4P 0.8 HF nozzle",
+  "Flashforge/Flashforge TPU 95A",
+  "Flashforge/Flashforge TPU 95A @FF AD5X",
+  "Flashforge/Flashforge TPU 95A @FF AD5X 0.6 nozzle",
+  "Flashforge/Flashforge TPU 95A @FF AD5X 0.8 nozzle",
+  "Flashforge/Flashforge TPU 95A @FF G4",
+  "Flashforge/Flashforge TPU 95A @FF G4 0.6 HF nozzle",
+  "Flashforge/Flashforge TPU 95A @FF G4 0.6 nozzle",
+  "Flashforge/Flashforge TPU 95A @FF G4 0.8 HF nozzle",
+  "Flashforge/Flashforge TPU 95A @FF G4P",
+  "Flashforge/Flashforge TPU 95A @FF G4P 0.6 HF nozzle",
+  "Flashforge/Flashforge TPU 95A @FF G4P 0.6 nozzle",
+  "Flashforge/Flashforge TPU 95A @FF G4P 0.8 HF nozzle",
+  "Flashforge/Flashforge TPU-64D @FF C5",
+  "Flashforge/Flashforge TPU-64D @FF C5P",
+  "Flashforge/Flashforge TPU-90A @FF C5",
+  "Flashforge/Flashforge TPU-90A @FF C5P",
+  "Flashforge/Flashforge TPU-95A @FF C5",
+  "Flashforge/Flashforge TPU-95A @FF C5P",
   "Flashforge/FusRock Generic NexPA-CF25",
   "Flashforge/FusRock Generic PAHT-CF",
   "Flashforge/FusRock Generic PAHT-CF @G3U 0.6 Nozzle",
@@ -6727,8 +7660,37 @@
   "Flashforge/FusRock Generic S-Multi @G3U 0.6 Nozzle",
   "Flashforge/FusRock Generic S-PAHT",
   "Flashforge/FusRock Generic S-PAHT @G3U 0.6 Nozzle",
+  "Flashforge/FusRock PAHT @FF G4 0.6 HF nozzle",
+  "Flashforge/FusRock PAHT @FF G4 0.6 nozzle",
+  "Flashforge/FusRock PAHT @FF G4 0.8 HF nozzle",
+  "Flashforge/FusRock PAHT @FF G4P 0.6 HF nozzle",
+  "Flashforge/FusRock PAHT @FF G4P 0.6 nozzle",
+  "Flashforge/FusRock PAHT @FF G4P 0.8 HF nozzle",
+  "Flashforge/FusRock PAHT-CF @FF C5",
+  "Flashforge/FusRock PAHT-CF @FF C5P",
+  "Flashforge/FusRock PAHT-CF @FF G4",
+  "Flashforge/FusRock PAHT-CF @FF G4 0.6 nozzle",
+  "Flashforge/FusRock PAHT-CF @FF G4P",
+  "Flashforge/FusRock PAHT-CF @FF G4P 0.6 nozzle",
+  "Flashforge/FusRock PET @FF G4P 0.8 HF nozzle",
+  "Flashforge/FusRock PET-CF @FF G4",
+  "Flashforge/FusRock PET-CF @FF G4 0.6 nozzle",
+  "Flashforge/FusRock PET-CF @FF G4P",
+  "Flashforge/FusRock PET-CF @FF G4P 0.6 nozzle",
+  "Flashforge/FusRock S-Multi @FF C5",
+  "Flashforge/FusRock S-Multi @FF C5P",
+  "Flashforge/FusRock S-PAHT @FF C5",
+  "Flashforge/FusRock S-PAHT @FF C5P",
   "Flashforge/Generic ABS @Flashforge AD4",
   "Flashforge/Generic ASA @Flashforge AD4",
+  "Flashforge/Generic PET @FF G4",
+  "Flashforge/Generic PET @FF G4 0.6 HF nozzle",
+  "Flashforge/Generic PET @FF G4 0.6 nozzle",
+  "Flashforge/Generic PET @FF G4 0.8 HF nozzle",
+  "Flashforge/Generic PET @FF G4P",
+  "Flashforge/Generic PET @FF G4P 0.6 HF nozzle",
+  "Flashforge/Generic PET @FF G4P 0.6 nozzle",
+  "Flashforge/Generic PET @FF G4P 0.8 HF nozzle",
   "Flashforge/Generic PETG @Flashforge AD4",
   "Flashforge/Generic PETG @Flashforge Artemis",
   "Flashforge/Generic PETG-CF10 @Flashforge AD4",
@@ -6736,7 +7698,22 @@
   "Flashforge/Generic PLA High Speed @Flashforge AD4",
   "Flashforge/Generic PLA Silk @Flashforge AD4",
   "Flashforge/Generic PLA-CF10 @Flashforge AD4",
+  "Flashforge/Generic TPU 85A @FF AD5X",
+  "Flashforge/Generic TPU 85A @FF AD5X 0.6 nozzle",
+  "Flashforge/Generic TPU 85A @FF AD5X 0.8 nozzle",
   "Flashforge/Generic TPU @Flashforge AD4",
+  "Flashforge/Generic TPU-64D @FF C5",
+  "Flashforge/Generic TPU-64D @FF C5P",
+  "Flashforge/Generic TPU-90A @FF C5",
+  "Flashforge/Generic TPU-90A @FF C5P",
+  "Flashforge/Generic TPU-95A @FF C5",
+  "Flashforge/Generic TPU-95A @FF C5P",
+  "Flashforge/Polymaker CoPA @FF G4 0.6 HF nozzle",
+  "Flashforge/Polymaker CoPA @FF G4 0.6 nozzle",
+  "Flashforge/Polymaker CoPA @FF G4 0.8 HF nozzle",
+  "Flashforge/Polymaker CoPA @FF G4P 0.6 HF nozzle",
+  "Flashforge/Polymaker CoPA @FF G4P 0.6 nozzle",
+  "Flashforge/Polymaker CoPA @FF G4P 0.8 HF nozzle",
   "Flashforge/Polymaker Generic CoPA",
   "Flashforge/Polymaker Generic S1",
   "FlyingBear/FlyingBear ABS @Ghost7",

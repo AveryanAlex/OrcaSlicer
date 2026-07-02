@@ -4,6 +4,7 @@
 	"inherits": "Generic PETG HF @System",
 	"from": "system",
 	"setting_id": "ypxgjHl9uIMyZIce",
+	"filament_id": "OFZQFvHQ",
 	"instantiation": "true",
 	"activate_air_filtration": [
 		"1"

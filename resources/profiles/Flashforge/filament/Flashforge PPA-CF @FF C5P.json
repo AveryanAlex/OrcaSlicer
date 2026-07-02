@@ -4,6 +4,7 @@
 	"inherits": "Generic PPA-GF @System",
 	"from": "system",
 	"setting_id": "Jws2AaLWaNyZhqX4",
+	"filament_id": "OFQCAYAt",
 	"instantiation": "true",
 	"activate_chamber_temp_control": [
 		"1"

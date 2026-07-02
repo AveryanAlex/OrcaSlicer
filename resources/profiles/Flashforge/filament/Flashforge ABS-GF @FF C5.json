@@ -4,6 +4,7 @@
 	"inherits": "Generic ABS @System",
 	"from": "system",
 	"setting_id": "UinlbuXNbad2kN0s",
+	"filament_id": "OFqRWRU6",
 	"instantiation": "true",
 	"compatible_printers": [
 		"Flashforge Creator 5 0.4 nozzle",

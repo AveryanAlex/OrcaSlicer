@@ -4,6 +4,7 @@
 	"inherits": "Flashforge Generic TPU",
 	"from": "system",
 	"setting_id": "qRqhbOYn5TMfccem",
+	"filament_id": "OFuswXlp",
 	"instantiation": "true",
 	"cool_plate_temp": [
 		"45"

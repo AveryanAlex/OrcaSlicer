@@ -4,6 +4,7 @@
 	"inherits": "Generic PLA-CF @System",
 	"from": "system",
 	"setting_id": "rBm25DRY1PAkEJ4r",
+	"filament_id": "OFPJrlC3",
 	"instantiation": "true",
 	"additional_cooling_fan_speed": [
 		"40"

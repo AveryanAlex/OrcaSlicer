@@ -4,6 +4,7 @@
 	"inherits": "Generic PLA Silk @System",
 	"from": "system",
 	"setting_id": "OIsfpi49wEoF0ekO",
+	"filament_id": "OFAGrVjP",
 	"instantiation": "true",
 	"additional_cooling_fan_speed": [
 		"40"

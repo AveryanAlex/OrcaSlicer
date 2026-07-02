@@ -4,6 +4,7 @@
 	"inherits": "Flashforge Generic PETG",
 	"from": "system",
 	"setting_id": "lCngVWG3q0FWsnrG",
+	"filament_id": "OFRgDMDJ",
 	"instantiation": "true",
 	"activate_air_filtration": [
 		"1"

@@ -4,6 +4,7 @@
 	"inherits": "Generic TPU @System",
 	"from": "system",
 	"setting_id": "AHu6wNV3zcPBusOF",
+	"filament_id": "OFyxAbO4",
 	"instantiation": "true",
 	"additional_cooling_fan_speed": [
 		"40"

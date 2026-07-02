@@ -4,6 +4,7 @@
 	"inherits": "Generic PLA @System",
 	"from": "system",
 	"setting_id": "Q0RsVOPLuMByur9c",
+	"filament_id": "OFHBTqyD",
 	"instantiation": "true",
 	"activate_air_filtration": [
 		"1"

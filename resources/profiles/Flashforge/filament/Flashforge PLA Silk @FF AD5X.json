@@ -4,6 +4,7 @@
 	"inherits": "Flashforge Generic PLA-Silk",
 	"from": "system",
 	"setting_id": "N6J7QqQ7TIgM3MyW",
+	"filament_id": "OFAGrVjP",
 	"instantiation": "true",
 	"cool_plate_temp": [
 		"50"

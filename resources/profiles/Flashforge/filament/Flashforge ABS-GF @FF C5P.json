@@ -4,6 +4,7 @@
 	"inherits": "Generic ABS @System",
 	"from": "system",
 	"setting_id": "ycgiXY41kqNgslE3",
+	"filament_id": "OFqRWRU6",
 	"instantiation": "true",
 	"activate_chamber_temp_control": [
 		"1"

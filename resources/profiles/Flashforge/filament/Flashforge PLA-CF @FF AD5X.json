@@ -4,6 +4,7 @@
 	"inherits": "Flashforge Generic PLA-CF10",
 	"from": "system",
 	"setting_id": "BXPI5Pkp7a6pLrCh",
+	"filament_id": "OFPJrlC3",
 	"instantiation": "true",
 	"cool_plate_temp": [
 		"45"

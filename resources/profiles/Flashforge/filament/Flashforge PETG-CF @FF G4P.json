@@ -4,6 +4,7 @@
 	"inherits": "Flashforge Generic PETG",
 	"from": "system",
 	"setting_id": "d5OleuNNZBJK9vxH",
+	"filament_id": "OFoimrpo",
 	"instantiation": "true",
 	"additional_cooling_fan_speed": [
 		"40"

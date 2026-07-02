@@ -4,6 +4,7 @@
 	"inherits": "FusRock Generic PET-CF",
 	"from": "system",
 	"setting_id": "5pVoGBvbiUlrJSwR",
+	"filament_id": "OFkaDtKx",
 	"instantiation": "true",
 	"filament_density": [
 		"1.1"
