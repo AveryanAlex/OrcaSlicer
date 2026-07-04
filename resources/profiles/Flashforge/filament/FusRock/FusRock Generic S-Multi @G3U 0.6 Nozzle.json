@@ -37,7 +37,7 @@
 		"; filament start gcode"
 	],
 	"filament_type": [
-		"PET-CF"
+		"PA"
 	],
 	"filament_unloading_speed": [
 		"35"

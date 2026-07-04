@@ -6,6 +6,9 @@
 	"setting_id": "vVKalJViJuBvlHkK",
 	"filament_id": "OFWv6JYn",
 	"instantiation": "true",
+	"filament_vendor": [
+		"Generic"
+	],
 	"additional_cooling_fan_speed": [
 		"40"
 	],

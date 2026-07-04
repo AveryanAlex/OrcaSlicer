@@ -6,6 +6,9 @@
 	"setting_id": "1CevPV960sQWT3NF",
 	"filament_id": "OFMHTnPP",
 	"instantiation": "true",
+	"filament_vendor": [
+		"Flashforge"
+	],
 	"filament_density": [
 		"1.1"
 	],

@@ -5,6 +5,9 @@
 	"name": "PolyLite PLA @base",
 	"filament_id": "1393866034",
 	"inherits": "fdm_filament_pla",
+	"filament_vendor": [
+		"Polymaker"
+	],
 	"filament_flow_ratio": [
 		"0.95"
 	],

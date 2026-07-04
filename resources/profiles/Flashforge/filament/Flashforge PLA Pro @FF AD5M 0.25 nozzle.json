@@ -6,6 +6,9 @@
 	"setting_id": "DIMoIGOGedN17WbO",
 	"filament_id": "OFTa6gPH",
 	"instantiation": "true",
+	"filament_vendor": [
+		"Generic"
+	],
 	"filament_settings_id": [
 		"Flashforge PLA Pro @FF AD5M 0.25 nozzle"
 	],

@@ -6,6 +6,9 @@
 	"setting_id": "p5c6XJ1VD8cn2Meh",
 	"filament_id": "OFRgDMDJ",
 	"instantiation": "true",
+	"filament_vendor": [
+		"Generic"
+	],
 	"activate_air_filtration": [
 		"1"
 	],

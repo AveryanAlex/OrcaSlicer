@@ -167,7 +167,7 @@
 		"0"
 	],
 	"filament_type": [
-		"S-PAHT"
+		"PAHT"
 	],
 	"filament_unload_time": [
 		"0"
@@ -179,7 +179,7 @@
 		"40"
 	],
 	"filament_vendor": [
-		"FusRock"
+		"Generic"
 	],
 	"filament_wipe": [
 		"nil"

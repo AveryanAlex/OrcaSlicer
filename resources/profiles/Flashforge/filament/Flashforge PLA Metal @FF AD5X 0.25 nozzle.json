@@ -6,6 +6,9 @@
 	"setting_id": "ekq4MRPyzlYxRhbX",
 	"filament_id": "OFWv6JYn",
 	"instantiation": "true",
+	"filament_vendor": [
+		"Generic"
+	],
 	"complete_print_exhaust_fan_speed": [
 		"80"
 	],

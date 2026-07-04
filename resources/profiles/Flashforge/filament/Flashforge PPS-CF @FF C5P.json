@@ -6,6 +6,9 @@
 	"setting_id": "UWFjBmSpUkZLBvoO",
 	"filament_id": "OFZcrV9c",
 	"instantiation": "true",
+	"filament_vendor": [
+		"Flashforge"
+	],
 	"activate_chamber_temp_control": [
 		"1"
 	],

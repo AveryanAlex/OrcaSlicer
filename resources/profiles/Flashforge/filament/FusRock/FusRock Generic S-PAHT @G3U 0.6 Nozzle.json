@@ -37,7 +37,7 @@
 		"; filament start gcode"
 	],
 	"filament_type": [
-		"PA-CF"
+		"PAHT"
 	],
 	"filament_unloading_speed": [
 		"35"

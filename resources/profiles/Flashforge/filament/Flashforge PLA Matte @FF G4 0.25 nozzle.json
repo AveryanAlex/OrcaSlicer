@@ -6,6 +6,9 @@
 	"setting_id": "cnPwhLyBq6JL8gEA",
 	"filament_id": "OF60Lmeq",
 	"instantiation": "true",
+	"filament_vendor": [
+		"Generic"
+	],
 	"additional_cooling_fan_speed": [
 		"40"
 	],

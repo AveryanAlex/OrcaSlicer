@@ -6,6 +6,9 @@
 	"setting_id": "MFItX51zZO0KYjdk",
 	"filament_id": "OFQCAYAt",
 	"instantiation": "true",
+	"filament_vendor": [
+		"Flashforge"
+	],
 	"filament_flow_ratio": [
 		"0.99"
 	],

@@ -6,6 +6,9 @@
 	"setting_id": "gmkc6fRLMI73Iut8",
 	"filament_id": "OF5T1Y9R",
 	"instantiation": "true",
+	"filament_vendor": [
+		"Generic"
+	],
 	"cool_plate_temp": [
 		"0"
 	],

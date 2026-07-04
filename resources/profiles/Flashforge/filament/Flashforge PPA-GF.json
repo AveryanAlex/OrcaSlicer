@@ -6,6 +6,9 @@
 	"setting_id": "KITjZXcyM4N8cVyu",
 	"filament_id": "OFp8lkYD",
 	"instantiation": "true",
+	"filament_vendor": [
+		"Flashforge"
+	],
 	"fan_max_speed": [
 		"40"
 	],

@@ -6,6 +6,9 @@
 	"setting_id": "k8iibCO2EnlTSRyi",
 	"filament_id": "OFwf0oWp",
 	"instantiation": "true",
+	"filament_vendor": [
+		"Generic"
+	],
 	"filament_settings_id": [
 		"Flashforge PLA Luminous @FF AD5M 0.25 nozzle"
 	],

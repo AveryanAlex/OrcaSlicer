@@ -6,6 +6,9 @@
 	"setting_id": "W59yTyPnVv4LYiah",
 	"filament_id": "OFRgDMDJ",
 	"instantiation": "true",
+	"filament_vendor": [
+		"Generic"
+	],
 	"filament_settings_id": [
 		"Flashforge PETG Transparent @FF AD5M 0.25 nozzle"
 	],
