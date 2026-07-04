@@ -59,7 +59,7 @@ int get_colume_idx(CaliColumnType type, MachineObject* obj)
     return type;
 }
 
-static wxString get_preset_name_by_filament_id(std::string filament_id)
+static wxString get_preset_name_by_filament_id(std::string filament_id, bool follow_succession = true)
 {
     auto preset_bundle = wxGetApp().preset_bundle;
     auto collection = &preset_bundle->filaments;
@@ -92,6 +92,12 @@ static wxString get_preset_name_by_filament_id(std::string filament_id)
                 }
             }
         }
+    }
+    if (preset_name.empty() && follow_succession) {
+        // Retired/renamed ids forward to a live successor through the shipped succession ledger.
+        const std::string successor = resolve_filament_id_succession(filament_id);
+        if (!successor.empty())
+            preset_name = get_preset_name_by_filament_id(successor, false);
     }
     return preset_name;
 }

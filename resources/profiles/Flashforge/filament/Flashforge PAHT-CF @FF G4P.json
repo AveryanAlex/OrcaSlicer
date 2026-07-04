@@ -61,7 +61,7 @@
 		"; filament start gcode\n;right_extruder_material:PA-CF\n"
 	],
 	"filament_type": [
-		"PA-CF"
+		"PAHT-CF"
 	],
 	"compatible_printers": [
 		"Flashforge Guider4 Pro 0.4 nozzle"

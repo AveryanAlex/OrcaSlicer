@@ -84,7 +84,12 @@ holding OFL-only materials, on-device PA-calibration records, user-root preset c
   followed to the live end). A retired id may never be minted again (check 4 unchanged).
   Cross-island *hint* entries are permitted for ids Orca cannot retire because another
   island owns them (e.g. `GFL99 → <OFL Generic PLA id>`): consulted only when no live
-  preset matches, so BBL installs still resolve `GFL99` natively first.
+  preset matches, so BBL installs still resolve `GFL99` natively first. By the same
+  principle, an id in a foreign island's space (`GF*`/`QD_*`) that vanishes from the tree
+  is **released with a hint, never retired** — the island's catalog owns it and may
+  legitimately (re)ship it later, which check 4 must never block. (Implementation
+  amendment, v3.0: `--update-snapshot` routes such ids to `hints` automatically; hint
+  keys may be absent from the tree.)
 - **Shipped and consulted at runtime.** The ledger ships in `resources/`; a small helper
   (`resolve_filament_id_succession(id)`) follows the chain and is consulted **only on
   resolution miss**, before the `Generic <type>` name fallback, in:
@@ -134,8 +139,9 @@ those families twice.
 
 **v3.1 — OFL re-mint.** Every OFL-declared id re-derives from its triple (mirrors like
 `OGFA00`, generics like `OGFL99`, blocks like `OEPLAB00` — all of it); each old shipped id
-gains a succession entry pointing at its replacement; the 26 BBL×OFL byte-shared ids
-dissolve (BBL keeps its id; the OFL family gets its own — two-island purity). Snapshot
+gains a succession entry pointing at its replacement; the 26 GF-shaped ids OFL declares
+(measured at v3.0: only one of them, `GFOT001`, is also declared by BBL) are released to
+the BBL island space with hints at the re-minted families — two-island purity. Snapshot
 regenerated; full gate battery + fixture overlays (this phase touches preset-visibility
 machinery only via ids, but the fixtures are cheap insurance).
 

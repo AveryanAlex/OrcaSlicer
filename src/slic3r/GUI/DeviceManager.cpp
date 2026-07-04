@@ -2540,14 +2540,22 @@ std::string MachineObject::setting_id_to_type(std::string setting_id, std::strin
     std::string type;
     PresetBundle* preset_bundle = GUI::wxGetApp().preset_bundle;
     if (preset_bundle) {
-        for (auto it = preset_bundle->filaments.begin(); it != preset_bundle->filaments.end(); it++) {
-
-            if (it->filament_id.compare(setting_id) == 0 && it->is_system) {
-                std::string display_filament_type;
-                it->config.get_filament_type(display_filament_type);
-                type = display_filament_type;
-                break;
+        auto lookup_system_type = [preset_bundle](const std::string &id) {
+            std::string display_filament_type;
+            for (auto it = preset_bundle->filaments.begin(); it != preset_bundle->filaments.end(); it++) {
+                if (it->filament_id.compare(id) == 0 && it->is_system) {
+                    it->config.get_filament_type(display_filament_type);
+                    break;
+                }
             }
+            return display_filament_type;
+        };
+        type = lookup_system_type(setting_id);
+        if (type.empty()) {
+            // Retired/renamed ids forward to a live successor through the shipped succession ledger.
+            const std::string successor = resolve_filament_id_succession(setting_id);
+            if (!successor.empty())
+                type = lookup_system_type(successor);
         }
     }
 
@@ -5249,7 +5257,10 @@ void MachineObject::update_filament_list()
 
         for (auto it = filament_list.begin(); it != filament_list.end(); it++) {
             if (m_filament_list.find(it->first) != m_filament_list.end()) {
-                assert(it->first.size() == 8 && it->first[0] == 'P');
+                // User roots may legitimately carry adopted system-shaped ids (GF*/OF*/P-hex
+                // system), so a non-'P' id here is expected, not an invariant violation.
+                if (it->first.size() != 8 || it->first[0] != 'P')
+                    BOOST_LOG_TRIVIAL(debug) << __FUNCTION__ << ": user-root filament_id is not user-shaped: " << it->first;
 
                 if (it->second.first != m_filament_list[it->first].first) {
                     BOOST_LOG_TRIVIAL(info) << "old min temp is not equal to new min temp and filament id: " << it->first;
@@ -5311,6 +5322,17 @@ void MachineObject::update_printer_preset_name()
 void MachineObject::check_ams_filament_valid()
 {
     PresetBundle * preset_bundle = Slic3r::GUI::wxGetApp().preset_bundle;
+    // A tray id carried by ANY system filament preset is not a dangling user-preset id
+    // (ten shipped P-hex system ids pass the 'P' shape gates below), so the destructive
+    // tray-wipe / temp-rewrite handling must never fire for it.
+    auto is_system_filament_id = [preset_bundle](const std::string &id) {
+        if (!preset_bundle)
+            return false;
+        for (auto it = preset_bundle->filaments.begin(); it != preset_bundle->filaments.end(); it++)
+            if (it->is_system && it->filament_id == id)
+                return true;
+        return false;
+    };
     auto printer_model = DevPrinterConfigUtil::get_printer_display_name(this->printer_type);
     std::map<std::string, std::set<std::string>> need_checked_filament_id;
     for (auto &ams_pair : m_fila_system->GetAmsList()) {
@@ -5332,6 +5354,8 @@ void MachineObject::check_ams_filament_valid()
         auto &checked_filament = data.checked_filament;
         for (const auto &[slot_id, curr_tray] : ams->GetTrays()) {
 
+            if (curr_tray->setting_id.size() == 8 && curr_tray->setting_id[0] == 'P' && is_system_filament_id(curr_tray->setting_id))
+                continue;
             if (curr_tray->setting_id.size() == 8 && curr_tray->setting_id[0] == 'P' && filament_list.find(curr_tray->setting_id) == filament_list.end()) {
                 if (checked_filament.find(curr_tray->setting_id) != checked_filament.end()) {
                     need_checked_filament_id[nozzle_diameter_str].insert(curr_tray->setting_id);
@@ -5392,6 +5416,8 @@ void MachineObject::check_ams_filament_valid()
         auto &data = m_nozzle_filament_data[nozzle_diameter_str];
         auto &checked_filament = data.checked_filament;
         auto &filament_list    = data.filament_list;
+        if (vt_tray.setting_id.size() == 8 && vt_tray.setting_id[0] == 'P' && is_system_filament_id(vt_tray.setting_id))
+            continue;
         if (vt_tray.setting_id.size() == 8 && vt_tray.setting_id[0] == 'P' && filament_list.find(vt_tray.setting_id) == filament_list.end()) {
             if (checked_filament.find(vt_tray.setting_id) != checked_filament.end()) {
                 need_checked_filament_id[nozzle_diameter_str].insert(vt_tray.setting_id);

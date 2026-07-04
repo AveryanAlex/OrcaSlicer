@@ -69,9 +69,12 @@ the `Generic X` base name, write no id key).
    `Generic X @System`, keeps the `Generic X` base name (that alias is what hides the library
    preset on your printers), sets a non-empty `compatible_printers`, and writes no id key.
    A vendor-*branded* filament never rides a generic family id.
-5. **Ids are immutable once shipped.** Renaming a family does not change its id — use
-   `renamed_from`. A shipped id is never recycled for a different material: old ids live on in
-   user presets and 3mf files and a recycled id would silently match the wrong material.
+5. **Ids follow the product identity.** The id is a pure function of the product triple
+   `(filament_vendor, filament_type, family name)` — correcting any of them re-mints the id
+   **by design**, and `--update-snapshot` records the old id in the shipped succession ledger
+   with its successor so device trays, calibration records, and user presets keep resolving
+   (`renamed_from` still gates preset-*name* compatibility as before). A shipped id is never
+   recycled for a different material: retired ids are blocked forever.
 
 ## Minting — nobody invents ids
 
@@ -81,15 +84,20 @@ New ids are deterministic, computed exactly like the `setting_id` precedent
 ```text
 FILAMENT_ID_NAMESPACE = uuid5(setting-id NAMESPACE, "filament_id")
                       = c4d3ff49-4c32-5534-a3e3-00894157ab97
-filament_id = "OF" + base62_6( uuid5(FILAMENT_ID_NAMESPACE, "filament_family/<vendor>/<family>") )
+filament_id = "OF" + base62_6( uuid5(FILAMENT_ID_NAMESPACE,
+                  "filament_product/<filament_vendor>/<filament_type>/<family_name>") )
 ```
 
 `base62_6` is the low 6 base62 digits (alphabet `0-9A-Za-z`) of the UUID taken as a big-endian
-integer, most-significant digit first — 8 chars total, within the AMS length limit. `<vendor>`
-is the vendor bundle name (the stem of the vendor index json, e.g. `Qidi`,
-`OrcaFilamentLibrary`); `<family>` is the family base name. On the rare collision with any
-existing or retired id, the minter salts the input (`…/1`, `…/2`, …) until free and the result
-is frozen in the file. Example: family `MyBrand PLA` in vendor `Orca 3D` mints `OFvCEY5V`.
+integer, most-significant digit first — 8 chars total, within the AMS length limit. The triple
+comes from the family root's *flattened* config: `<filament_vendor>` is the filament
+**manufacturer** (`"Polymaker"`, or `"Generic"` for generics — never the printer brand),
+`<filament_type>` the material type, `<family_name>` the root's base name; the two config
+values are inheritable list options and the first element counts. The key contains no bundle
+name, so the same product mints the same id in every bundle — hoisting a family into
+OrcaFilamentLibrary never changes its id. On the rare collision with any existing or retired
+id, the minter salts the input (`…/1`, `…/2`, …) until free and the result is frozen in the
+file. Example: `Polymaker/PLA/PolyLite PLA` mints `OF5CgdDq`.
 
 Workflow for a new family:
 
@@ -101,8 +109,12 @@ python scripts/assign_filament_ids.py --check            # 4. verify — the sam
 # 5. Commit the profile edits together with scripts/filament_id_snapshot.json.
 ```
 
-`--mint "Vendor/Family"` prints the id for one family without touching anything. The default
-run is idempotent and never rewrites a valid existing id.
+`--mint "filament_vendor/filament_type/family_name"` prints the id a triple would mint without
+touching anything. The default run is idempotent and never rewrites a valid existing id.
+Maintenance modes (normally only used by id migrations): `--remint VENDOR` re-derives a
+vendor's declared ids from their triples, `--drop-redundant-ids VENDOR` deletes declarations
+that merely re-declare an inherited OFL id, and `--add-hint "OLD=NEW"` records a cross-island
+succession hint.
 
 If you skip the tooling, CI fails and prints the remedy: the expected id for your family, and
 the instruction to run `python scripts/assign_filament_ids.py --update-snapshot` and commit
@@ -116,7 +128,20 @@ the resulting diff.
 | `QD_*` | Qidi device protocol | frozen device contract; Qidi vendor only |
 | `P` + 7 hex chars (case-insensitive), `"null"` | user-created custom filaments (`CreatePresetsDialog.cpp`) | never appears in system profiles |
 | every already-shipped id | grandfather snapshot | frozen as-is; new claims need maintainer sign-off |
-| every retired id | `scripts/retired_filament_ids.json` | never used again, for anything |
+| every retired id | `resources/profiles/retired_filament_ids.json` | never used again, for anything |
+
+## The succession ledger
+
+`resources/profiles/retired_filament_ids.json` ships with the app. Each retired id maps to
+`{"claims": [...], "successor": <id|null>}` — successor chains are followed to the live end —
+and a `hints` map carries the same forwarding for ids Orca cannot retire because another
+island owns them (e.g. a `GF*` id whose material also exists as an OFL family). The client
+consults the ledger **only on resolution miss** (AMS tray sync, tray-id type lookup,
+calibration history, filament-id preset lookup): a live preset always wins first, so BBL
+installs resolve `GF*` natively and behavior is unchanged wherever the raw id still exists.
+This is what makes identity-driven re-mints (structure rule 5) safe: the old id keeps
+resolving to the family's current preset instead of degrading to a `Generic <type>` fallback.
+The file is append-only and maintained exclusively by `--update-snapshot` / `--add-hint`.
 
 ## How CI enforces this
 
@@ -131,14 +156,22 @@ deterministically (running it twice changes nothing).
 The checks, in brief:
 
 - **Format** — every id is either in the snapshot, `OF` + 6 base62 chars, BBL's, or Qidi `QD_*`.
-- **Snapshot equality** — tree claims == snapshot claims, both directions.
-- **Mint conformance** — a non-grandfathered `OF*` claim must equal the mint (or a salt
-  iteration) of its `(vendor, family)`; the error prints the expected id.
-- **Retired reuse** — any tree id present in `scripts/retired_filament_ids.json` is an error.
+- **Snapshot equality** — tree claims == snapshot claims **and** tree triples == snapshot
+  triples, both directions: any `filament_vendor`/`filament_type`/family-name change surfaces
+  as a snapshot diff.
+- **Mint conformance** — a non-grandfathered `OF*` id must equal the mint (or a salt
+  iteration) of its declarer's product triple; the error prints the expected id.
+- **Retired reuse** — any tree id present in `resources/profiles/retired_filament_ids.json` is an error.
   Ids that fully vanish from the tree are appended there by `--update-snapshot`; the file is
   **append-only**.
-- **Alias hygiene** — a tuned generic must keep the library preset's base name and a non-empty
-  `compatible_printers` (structure rule 4); the error names the rename as the cause.
+- **Alias hygiene** — any vendor preset riding an OFL family id must keep the library
+  preset's base name, a non-empty `compatible_printers`, and no own id key (structure rule 4);
+  the error names the rename as the cause.
+- **Triple integrity** — every declarer outside the BBL/`QD_*` islands must resolve a
+  non-empty `filament_vendor` and `filament_type` (generics use `"Generic"`), and all
+  declarers of one family within a bundle must agree on the triple.
+- **Succession integrity** — retired successor chains terminate at a live id (or null) with
+  no cycles; `hints` keys are live, island-owned ids.
 - **Reserved namespaces** — `GF*` outside BBL, `QD_*` outside Qidi, `P<7-hex>` or `null`
   anywhere, unless that exact claim is grandfathered in the snapshot.
 - **Structure** — no `filament_id` key on instantiated presets; no declared-vs-inherited id
@@ -161,7 +194,10 @@ check instead.
   inherit the family's root, write no id key.
 - **A tuned generic ("our profile for Generic PLA")?** Inherit `Generic PLA @System`, keep the
   `Generic PLA` base name, set `compatible_printers`, write no id key.
-- **I need to rename a family.** Keep the id, add `renamed_from`. Ids never change.
+- **I need to rename a family (or fix its `filament_vendor`/`filament_type`).** Add
+  `renamed_from` for the name, run `--remint <Vendor>` then `--update-snapshot`: the id
+  re-derives from the corrected identity and the old id lands in the succession ledger
+  pointing at the new one. Commit the profile, snapshot, and ledger diffs together.
 - **CI says my family needs an id.** Run `python scripts/assign_filament_ids.py`, then
   `--update-snapshot`, and commit both diffs. Do not type an id by hand.
 

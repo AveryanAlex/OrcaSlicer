@@ -63,6 +63,9 @@
 	"filament_start_gcode": [
 		"; filament start gcode\n;right_extruder_material:HIPS"
 	],
+	"filament_type": [
+		"HIPS"
+	],
 	"compatible_printers": [
 		"Flashforge Guider4 Pro 0.8 HF nozzle"
 	],

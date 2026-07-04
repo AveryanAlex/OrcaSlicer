@@ -1,0 +1,90 @@
+{
+ "hints": {},
+ "retired": {
+  "GFABS": {
+   "claims": [
+    "Anycubic/Anycubic ABS"
+   ],
+   "successor": "OFf2b9wu"
+  },
+  "GFL92": {
+   "claims": [
+    "Anycubic/Anycubic PLA"
+   ],
+   "successor": "OFgK2Xvv"
+  },
+  "GFL93": {
+   "claims": [
+    "Anycubic/Anycubic PLA+"
+   ],
+   "successor": "OFgrGfPy"
+  },
+  "GFPLA": {
+   "claims": [
+    "Anycubic/Anycubic PLA"
+   ],
+   "successor": "OFgK2Xvv"
+  },
+  "GFPLA High Speed": {
+   "claims": [
+    "Anycubic/Anycubic PLA High Speed"
+   ],
+   "successor": "OFgSK1hL"
+  },
+  "GFPLA Matte": {
+   "claims": [
+    "Anycubic/Anycubic PLA Matte"
+   ],
+   "successor": "OFvYfHPB"
+  },
+  "GFPLA Silk": {
+   "claims": [
+    "Anycubic/Anycubic PLA Silk"
+   ],
+   "successor": "OFjdTQd6"
+  },
+  "GFPLA+": {
+   "claims": [
+    "Anycubic/Anycubic PLA+"
+   ],
+   "successor": "OFgrGfPy"
+  },
+  "P11851ba": {
+   "claims": [
+    "Artillery/Artillery PET"
+   ],
+   "successor": "OFw0qp7w"
+  },
+  "P284941e": {
+   "claims": [
+    "Artillery/Artillery PETG",
+    "Artillery/Artillery PETG Basic"
+   ],
+   "successor": "OFEYKrjb"
+  },
+  "P2fbf0c0": {
+   "claims": [
+    "Artillery/Artillery TPU"
+   ],
+   "successor": "OFTbsWVg"
+  },
+  "P39db358": {
+   "claims": [
+    "Artillery/Artillery ABS"
+   ],
+   "successor": "OFw1S8lL"
+  },
+  "P8163162": {
+   "claims": [
+    "Artillery/Artillery PVA"
+   ],
+   "successor": "OFc2SnEp"
+  },
+  "P87436f6": {
+   "claims": [
+    "Artillery/Artillery ASA"
+   ],
+   "successor": "OFtmT4Nd"
+  }
+ }
+}

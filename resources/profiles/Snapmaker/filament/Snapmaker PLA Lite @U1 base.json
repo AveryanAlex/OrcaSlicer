@@ -46,6 +46,9 @@
 	"filament_type": [
 		"PLA"
 	],
+	"filament_vendor": [
+		"Snapmaker"
+	],
 	"filament_density": [
 		"1.24"
 	],

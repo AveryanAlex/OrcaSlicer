@@ -4,5 +4,8 @@
 	"inherits": "fdm_filament_pla",
 	"from": "system",
 	"filament_id": "OFv8SRZh",
-	"instantiation": "false"
+	"instantiation": "false",
+	"filament_type": [
+		"PLA-CF"
+	]
 }

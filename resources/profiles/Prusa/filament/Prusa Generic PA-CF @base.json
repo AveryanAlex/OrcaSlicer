@@ -4,5 +4,8 @@
 	"inherits": "fdm_filament_pa",
 	"from": "system",
 	"filament_id": "OFXfgh61",
-	"instantiation": "false"
+	"instantiation": "false",
+	"filament_type": [
+		"PA-CF"
+	]
 }

@@ -39,6 +39,9 @@
 	"filament_start_gcode": [
 		"; filament start gcode\n;right_extruder_material: ABS-CF\n"
 	],
+	"filament_type": [
+		"ABS-CF"
+	],
 	"compatible_printers": [
 		"Flashforge Guider4 0.4 nozzle"
 	],

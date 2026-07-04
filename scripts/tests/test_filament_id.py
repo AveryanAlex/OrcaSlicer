@@ -34,12 +34,18 @@ def load_json_file(path):
 # ---------------------------------------------------------------------------
 
 def preset(name, filament_id=None, inherits=None, instantiation=True,
-           compatible_printers=None):
+           compatible_printers=None, filament_vendor=None, filament_type=None):
     data = {"type": "filament", "name": name}
     if inherits is not None:
         data["inherits"] = inherits
     if filament_id is not None:
         data["filament_id"] = filament_id
+    if filament_vendor is not None:
+        data["filament_vendor"] = (
+            [filament_vendor] if isinstance(filament_vendor, str) else filament_vendor)
+    if filament_type is not None:
+        data["filament_type"] = (
+            [filament_type] if isinstance(filament_type, str) else filament_type)
     data["instantiation"] = "true" if instantiation else "false"
     if compatible_printers is not None:
         data["compatible_printers"] = compatible_printers
@@ -102,13 +108,18 @@ class SyntheticTree:
         with open(idx_path, "w", encoding="utf-8") as f:
             json.dump(index, f, indent=4, ensure_ascii=False)
 
+    def write_ledger(self, retired=None, hints=None):
+        afi.write_ledger(self.retired, {"retired": retired or {},
+                                        "hints": hints or {}})
+
     # -- pipeline wrappers ---------------------------------------------------
 
-    def update_snapshot(self, allow_shared_catalog=False):
+    def update_snapshot(self, allow_shared_catalog=False, forget_path=None):
         buf = io.StringIO()
         with contextlib.redirect_stdout(buf):
             rc = afi.update_snapshot(self.profiles, self.snapshot, self.retired,
-                                     allow_shared_catalog=allow_shared_catalog)
+                                     allow_shared_catalog=allow_shared_catalog,
+                                     forget_path=forget_path)
         return rc, buf.getvalue()
 
     def check(self):
@@ -124,17 +135,37 @@ class SyntheticTree:
                                                      self.retired)
         return changed, errors, buf.getvalue()
 
+    def remint(self, vendors):
+        buf = io.StringIO()
+        with contextlib.redirect_stdout(buf):
+            changed, errors = afi.remint_vendors(vendors, self.profiles, self.retired)
+        return changed, errors, buf.getvalue()
+
+    def drop_redundant(self, vendor):
+        buf = io.StringIO()
+        with contextlib.redirect_stdout(buf):
+            dropped, errors = afi.drop_redundant_ids(vendor, self.profiles)
+        return dropped, errors, buf.getvalue()
+
+    def add_hint(self, pairs):
+        buf = io.StringIO()
+        with contextlib.redirect_stdout(buf):
+            rc = afi.add_hints(pairs, self.profiles, self.retired)
+        return rc, buf.getvalue()
+
 
 def make_clean_tree():
     """Baseline tree: OFL base+generic, a vendor family, a clean tuned generic."""
     t = SyntheticTree()
     t.add_vendor(OFL, [
-        preset("fdm_pla", filament_id="OGFL99", instantiation=False),
+        preset("fdm_pla", filament_id="OGFL99", instantiation=False,
+               filament_vendor="Generic", filament_type="PLA"),
         preset("Generic PLA @System", inherits="fdm_pla",
                compatible_printers=[]),
     ])
     t.add_vendor("VendorA", [
-        preset("APLA @base", filament_id="AX01", instantiation=False),
+        preset("APLA @base", filament_id="AX01", instantiation=False,
+               filament_vendor="AVendor", filament_type="PLA"),
         preset("APLA @P1", inherits="APLA @base",
                compatible_printers=["P1 0.4 nozzle"]),
         # Correctly tuned OFL generic: keeps the OFL base name, claims a printer.
@@ -163,33 +194,45 @@ class TestMint(unittest.TestCase):
                          uuid.UUID("c4d3ff49-4c32-5534-a3e3-00894157ab97"))
 
     def test_known_vector(self):
-        # Hardcoded, independently computed vector: freezes prefix, input string
-        # layout ("filament_family/<vendor>/<family>") and base62 derivation.
-        self.assertEqual(afi.generate_filament_id("Qidi", "HATCHBOX PLA"), "OFiJYDPC")
+        # Hardcoded, independently computed vectors: freeze prefix, input string
+        # layout ("filament_product/<vendor>/<type>/<family>") and base62 tail.
+        self.assertEqual(afi.generate_filament_id("Polymaker", "PLA", "PolyLite PLA"),
+                         "OF5CgdDq")
+        self.assertEqual(afi.generate_filament_id("Polymaker", "PLA", "PolyLite PLA",
+                                                  salt=1), "OFD9mV8H")
+        self.assertEqual(afi.generate_filament_id("Generic", "PLA", "Generic PLA"),
+                         "OFDSrzZ8")
 
     def test_determinism_and_format(self):
-        for vendor, family in [("Qidi", "HATCHBOX PLA"), ("Creality", "CR PLA"),
-                               ("OrcaFilamentLibrary", "Generic ABS"),
-                               ("BBL", "拓竹 PLA")]:  # unicode family
-            a = afi.generate_filament_id(vendor, family)
-            b = afi.generate_filament_id(vendor, family)
+        for triple in [("Polymaker", "PLA", "PolyLite PLA"),
+                       ("Creality", "PLA", "CR PLA"),
+                       ("Generic", "ABS", "Generic ABS"),
+                       ("拓竹", "PLA", "拓竹 PLA")]:  # unicode components
+            a = afi.generate_filament_id(*triple)
+            b = afi.generate_filament_id(*triple)
             self.assertEqual(a, b)
             self.assertRegex(a, r"^OF[0-9A-Za-z]{6}$")
             self.assertEqual(len(a), 8)
 
+    def test_every_triple_component_changes_the_id(self):
+        base = afi.generate_filament_id("Polymaker", "PLA", "PolyLite PLA")
+        self.assertNotEqual(base, afi.generate_filament_id("Other", "PLA", "PolyLite PLA"))
+        self.assertNotEqual(base, afi.generate_filament_id("Polymaker", "PETG", "PolyLite PLA"))
+        self.assertNotEqual(base, afi.generate_filament_id("Polymaker", "PLA", "PolyLite PLA Pro"))
+
     def test_salt_changes_id(self):
-        base = afi.generate_filament_id("Qidi", "HATCHBOX PLA")
-        salted = afi.generate_filament_id("Qidi", "HATCHBOX PLA", salt=1)
+        base = afi.generate_filament_id("Polymaker", "PLA", "PolyLite PLA")
+        salted = afi.generate_filament_id("Polymaker", "PLA", "PolyLite PLA", salt=1)
         self.assertNotEqual(base, salted)
         self.assertRegex(salted, r"^OF[0-9A-Za-z]{6}$")
 
     def test_mint_salt_iteration(self):
-        v, fam = "Qidi", "HATCHBOX PLA"
-        taken = {afi.generate_filament_id(v, fam, s) for s in range(2)}
-        self.assertEqual(afi.mint_filament_id(v, fam, taken),
-                         afi.generate_filament_id(v, fam, salt=2))
-        self.assertEqual(afi.mint_filament_id(v, fam, set()),
-                         afi.generate_filament_id(v, fam))
+        triple = ("Polymaker", "PLA", "PolyLite PLA")
+        taken = {afi.generate_filament_id(*triple, salt=s) for s in range(2)}
+        self.assertEqual(afi.mint_filament_id(*triple, taken),
+                         afi.generate_filament_id(*triple, salt=2))
+        self.assertEqual(afi.mint_filament_id(*triple, set()),
+                         afi.generate_filament_id(*triple))
 
 
 class TestBaseName(unittest.TestCase):
@@ -278,8 +321,74 @@ class TestResolver(unittest.TestCase):
         self.assertEqual(fid, "PARENT")
 
 
+class TestTripleResolution(unittest.TestCase):
+    @staticmethod
+    def rec(name, inherits=None, filament_vendor=None, filament_type=None):
+        return {"name": name, "inherits": inherits,
+                "filament_vendor": filament_vendor, "filament_type": filament_type}
+
+    def field(self, name, vendor_recs, ofl_recs, field="filament_vendor"):
+        fmap = {r["name"]: r for r in vendor_recs}
+        omap = {r["name"]: r for r in ofl_recs}
+        return afi.resolve_filament_field(name, field, fmap, omap)
+
+    def test_own_value_first_element_of_list(self):
+        got = self.field("A", [self.rec("A", filament_vendor=["Poly", "Ignored"])], [])
+        self.assertEqual(got, "Poly")
+
+    def test_plain_string_value_tolerated(self):
+        got = self.field("A", [self.rec("A", filament_vendor="Poly")], [])
+        self.assertEqual(got, "Poly")
+
+    def test_inherited_within_vendor(self):
+        got = self.field(
+            "A", [self.rec("A", inherits="B"), self.rec("B", inherits="C"),
+                  self.rec("C", filament_vendor=["Poly"])], [])
+        self.assertEqual(got, "Poly")
+
+    def test_empty_list_keeps_walking(self):
+        got = self.field(
+            "A", [self.rec("A", inherits="B", filament_vendor=[]),
+                  self.rec("B", filament_vendor=["Poly"])], [])
+        self.assertEqual(got, "Poly")
+
+    def test_ofl_fallback(self):
+        got = self.field(
+            "A", [self.rec("A", inherits="Generic PLA @System")],
+            [self.rec("Generic PLA @System", inherits="fdm_pla"),
+             self.rec("fdm_pla", filament_vendor=["Generic"])])
+        self.assertEqual(got, "Generic")
+
+    def test_ofl_stays_in_ofl(self):
+        got = self.field(
+            "A",
+            [self.rec("A", inherits="ofl_entry"),
+             self.rec("fdm_pla", filament_vendor=["WRONG"])],
+            [self.rec("ofl_entry", inherits="fdm_pla"),
+             self.rec("fdm_pla", filament_vendor=["RIGHT"])])
+        self.assertEqual(got, "RIGHT")
+
+    def test_dead_end_retries_parent_in_ofl(self):
+        got = self.field(
+            "A", [self.rec("A", inherits="shared"), self.rec("shared")],
+            [self.rec("shared", filament_vendor=["Poly"])])
+        self.assertEqual(got, "Poly")
+
+    def test_missing_is_empty(self):
+        self.assertEqual(self.field("A", [self.rec("A")], []), "")
+        self.assertEqual(self.field("A", [self.rec("A", inherits="nope")], []), "")
+
+    def test_resolve_triple(self):
+        recs = [self.rec("MyPLA @base", filament_vendor=["MyVendor"],
+                         filament_type=["PLA"]),
+                self.rec("MyPLA @P1", inherits="MyPLA @base")]
+        fmap = {r["name"]: r for r in recs}
+        self.assertEqual(afi.resolve_triple("MyPLA @P1", fmap, {}),
+                         ("MyVendor", "PLA", "MyPLA"))
+
+
 # ---------------------------------------------------------------------------
-# reserved namespaces
+# reserved namespaces / islands
 # ---------------------------------------------------------------------------
 
 class TestReservedSpaces(unittest.TestCase):
@@ -289,8 +398,15 @@ class TestReservedSpaces(unittest.TestCase):
         self.assertEqual(afi.reserved_space_owner("P1234abc"), (True, None))
         self.assertEqual(afi.reserved_space_owner("pAbCdEf1"), (True, None))  # case-insensitive
         self.assertEqual(afi.reserved_space_owner("null"), (True, None))
-        self.assertEqual(afi.reserved_space_owner("OFiJYDPC"), (False, None))
+        self.assertEqual(afi.reserved_space_owner("OF5CgdDq"), (False, None))
         self.assertEqual(afi.reserved_space_owner("P1234abcd"), (False, None))  # 8 hex chars: not the user space
+
+    def test_island_declarations(self):
+        self.assertTrue(afi.is_island_declaration("BBL", "GFL99"))
+        self.assertTrue(afi.is_island_declaration("BBL", "OF5CgdDq"))
+        self.assertTrue(afi.is_island_declaration("Qidi", "QD_X4_PLA"))
+        self.assertFalse(afi.is_island_declaration("Qidi", "OF5CgdDq"))
+        self.assertFalse(afi.is_island_declaration("VendorA", "GFL99"))
 
 
 # ---------------------------------------------------------------------------
@@ -302,10 +418,12 @@ class TestChecks(SyntheticTreeCase):
         errors, out = self.t.check()
         self.assertEqual(errors, 0, out)
         self.assertNotIn("[ERROR]", out)
+        self.assertNotIn("[WARNING]", out)
 
     def test_check1_unknown_non_of_id(self):
         self.t.write_preset("VendorA", preset("BPLA @base", filament_id="BOGUS_9",
-                                              instantiation=False))
+                                              instantiation=False,
+                                              filament_vendor="BV", filament_type="PLA"))
         self.t.write_preset("VendorA", preset("BPLA @P1", inherits="BPLA @base",
                                               compatible_printers=["P1"]))
         errors, out = self.t.check()
@@ -328,27 +446,57 @@ class TestChecks(SyntheticTreeCase):
         self.assertIn("stability", out)
         self.assertIn('"VendorA/APLA"', out)
 
-    def test_check3_of_id_must_match_mint(self):
+    def test_check2_triple_change_needs_snapshot_update(self):
+        self.t.write_preset("VendorA", preset("APLA @base", filament_id="AX01",
+                                              instantiation=False,
+                                              filament_vendor="AVendor",
+                                              filament_type="PETG"),
+                            register=False)
+        errors, out = self.t.check()
+        self.assertGreater(errors, 0)
+        self.assertIn('triple "AVendor/PETG/APLA" is not sanctioned', out)
+        self.assertIn('triple stability: snapshot triple "AVendor/PLA/APLA"', out)
+        rc, _out = self.t.update_snapshot()
+        self.assertEqual(rc, 0)
+        errors, out = self.t.check()
+        self.assertEqual(errors, 0, out)
+
+    def test_check3_of_id_must_match_triple_mint(self):
         self.t.write_preset("VendorA", preset("BNEW @base", filament_id="OFZZZZZZ",
-                                              instantiation=False))
+                                              instantiation=False,
+                                              filament_vendor="BV", filament_type="PLA"))
         self.t.write_preset("VendorA", preset("BNEW @P1", inherits="BNEW @base",
                                               compatible_printers=["P1"]))
         errors, out = self.t.check()
         self.assertGreater(errors, 0)
-        self.assertIn("does not match its mint", out)
-        self.assertIn(afi.generate_filament_id("VendorA", "BNEW"), out)
+        self.assertIn("does not match the mint of its triple", out)
+        self.assertIn(afi.generate_filament_id("BV", "PLA", "BNEW"), out)
 
     def test_check3_salted_mint_is_accepted(self):
-        salted = afi.generate_filament_id("VendorA", "BNEW", salt=3)
+        salted = afi.generate_filament_id("BV", "PLA", "BNEW", salt=3)
         self.t.write_preset("VendorA", preset("BNEW @base", filament_id=salted,
-                                              instantiation=False))
+                                              instantiation=False,
+                                              filament_vendor="BV", filament_type="PLA"))
         self.t.write_preset("VendorA", preset("BNEW @P1", inherits="BNEW @base",
                                               compatible_printers=["P1"]))
         _errors, out = self.t.check()  # check 2 still wants a snapshot update
-        self.assertNotIn("does not match its mint", out)
+        self.assertNotIn("does not match the mint", out)
+
+    def test_check3_grandfathered_id_triple_pair(self):
+        # A non-conforming (id, triple) pair sanctioned by the snapshot passes.
+        self.t.write_preset("VendorA", preset("CNEW @base", filament_id="OFZZZZZZ",
+                                              instantiation=False,
+                                              filament_vendor="CV", filament_type="PLA"))
+        self.t.write_preset("VendorA", preset("CNEW @P1", inherits="CNEW @base",
+                                              compatible_printers=["P1"]))
+        rc, _out = self.t.update_snapshot()
+        self.assertEqual(rc, 0)
+        errors, out = self.t.check()
+        self.assertEqual(errors, 0, out)
 
     def test_check4_retired_id_reuse(self):
-        afi.write_ledger(self.t.retired, {"retired": {"AX01": ["VendorA/APLA"]}})
+        self.t.write_ledger(retired={"AX01": {"claims": ["VendorA/APLA"],
+                                              "successor": None}})
         errors, out = self.t.check()
         self.assertGreater(errors, 0)
         self.assertIn("retired", out)
@@ -371,6 +519,37 @@ class TestChecks(SyntheticTreeCase):
         self.assertGreater(errors, 0)
         self.assertIn("cannot shadow the OFL preset", out)
 
+    def test_check5_own_id_key_on_ofl_rider(self):
+        # A vendor root that declares its own id while inheriting an OFL family
+        # forks the family off the catalog id.
+        self.t.write_preset("VendorA", preset("GPLA @base", filament_id="AX77",
+                                              instantiation=False,
+                                              inherits="Generic PLA @System"))
+        self.t.write_preset("VendorA", preset("GPLA @P1", inherits="GPLA @base",
+                                              compatible_printers=["P1"]))
+        errors, out = self.t.check()
+        self.assertGreater(errors, 0)
+        self.assertIn('declares its own filament_id "AX77"', out)
+
+    def test_check5_applies_to_non_generic_ofl_families(self):
+        fid = afi.generate_filament_id("Polymaker", "PLA", "PolyLite PLA")
+        self.t.write_preset(OFL, preset("poly_pla_base", filament_id=fid,
+                                        instantiation=False,
+                                        filament_vendor="Polymaker",
+                                        filament_type="PLA"))
+        self.t.write_preset(OFL, preset("PolyLite PLA @System",
+                                        inherits="poly_pla_base",
+                                        compatible_printers=[]))
+        rc, _out = self.t.update_snapshot()
+        self.assertEqual(rc, 0)
+        self.t.write_preset("VendorA", preset("PolyX PLA @P1",
+                                              inherits="PolyLite PLA @System",
+                                              compatible_printers=["P1"]))
+        errors, out = self.t.check()
+        self.assertGreater(errors, 0)
+        self.assertIn("rename re-exposes the OFL preset", out)
+        self.assertIn("PolyX PLA @P1", out)
+
     def test_check5_exception_is_grandfathered(self):
         self.t.write_preset("VendorA", preset("Tuned PLA @P1",
                                               inherits="Generic PLA @System",
@@ -388,7 +567,9 @@ class TestChecks(SyntheticTreeCase):
             with self.subTest(fid=fid):
                 name = f"R{fid} @base"
                 self.t.write_preset("VendorA", preset(name, filament_id=fid,
-                                                      instantiation=False))
+                                                      instantiation=False,
+                                                      filament_vendor="RV",
+                                                      filament_type="PLA"))
                 self.t.write_preset("VendorA", preset(f"R{fid} @P1", inherits=name,
                                                       compatible_printers=["P1"]))
                 errors, out = self.t.check()
@@ -428,6 +609,184 @@ class TestChecks(SyntheticTreeCase):
         self.assertIn("snapshot not found", out)
 
 
+class TestCheck8(SyntheticTreeCase):
+    def test_8a_empty_vendor_is_hard_error(self):
+        fid = afi.generate_filament_id("", "PLA", "NVPLA")
+        self.t.write_preset("VendorA", preset("NVPLA @base", filament_id=fid,
+                                              instantiation=False,
+                                              filament_type="PLA"))
+        self.t.write_preset("VendorA", preset("NVPLA @P1", inherits="NVPLA @base",
+                                              compatible_printers=["P1"]))
+        errors, out = self.t.check()
+        self.assertGreater(errors, 0)
+        self.assertIn("resolves empty filament_vendor", out)
+        self.assertIn('filament_vendor "Generic"', out)
+        # No grandfathering: sanctioning the tree does not silence check 8a.
+        rc, _out = self.t.update_snapshot()
+        self.assertEqual(rc, 0)
+        errors, out = self.t.check()
+        self.assertEqual(errors, 1, out)
+        self.assertIn("resolves empty filament_vendor", out)
+
+    def test_8b_divergent_family_triples(self):
+        id1 = afi.generate_filament_id("MV", "PLA", "MPLA")
+        id2 = afi.generate_filament_id("MV", "PETG", "MPLA")
+        self.t.write_preset("VendorA", preset("MPLA @base1", filament_id=id1,
+                                              instantiation=False,
+                                              filament_vendor="MV",
+                                              filament_type="PLA"))
+        self.t.write_preset("VendorA", preset("MPLA @base2", filament_id=id2,
+                                              instantiation=False,
+                                              filament_vendor="MV",
+                                              filament_type="PETG"))
+        errors, out = self.t.check()
+        self.assertGreater(errors, 0)
+        self.assertIn("divergent triples", out)
+        self.assertIn("MV/PLA/MPLA", out)
+        self.assertIn("MV/PETG/MPLA", out)
+        # ... until --update-snapshot grandfathers the family in triple_exceptions.
+        rc, _out = self.t.update_snapshot()
+        self.assertEqual(rc, 0)
+        self.assertIn("VendorA/MPLA", load_json_file(self.t.snapshot)["triple_exceptions"])
+        errors, out = self.t.check()
+        self.assertEqual(errors, 0, out)
+
+    def test_8_cross_bundle_divergence_is_warning_only(self):
+        fid = afi.generate_filament_id("BV", "PETG", "APLA")
+        self.t.add_vendor("VendorB", [
+            preset("APLA @base", filament_id=fid, instantiation=False,
+                   filament_vendor="BV", filament_type="PETG"),
+            preset("APLA @PB", inherits="APLA @base",
+                   compatible_printers=["PB 0.4 nozzle"]),
+        ])
+        rc, _out = self.t.update_snapshot()
+        self.assertEqual(rc, 0)
+        errors, out = self.t.check()
+        self.assertEqual(errors, 0, out)
+        self.assertIn("[WARNING]", out)
+        self.assertIn("across bundles", out)
+        self.assertIn('"APLA"', out)
+
+
+class TestCheck9(SyntheticTreeCase):
+    def test_ok_chain_null_and_live(self):
+        self.t.write_ledger(retired={
+            "R1": {"claims": ["VendorA/Gone1"], "successor": "AX01"},
+            "R2": {"claims": ["VendorA/Gone2"], "successor": "R1"},
+            "R3": {"claims": ["VendorA/Gone3"], "successor": None},
+        })
+        errors, out = self.t.check()
+        self.assertEqual(errors, 0, out)
+
+    def test_cycle_is_an_error(self):
+        self.t.write_ledger(retired={
+            "C1": {"claims": [], "successor": "C2"},
+            "C2": {"claims": [], "successor": "C1"},
+        })
+        errors, out = self.t.check()
+        self.assertEqual(errors, 2, out)
+        self.assertIn("cycles", out)
+
+    def test_dead_end_is_an_error(self):
+        self.t.write_ledger(retired={
+            "D1": {"claims": [], "successor": "OFnope99"},
+        })
+        errors, out = self.t.check()
+        self.assertEqual(errors, 1, out)
+        self.assertIn("dead-ends", out)
+        self.assertIn("OFnope99", out)
+
+    def test_hint_key_must_be_in_island_space(self):
+        self.t.write_ledger(hints={"AX01": "OGFL99"})
+        errors, out = self.t.check()
+        self.assertEqual(errors, 1, out)
+        self.assertIn("not in an island id space", out)
+
+    def test_hint_key_may_be_absent_island_id(self):
+        # Released / never-shipped island-catalog ids are valid hint keys.
+        self.t.write_ledger(hints={"GFXX99": "AX01"})
+        errors, out = self.t.check()
+        self.assertEqual(errors, 0, out)
+
+    def test_hint_key_must_not_be_retired_too(self):
+        self.t.write_ledger(retired={"GFXX99": {"claims": [], "successor": "AX01"}},
+                            hints={"GFXX99": "AX01"})
+        errors, out = self.t.check()
+        self.assertEqual(errors, 1, out)
+        self.assertIn("never both", out)
+
+    def test_live_hint_key_with_non_island_declarer_is_an_error(self):
+        self.t.write_preset("VendorA", preset(
+            "GPLA @base", filament_id="GFZZ01", instantiation=False,
+            filament_vendor="Generic", filament_type="PLA"))
+        self.t.write_preset("VendorA", preset(
+            "GPLA @P1", inherits="GPLA @base",
+            compatible_printers=["P1 0.4 nozzle"]))
+        rc, _out = self.t.update_snapshot(allow_shared_catalog=True)
+        self.assertEqual(rc, 0)
+        self.t.write_ledger(hints={"GFZZ01": "AX01"})
+        errors, out = self.t.check()
+        self.assertEqual(errors, 1, out)
+        self.assertIn("re-mint those declarers first", out)
+
+    def test_island_hint_ok_and_value_must_chain_live(self):
+        self.t.add_vendor("BBL", [
+            preset("BPLA @base", filament_id="GFB01", instantiation=False),
+            preset("BPLA @X1C", inherits="BPLA @base",
+                   compatible_printers=["X1C 0.4 nozzle"]),
+        ])
+        rc, _out = self.t.update_snapshot()
+        self.assertEqual(rc, 0)
+        self.t.write_ledger(hints={"GFB01": "AX01"})
+        errors, out = self.t.check()
+        self.assertEqual(errors, 0, out)
+        # A hint chain ending on a null retirement is dead for the runtime.
+        self.t.write_ledger(retired={"R9": {"claims": [], "successor": None}},
+                            hints={"GFB01": "R9"})
+        errors, out = self.t.check()
+        self.assertEqual(errors, 1, out)
+        self.assertIn("chain-terminate at a live tree id", out)
+
+
+# ---------------------------------------------------------------------------
+# successor mode rule + ledger schema migration
+# ---------------------------------------------------------------------------
+
+class TestSuccessorMode(unittest.TestCase):
+    def test_majority_wins(self):
+        claim_ids = {"V/A": {"ID1"}, "V/B": {"ID1"}, "V/C": {"ID2"}}
+        succ, counts = afi.successor_by_mode(["V/A", "V/B", "V/C"], claim_ids)
+        self.assertEqual(succ, "ID1")
+        self.assertEqual(counts, {"ID1": 2, "ID2": 1})
+
+    def test_tie_breaks_lexicographically(self):
+        claim_ids = {"V/A": {"IDB"}, "V/B": {"IDA"}}
+        succ, counts = afi.successor_by_mode(["V/A", "V/B"], claim_ids)
+        self.assertEqual(succ, "IDA")
+        self.assertEqual(counts, {"IDA": 1, "IDB": 1})
+
+    def test_no_surviving_family_means_null(self):
+        self.assertEqual(afi.successor_by_mode(["V/GONE"], {}), (None, {}))
+        self.assertEqual(afi.successor_by_mode([], {"V/A": {"ID1"}}), (None, {}))
+
+
+class TestLedgerMigration(SyntheticTreeCase):
+    def test_backfill_successors_via_mode_rule(self):
+        analysis = afi.analyze_tree(self.t.profiles)
+        claim_ids = afi.claim_effective_ids(analysis)
+        old = {
+            "X9": ["VendorA/APLA"],                              # family lives on
+            "Y9": ["VendorA/GONE"],                              # family died
+            "Z9": {"claims": ["kept"], "successor": "AX01"},     # already migrated
+        }
+        migrated = afi.migrate_retired_entries(old, claim_ids)
+        self.assertEqual(migrated["X9"],
+                         {"claims": ["VendorA/APLA"], "successor": "AX01"})
+        self.assertEqual(migrated["Y9"],
+                         {"claims": ["VendorA/GONE"], "successor": None})
+        self.assertEqual(migrated["Z9"], old["Z9"])
+
+
 # ---------------------------------------------------------------------------
 # --update-snapshot
 # ---------------------------------------------------------------------------
@@ -448,30 +807,117 @@ class TestUpdateSnapshot(SyntheticTreeCase):
         self.assertEqual(snap["ids"]["AX01"], ["VendorA/APLA"])
         self.assertEqual(snap["ids"]["OGFL99"],
                          ["OrcaFilamentLibrary/Generic PLA", "VendorA/Generic PLA"])
+        self.assertEqual(snap["triples"]["AX01"], [["AVendor", "PLA", "APLA"]])
+        self.assertEqual(snap["triples"]["OGFL99"], [["Generic", "PLA", "fdm_pla"]])
+        self.assertEqual(snap["triple_exceptions"], [])
 
-    def test_vanished_id_is_retired(self):
+    def test_vanished_island_id_released_with_hint_not_retired(self):
+        self.t.write_preset("VendorA", preset(
+            "GPLA @base", filament_id="GFZZ01", instantiation=False,
+            filament_vendor="Generic", filament_type="PLA"))
+        self.t.write_preset("VendorA", preset(
+            "GPLA @P1", inherits="GPLA @base",
+            compatible_printers=["P1 0.4 nozzle"]))
+        rc, _out = self.t.update_snapshot(allow_shared_catalog=True)
+        self.assertEqual(rc, 0)
+        # The family re-mints away from the island id: released, not retired.
+        self.t.write_preset("VendorA", preset(
+            "GPLA @base", filament_id="OFaaaaaa", instantiation=False,
+            filament_vendor="Generic", filament_type="PLA"), register=False)
+        rc, out = self.t.update_snapshot()
+        self.assertEqual(rc, 0)
+        self.assertIn("released to the BBL island space", out)
+        ledger = afi.load_ledger(self.t.retired)
+        self.assertNotIn("GFZZ01", ledger["retired"])
+        self.assertEqual(ledger["hints"].get("GFZZ01"), "OFaaaaaa")
+        errors, out = self.t.check()
+        self.assertEqual(errors, 0, out)
+        # The island may legitimately (re)ship a released id later.
+        self.t.add_vendor("BBL", [
+            preset("BPLA @base", filament_id="GFZZ01", instantiation=False),
+            preset("BPLA @X1C", inherits="BPLA @base",
+                   compatible_printers=["X1C 0.4 nozzle"]),
+        ])
+        rc, _out = self.t.update_snapshot()
+        self.assertEqual(rc, 0)
+        errors, out = self.t.check()
+        self.assertEqual(errors, 0, out)
+
+    def test_vanished_id_is_retired_with_null_successor(self):
         self.t.remove_preset("VendorA", "APLA @base")
         self.t.remove_preset("VendorA", "APLA @P1")
         rc, out = self.t.update_snapshot()
         self.assertEqual(rc, 0)
         self.assertIn("AX01", out)
-        retired = load_json_file(self.t.retired)
-        self.assertEqual(retired["retired"], {"AX01": ["VendorA/APLA"]})
+        retired = load_json_file(self.t.retired)["retired"]
+        self.assertEqual(retired,
+                         {"AX01": {"claims": ["VendorA/APLA"], "successor": None}})
         snap = load_json_file(self.t.snapshot)
         self.assertNotIn("AX01", snap["ids"])
+        self.assertNotIn("AX01", snap["triples"])
         # append-only + idempotent: a second run keeps the ledger intact
         rc, out = self.t.update_snapshot()
         self.assertEqual(rc, 0)
         self.assertIn("nothing changed", out)
-        retired2 = load_json_file(self.t.retired)
-        self.assertEqual(retired, retired2)
+        self.assertEqual(retired, load_json_file(self.t.retired)["retired"])
         # ... and a retired id may never be minted again
-        self.assertNotIn(afi.mint_filament_id("VendorA", "APLA",
-                                              set(retired["retired"])), retired["retired"])
+        self.assertNotIn(afi.mint_filament_id("AVendor", "PLA", "APLA",
+                                              set(retired)), retired)
+
+    def test_vanished_id_successor_follows_surviving_family(self):
+        # The family lives on under a new id (a re-mint): the mode rule finds it.
+        self.t.write_preset("VendorA", preset("APLA @base", filament_id="AXNEW",
+                                              instantiation=False,
+                                              filament_vendor="AVendor",
+                                              filament_type="PLA"),
+                            register=False)
+        rc, out = self.t.update_snapshot()
+        self.assertEqual(rc, 0)
+        retired = load_json_file(self.t.retired)["retired"]
+        self.assertEqual(retired["AX01"],
+                         {"claims": ["VendorA/APLA"], "successor": "AXNEW"})
+
+    def test_multi_candidate_retirement_warns_and_ties_break(self):
+        self.t.write_preset("VendorA", preset("SHRD @base", filament_id="SH01",
+                                              instantiation=False,
+                                              filament_vendor="SV",
+                                              filament_type="PLA"))
+        self.t.write_preset("VendorA", preset("CH1 @P1", inherits="SHRD @base",
+                                              compatible_printers=["P1"]))
+        self.t.write_preset("VendorA", preset("CH2 @P1", inherits="SHRD @base",
+                                              compatible_printers=["P1"]))
+        rc, _out = self.t.update_snapshot()
+        self.assertEqual(rc, 0)
+        # Split the two families onto their own roots and drop the shared id.
+        self.t.write_preset("VendorA", preset("CH1 @base", filament_id="SA01",
+                                              instantiation=False,
+                                              filament_vendor="SV",
+                                              filament_type="PLA"))
+        self.t.write_preset("VendorA", preset("CH2 @base", filament_id="SB01",
+                                              instantiation=False,
+                                              filament_vendor="SV",
+                                              filament_type="PLA"))
+        self.t.write_preset("VendorA", preset("CH1 @P1", inherits="CH1 @base",
+                                              compatible_printers=["P1"]),
+                            register=False)
+        self.t.write_preset("VendorA", preset("CH2 @P1", inherits="CH2 @base",
+                                              compatible_printers=["P1"]),
+                            register=False)
+        self.t.remove_preset("VendorA", "SHRD @base")
+        rc, out = self.t.update_snapshot()
+        self.assertEqual(rc, 0)
+        self.assertIn("[WARNING]", out)
+        self.assertIn("SB01", out)  # the losing candidate is named
+        retired = load_json_file(self.t.retired)["retired"]
+        self.assertEqual(retired["SH01"]["successor"], "SA01")
+        self.assertEqual(retired["SH01"]["claims"],
+                         ["VendorA/CH1", "VendorA/CH2"])
 
     def test_refuses_new_reserved_namespace_claims(self):
         self.t.write_preset("VendorA", preset("CNEW @base", filament_id="GFX99",
-                                              instantiation=False))
+                                              instantiation=False,
+                                              filament_vendor="CV",
+                                              filament_type="PLA"))
         self.t.write_preset("VendorA", preset("CNEW @P1", inherits="CNEW @base",
                                               compatible_printers=["P1"]))
         with open(self.t.snapshot, "rb") as f:
@@ -487,6 +933,122 @@ class TestUpdateSnapshot(SyntheticTreeCase):
         self.assertEqual(snap["ids"]["GFX99"], ["VendorA/CNEW"])
 
 
+class TestForgetNeverShipped(SyntheticTreeCase):
+    def forget_file(self, ids):
+        path = os.path.join(self.t.dir, "forget.json")
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump(ids, f)
+        return path
+
+    def test_refuses_when_listed_id_is_live(self):
+        with open(self.t.snapshot, "rb") as f:
+            before = f.read()
+        rc, out = self.t.update_snapshot(forget_path=self.forget_file(["AX01"]))
+        self.assertEqual(rc, 1)
+        self.assertIn("still in the tree", out)
+        with open(self.t.snapshot, "rb") as f:
+            self.assertEqual(f.read(), before)
+
+    def test_forgotten_id_is_not_retired(self):
+        self.t.write_preset("VendorA", preset("ZN @base", filament_id="Y999",
+                                              instantiation=False,
+                                              filament_vendor="ZV",
+                                              filament_type="PLA"))
+        self.t.write_preset("VendorA", preset("ZN @P1", inherits="ZN @base",
+                                              compatible_printers=["P1"]))
+        rc, _out = self.t.update_snapshot()
+        self.assertEqual(rc, 0)
+        self.t.remove_preset("VendorA", "ZN @base")
+        self.t.remove_preset("VendorA", "ZN @P1")
+        rc, out = self.t.update_snapshot(forget_path=self.forget_file(["Y999"]))
+        self.assertEqual(rc, 0)
+        self.assertIn("forgotten (never shipped)", out)
+        self.assertNotIn("Y999", load_json_file(self.t.retired)["retired"])
+        self.assertNotIn("Y999", load_json_file(self.t.snapshot)["ids"])
+
+    def test_splices_chains_through_forgotten_id(self):
+        self.t.write_preset("VendorA", preset("ZN @base", filament_id="Y999",
+                                              instantiation=False,
+                                              filament_vendor="ZV",
+                                              filament_type="PLA"))
+        self.t.write_preset("VendorA", preset("ZN @P1", inherits="ZN @base",
+                                              compatible_printers=["P1"]))
+        rc, _out = self.t.update_snapshot()
+        self.assertEqual(rc, 0)
+        # A shipped id already forwards to Y999, which turns out never shipped.
+        self.t.write_ledger(retired={
+            "OLD1": {"claims": ["VendorA/ZN"], "successor": "Y999"}})
+        # The family re-mints to NEWZ and Y999 vanishes.
+        self.t.write_preset("VendorA", preset("ZN @base", filament_id="NEWZ",
+                                              instantiation=False,
+                                              filament_vendor="ZV",
+                                              filament_type="PLA"),
+                            register=False)
+        rc, out = self.t.update_snapshot(forget_path=self.forget_file(["Y999"]))
+        self.assertEqual(rc, 0)
+        self.assertIn("spliced succession", out)
+        retired = load_json_file(self.t.retired)["retired"]
+        self.assertNotIn("Y999", retired)
+        self.assertEqual(retired["OLD1"],
+                         {"claims": ["VendorA/ZN"], "successor": "NEWZ"})
+
+
+# ---------------------------------------------------------------------------
+# --add-hint
+# ---------------------------------------------------------------------------
+
+class TestAddHint(SyntheticTreeCase):
+    def add_bbl(self):
+        self.t.add_vendor("BBL", [
+            preset("BPLA @base", filament_id="GFB01", instantiation=False),
+            preset("BPLA @X1C", inherits="BPLA @base",
+                   compatible_printers=["X1C 0.4 nozzle"]),
+        ])
+        rc, _out = self.t.update_snapshot()
+        assert rc == 0
+
+    def test_adds_island_hint(self):
+        self.add_bbl()
+        rc, out = self.t.add_hint(["GFB01=AX01"])
+        self.assertEqual(rc, 0, out)
+        self.assertEqual(load_json_file(self.t.retired)["hints"],
+                         {"GFB01": "AX01"})
+        errors, out = self.t.check()
+        self.assertEqual(errors, 0, out)
+
+    def test_rejects_non_island_old(self):
+        rc, out = self.t.add_hint(["AX01=OGFL99"])
+        self.assertEqual(rc, 1)
+        self.assertIn("not in an island id space", out)
+        self.assertEqual(afi.load_ledger(self.t.retired)["hints"], {})
+
+    def test_accepts_absent_island_old(self):
+        # Island catalogs own ids Orca never shipped (or has released).
+        rc, out = self.t.add_hint(["GFXX99=AX01"])
+        self.assertEqual(rc, 0, out)
+        self.assertEqual(load_json_file(self.t.retired)["hints"],
+                         {"GFXX99": "AX01"})
+        errors, out = self.t.check()
+        self.assertEqual(errors, 0, out)
+
+    def test_rejects_retired_old(self):
+        self.t.write_ledger(retired={"ROLD": {"claims": [], "successor": None}})
+        rc, out = self.t.add_hint(["ROLD=AX01"])
+        self.assertEqual(rc, 1)
+        self.assertIn("is retired", out)
+
+    def test_rejects_dead_target(self):
+        self.add_bbl()
+        rc, out = self.t.add_hint(["GFB01=OFnope99"])
+        self.assertEqual(rc, 1)
+        self.assertIn("not a live tree id", out)
+
+    def test_rejects_malformed_pair(self):
+        rc, out = self.t.add_hint(["GFB01"])
+        self.assertEqual(rc, 1)
+        self.assertIn('expects "OLD=NEW"', out)
+
+
 # ---------------------------------------------------------------------------
 # default run: mint + insert
 # ---------------------------------------------------------------------------
@@ -498,21 +1060,25 @@ class TestAssign(SyntheticTreeCase):
         self.assertIn("nothing to do (0 files changed)", out)
 
     def test_mints_into_family_root_and_rootless_member(self):
-        self.t.write_preset("VendorA", preset("FNEW @base", instantiation=False))
+        self.t.write_preset("VendorA", preset("FNEW @base", instantiation=False,
+                                              filament_vendor="FV",
+                                              filament_type="PLA"))
         self.t.write_preset("VendorA", preset("FNEW @P1", inherits="FNEW @base",
                                               compatible_printers=["P1"]))
         self.t.write_preset("VendorA", preset("FNEW @P2", inherits="FNEW @base",
                                               compatible_printers=["P2"]))
-        self.t.write_preset("VendorA", preset("GNEW @P1", compatible_printers=["P1"]))
+        self.t.write_preset("VendorA", preset("GNEW @P1", compatible_printers=["P1"],
+                                              filament_vendor="GV",
+                                              filament_type="PETG"))
         changed, errors, _out = self.t.assign()
         self.assertEqual(errors, 0)
         self.assertEqual(changed, 2)  # one root + one root-less member
         root = load_json_file(self.t.preset_path("VendorA", "FNEW @base"))
         self.assertEqual(root["filament_id"],
-                         afi.generate_filament_id("VendorA", "FNEW"))
+                         afi.generate_filament_id("FV", "PLA", "FNEW"))
         member = load_json_file(self.t.preset_path("VendorA", "GNEW @P1"))
         self.assertEqual(member["filament_id"],
-                         afi.generate_filament_id("VendorA", "GNEW"))
+                         afi.generate_filament_id("GV", "PETG", "GNEW"))
         # variants themselves never get the key
         child = load_json_file(self.t.preset_path("VendorA", "FNEW @P1"))
         self.assertNotIn("filament_id", child)
@@ -521,8 +1087,36 @@ class TestAssign(SyntheticTreeCase):
         self.assertEqual((changed, errors), (0, 0))
         self.assertIn("nothing to do", out)
 
+    def test_refuses_family_with_incomplete_triple(self):
+        self.t.write_preset("VendorA", preset("ENEW @base", instantiation=False))
+        self.t.write_preset("VendorA", preset("ENEW @P1", inherits="ENEW @base",
+                                              compatible_printers=["P1"]))
+        changed, errors, out = self.t.assign()
+        self.assertEqual(changed, 0)
+        self.assertGreater(errors, 0)
+        self.assertIn("resolves empty filament_vendor and filament_type", out)
+        self.assertIn("mint key needs both", out)
+
+    def test_refuses_family_with_divergent_root_fields(self):
+        self.t.write_preset("VendorA", preset("HNEW @base1", instantiation=False,
+                                              filament_vendor="HV",
+                                              filament_type="PLA"))
+        self.t.write_preset("VendorA", preset("HNEW @base2", instantiation=False,
+                                              filament_vendor="HV",
+                                              filament_type="PETG"))
+        self.t.write_preset("VendorA", preset("HNEW @P1", inherits="HNEW @base1",
+                                              compatible_printers=["P1"]))
+        self.t.write_preset("VendorA", preset("HNEW @P2", inherits="HNEW @base2",
+                                              compatible_printers=["P2"]))
+        changed, errors, out = self.t.assign()
+        self.assertEqual(changed, 0)
+        self.assertGreater(errors, 0)
+        self.assertIn("divergent (filament_vendor, filament_type)", out)
+
     def test_shared_root_between_families_is_refused(self):
-        self.t.write_preset("VendorA", preset("shared_base", instantiation=False))
+        self.t.write_preset("VendorA", preset("shared_base", instantiation=False,
+                                              filament_vendor="SV",
+                                              filament_type="PLA"))
         self.t.write_preset("VendorA", preset("HNEW @P1", inherits="shared_base",
                                               compatible_printers=["P1"]))
         self.t.write_preset("VendorA", preset("INEW @P1", inherits="shared_base",
@@ -533,6 +1127,10 @@ class TestAssign(SyntheticTreeCase):
         self.assertIn("shared with famil", out)
 
 
+# ---------------------------------------------------------------------------
+# byte-preserving profile edits
+# ---------------------------------------------------------------------------
+
 class TestInsertEditing(unittest.TestCase):
     CRLF_TEXT = (
         '{\r\n'
@@ -540,6 +1138,17 @@ class TestInsertEditing(unittest.TestCase):
         '\t"name": "JNEW @base",\r\n'
         '\t"inherits": "fdm_pla",\r\n'
         '\t"from": "system",\r\n'
+        '\t"instantiation": "false",\r\n'
+        '\t"filament_type": [\r\n'
+        '\t\t"PLA"\r\n'
+        '\t]\r\n'
+        '}\r\n'
+    )
+    CRLF_WITH_ID = (
+        '{\r\n'
+        '\t"type": "filament",\r\n'
+        '\t"name": "JNEW @base",\r\n'
+        '\t"filament_id": "OFold123",\r\n'
         '\t"instantiation": "false",\r\n'
         '\t"filament_type": [\r\n'
         '\t\t"PLA"\r\n'
@@ -585,6 +1194,192 @@ class TestInsertEditing(unittest.TestCase):
             raw.replace(b'\t"filament_id": "OFabc123",\r\n', b"", 1),
             self.CRLF_TEXT.encode("utf-8"))
 
+    def test_replace_value_preserves_every_other_byte(self):
+        text, n = afi.replace_filament_id_value(self.CRLF_WITH_ID,
+                                                "OFold123", "OFnew456")
+        self.assertEqual(n, 1)
+        self.assertEqual(json.loads(text)["filament_id"], "OFnew456")
+        self.assertEqual(text, self.CRLF_WITH_ID.replace('"OFold123"', '"OFnew456"'))
+
+    def test_replace_value_requires_exact_old_value(self):
+        _text, n = afi.replace_filament_id_value(self.CRLF_WITH_ID,
+                                                 "OFwrong1", "OFnew456")
+        self.assertEqual(n, 0)
+
+    def test_rewrite_filament_id_on_disk(self):
+        t = SyntheticTree()
+        self.addCleanup(t.cleanup)
+        t.add_vendor("VendorA", [])
+        path = t.preset_path("VendorA", "JNEW @base")
+        with open(path, "wb") as f:
+            f.write(self.CRLF_WITH_ID.encode("utf-8"))
+        afi.rewrite_filament_id(path, "OFold123", "OFnew456")
+        with open(path, "rb") as f:
+            raw = f.read()
+        self.assertEqual(raw,
+                         self.CRLF_WITH_ID.replace('"OFold123"', '"OFnew456"')
+                         .encode("utf-8"))
+        with self.assertRaises(RuntimeError):
+            afi.rewrite_filament_id(path, "OFold123", "OFxxx999")  # stale old id
+
+    def test_delete_line_with_trailing_comma(self):
+        text, n = afi.delete_filament_id_line(self.CRLF_WITH_ID, "OFold123")
+        self.assertEqual(n, 1)
+        self.assertNotIn("filament_id", json.loads(text))
+        self.assertEqual(text, self.CRLF_WITH_ID.replace(
+            '\t"filament_id": "OFold123",\r\n', "", 1))
+
+    def test_delete_last_property_line(self):
+        lf_text = ('{\n    "name": "K @base",\n    "instantiation": "false",\n'
+                   '    "filament_id": "OFold123"\n}\n')
+        text, n = afi.delete_filament_id_line(lf_text, "OFold123")
+        self.assertEqual(n, 1)
+        data = json.loads(text)
+        self.assertNotIn("filament_id", data)
+        self.assertEqual(data["instantiation"], "false")
+
+
+# ---------------------------------------------------------------------------
+# --remint
+# ---------------------------------------------------------------------------
+
+class TestRemint(SyntheticTreeCase):
+    TRIPLE = ("AVendor", "PLA", "APLA")
+
+    def test_rewrites_mismatching_declaration(self):
+        want = afi.generate_filament_id(*self.TRIPLE)
+        changed, errors, out = self.t.remint(["VendorA"])
+        self.assertEqual(errors, 0, out)
+        self.assertEqual(changed, 1)
+        self.assertIn('"AX01" -> "%s"' % want, out)
+        root = load_json_file(self.t.preset_path("VendorA", "APLA @base"))
+        self.assertEqual(root["filament_id"], want)
+        # OFL was not part of the run
+        ofl_root = load_json_file(self.t.preset_path(OFL, "fdm_pla"))
+        self.assertEqual(ofl_root["filament_id"], "OGFL99")
+        # idempotent: a second run over the same vendor rewrites nothing
+        changed, errors, _out = self.t.remint(["VendorA"])
+        self.assertEqual((changed, errors), (0, 0))
+
+    def test_same_triple_converges_within_run(self):
+        self.t.add_vendor("VendorB", [
+            preset("APLA @Bbase", filament_id="BX01", instantiation=False,
+                   filament_vendor="AVendor", filament_type="PLA"),
+            preset("APLA @PB", inherits="APLA @Bbase",
+                   compatible_printers=["PB 0.4 nozzle"]),
+        ])
+        want = afi.generate_filament_id(*self.TRIPLE)
+        changed, errors, _out = self.t.remint(["VendorA", "VendorB"])
+        self.assertEqual(errors, 0)
+        self.assertEqual(changed, 2)
+        a = load_json_file(self.t.preset_path("VendorA", "APLA @base"))
+        b = load_json_file(self.t.preset_path("VendorB", "APLA @Bbase"))
+        self.assertEqual(a["filament_id"], want)
+        self.assertEqual(b["filament_id"], want)
+
+    def test_same_triple_converges_with_existing_tree_id(self):
+        # Another bundle already carries the conforming id for the same triple:
+        # reuse is required, not blocked.
+        want = afi.generate_filament_id(*self.TRIPLE)
+        self.t.add_vendor("VendorB", [
+            preset("APLA @Bbase", filament_id=want, instantiation=False,
+                   filament_vendor="AVendor", filament_type="PLA"),
+        ])
+        changed, errors, _out = self.t.remint(["VendorA"])
+        self.assertEqual((changed, errors), (1, 0))
+        a = load_json_file(self.t.preset_path("VendorA", "APLA @base"))
+        self.assertEqual(a["filament_id"], want)
+
+    def test_blocked_by_retired_id(self):
+        want0 = afi.generate_filament_id(*self.TRIPLE)
+        self.t.write_ledger(retired={want0: {"claims": [], "successor": None}})
+        changed, errors, _out = self.t.remint(["VendorA"])
+        self.assertEqual((changed, errors), (1, 0))
+        root = load_json_file(self.t.preset_path("VendorA", "APLA @base"))
+        self.assertEqual(root["filament_id"],
+                         afi.generate_filament_id(*self.TRIPLE, salt=1))
+
+    def test_blocked_by_hint_key(self):
+        want0 = afi.generate_filament_id(*self.TRIPLE)
+        self.t.write_ledger(hints={want0: "AX01"})
+        changed, errors, _out = self.t.remint(["VendorA"])
+        self.assertEqual((changed, errors), (1, 0))
+        root = load_json_file(self.t.preset_path("VendorA", "APLA @base"))
+        self.assertEqual(root["filament_id"],
+                         afi.generate_filament_id(*self.TRIPLE, salt=1))
+
+    def test_blocked_by_other_triple_occurrence(self):
+        want0 = afi.generate_filament_id(*self.TRIPLE)
+        self.t.add_vendor("VendorB", [
+            preset("BPLA @base", filament_id=want0, instantiation=False,
+                   filament_vendor="BV", filament_type="PETG"),
+        ])
+        changed, errors, _out = self.t.remint(["VendorA"])
+        self.assertEqual((changed, errors), (1, 0))
+        root = load_json_file(self.t.preset_path("VendorA", "APLA @base"))
+        self.assertEqual(root["filament_id"],
+                         afi.generate_filament_id(*self.TRIPLE, salt=1))
+
+    def test_bbl_is_forbidden(self):
+        changed, errors, out = self.t.remint(["BBL"])
+        self.assertEqual(changed, 0)
+        self.assertGreater(errors, 0)
+        self.assertIn("forbidden", out)
+
+
+# ---------------------------------------------------------------------------
+# --drop-redundant-ids
+# ---------------------------------------------------------------------------
+
+class TestDropRedundantIds(SyntheticTreeCase):
+    def test_drops_only_ofl_riding_same_base_name_declarations(self):
+        # Redundant: same base name, rides the OFL generic, re-declares its id.
+        self.t.write_preset("VendorA", preset("Generic PLA @P2",
+                                              inherits="Generic PLA @System",
+                                              compatible_printers=["P2"],
+                                              filament_id="OGFL99"))
+        # Renamed rider: not dropped (a repoint worksheet decision, not a drop).
+        self.t.write_preset("VendorA", preset("Tuned PLA @P3",
+                                              inherits="Generic PLA @System",
+                                              compatible_printers=["P3"],
+                                              filament_id="OGFL99"))
+        dropped, errors, out = self.t.drop_redundant("VendorA")
+        self.assertEqual(errors, 0, out)
+        self.assertEqual(dropped, 1)
+        self.assertIn('dropped filament_id "OGFL99"', out)
+        self.assertIn('rides OFL "Generic PLA @System"', out)
+        gone = load_json_file(self.t.preset_path("VendorA", "Generic PLA @P2"))
+        self.assertNotIn("filament_id", gone)
+        kept = load_json_file(self.t.preset_path("VendorA", "Tuned PLA @P3"))
+        self.assertEqual(kept["filament_id"], "OGFL99")
+        # vendor-rooted families are untouched
+        root = load_json_file(self.t.preset_path("VendorA", "APLA @base"))
+        self.assertEqual(root["filament_id"], "AX01")
+
+    def test_bbl_is_forbidden(self):
+        dropped, errors, out = self.t.drop_redundant("BBL")
+        self.assertEqual(dropped, 0)
+        self.assertGreater(errors, 0)
+        self.assertIn("forbidden", out)
+
+
+# ---------------------------------------------------------------------------
+# --mint CLI
+# ---------------------------------------------------------------------------
+
+class TestMintCli(unittest.TestCase):
+    def test_prints_an_of_id(self):
+        buf = io.StringIO()
+        with contextlib.redirect_stdout(buf):
+            rc = afi.main(["--mint", "Polymaker/PLA/PolyLite PLA"])
+        self.assertEqual(rc, 0)
+        self.assertRegex(buf.getvalue().strip(), r"^OF[0-9A-Za-z]{6}$")
+
+    def test_requires_exactly_three_parts(self):
+        with self.assertRaises(SystemExit), \
+                contextlib.redirect_stderr(io.StringIO()):
+            afi.main(["--mint", "Vendor/Family"])
+
 
 # ---------------------------------------------------------------------------
 # the real tree
@@ -610,9 +1405,11 @@ class TestRealTree(unittest.TestCase):
 
 class TestReviewFixes(SyntheticTreeCase):
     def test_update_snapshot_refuses_retired_id_reuse(self):
-        fid = afi.generate_filament_id("VendorA", "LONER")
+        fid = afi.generate_filament_id("LV", "PLA", "LONER")
         self.t.write_preset("VendorA", preset("LONER @base", filament_id=fid,
-                                              instantiation=False))
+                                              instantiation=False,
+                                              filament_vendor="LV",
+                                              filament_type="PLA"))
         self.t.write_preset("VendorA", preset("LONER @P1", inherits="LONER @base",
                                               compatible_printers=["P1 0.4 nozzle"]))
         rc, _ = self.t.update_snapshot()
@@ -624,7 +1421,9 @@ class TestReviewFixes(SyntheticTreeCase):
         self.assertIn(fid, afi.load_retired(self.t.retired))
         # Resurrect the same id: --update-snapshot must refuse, not sanction.
         self.t.write_preset("VendorA", preset("LONER @base", filament_id=fid,
-                                              instantiation=False))
+                                              instantiation=False,
+                                              filament_vendor="LV",
+                                              filament_type="PLA"))
         self.t.write_preset("VendorA", preset("LONER @P1", inherits="LONER @base",
                                               compatible_printers=["P1 0.4 nozzle"]))
         rc, out = self.t.update_snapshot()
@@ -633,12 +1432,14 @@ class TestReviewFixes(SyntheticTreeCase):
         self.assertNotIn(fid, load_json_file(self.t.snapshot)["ids"])
 
     def test_check3_skips_of_id_inherited_from_other_vendor(self):
-        # Post-Phase-1 world: an OFL generic carries its own minted OF id and a
-        # vendor tunes it correctly (same base name, non-empty printers). The
-        # new claim must trip only the snapshot gate, never mint conformance.
-        fid = afi.generate_filament_id(OFL, "Generic PLA Matte")
+        # An OFL family carries its own minted OF id and a vendor tunes it
+        # correctly (same base name, non-empty printers). The new claim must
+        # trip only the snapshot gate, never mint conformance.
+        fid = afi.generate_filament_id("Generic", "PLA", "Generic PLA Matte")
         self.t.write_preset(OFL, preset("Generic PLA Matte @base", filament_id=fid,
-                                        instantiation=False))
+                                        instantiation=False,
+                                        filament_vendor="Generic",
+                                        filament_type="PLA"))
         self.t.write_preset(OFL, preset("Generic PLA Matte @System",
                                         inherits="Generic PLA Matte @base",
                                         compatible_printers=[]))
@@ -648,7 +1449,7 @@ class TestReviewFixes(SyntheticTreeCase):
                                               inherits="Generic PLA Matte @System",
                                               compatible_printers=["P1 0.4 nozzle"]))
         errors, out = self.t.check()
-        self.assertNotIn("does not match its mint", out)
+        self.assertNotIn("does not match the mint", out)
         self.assertIn("not sanctioned", out)
         self.assertEqual(errors, 1, out)
         # After sanctioning the claim the tree is fully green again.
@@ -659,10 +1460,12 @@ class TestReviewFixes(SyntheticTreeCase):
 
     def test_check7c_prints_expected_mint(self):
         self.t.write_preset("VendorA", preset("Orphan PLA @P1",
-                                              compatible_printers=["P1 0.4 nozzle"]))
+                                              compatible_printers=["P1 0.4 nozzle"],
+                                              filament_vendor="OV",
+                                              filament_type="PLA"))
         errors, out = self.t.check()
         self.assertGreater(errors, 0)
-        self.assertIn(afi.generate_filament_id("VendorA", "Orphan PLA"), out)
+        self.assertIn(afi.generate_filament_id("OV", "PLA", "Orphan PLA"), out)
 
 
 if __name__ == "__main__":

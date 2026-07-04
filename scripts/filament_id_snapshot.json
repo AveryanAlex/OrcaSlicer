@@ -1,5 +1,1042 @@
 {
- "alias_exceptions": [],
+ "alias_exceptions": [
+  "Afinia/Afinia PLA",
+  "Afinia/Afinia PLA@HS",
+  "Afinia/Afinia Value PLA",
+  "Afinia/Afinia Value PLA@HS",
+  "Anker/Anker Generic PA @base",
+  "Anker/Anker Generic PA-CF @base",
+  "Anker/Anker Generic PC @base",
+  "Anker/Anker Generic PETG @base",
+  "Anker/Anker Generic PETG-CF @base",
+  "Anker/Anker Generic PLA @base",
+  "Anker/Anker Generic PLA Silk @base",
+  "Anker/Anker Generic PLA+ @base",
+  "Anker/Anker Generic PLA-CF @base",
+  "Anycubic/Anycubic Generic PA",
+  "Anycubic/Anycubic Generic PA-CF",
+  "Anycubic/Anycubic Generic PC",
+  "Anycubic/Anycubic Generic PETG",
+  "Anycubic/Anycubic Generic PLA",
+  "Anycubic/Anycubic Generic PLA-CF",
+  "Anycubic/Anycubic PA @Anycubic Kobra S1 Max 0.4 nozzle",
+  "Anycubic/Anycubic PA @Anycubic Kobra S1 Max 0.6 nozzle",
+  "Anycubic/Anycubic PA @Anycubic Kobra S1 Max 0.8 nozzle",
+  "Anycubic/Anycubic PA6-CF @Anycubic Kobra S1 Max 0.4 nozzle",
+  "Anycubic/Anycubic PA6-CF @Anycubic Kobra S1 Max 0.6 nozzle",
+  "Anycubic/Anycubic PA6-CF @Anycubic Kobra S1 Max 0.8 nozzle",
+  "Anycubic/Anycubic PAHT-CF @Anycubic Kobra S1 Max 0.4 nozzle",
+  "Anycubic/Anycubic PAHT-CF @Anycubic Kobra S1 Max 0.6 nozzle",
+  "Anycubic/Anycubic PAHT-CF @Anycubic Kobra S1 Max 0.8 nozzle",
+  "Anycubic/Anycubic PC @Anycubic Kobra S1 Max 0.4 nozzle",
+  "Anycubic/Anycubic PC @Anycubic Kobra S1 Max 0.6 nozzle",
+  "Anycubic/Anycubic PC @Anycubic Kobra S1 Max 0.8 nozzle",
+  "Anycubic/Anycubic PC-CF @Anycubic Kobra S1 Max 0.4 nozzle",
+  "Anycubic/Anycubic PC-CF @Anycubic Kobra S1 Max 0.6 nozzle",
+  "Anycubic/Anycubic PC-CF @Anycubic Kobra S1 Max 0.8 nozzle",
+  "Anycubic/Anycubic PC-GF @Anycubic Kobra S1 Max 0.4 nozzle",
+  "Anycubic/Anycubic PC-GF @Anycubic Kobra S1 Max 0.6 nozzle",
+  "Anycubic/Anycubic PC-GF @Anycubic Kobra S1 Max 0.8 nozzle",
+  "Anycubic/Anycubic PET-CF @Anycubic Kobra S1 Max 0.4 nozzle",
+  "Anycubic/Anycubic PET-CF @Anycubic Kobra S1 Max 0.6 nozzle",
+  "Anycubic/Anycubic PET-CF @Anycubic Kobra S1 Max 0.8 nozzle",
+  "Anycubic/Anycubic PETG @Anycubic Kobra 3 Max 0.4 nozzle",
+  "Anycubic/Anycubic PETG @Anycubic Kobra 3 Max 0.6 nozzle",
+  "Anycubic/Anycubic PETG @Anycubic Kobra 3 Max 0.8 nozzle",
+  "Anycubic/Anycubic PETG @Anycubic Kobra S1 0.4 nozzle",
+  "Anycubic/Anycubic PETG @Anycubic Kobra S1 Max 0.25 nozzle",
+  "Anycubic/Anycubic PETG @Anycubic Kobra S1 Max 0.4 nozzle",
+  "Anycubic/Anycubic PETG @Anycubic Kobra S1 Max 0.6 nozzle",
+  "Anycubic/Anycubic PETG @Anycubic Kobra S1 Max 0.8 nozzle",
+  "Anycubic/Anycubic PETG @Anycubic Kobra X 0.4 nozzle",
+  "Anycubic/Anycubic PETG-CF @Anycubic Kobra S1 Max 0.4 nozzle",
+  "Anycubic/Anycubic PETG-CF @Anycubic Kobra S1 Max 0.6 nozzle",
+  "Anycubic/Anycubic PETG-CF @Anycubic Kobra S1 Max 0.8 nozzle",
+  "Anycubic/Anycubic PLA @Anycubic Kobra 3 Max 0.4 nozzle",
+  "Anycubic/Anycubic PLA @Anycubic Kobra 3 Max 0.6 nozzle",
+  "Anycubic/Anycubic PLA @Anycubic Kobra 3 Max 0.8 nozzle",
+  "Anycubic/Anycubic PLA @Anycubic Kobra S1 0.4 nozzle",
+  "Anycubic/Anycubic PLA @Anycubic Kobra S1 Max 0.25 nozzle",
+  "Anycubic/Anycubic PLA @Anycubic Kobra S1 Max 0.4 nozzle",
+  "Anycubic/Anycubic PLA @Anycubic Kobra S1 Max 0.6 nozzle",
+  "Anycubic/Anycubic PLA @Anycubic Kobra S1 Max 0.8 nozzle",
+  "Anycubic/Anycubic PLA @Anycubic Kobra X 0.4 nozzle",
+  "Anycubic/Anycubic PLA Glow @Anycubic Kobra X 0.4 nozzle",
+  "Anycubic/Anycubic PLA High Speed @Anycubic Kobra 3 Max 0.4 nozzle",
+  "Anycubic/Anycubic PLA High Speed @Anycubic Kobra S1 0.4 nozzle",
+  "Anycubic/Anycubic PLA High Speed @Anycubic Kobra S1 Max 0.4 nozzle",
+  "Anycubic/Anycubic PLA High Speed @Anycubic Kobra S1 Max 0.6 nozzle",
+  "Anycubic/Anycubic PLA High Speed @Anycubic Kobra S1 Max 0.8 nozzle",
+  "Anycubic/Anycubic PLA High Speed @Anycubic Kobra X 0.4 nozzle",
+  "Anycubic/Anycubic PLA Luminous @Anycubic Kobra 3 Max 0.4 nozzle",
+  "Anycubic/Anycubic PLA Matte @Anycubic Kobra 3 Max 0.4 nozzle",
+  "Anycubic/Anycubic PLA Matte @Anycubic Kobra S1 Max 0.4 nozzle",
+  "Anycubic/Anycubic PLA Matte @Anycubic Kobra S1 Max 0.6 nozzle",
+  "Anycubic/Anycubic PLA Matte @Anycubic Kobra S1 Max 0.8 nozzle",
+  "Anycubic/Anycubic PLA Matte @Anycubic Kobra X 0.4 nozzle",
+  "Anycubic/Anycubic PLA Silk @Anycubic Kobra 3 Max 0.4 nozzle",
+  "Anycubic/Anycubic PLA Silk @Anycubic Kobra S1 0.4 nozzle",
+  "Anycubic/Anycubic PLA Silk @Anycubic Kobra S1 Max 0.4 nozzle",
+  "Anycubic/Anycubic PLA Silk @Anycubic Kobra S1 Max 0.6 nozzle",
+  "Anycubic/Anycubic PLA Silk @Anycubic Kobra S1 Max 0.8 nozzle",
+  "Anycubic/Anycubic PLA Silk @Anycubic Kobra X 0.4 nozzle",
+  "Anycubic/Anycubic PLA Translucent @Anycubic Kobra S1 Max 0.4 nozzle",
+  "Anycubic/Anycubic PLA+ @Anycubic Kobra 3 Max 0.4 nozzle",
+  "Anycubic/Anycubic PLA+ @Anycubic Kobra S1 0.4 nozzle",
+  "Anycubic/Anycubic PLA+ @Anycubic Kobra S1 Max 0.4 nozzle",
+  "Anycubic/Anycubic PLA+ @Anycubic Kobra S1 Max 0.6 nozzle",
+  "Anycubic/Anycubic PLA+ @Anycubic Kobra S1 Max 0.8 nozzle",
+  "Anycubic/Anycubic PLA+ @Anycubic Kobra X 0.4 nozzle",
+  "Anycubic/Fiberon PA6-CF20 @Anycubic Kobra S1",
+  "Anycubic/Generic PETG @Anycubic Kobra S1 Max 0.4 nozzle",
+  "Anycubic/Generic PETG @Anycubic Kobra X 0.4 nozzle",
+  "Anycubic/Generic PETG Basic @Anycubic Kobra 3 Max 0.4 nozzle",
+  "Anycubic/Panchroma PLA @Anycubic Kobra S1",
+  "Anycubic/Polymaker PLA Pro @Anycubic Kobra S1",
+  "Anycubic/Polymaker PLA Pro Metallic @Anycubic Kobra S1",
+  "Artillery/Artillery Generic PETG",
+  "Artillery/Artillery Generic PLA",
+  "Artillery/Artillery Generic PLA-CF",
+  "BBL/BETA HIPS @base",
+  "BBL/BETA PAHT-CF @base",
+  "BBL/BETA PETG @base",
+  "BBL/BETA PETG Fluorescence @base",
+  "BBL/BETA PETG Glitter @base",
+  "BBL/BETA PETG Glow @base",
+  "BBL/BETA PETG Gradient @base",
+  "BBL/BETA PETG HF @base",
+  "BBL/BETA PETG Heat Color Change @base",
+  "BBL/BETA PETG Marble @base",
+  "BBL/BETA PETG Matte @base",
+  "BBL/BETA PETG Metallic @base",
+  "BBL/BETA PETG Transparent @base",
+  "BBL/BETA PETG UV Color Change @base",
+  "BBL/BETA PETG-CF @base",
+  "BBL/BETA PETG-GF @base",
+  "BBL/BETA PLA Basic @base",
+  "BBL/BETA PLA Chameleon @base",
+  "BBL/BETA PLA Fluorescence @base",
+  "BBL/BETA PLA Glitter @base",
+  "BBL/BETA PLA Glow @base",
+  "BBL/BETA PLA Gradient @base",
+  "BBL/BETA PLA Heat Color Change @base",
+  "BBL/BETA PLA High Speed @base",
+  "BBL/BETA PLA High Temp @base",
+  "BBL/BETA PLA Marble @base",
+  "BBL/BETA PLA Matte @base",
+  "BBL/BETA PLA Metal @base",
+  "BBL/BETA PLA Metallic @base",
+  "BBL/BETA PLA PRO @base",
+  "BBL/BETA PLA Silk @base",
+  "BBL/BETA PLA Silk+ @base",
+  "BBL/BETA PLA Transparent @base",
+  "BBL/BETA PLA UV Color Change @base",
+  "BBL/BETA PLA Wood @base",
+  "BBL/BETA PLA Youth @base",
+  "BBL/BETA PLA-CF @base",
+  "BBL/Bambu PA-CF @base",
+  "BBL/Bambu PA6-CF @base",
+  "BBL/Bambu PA6-GF @base",
+  "BBL/Bambu PAHT-CF @base",
+  "BBL/Bambu PC @base",
+  "BBL/Bambu PC FR @base",
+  "BBL/Bambu PET-CF @base",
+  "BBL/Bambu PETG Basic @base",
+  "BBL/Bambu PETG HF @base",
+  "BBL/Bambu PETG Translucent @base",
+  "BBL/Bambu PETG-CF @base",
+  "BBL/Bambu PLA Aero @base",
+  "BBL/Bambu PLA Basic @base",
+  "BBL/Bambu PLA Dynamic @base",
+  "BBL/Bambu PLA Galaxy @base",
+  "BBL/Bambu PLA Glow @base",
+  "BBL/Bambu PLA Lite @base",
+  "BBL/Bambu PLA Marble @base",
+  "BBL/Bambu PLA Matte @base",
+  "BBL/Bambu PLA Metal @base",
+  "BBL/Bambu PLA Silk @base",
+  "BBL/Bambu PLA Silk+ @base",
+  "BBL/Bambu PLA Sparkle @base",
+  "BBL/Bambu PLA Tough @base",
+  "BBL/Bambu PLA Tough+ @base",
+  "BBL/Bambu PLA Translucent @base",
+  "BBL/Bambu PLA Wood @base",
+  "BBL/Bambu PLA-CF @base",
+  "BBL/Bambu PPA-CF @base",
+  "BBL/Bambu Support For PA/PET @base",
+  "BBL/Bambu Support For PLA @base",
+  "BBL/Bambu Support For PLA/PETG @base",
+  "BBL/Bambu Support G @base",
+  "BBL/Bambu Support W @base",
+  "BBL/COEX NYLEX UNFILLED  @BBL X1C",
+  "BBL/Fiberon PA12-CF @base",
+  "BBL/Fiberon PA12-CF10 @base",
+  "BBL/Fiberon PA6-CF @base",
+  "BBL/Fiberon PA6-CF20 @base",
+  "BBL/Fiberon PA6-GF @base",
+  "BBL/Fiberon PA6-GF25 @base",
+  "BBL/Fiberon PA612-CF @base",
+  "BBL/Fiberon PA612-CF15 @base",
+  "BBL/Fiberon PET-CF @base",
+  "BBL/Fiberon PET-CF17 @base",
+  "BBL/Fiberon PETG-ESD @base",
+  "BBL/Fiberon PETG-rCF @base",
+  "BBL/Fiberon PETG-rCF08 @base",
+  "BBL/Generic BVOH @base",
+  "BBL/Generic EVA @base",
+  "BBL/Generic HIPS @base",
+  "BBL/Generic PA @base",
+  "BBL/Generic PA-CF @base",
+  "BBL/Generic PC @base",
+  "BBL/Generic PCTG @base",
+  "BBL/Generic PE @base",
+  "BBL/Generic PE-CF @base",
+  "BBL/Generic PETG @base",
+  "BBL/Generic PETG HF @base",
+  "BBL/Generic PETG-CF @base",
+  "BBL/Generic PHA @base",
+  "BBL/Generic PLA @base",
+  "BBL/Generic PLA High Speed @base",
+  "BBL/Generic PLA Silk @base",
+  "BBL/Generic PLA-CF @base",
+  "BBL/Generic PP @base",
+  "BBL/Generic PP-CF @base",
+  "BBL/Generic PP-GF @base",
+  "BBL/Generic PPA-CF @base",
+  "BBL/Generic PPA-GF @base",
+  "BBL/Generic SBS @base",
+  "BBL/Numakers PLA+ @base",
+  "BBL/Overture Matte PLA @base",
+  "BBL/Overture PLA @base",
+  "BBL/Overture PLA Pro @base",
+  "BBL/Panchroma CoPE @base",
+  "BBL/Panchroma PLA @base",
+  "BBL/Panchroma PLA Celestial @base",
+  "BBL/Panchroma PLA Galaxy @base",
+  "BBL/Panchroma PLA Glow @base",
+  "BBL/Panchroma PLA Luminous @base",
+  "BBL/Panchroma PLA Marble @base",
+  "BBL/Panchroma PLA Matte @base",
+  "BBL/Panchroma PLA Metallic @base",
+  "BBL/Panchroma PLA Neon @base",
+  "BBL/Panchroma PLA Satin @base",
+  "BBL/Panchroma PLA Silk @base",
+  "BBL/Panchroma PLA Starlight @base",
+  "BBL/Panchroma PLA Temp Shift @base",
+  "BBL/Panchroma PLA Translucent @base",
+  "BBL/Panchroma PLA UV Shift @base",
+  "BBL/PolyLite CosPLA @base",
+  "BBL/PolyLite PETG @base",
+  "BBL/PolyLite PLA @base",
+  "BBL/PolyLite PLA Galaxy @base",
+  "BBL/PolyLite PLA Glow @base",
+  "BBL/PolyLite PLA Luminous @base",
+  "BBL/PolyLite PLA Neon @base",
+  "BBL/PolyLite PLA Pro @base",
+  "BBL/PolyLite PLA Starlight @base",
+  "BBL/PolyLite PLA Translucent @base",
+  "BBL/PolyTerra PLA @base",
+  "BBL/PolyTerra PLA Marble @base",
+  "BBL/PolyTerra PLA+ @base",
+  "BBL/Polymaker HT-PLA @base",
+  "BBL/Polymaker HT-PLA-GF @base",
+  "BBL/SUNLU PETG @base",
+  "BBL/SUNLU PLA Marble @base",
+  "BBL/SUNLU PLA Matte @base",
+  "BBL/SUNLU PLA+ 2.0 @base",
+  "BBL/SUNLU PLA+ @base",
+  "BBL/SUNLU Silk PLA+ @base",
+  "BBL/SUNLU Wood PLA @base",
+  "BBL/eSUN PLA+ @base",
+  "Blocks/Blocks Generic PA",
+  "Blocks/Blocks Generic PA-CF",
+  "Blocks/Blocks Generic PC",
+  "Blocks/Blocks Generic PLA",
+  "Blocks/Blocks Generic PLA-CF",
+  "CONSTRUCT3D/C1 Generic High Flow PETG",
+  "CONSTRUCT3D/C1 Generic PETG",
+  "CONSTRUCT3D/C1 Generic PLA",
+  "Chuanying/Chuanying Generic HS PLA",
+  "Chuanying/Chuanying Generic PETG",
+  "Chuanying/Chuanying Generic PETG-CF10",
+  "Chuanying/Chuanying Generic PLA",
+  "Chuanying/Chuanying Generic PLA-CF10",
+  "Chuanying/Chuanying Generic PLA-Silk",
+  "Co Print/CoPrint Generic PLA",
+  "CoLiDo/CoLiDo Generic PETG @CoLiDo DIY 4.0",
+  "CoLiDo/CoLiDo Generic PETG @CoLiDo X16",
+  "CoLiDo/CoLiDo Generic PLA @CoLiDo DIY 4.0",
+  "CoLiDo/CoLiDo Generic PLA @CoLiDo X16",
+  "CoLiDo/CoLiDo PETG @CoLiDo SR1",
+  "CoLiDo/CoLiDo PLA @CoLiDo SR1",
+  "CoLiDo/CoLiDo PLA Silk @CoLiDo SR1",
+  "CoLiDo/CoLiDo PLA+ @CoLiDo DIY 4.0 V2",
+  "Comgrow/Comgrow Generic PETG",
+  "Comgrow/Comgrow Generic PLA",
+  "Creality/CR-Nylon @K1 Max_CFS-C-all",
+  "Creality/CR-Nylon @K1C-all",
+  "Creality/CR-Nylon @K1C_CFS-C-all",
+  "Creality/CR-Nylon @K1_CFS-C-all",
+  "Creality/CR-Nylon @K2 Plus-all",
+  "Creality/CR-PLA @Ender-3 V4-all",
+  "Creality/CR-PLA @Hi-all",
+  "Creality/CR-PLA @K1 Max_CFS-C-all",
+  "Creality/CR-PLA @K1 SE-all",
+  "Creality/CR-PLA @K1 SE_CFS-C-all",
+  "Creality/CR-PLA @K1C-all",
+  "Creality/CR-PLA @K1C_CFS-C-all",
+  "Creality/CR-PLA @K1_CFS-C-all",
+  "Creality/CR-PLA @K2 Plus-all",
+  "Creality/CR-PLA @K2 Pro-all",
+  "Creality/CR-PLA @K2 SE-all",
+  "Creality/CR-PLA @K2-all",
+  "Creality/CR-PLA @SPARKX i7-all",
+  "Creality/CR-PLA Carbon @K1 Max_CFS-C-all",
+  "Creality/CR-PLA Carbon @K1C-all",
+  "Creality/CR-PLA Carbon @K1C_CFS-C-all",
+  "Creality/CR-PLA Carbon @K1_CFS-C-all",
+  "Creality/CR-PLA Carbon @K2 Plus-all",
+  "Creality/CR-PLA Fluo @K1 Max_CFS-C-all",
+  "Creality/CR-PLA Fluo @K1C-all",
+  "Creality/CR-PLA Fluo @K1C_CFS-C-all",
+  "Creality/CR-PLA Fluo @K1_CFS-C-all",
+  "Creality/CR-PLA Fluo @K2 Plus-all",
+  "Creality/CR-PLA Fluo @K2 Pro-all",
+  "Creality/CR-PLA Fluo @K2-all",
+  "Creality/CR-PLA Fluo @SPARKX i7-all",
+  "Creality/CR-PLA Matte @Ender-3 V4-all",
+  "Creality/CR-PLA Matte @K1 Max_CFS-C-all",
+  "Creality/CR-PLA Matte @K1C-all",
+  "Creality/CR-PLA Matte @K1C_CFS-C-all",
+  "Creality/CR-PLA Matte @K1_CFS-C-all",
+  "Creality/CR-PLA Matte @K2 Plus-all",
+  "Creality/CR-PLA Matte @K2 Pro-all",
+  "Creality/CR-PLA Matte @K2-all",
+  "Creality/CR-PLA Matte @SPARKX i7-all",
+  "Creality/CR-Silk @Ender-3 V4-all",
+  "Creality/CR-Silk @Hi-all",
+  "Creality/CR-Silk @K1 Max_CFS-C-all",
+  "Creality/CR-Silk @K1 SE-all",
+  "Creality/CR-Silk @K1 SE_CFS-C-all",
+  "Creality/CR-Silk @K1C-all",
+  "Creality/CR-Silk @K1C_CFS-C-all",
+  "Creality/CR-Silk @K1_CFS-C-all",
+  "Creality/CR-Silk @K2 Plus-all",
+  "Creality/CR-Silk @K2 Pro-all",
+  "Creality/CR-Silk @K2 SE-all",
+  "Creality/CR-Silk @K2-all",
+  "Creality/CR-Silk @SPARKX i7-all",
+  "Creality/CR-Wood @K1 Max_CFS-C-all",
+  "Creality/CR-Wood @K1C-all",
+  "Creality/CR-Wood @K1C_CFS-C-all",
+  "Creality/CR-Wood @K1_CFS-C-all",
+  "Creality/CR-Wood @K2 Plus-all",
+  "Creality/Creality Generic PA-CF",
+  "Creality/Creality Generic PC",
+  "Creality/Creality Generic PETG",
+  "Creality/Creality Generic PLA",
+  "Creality/Creality Generic PLA-CF",
+  "Creality/Creality HF Generic PLA",
+  "Creality/Creality HF Generic Speed PLA",
+  "Creality/EN-PLA+ @K1 Max_CFS-C-all",
+  "Creality/EN-PLA+ @K1C-all",
+  "Creality/EN-PLA+ @K1C_CFS-C-all",
+  "Creality/EN-PLA+ @K1_CFS-C-all",
+  "Creality/EN-PLA+ @K2 Plus-all",
+  "Creality/EN-PLA+ @K2 Pro-all",
+  "Creality/EN-PLA+ @K2-all",
+  "Creality/EN-PLA+ @SPARKX i7-all",
+  "Creality/ENDER FAST PLA @Hi-all",
+  "Creality/ENDER FAST PLA @K2 Plus-all",
+  "Creality/ENDER FAST PLA @K2 Pro-all",
+  "Creality/ENDER FAST PLA @K2-all",
+  "Creality/ENDER FAST PLA @SPARKX i7-all",
+  "Creality/Ender-PLA @Ender-3 V4-all",
+  "Creality/Ender-PLA @Hi-all",
+  "Creality/Ender-PLA @K1 Max_CFS-C-all",
+  "Creality/Ender-PLA @K1C-all",
+  "Creality/Ender-PLA @K1C_CFS-C-all",
+  "Creality/Ender-PLA @K1_CFS-C-all",
+  "Creality/Ender-PLA @K2 Plus-all",
+  "Creality/Ender-PLA @K2 Pro-all",
+  "Creality/Ender-PLA @K2-all",
+  "Creality/Ender-PLA @SPARKX i7-all",
+  "Creality/Generic HIPS @K1 Max_CFS-C-all",
+  "Creality/Generic HIPS @K1C-all",
+  "Creality/Generic HIPS @K1C_CFS-C-all",
+  "Creality/Generic HIPS @K1_CFS-C-all",
+  "Creality/Generic HIPS @K2 Plus-all",
+  "Creality/Generic PA @K1 Max_CFS-C-all",
+  "Creality/Generic PA @K1C-all",
+  "Creality/Generic PA @K1C_CFS-C-all",
+  "Creality/Generic PA @K1_CFS-C-all",
+  "Creality/Generic PA @K2 Plus-all",
+  "Creality/Generic PA @K2 Pro-all",
+  "Creality/Generic PA @K2-all",
+  "Creality/Generic PA-CF @K1 Max_CFS-C-all",
+  "Creality/Generic PA-CF @K1C-all",
+  "Creality/Generic PA-CF @K1C_CFS-C-all",
+  "Creality/Generic PA-CF @K1_CFS-C-all",
+  "Creality/Generic PA-CF @K2 Plus-all",
+  "Creality/Generic PA12-CF @K2 Plus-all",
+  "Creality/Generic PA6-CF @K1 Max_CFS-C-all",
+  "Creality/Generic PA6-CF @K1C-all",
+  "Creality/Generic PA6-CF @K1C_CFS-C-all",
+  "Creality/Generic PA6-CF @K1_CFS-C-all",
+  "Creality/Generic PA6-CF @K2 Plus-all",
+  "Creality/Generic PA6-CF @K2 Pro-all",
+  "Creality/Generic PA612-CF @K2 Plus-all",
+  "Creality/Generic PA612-CF @K2 Pro-all",
+  "Creality/Generic PAHT-CF @K1 Max_CFS-C-all",
+  "Creality/Generic PAHT-CF @K1C-all",
+  "Creality/Generic PAHT-CF @K1C_CFS-C-all",
+  "Creality/Generic PAHT-CF @K1_CFS-C-all",
+  "Creality/Generic PAHT-CF @K2 Plus-all",
+  "Creality/Generic PAHT-CF @K2 Pro-all",
+  "Creality/Generic PAHT-CF @K2-all",
+  "Creality/Generic PC @K1 Max_CFS-C-all",
+  "Creality/Generic PC @K1C-all",
+  "Creality/Generic PC @K1C_CFS-C-all",
+  "Creality/Generic PC @K1_CFS-C-all",
+  "Creality/Generic PC @K2 Plus-all",
+  "Creality/Generic PC @K2 Pro-all",
+  "Creality/Generic PET @K1 Max_CFS-C-all",
+  "Creality/Generic PET @K1C-all",
+  "Creality/Generic PET @K1C_CFS-C-all",
+  "Creality/Generic PET @K1_CFS-C-all",
+  "Creality/Generic PET @K2 Plus-all",
+  "Creality/Generic PET @K2 Pro-all",
+  "Creality/Generic PET @K2-all",
+  "Creality/Generic PET-CF @K1 Max_CFS-C-all",
+  "Creality/Generic PET-CF @K1C-all",
+  "Creality/Generic PET-CF @K1C_CFS-C-all",
+  "Creality/Generic PET-CF @K1_CFS-C-all",
+  "Creality/Generic PET-CF @K2 Plus-all",
+  "Creality/Generic PET-CF @K2 Pro-all",
+  "Creality/Generic PLA @Ender-3 V4-all",
+  "Creality/Generic PLA @Hi-all",
+  "Creality/Generic PLA @K1 Max_CFS-C-all",
+  "Creality/Generic PLA @K1 SE-all",
+  "Creality/Generic PLA @K1 SE_CFS-C-all",
+  "Creality/Generic PLA @K1C-all",
+  "Creality/Generic PLA @K1C_CFS-C-all",
+  "Creality/Generic PLA @K1_CFS-C-all",
+  "Creality/Generic PLA @K2 Plus-all",
+  "Creality/Generic PLA @K2 Pro-all",
+  "Creality/Generic PLA @K2 SE-all",
+  "Creality/Generic PLA @K2-all",
+  "Creality/Generic PLA @SPARKX i7-all",
+  "Creality/Generic PLA-CF @Ender-3 V4-all",
+  "Creality/Generic PLA-CF @K1 Max_CFS-C-all",
+  "Creality/Generic PLA-CF @K1 SE-all",
+  "Creality/Generic PLA-CF @K1 SE_CFS-C-all",
+  "Creality/Generic PLA-CF @K1C-all",
+  "Creality/Generic PLA-CF @K1C_CFS-C-all",
+  "Creality/Generic PLA-CF @K1_CFS-C-all",
+  "Creality/Generic PLA-CF @K2 Plus-all",
+  "Creality/Generic PLA-CF @K2 Pro-all",
+  "Creality/Generic PLA-CF @K2 SE-all",
+  "Creality/Generic PLA-CF @K2-all",
+  "Creality/Generic PLA-CF @SPARKX i7-all",
+  "Creality/Generic PLA-Silk @Ender-3 V4-all",
+  "Creality/Generic PLA-Silk @Hi-all",
+  "Creality/Generic PLA-Silk @K1 Max_CFS-C-all",
+  "Creality/Generic PLA-Silk @K1 SE-all",
+  "Creality/Generic PLA-Silk @K1 SE_CFS-C-all",
+  "Creality/Generic PLA-Silk @K1C-all",
+  "Creality/Generic PLA-Silk @K1C_CFS-C-all",
+  "Creality/Generic PLA-Silk @K1_CFS-C-all",
+  "Creality/Generic PLA-Silk @K2 Plus-all",
+  "Creality/Generic PLA-Silk @K2 Pro-all",
+  "Creality/Generic PLA-Silk @K2 SE-all",
+  "Creality/Generic PLA-Silk @K2-all",
+  "Creality/Generic PLA-Silk @SPARKX i7-all",
+  "Creality/Generic PP @K1 Max_CFS-C-all",
+  "Creality/Generic PP @K1C-all",
+  "Creality/Generic PP @K1C_CFS-C-all",
+  "Creality/Generic PP @K1_CFS-C-all",
+  "Creality/Generic PP @K2 Plus-all",
+  "Creality/Generic PP @K2 Pro-all",
+  "Creality/Generic PP @K2-all",
+  "Creality/Generic Support for PA @K2 Plus-all",
+  "Creality/Generic Support for PLA @K2 Plus-all",
+  "Creality/HP Ultra PLA @K1 Max_CFS-C-all",
+  "Creality/HP Ultra PLA @K1C-all",
+  "Creality/HP Ultra PLA @K1C_CFS-C-all",
+  "Creality/HP Ultra PLA @K1_CFS-C-all",
+  "Creality/HP Ultra PLA @K2 Plus-all",
+  "Creality/Hyper L-W PLA @Hi-all",
+  "Creality/Hyper L-W PLA @K1 Max_CFS-C-all",
+  "Creality/Hyper L-W PLA @K1 SE-all",
+  "Creality/Hyper L-W PLA @K1 SE_CFS-C-all",
+  "Creality/Hyper L-W PLA @K1C-all",
+  "Creality/Hyper L-W PLA @K1C_CFS-C-all",
+  "Creality/Hyper L-W PLA @K1_CFS-C-all",
+  "Creality/Hyper L-W PLA @K2 Plus-all",
+  "Creality/Hyper L-W PLA @K2 Pro-all",
+  "Creality/Hyper L-W PLA @K2-all",
+  "Creality/Hyper Luminous @Hi-all",
+  "Creality/Hyper Luminous @K1C-all",
+  "Creality/Hyper Luminous @K2 Plus-all",
+  "Creality/Hyper Luminous @K2 Pro-all",
+  "Creality/Hyper Luminous @K2-all",
+  "Creality/Hyper Luminous @SPARKX i7-all",
+  "Creality/Hyper Marble @Hi-all",
+  "Creality/Hyper Marble @K1 Max_CFS-C-all",
+  "Creality/Hyper Marble @K1C-all",
+  "Creality/Hyper Marble @K1C_CFS-C-all",
+  "Creality/Hyper Marble @K1_CFS-C-all",
+  "Creality/Hyper Marble @K2 Plus-all",
+  "Creality/Hyper Marble @K2 Pro-all",
+  "Creality/Hyper Marble @K2 SE-all",
+  "Creality/Hyper Marble @K2-all",
+  "Creality/Hyper Marble @SPARKX i7-all",
+  "Creality/Hyper PA6-CF @K2 Plus-all",
+  "Creality/Hyper PA6-CF @K2 Pro-all",
+  "Creality/Hyper PA612-CF @K2 Plus-all",
+  "Creality/Hyper PA612-CF @K2 Pro-all",
+  "Creality/Hyper PAHT-CF @K1 Max_CFS-C-all",
+  "Creality/Hyper PAHT-CF @K1C-all",
+  "Creality/Hyper PAHT-CF @K1C_CFS-C-all",
+  "Creality/Hyper PAHT-CF @K1_CFS-C-all",
+  "Creality/Hyper PAHT-CF @K2 Plus-all",
+  "Creality/Hyper PAHT-CF @K2 Pro-all",
+  "Creality/Hyper PAHT-CF @K2-all",
+  "Creality/Hyper PC @K2 Plus-all",
+  "Creality/Hyper PC @K2 Pro-all",
+  "Creality/Hyper PLA @Ender-3 V4-all",
+  "Creality/Hyper PLA @Hi-all",
+  "Creality/Hyper PLA @K1 Max_CFS-C-all",
+  "Creality/Hyper PLA @K1 SE-all",
+  "Creality/Hyper PLA @K1 SE_CFS-C-all",
+  "Creality/Hyper PLA @K1C-all",
+  "Creality/Hyper PLA @K1C_CFS-C-all",
+  "Creality/Hyper PLA @K1_CFS-C-all",
+  "Creality/Hyper PLA @K2 Plus-all",
+  "Creality/Hyper PLA @K2 Pro-all",
+  "Creality/Hyper PLA @K2 SE-all",
+  "Creality/Hyper PLA @K2-all",
+  "Creality/Hyper PLA @SPARKX i7-all",
+  "Creality/Hyper PLA-CF @Ender-3 V4-all",
+  "Creality/Hyper PLA-CF @Hi-all",
+  "Creality/Hyper PLA-CF @K1 Max_CFS-C-all",
+  "Creality/Hyper PLA-CF @K1 SE-all",
+  "Creality/Hyper PLA-CF @K1 SE_CFS-C-all",
+  "Creality/Hyper PLA-CF @K1C-all",
+  "Creality/Hyper PLA-CF @K1C_CFS-C-all",
+  "Creality/Hyper PLA-CF @K1_CFS-C-all",
+  "Creality/Hyper PLA-CF @K2 Plus-all",
+  "Creality/Hyper PLA-CF @K2 Pro-all",
+  "Creality/Hyper PLA-CF @K2 SE-all",
+  "Creality/Hyper PLA-CF @K2-all",
+  "Creality/Hyper PLA-CF @SPARKX i7-all",
+  "Creality/Hyper PPA-CF @K2 Plus-all",
+  "Creality/Hyper PPA-CF @K2 Pro-all",
+  "Creality/Hyper Stardust @Hi-all",
+  "Creality/Hyper Stardust @K1 Max_CFS-C-all",
+  "Creality/Hyper Stardust @K1C-all",
+  "Creality/Hyper Stardust @K1C_CFS-C-all",
+  "Creality/Hyper Stardust @K1_CFS-C-all",
+  "Creality/Hyper Stardust @K2 Plus-all",
+  "Creality/Hyper Stardust @K2 Pro-all",
+  "Creality/Hyper Stardust @K2 SE-all",
+  "Creality/Hyper Stardust @K2-all",
+  "Creality/Hyper Stardust @SPARKX i7-all",
+  "Creality/Panchroma PLA Matte @K2 Plus-all",
+  "Creality/Panchroma PLA Satin @K2 Plus-all",
+  "Creality/PolySonic PLA @K2 Plus-all",
+  "Creality/PolySonic PLA Pro @K2 Plus-all",
+  "Creality/Soleyin Ultra PLA @Ender-3 V4-all",
+  "Creality/Soleyin Ultra PLA @Hi-all",
+  "Creality/Soleyin Ultra PLA @K1 Max_CFS-C-all",
+  "Creality/Soleyin Ultra PLA @K1C-all",
+  "Creality/Soleyin Ultra PLA @K1C_CFS-C-all",
+  "Creality/Soleyin Ultra PLA @K1_CFS-C-all",
+  "Creality/Soleyin Ultra PLA @K2 Plus-all",
+  "Creality/Soleyin Ultra PLA @K2 Pro-all",
+  "Creality/Soleyin Ultra PLA @K2 SE-all",
+  "Creality/Soleyin Ultra PLA @K2-all",
+  "Creality/Soleyin Ultra PLA @SPARKX i7-all",
+  "Creality/eSUN PET-Basic @K2 Plus-all",
+  "Creality/eSUN PLA+ @K2 Plus-all",
+  "Creality/eSUN PLA-CF @K2 Plus-all",
+  "Creality/eSUN PLA-HS @K2 Plus-all",
+  "Creality/eSUN PLA-LW @K2 Plus-all",
+  "Creality/eSUN PLA-Lite @K2 Plus-all",
+  "Creality/eSUN PLA-Matte @K2 Plus-all",
+  "Creality/eSUN PLA-Silk @K2 Plus-all",
+  "Cubicon/Cubicon PLA @base",
+  "Custom/Generic PC @MyToolChanger",
+  "Custom/Generic PETG @MyToolChanger",
+  "Custom/Generic PLA @MyToolChanger",
+  "Custom/Generic PLA-CF @MyToolChanger",
+  "Custom/Generic PVA @MyToolChanger",
+  "Custom/Generic TPU @MyToolChanger",
+  "DeltaMaker/DeltaMaker Brand PLA",
+  "DeltaMaker/DeltaMaker Generic PETG",
+  "DeltaMaker/DeltaMaker Generic PLA",
+  "Dremel/Dremel Generic PLA",
+  "Elegoo/Elegoo PAHT @base",
+  "Elegoo/Elegoo PC @base",
+  "Elegoo/Elegoo PETG @base",
+  "Elegoo/Elegoo PLA @base",
+  "Elegoo/Generic PA @base",
+  "Elegoo/Generic PC @base",
+  "Elegoo/Generic PET @base",
+  "Elegoo/Generic PETG @base",
+  "Elegoo/Generic PLA @base",
+  "FLSun/FLSun Generic PA",
+  "FLSun/FLSun Generic PA-CF",
+  "FLSun/FLSun Generic PC",
+  "FLSun/FLSun Generic PETG",
+  "FLSun/FLSun Generic PLA",
+  "FLSun/FLSun Generic PLA-CF",
+  "Flashforge/Flashforge ABS Basic @FF C5",
+  "Flashforge/Flashforge ABS Basic @FF C5P",
+  "Flashforge/Flashforge ABS-GF @FF C5",
+  "Flashforge/Flashforge ABS-GF @FF C5P",
+  "Flashforge/Flashforge ASA Basic @FF C5",
+  "Flashforge/Flashforge ASA Basic @FF C5P",
+  "Flashforge/Flashforge ASA-CF @FF C5",
+  "Flashforge/Flashforge ASA-CF @FF C5P",
+  "Flashforge/Flashforge ASA-GF @FF C5",
+  "Flashforge/Flashforge ASA-GF @FF C5P",
+  "Flashforge/Flashforge Generic HS PLA",
+  "Flashforge/Flashforge Generic PETG",
+  "Flashforge/Flashforge Generic PETG-CF10",
+  "Flashforge/Flashforge Generic PLA",
+  "Flashforge/Flashforge Generic PLA-CF10",
+  "Flashforge/Flashforge Generic PLA-Silk",
+  "Flashforge/Flashforge HIPS @FF C5",
+  "Flashforge/Flashforge HIPS @FF C5P",
+  "Flashforge/Flashforge HS PETG @FF C5",
+  "Flashforge/Flashforge HS PETG @FF C5P",
+  "Flashforge/Flashforge HS PLA @FF C5",
+  "Flashforge/Flashforge HS PLA @FF C5P",
+  "Flashforge/Flashforge PA-CF @FF C5",
+  "Flashforge/Flashforge PA-CF @FF C5P",
+  "Flashforge/Flashforge PAHT-CF @FF C5",
+  "Flashforge/Flashforge PAHT-CF @FF C5P",
+  "Flashforge/Flashforge PET-CF @FF C5",
+  "Flashforge/Flashforge PET-CF @FF C5P",
+  "Flashforge/Flashforge PETG",
+  "Flashforge/Flashforge PETG Pro @FF C5",
+  "Flashforge/Flashforge PETG Pro @FF C5P",
+  "Flashforge/Flashforge PETG Transparent @FF C5",
+  "Flashforge/Flashforge PETG Transparent @FF C5P",
+  "Flashforge/Flashforge PETG-CF @FF C5",
+  "Flashforge/Flashforge PETG-CF @FF C5P",
+  "Flashforge/Flashforge PLA",
+  "Flashforge/Flashforge PLA  Matte @FF C5",
+  "Flashforge/Flashforge PLA  Matte @FF C5P",
+  "Flashforge/Flashforge PLA  Metal @FF C5",
+  "Flashforge/Flashforge PLA  Metal @FF C5P",
+  "Flashforge/Flashforge PLA  Pro @FF C5",
+  "Flashforge/Flashforge PLA  Pro @FF C5P",
+  "Flashforge/Flashforge PLA Basic @FF C5",
+  "Flashforge/Flashforge PLA Basic @FF C5P",
+  "Flashforge/Flashforge PLA Color Change @FF C5",
+  "Flashforge/Flashforge PLA Color Change @FF C5P",
+  "Flashforge/Flashforge PLA Galaxy @FF C5",
+  "Flashforge/Flashforge PLA Galaxy @FF C5P",
+  "Flashforge/Flashforge PLA Luminous @FF C5",
+  "Flashforge/Flashforge PLA Luminous @FF C5P",
+  "Flashforge/Flashforge PLA Silk @FF C5",
+  "Flashforge/Flashforge PLA Silk @FF C5P",
+  "Flashforge/Flashforge PLA-CF @FF C5",
+  "Flashforge/Flashforge PLA-CF @FF C5P",
+  "Flashforge/Flashforge PPA-CF @FF C5",
+  "Flashforge/Flashforge PPA-CF @FF C5P",
+  "Flashforge/Flashforge PPS-CF @FF C5",
+  "Flashforge/Flashforge PPS-CF @FF C5P",
+  "Flashforge/Flashforge PVA @FF C5",
+  "Flashforge/Flashforge PVA @FF C5P",
+  "Flashforge/Flashforge TPU-64D @FF C5",
+  "Flashforge/Flashforge TPU-64D @FF C5P",
+  "Flashforge/Flashforge TPU-90A @FF C5",
+  "Flashforge/Flashforge TPU-90A @FF C5P",
+  "Flashforge/Flashforge TPU-95A @FF C5",
+  "Flashforge/Flashforge TPU-95A @FF C5P",
+  "Flashforge/FusRock PAHT-CF @FF C5",
+  "Flashforge/FusRock PAHT-CF @FF C5P",
+  "Flashforge/FusRock S-Multi @FF C5",
+  "Flashforge/FusRock S-Multi @FF C5P",
+  "Flashforge/FusRock S-PAHT @FF C5",
+  "Flashforge/FusRock S-PAHT @FF C5P",
+  "Flashforge/Generic PETG @Flashforge Artemis",
+  "Flashforge/Generic TPU-64D @FF C5",
+  "Flashforge/Generic TPU-64D @FF C5P",
+  "Flashforge/Generic TPU-90A @FF C5",
+  "Flashforge/Generic TPU-90A @FF C5P",
+  "Flashforge/Generic TPU-95A @FF C5",
+  "Flashforge/Generic TPU-95A @FF C5P",
+  "Flashforge/SUNLU PETG @base",
+  "Flashforge/SUNLU PLA Marble @base",
+  "Flashforge/SUNLU PLA Matte @base",
+  "Flashforge/SUNLU PLA+ 2.0 @base",
+  "Flashforge/SUNLU PLA+ @base",
+  "Flashforge/SUNLU Silk PLA+ @base",
+  "Flashforge/SUNLU Wood PLA @base",
+  "FlyingBear/FlyingBear Generic PA-CF",
+  "FlyingBear/FlyingBear Generic PC",
+  "FlyingBear/FlyingBear Generic PETG",
+  "FlyingBear/FlyingBear Generic PLA",
+  "InfiMech/InfiMech Generic PA-CF",
+  "InfiMech/InfiMech Generic PC",
+  "InfiMech/InfiMech Generic PETG",
+  "InfiMech/InfiMech Generic PLA",
+  "LH/LHS PC CF",
+  "LH/LHS PCTG",
+  "LH/LHS PETG",
+  "LH/LHS PLA",
+  "LONGER/Generic PETG @LONGER LK10",
+  "LONGER/Generic PETG @LONGER LK10 Plus",
+  "LONGER/Generic PLA @LONGER LK10",
+  "LONGER/Generic PLA @LONGER LK10 Plus",
+  "Lulzbot/Lulzbot 2.85mm ABS",
+  "Lulzbot/Lulzbot 2.85mm PETG",
+  "Lulzbot/Lulzbot 2.85mm PLA",
+  "OrcaArena/Arena PA-CF @base",
+  "OrcaArena/Arena PAHT-CF @base",
+  "OrcaArena/Arena PC @base",
+  "OrcaArena/Arena PET-CF @base",
+  "OrcaArena/Arena PETG Basic @base",
+  "OrcaArena/Arena PETG-CF @base",
+  "OrcaArena/Arena PLA Basic @base",
+  "OrcaArena/Arena PLA Impact @base",
+  "OrcaArena/Arena PLA Marble @base",
+  "OrcaArena/Arena PLA Matte @base",
+  "OrcaArena/Arena PLA Metal @base",
+  "OrcaArena/Arena PLA Silk @base",
+  "OrcaArena/Arena PLA Sparkle @base",
+  "OrcaArena/Arena PLA Tough @base",
+  "OrcaArena/Arena PLA-CF @base",
+  "OrcaArena/Arena Support G @base",
+  "OrcaArena/Arena Support W @base",
+  "OrcaArena/OrcaArena Generic PA",
+  "OrcaArena/OrcaArena Generic PA-CF",
+  "OrcaArena/OrcaArena Generic PC @base",
+  "OrcaArena/OrcaArena Generic PETG @base",
+  "OrcaArena/OrcaArena Generic PETG-CF @base",
+  "OrcaArena/OrcaArena Generic PLA @base",
+  "OrcaArena/OrcaArena Generic PLA Silk @base",
+  "OrcaArena/OrcaArena Generic PLA-CF @base",
+  "OrcaArena/PolyLite PLA @base",
+  "OrcaArena/PolyTerra PLA @base",
+  "Peopoly/Peopoly Generic PLA",
+  "Peopoly/Peopoly Lancer PLA-C",
+  "Phrozen/Phrozen PLA @Phrozen Arco 0.4 nozzle",
+  "Prusa/Prusa Generic PA @MK3.5",
+  "Prusa/Prusa Generic PA @MK3.5 0.25",
+  "Prusa/Prusa Generic PA @MK3.5 0.6",
+  "Prusa/Prusa Generic PA @MK3.5 0.8",
+  "Prusa/Prusa Generic PA @base",
+  "Prusa/Prusa Generic PA-CF @MK3.5",
+  "Prusa/Prusa Generic PA-CF @MK3.5 0.25",
+  "Prusa/Prusa Generic PA-CF @MK3.5 0.6",
+  "Prusa/Prusa Generic PA-CF @MK3.5 0.8",
+  "Prusa/Prusa Generic PA-CF @base",
+  "Prusa/Prusa Generic PETG @CORE One",
+  "Prusa/Prusa Generic PETG @MK3.5",
+  "Prusa/Prusa Generic PETG @MK3.5 0.25",
+  "Prusa/Prusa Generic PETG @MK3.5 0.6",
+  "Prusa/Prusa Generic PETG @MK3.5 0.8",
+  "Prusa/Prusa Generic PETG @MK4S",
+  "Prusa/Prusa Generic PETG @base",
+  "Prusa/Prusa Generic PETG HF @MK3.5",
+  "Prusa/Prusa Generic PETG HF @MK3.5 0.6",
+  "Prusa/Prusa Generic PETG HF @MK3.5 0.8",
+  "Prusa/Prusa Generic PETG HF @base",
+  "Prusa/Prusa Generic PLA @CORE One",
+  "Prusa/Prusa Generic PLA @MK3.5",
+  "Prusa/Prusa Generic PLA @MK3.5 0.25",
+  "Prusa/Prusa Generic PLA @MK3.5 0.6",
+  "Prusa/Prusa Generic PLA @MK3.5 0.8",
+  "Prusa/Prusa Generic PLA @MK4S",
+  "Prusa/Prusa Generic PLA @base",
+  "Prusa/Prusa Generic PLA HF @MK3.5",
+  "Prusa/Prusa Generic PLA HF @MK3.5 0.6",
+  "Prusa/Prusa Generic PLA HF @MK3.5 0.8",
+  "Prusa/Prusa Generic PLA HF @base",
+  "Prusa/Prusa Generic PLA Silk @CORE One",
+  "Prusa/Prusa Generic PLA-CF @MK3.5",
+  "Prusa/Prusa Generic PLA-CF @MK3.5 0.25",
+  "Prusa/Prusa Generic PLA-CF @MK3.5 0.6",
+  "Prusa/Prusa Generic PLA-CF @MK3.5 0.8",
+  "Prusa/Prusa Generic PLA-CF @base",
+  "Prusa/Prusament PA-CF @CORE One",
+  "Prusa/Prusament PETG @CORE One",
+  "Prusa/Prusament PETG @base",
+  "Prusa/Prusament PLA @CORE One",
+  "Prusa/Prusament PLA @base",
+  "Prusa/Prusament rPLA @CORE One",
+  "Prusa/Prusament rPLA @base",
+  "Qidi/Bambu PETG",
+  "Qidi/Bambu PLA",
+  "Qidi/HATCHBOX PETG @Qidi",
+  "Qidi/HATCHBOX PLA @Qidi",
+  "Qidi/Overture PLA @Qidi",
+  "Qidi/PolyLite PLA @Qidi",
+  "Qidi/QIDI PA-Ultra",
+  "Qidi/QIDI PA12-CF",
+  "Qidi/QIDI PAHT-CF",
+  "Qidi/QIDI PAHT-GF",
+  "Qidi/QIDI PET-CF",
+  "Qidi/QIDI PET-GF",
+  "Qidi/QIDI PETG Basic",
+  "Qidi/QIDI PETG Rapido",
+  "Qidi/QIDI PETG Tough",
+  "Qidi/QIDI PETG Translucent",
+  "Qidi/QIDI PETG-CF",
+  "Qidi/QIDI PETG-GF",
+  "Qidi/QIDI PLA Basic",
+  "Qidi/QIDI PLA Matte Basic",
+  "Qidi/QIDI PLA Rapido",
+  "Qidi/QIDI PLA Rapido Matte",
+  "Qidi/QIDI PLA Rapido Metal",
+  "Qidi/QIDI PLA Rapido Silk",
+  "Qidi/QIDI PPS-CF",
+  "Qidi/QIDI PPS-GF",
+  "Qidi/QIDI Support For PAHT",
+  "Qidi/QIDI Support For PET/PA",
+  "Qidi/QIDI UltraPA-CF25",
+  "Qidi/QIDI WOOD Rapido",
+  "Qidi/Qidi Generic PA",
+  "Qidi/Qidi Generic PA-CF",
+  "Qidi/Qidi Generic PC",
+  "Qidi/Qidi Generic PETG",
+  "Qidi/Qidi Generic PETG-CF",
+  "Qidi/Qidi Generic PLA",
+  "Qidi/Qidi Generic PLA Silk",
+  "Qidi/Qidi Generic PLA+",
+  "Qidi/Qidi Generic PLA-CF",
+  "Qidi/Qidi PLA-CF",
+  "Qidi/Tinmorry PETG-ECO",
+  "Ratrig/RatRig BigNozzle PCTG",
+  "Ratrig/RatRig BigNozzle PETG",
+  "Ratrig/RatRig BigNozzle PLA",
+  "Ratrig/RatRig Generic PA",
+  "Ratrig/RatRig Generic PA-CF",
+  "Ratrig/RatRig Generic PC",
+  "Ratrig/RatRig Generic PCTG",
+  "Ratrig/RatRig Generic PETG",
+  "Ratrig/RatRig Generic PLA",
+  "Ratrig/RatRig Generic PLA-CF",
+  "Ratrig/RatRig PunkFil PETG",
+  "Ratrig/RatRig PunkFil PETG CF",
+  "SecKit/SecKit Generic PA",
+  "SecKit/SecKit Generic PA-CF",
+  "SecKit/SecKit Generic PC",
+  "SecKit/SecKit Generic PETG",
+  "SecKit/SecKit Generic PLA",
+  "SecKit/SecKit Generic PLA-CF",
+  "Snapmaker/Fiberon PA12-CF10 @Snapmaker U1 base",
+  "Snapmaker/Fiberon PA6-CF20 @Snapmaker U1 base",
+  "Snapmaker/Fiberon PA612-ESD @Snapmaker U1 base",
+  "Snapmaker/Panchroma CoPE @Snapmaker U1 base",
+  "Snapmaker/Panchroma PLA @Snapmaker U1 base",
+  "Snapmaker/Panchroma PLA Celestial @Snapmaker U1 base",
+  "Snapmaker/Panchroma PLA Galaxy @Snapmaker U1 base",
+  "Snapmaker/Panchroma PLA Glow @Snapmaker U1 base",
+  "Snapmaker/Panchroma PLA Luminous @Snapmaker U1 base",
+  "Snapmaker/Panchroma PLA Marble @Snapmaker U1 base",
+  "Snapmaker/Panchroma PLA Matte @Snapmaker U1 base",
+  "Snapmaker/Panchroma PLA Metallic @Snapmaker U1 base",
+  "Snapmaker/Panchroma PLA Neon @Snapmaker U1 base",
+  "Snapmaker/Panchroma PLA Satin @Snapmaker U1 base",
+  "Snapmaker/Panchroma PLA Silk @Snapmaker U1 base",
+  "Snapmaker/Panchroma PLA Starlight @Snapmaker U1 base",
+  "Snapmaker/Panchroma PLA Temp Shift @Snapmaker U1 base",
+  "Snapmaker/Panchroma PLA Translucent @Snapmaker U1 base",
+  "Snapmaker/Panchroma PLA UV Shift @Snapmaker U1 base",
+  "Snapmaker/PolyLite CosPLA @Snapmaker U1 base",
+  "Snapmaker/PolyLite PLA @Snapmaker U1 base",
+  "Snapmaker/PolyLite PLA @base",
+  "Snapmaker/PolyLite PLA Galaxy @Snapmaker U1 base",
+  "Snapmaker/PolyLite PLA Glow @Snapmaker U1 base",
+  "Snapmaker/PolyLite PLA Luminous @Snapmaker U1 base",
+  "Snapmaker/PolyLite PLA Neon @Snapmaker U1 base",
+  "Snapmaker/PolyLite PLA Pro @Snapmaker U1 base",
+  "Snapmaker/PolyLite PLA Pro Metallic @Snapmaker U1 base",
+  "Snapmaker/PolyLite PLA Starlight @Snapmaker U1 base",
+  "Snapmaker/PolyLite PLA Translucent @Snapmaker U1 base",
+  "Snapmaker/PolyTerra Dual PLA @0.2 nozzle",
+  "Snapmaker/PolyTerra J1 PLA",
+  "Snapmaker/PolyTerra J1 PLA @0.2 nozzle",
+  "Snapmaker/PolyTerra PLA @Snapmaker U1 base",
+  "Snapmaker/PolyTerra PLA Marble @Snapmaker U1 base",
+  "Snapmaker/PolyTerra PLA+ @Snapmaker U1 base",
+  "Snapmaker/Polymaker HT-PLA @Snapmaker U1 base",
+  "Snapmaker/Polymaker HT-PLA-GF @Snapmaker U1 base",
+  "Snapmaker/Polymaker PLA @Snapmaker U1 base",
+  "Snapmaker/Polymaker PLA Pro @Snapmaker U1 base",
+  "Snapmaker/Polymaker PLA Pro Metallic @Snapmaker U1 base",
+  "Snapmaker/Snapmaker Dual PA-CF @base",
+  "Snapmaker/Snapmaker Dual PET @base",
+  "Snapmaker/Snapmaker Dual PLA @base",
+  "Snapmaker/Snapmaker Dual PLA Eco @base",
+  "Snapmaker/Snapmaker Dual PLA Matte @base",
+  "Snapmaker/Snapmaker Dual PLA Metal @base",
+  "Snapmaker/Snapmaker Dual PLA Silk @base",
+  "Snapmaker/Snapmaker Dual PLA-CF @base",
+  "Snapmaker/Snapmaker J1 PA-CF @base",
+  "Snapmaker/Snapmaker J1 PET @base",
+  "Snapmaker/Snapmaker J1 PLA @base",
+  "Snapmaker/Snapmaker J1 PLA Eco @base",
+  "Snapmaker/Snapmaker J1 PLA Matte @base",
+  "Snapmaker/Snapmaker J1 PLA Metal @base",
+  "Snapmaker/Snapmaker J1 PLA Silk @base",
+  "Snapmaker/Snapmaker J1 PLA-CF @base",
+  "Snapmaker/Snapmaker PA-CF @U1 base",
+  "Snapmaker/Snapmaker PA-CF @base",
+  "Snapmaker/Snapmaker PET @U1 base",
+  "Snapmaker/Snapmaker PET @base",
+  "Snapmaker/Snapmaker PLA @U1 base",
+  "Snapmaker/Snapmaker PLA @base",
+  "Snapmaker/Snapmaker PLA Eco @U1 base",
+  "Snapmaker/Snapmaker PLA Eco @base",
+  "Snapmaker/Snapmaker PLA Metal @U1 base",
+  "Snapmaker/Snapmaker PLA Silk @U1 base",
+  "Snapmaker/Snapmaker PLA Silk @base",
+  "Snapmaker/Snapmaker PLA-CF @U1 base",
+  "Snapmaker/Snapmaker PLA-CF @base",
+  "Sovol/Generic PLA Silk @Sovol SV08 MAX",
+  "Sovol/Polymaker PETG @Sovol SV08 MAX",
+  "Sovol/SUNLU PETG @Sovol SV08 MAX",
+  "Sovol/Sovol SV06 ACE ABS",
+  "Sovol/Sovol SV06 ACE PETG",
+  "Sovol/Sovol SV06 ACE PLA",
+  "Sovol/Sovol SV06 ACE TPU",
+  "Sovol/Sovol SV06 Plus ACE ABS",
+  "Sovol/Sovol SV06 Plus ACE PETG",
+  "Sovol/Sovol SV06 Plus ACE PLA",
+  "Sovol/Sovol SV06 Plus ACE TPU",
+  "Sovol/Sovol SV07 PLA",
+  "Sovol/Sovol SV08 ABS",
+  "Sovol/Sovol SV08 PETG",
+  "Sovol/Sovol SV08 PLA",
+  "Sovol/Sovol SV08 PLA @SV08 0.2 nozzle",
+  "Sovol/Sovol SV08 TPU",
+  "Sovol/Sovol Zero ABS",
+  "Sovol/Sovol Zero PC",
+  "Sovol/Sovol Zero PETG",
+  "Sovol/Sovol Zero PETG HS Nozzle",
+  "Sovol/Sovol Zero PLA Basic",
+  "Sovol/Sovol Zero PLA Basic HS Nozzle",
+  "Sovol/Sovol Zero PLA Silk",
+  "Sovol/Sovol Zero PLA Silk HS Nozzle",
+  "Sovol/Sovol Zero TPU",
+  "Tiertime/Tiertime Generic BVOH",
+  "Tiertime/Tiertime Generic BVOH@300HS",
+  "Tiertime/Tiertime Generic EVA",
+  "Tiertime/Tiertime Generic EVA@300HS",
+  "Tiertime/Tiertime Generic HIPS",
+  "Tiertime/Tiertime Generic HIPS@300HS",
+  "Tiertime/Tiertime Generic PA",
+  "Tiertime/Tiertime Generic PA-CF",
+  "Tiertime/Tiertime Generic PA-CF@300HS",
+  "Tiertime/Tiertime Generic PA@300HS",
+  "Tiertime/Tiertime Generic PC",
+  "Tiertime/Tiertime Generic PC@300HS",
+  "Tiertime/Tiertime Generic PCTG",
+  "Tiertime/Tiertime Generic PCTG@300HS",
+  "Tiertime/Tiertime Generic PE",
+  "Tiertime/Tiertime Generic PE-CF",
+  "Tiertime/Tiertime Generic PE-CF@300HS",
+  "Tiertime/Tiertime Generic PE@300HS",
+  "Tiertime/Tiertime Generic PETG",
+  "Tiertime/Tiertime Generic PETG-CF",
+  "Tiertime/Tiertime Generic PETG-CF@300HS",
+  "Tiertime/Tiertime Generic PETG@300HS",
+  "Tiertime/Tiertime Generic PHA",
+  "Tiertime/Tiertime Generic PHA@300HS",
+  "Tiertime/Tiertime Generic PLA",
+  "Tiertime/Tiertime Generic PLA High Speed",
+  "Tiertime/Tiertime Generic PLA High Speed@300HS",
+  "Tiertime/Tiertime Generic PLA Silk",
+  "Tiertime/Tiertime Generic PLA Silk@300HS",
+  "Tiertime/Tiertime Generic PLA-CF",
+  "Tiertime/Tiertime Generic PLA-CF@300HS",
+  "Tiertime/Tiertime Generic PLA@300HS",
+  "Tiertime/Tiertime Generic PP",
+  "Tiertime/Tiertime Generic PP-CF",
+  "Tiertime/Tiertime Generic PP-CF@300HS",
+  "Tiertime/Tiertime Generic PP-GF",
+  "Tiertime/Tiertime Generic PP-GF@300HS",
+  "Tiertime/Tiertime Generic PP@300HS",
+  "Tiertime/Tiertime Generic PPA-CF",
+  "Tiertime/Tiertime Generic PPA-CF@300HS",
+  "Tiertime/Tiertime Generic PPA-GF",
+  "Tiertime/Tiertime Generic PPA-GF@300HS",
+  "Tiertime/Tiertime Generic SBS",
+  "Tiertime/Tiertime Generic SBS@300HS",
+  "Tiertime/Tiertime PA6-CF",
+  "Tiertime/Tiertime PA6-CF@300HS",
+  "Tiertime/Tiertime PC",
+  "Tiertime/Tiertime PC@300HS",
+  "Tiertime/Tiertime PET-CF",
+  "Tiertime/Tiertime PET-CF@300HS",
+  "Tiertime/Tiertime PETG",
+  "Tiertime/Tiertime PETG@300HS",
+  "Tiertime/Tiertime PLA",
+  "Tiertime/Tiertime PLA-CF",
+  "Tiertime/Tiertime PLA-CF@300HS",
+  "Tiertime/Tiertime PLA@300HS",
+  "TwoTrees/TwoTrees Generic HS PLA @SK1",
+  "Volumic/Désactivé",
+  "Volumic/PA6 CF20 (Performance)",
+  "Volumic/PETG ESD (Performance)",
+  "Volumic/PPS Carbone (Performance)",
+  "Volumic/Volumic NYLON Ultra",
+  "Volumic/Volumic NYLON Ultra (Performance)",
+  "Volumic/Volumic PC",
+  "Volumic/Volumic PC (Performance)",
+  "Volumic/Volumic PCTG Ultra (Performance)",
+  "Volumic/Volumic PETG Ultra",
+  "Volumic/Volumic PETG Ultra (Performance)",
+  "Volumic/Volumic PETG Ultra carbone",
+  "Volumic/Volumic PETG Ultra carbone (Performance)",
+  "Volumic/Volumic PLA Ultra",
+  "Volumic/Volumic PLA Ultra (Performance)",
+  "Volumic/Volumic PP Ultra",
+  "Volumic/Volumic PP Ultra (Performance)",
+  "Volumic/Volumic UNIVERSAL Ultra",
+  "Volumic/Volumic UNIVERSAL Ultra (Performance)",
+  "Vzbot/Vzbot Generic PA",
+  "Vzbot/Vzbot Generic PA-CF",
+  "Vzbot/Vzbot Generic PC",
+  "Vzbot/Vzbot Generic PETG",
+  "Vzbot/Vzbot Generic PLA",
+  "Vzbot/Vzbot Generic PLA-CF",
+  "Wanhao France/Yumi Generic PETG",
+  "Wanhao France/Yumi Generic PLA",
+  "WonderMaker/WonderMaker PET-CF",
+  "WonderMaker/WonderMaker PETG Basic",
+  "WonderMaker/WonderMaker PLA Basic",
+  "WonderMaker/WonderMaker PLA Marble",
+  "WonderMaker/WonderMaker PLA Matte",
+  "WonderMaker/WonderMaker PLA Metal",
+  "WonderMaker/WonderMaker PLA Silk",
+  "WonderMaker/WonderMaker PLA Wood",
+  "Z-Bolt/Generic PA @Z-Bolt Base",
+  "Z-Bolt/Generic PETG @Z-Bolt Base",
+  "Z-Bolt/Generic PLA @Z-Bolt Base",
+  "re3D/re3D Greengate rPETG",
+  "re3D/re3D Greengate rPETG @0.8 nozzle",
+  "re3D/re3D Greengate rPETG @1.75 nozzle",
+  "re3D/re3D PC",
+  "re3D/re3D PC @0.4 nozzle",
+  "re3D/re3D PC @0.8 nozzle",
+  "re3D/re3D PETG",
+  "re3D/re3D PETG @0.4 nozzle",
+  "re3D/re3D PETG @0.8 nozzle",
+  "re3D/re3D PLA",
+  "re3D/re3D PLA @0.4 nozzle",
+  "re3D/re3D PLA @0.8 nozzle",
+  "re3D/re3D rPP",
+  "re3D/re3D rPP @0.8 nozzle",
+  "re3D/re3D rPP @1.75 nozzle"
+ ],
  "id_overrides": [
   "Afinia/Afinia PLA",
   "Afinia/Afinia PLA@HS",
@@ -9446,5 +10483,9965 @@
   "re3D/re3D rPP",
   "re3D/re3D rPP @0.8 nozzle",
   "re3D/re3D rPP @1.75 nozzle"
- ]
+ ],
+ "triple_exceptions": [
+  "Anycubic/Anycubic ABS",
+  "Anycubic/Anycubic ASA",
+  "Anycubic/Anycubic PETG",
+  "Anycubic/Anycubic PLA",
+  "Anycubic/Anycubic PLA High Speed",
+  "Anycubic/Anycubic PLA Silk",
+  "Anycubic/Anycubic PLA+",
+  "Anycubic/Anycubic TPU",
+  "Anycubic/Generic PETG",
+  "Creality/Creality Generic ABS",
+  "Creality/Creality Generic ASA",
+  "Creality/Creality Generic PETG",
+  "Creality/Creality Generic TPU",
+  "Creality/Generic PETG-GF",
+  "Flashforge/Flashforge ABS",
+  "Flashforge/Flashforge ASA-CF",
+  "Flashforge/Flashforge PET-CF",
+  "Flashforge/Flashforge PETG",
+  "Flashforge/Flashforge PPA-CF",
+  "Flashforge/Flashforge PPS-CF",
+  "Flashforge/FusRock Generic PAHT-CF",
+  "Flashforge/FusRock Generic PET-CF",
+  "Flashforge/FusRock Generic S-Multi",
+  "Flashforge/FusRock Generic S-PAHT",
+  "Prusa/Prusa Generic ASA",
+  "Prusa/Prusa Generic TPU",
+  "Prusa/Prusa Generic TPU HF",
+  "Prusa/Prusament PETG",
+  "Prusa/Prusament PLA",
+  "Prusa/Prusament rPLA",
+  "Snapmaker/PolyLite PLA",
+  "re3D/re3D Greengate rPETG"
+ ],
+ "triples": {
+  "00001": [
+   [
+    "Generic",
+    "PLA",
+    "Generic PLA"
+   ]
+  ],
+  "00002": [
+   [
+    "Generic",
+    "PLA",
+    "Generic PLA-Silk"
+   ]
+  ],
+  "00003": [
+   [
+    "Generic",
+    "PETG",
+    "Generic PETG"
+   ]
+  ],
+  "00004": [
+   [
+    "Generic",
+    "ABS",
+    "Generic ABS"
+   ]
+  ],
+  "00005": [
+   [
+    "Generic",
+    "TPU",
+    "Generic TPU"
+   ]
+  ],
+  "00006": [
+   [
+    "Generic",
+    "PLA-CF",
+    "Generic PLA-CF"
+   ]
+  ],
+  "00007": [
+   [
+    "Generic",
+    "ASA",
+    "Generic ASA"
+   ]
+  ],
+  "00008": [
+   [
+    "Generic",
+    "PA",
+    "Generic PA"
+   ]
+  ],
+  "00009": [
+   [
+    "Generic",
+    "PA-CF",
+    "Generic PA-CF"
+   ]
+  ],
+  "00010": [
+   [
+    "Generic",
+    "BVOH",
+    "Generic BVOH"
+   ]
+  ],
+  "00011": [
+   [
+    "Generic",
+    "PVA",
+    "Generic PVA"
+   ]
+  ],
+  "00012": [
+   [
+    "Generic",
+    "HIPS",
+    "Generic HIPS"
+   ]
+  ],
+  "00013": [
+   [
+    "Generic",
+    "PET-CF",
+    "Generic PET-CF"
+   ]
+  ],
+  "00014": [
+   [
+    "Generic",
+    "PETG-CF",
+    "Generic PETG-CF"
+   ]
+  ],
+  "00015": [
+   [
+    "Generic",
+    "PA6-CF",
+    "Generic PA6-CF"
+   ]
+  ],
+  "00016": [
+   [
+    "Generic",
+    "PA-CF",
+    "Generic PAHT-CF"
+   ]
+  ],
+  "00017": [
+   [
+    "Generic",
+    "PPS",
+    "Generic PPS"
+   ]
+  ],
+  "00018": [
+   [
+    "Generic",
+    "PPS-CF",
+    "Generic PPS-CF"
+   ]
+  ],
+  "00019": [
+   [
+    "Generic",
+    "PP",
+    "Generic PP"
+   ]
+  ],
+  "00020": [
+   [
+    "Generic",
+    "PET",
+    "Generic PET"
+   ]
+  ],
+  "00021": [
+   [
+    "Generic",
+    "PC",
+    "Generic PC"
+   ]
+  ],
+  "00022": [
+   [
+    "Generic",
+    "PA-CF",
+    "Generic PA612-CF"
+   ]
+  ],
+  "00023": [
+   [
+    "Generic",
+    "PA",
+    "Generic Support for PA"
+   ]
+  ],
+  "00024": [
+   [
+    "Generic",
+    "PLA",
+    "Generic Support for PLA"
+   ]
+  ],
+  "00025": [
+   [
+    "Generic",
+    "PA-CF",
+    "Generic PA12-CF"
+   ]
+  ],
+  "00026": [
+   [
+    "Generic",
+    "TPU",
+    "Generic TPU 64D"
+   ]
+  ],
+  "00027": [
+   [
+    "Creality",
+    "PETG-GF",
+    "Generic PETG-GF"
+   ],
+   [
+    "Generic",
+    "PETG-GF",
+    "Generic PETG-GF"
+   ]
+  ],
+  "00031": [
+   [
+    "Generic",
+    "PP-CF",
+    "Generic PP-CF"
+   ]
+  ],
+  "00032": [
+   [
+    "Generic",
+    "PCTG",
+    "Generic PCTG"
+   ]
+  ],
+  "00033": [
+   [
+    "Generic",
+    "ASA-CF",
+    "Generic ASA-CF"
+   ]
+  ],
+  "00034": [
+   [
+    "Generic",
+    "PA-GF",
+    "Generic PA6-GF"
+   ]
+  ],
+  "00035": [
+   [
+    "eSUN",
+    "PLA",
+    "eSUN PLA-LW"
+   ]
+  ],
+  "01001": [
+   [
+    "Creality",
+    "PLA",
+    "Creality Hyper PLA"
+   ],
+   [
+    "Creality",
+    "PLA",
+    "Hyper PLA"
+   ]
+  ],
+  "01002": [
+   [
+    "Creality",
+    "PLA",
+    "Hyper L-W PLA"
+   ]
+  ],
+  "01003": [
+   [
+    "Creality",
+    "PLA",
+    "Hyper Luminous"
+   ]
+  ],
+  "01004": [
+   [
+    "Creality",
+    "PLA",
+    "Hyper Stardust"
+   ]
+  ],
+  "01601": [
+   [
+    "Creality",
+    "PLA",
+    "Soleyin Ultra PLA"
+   ]
+  ],
+  "02001": [
+   [
+    "Creality",
+    "PLA-CF",
+    "Creality Hyper PLA-CF"
+   ],
+   [
+    "Creality",
+    "PLA-CF",
+    "Hyper PLA-CF"
+   ]
+  ],
+  "03001": [
+   [
+    "Creality",
+    "ABS",
+    "Creality Hyper ABS"
+   ],
+   [
+    "Creality",
+    "ABS",
+    "Hyper ABS"
+   ]
+  ],
+  "04001": [
+   [
+    "Creality",
+    "PLA",
+    "CR-PLA"
+   ],
+   [
+    "Generic",
+    "PLA",
+    "Creality Generic PLA"
+   ]
+  ],
+  "05001": [
+   [
+    "Creality",
+    "PLA",
+    "CR-Silk"
+   ],
+   [
+    "Creality",
+    "PLA",
+    "Creality Silk PLA"
+   ]
+  ],
+  "06001": [
+   [
+    "Creality",
+    "PETG",
+    "CR-PETG"
+   ],
+   [
+    "Creality",
+    "PETG",
+    "Creality Generic PETG"
+   ]
+  ],
+  "06002": [
+   [
+    "Creality",
+    "PETG",
+    "Hyper PETG"
+   ]
+  ],
+  "06003": [
+   [
+    "Creality",
+    "PETG-CF",
+    "Hyper PETG-CF"
+   ]
+  ],
+  "06004": [
+   [
+    "Creality",
+    "PETG-GF",
+    "Hyper PETG-GF"
+   ]
+  ],
+  "06005": [
+   [
+    "Creality",
+    "PETG",
+    "Soleyin Basic PETG"
+   ]
+  ],
+  "07001": [
+   [
+    "Creality",
+    "ABS",
+    "CR-ABS"
+   ],
+   [
+    "Creality",
+    "ABS",
+    "Creality Generic ABS"
+   ]
+  ],
+  "07002": [
+   [
+    "Creality",
+    "PC",
+    "Hyper PC"
+   ]
+  ],
+  "08001": [
+   [
+    "Creality",
+    "PLA",
+    "Ender-PLA"
+   ]
+  ],
+  "09001": [
+   [
+    "Creality",
+    "PLA",
+    "EN-PLA+"
+   ]
+  ],
+  "09002": [
+   [
+    "Creality",
+    "PLA",
+    "ENDER FAST PLA"
+   ]
+  ],
+  "10001": [
+   [
+    "Creality",
+    "TPU",
+    "Creality Generic TPU"
+   ],
+   [
+    "Creality",
+    "TPU",
+    "HP-TPU"
+   ]
+  ],
+  "1009481135": [
+   [
+    "Snapmaker",
+    "PET",
+    "Snapmaker J1 PET"
+   ]
+  ],
+  "1042511226": [
+   [
+    "Snapmaker",
+    "PETG-CF",
+    "Snapmaker Dual PETG-CF"
+   ]
+  ],
+  "10425112260": [
+   [
+    "Snapmaker",
+    "PETG-CF",
+    "Snapmaker PETG-CF"
+   ]
+  ],
+  "11001": [
+   [
+    "Creality",
+    "PA",
+    "CR-Nylon"
+   ],
+   [
+    "Creality",
+    "PA",
+    "Creality Generic PA"
+   ]
+  ],
+  "1172603684": [
+   [
+    "Snapmaker",
+    "PETG",
+    "Snapmaker J1 PETG"
+   ]
+  ],
+  "1181363872": [
+   [
+    "Snapmaker",
+    "PLA",
+    "Snapmaker Dual PLA Silk"
+   ]
+  ],
+  "11813638720": [
+   [
+    "Snapmaker",
+    "PLA",
+    "Snapmaker PLA Silk"
+   ]
+  ],
+  "1192769348": [
+   [
+    "Snapmaker",
+    "PLA",
+    "Snapmaker J1 PLA Matte"
+   ]
+  ],
+  "12002": [
+   [
+    "Creality",
+    "PA-CF",
+    "Hyper PPA-CF"
+   ]
+  ],
+  "12003": [
+   [
+    "Creality",
+    "PA-CF",
+    "Hyper PAHT-CF"
+   ]
+  ],
+  "12004": [
+   [
+    "Creality",
+    "PA-CF",
+    "Hyper PA612-CF"
+   ]
+  ],
+  "12005": [
+   [
+    "Creality",
+    "PA-CF",
+    "Hyper PA6-CF"
+   ]
+  ],
+  "1207881278": [
+   [
+    "Snapmaker",
+    "Breakaway Support",
+    "Snapmaker Dual Breakaway"
+   ]
+  ],
+  "1210173120": [
+   [
+    "Snapmaker",
+    "PA-CF",
+    "Snapmaker J1 PA-CF"
+   ]
+  ],
+  "1223824394": [
+   [
+    "Snapmaker",
+    "ABS",
+    "Snapmaker J1 ABS"
+   ]
+  ],
+  "1247172706": [
+   [
+    "Snapmaker",
+    "ASA",
+    "Snapmaker Dual ASA"
+   ]
+  ],
+  "12471727060": [
+   [
+    "Snapmaker",
+    "ASA",
+    "Snapmaker ASA"
+   ]
+  ],
+  "13001": [
+   [
+    "Creality",
+    "PLA-CF",
+    "CR-PLA Carbon"
+   ]
+  ],
+  "1344609062": [
+   [
+    "Snapmaker",
+    "PVA",
+    "Snapmaker PVA"
+   ]
+  ],
+  "1355502217": [
+   [
+    "Snapmaker",
+    "PETG-CF",
+    "Snapmaker PETG-CF"
+   ]
+  ],
+  "1393866034": [
+   [
+    "Snapmaker",
+    "PLA",
+    "PolyLite PLA"
+   ]
+  ],
+  "14001": [
+   [
+    "Creality",
+    "PLA",
+    "CR-PLA Matte"
+   ]
+  ],
+  "1417031127": [
+   [
+    "Snapmaker",
+    "PLA",
+    "Snapmaker Dual PLA"
+   ]
+  ],
+  "14170311270": [
+   [
+    "Snapmaker",
+    "PLA",
+    "Snapmaker PLA"
+   ]
+  ],
+  "141703112701": [
+   [
+    "Snapmaker",
+    "PLA",
+    "Snapmaker PLA SnapSpeed"
+   ]
+  ],
+  "1417031127011": [
+   [
+    "Snapmaker",
+    "PLA",
+    "Snapmaker PLA Lite"
+   ]
+  ],
+  "144877656": [
+   [
+    "Snapmaker",
+    "ASA",
+    "Snapmaker J1 ASA"
+   ]
+  ],
+  "1480063856": [
+   [
+    "Snapmaker",
+    "TPU",
+    "Snapmaker TPU"
+   ]
+  ],
+  "15001": [
+   [
+    "Creality",
+    "PLA",
+    "CR-PLA Fluo"
+   ]
+  ],
+  "1528786603": [
+   [
+    "Snapmaker",
+    "PLA",
+    "Snapmaker J1 PLA Silk"
+   ]
+  ],
+  "16001": [
+   [
+    "Creality",
+    "TPU",
+    "CR-TPU"
+   ]
+  ],
+  "1655727393": [
+   [
+    "Snapmaker",
+    "PLA",
+    "Snapmaker PLA Silk"
+   ]
+  ],
+  "168223792": [
+   [
+    "Snapmaker",
+    "ABS",
+    "Snapmaker Dual ABS"
+   ]
+  ],
+  "1682237920": [
+   [
+    "Snapmaker",
+    "ABS",
+    "Snapmaker ABS"
+   ]
+  ],
+  "1695556157": [
+   [
+    "Snapmaker",
+    "PLA",
+    "Snapmaker PLA Eco"
+   ]
+  ],
+  "17001": [
+   [
+    "Creality",
+    "PLA",
+    "CR-Wood"
+   ]
+  ],
+  "1702147325": [
+   [
+    "Snapmaker",
+    "PLA-CF",
+    "Snapmaker Dual PLA-CF"
+   ]
+  ],
+  "17021473250": [
+   [
+    "Snapmaker",
+    "PLA-CF",
+    "Snapmaker PLA-CF"
+   ]
+  ],
+  "18001": [
+   [
+    "Creality",
+    "PLA",
+    "HP Ultra PLA"
+   ]
+  ],
+  "1895495477": [
+   [
+    "Snapmaker",
+    "PETG",
+    "Snapmaker PETG"
+   ]
+  ],
+  "19001": [
+   [
+    "Creality",
+    "ASA",
+    "Creality Generic ASA"
+   ],
+   [
+    "Creality",
+    "ASA",
+    "HP-ASA"
+   ]
+  ],
+  "200803790": [
+   [
+    "Snapmaker",
+    "PLA",
+    "Snapmaker Dual PLA Eco"
+   ]
+  ],
+  "2008037900": [
+   [
+    "Snapmaker",
+    "PLA",
+    "Snapmaker PLA Eco"
+   ]
+  ],
+  "2029994346": [
+   [
+    "Snapmaker",
+    "PLA",
+    "Snapmaker Dual PLA Metal"
+   ]
+  ],
+  "20299943460": [
+   [
+    "Snapmaker",
+    "PLA",
+    "Snapmaker PLA Metal"
+   ]
+  ],
+  "2128577941": [
+   [
+    "Snapmaker",
+    "PET",
+    "Snapmaker Dual PET"
+   ]
+  ],
+  "21285779410": [
+   [
+    "Snapmaker",
+    "PET",
+    "Snapmaker PET"
+   ]
+  ],
+  "2209001062": [
+   [
+    "Snapmaker",
+    "PETG",
+    "Snapmaker Dual PETG"
+   ]
+  ],
+  "22090010620": [
+   [
+    "Snapmaker",
+    "PETG",
+    "Snapmaker PETG"
+   ]
+  ],
+  "2549587591": [
+   [
+    "Snapmaker",
+    "PET",
+    "Snapmaker PET"
+   ]
+  ],
+  "2742961008": [
+   [
+    "Snapmaker",
+    "ASA",
+    "Snapmaker ASA"
+   ]
+  ],
+  "29001": [
+   [
+    "Creality",
+    "PLA",
+    "Hyper Marble"
+   ]
+  ],
+  "2971656290": [
+   [
+    "Snapmaker",
+    "TPU",
+    "Snapmaker Dual TPU"
+   ]
+  ],
+  "29716562900": [
+   [
+    "Snapmaker",
+    "TPU",
+    "Snapmaker TPU"
+   ]
+  ],
+  "297165629001": [
+   [
+    "Generic",
+    "TPU",
+    "Snapmaker TPU 95A"
+   ]
+  ],
+  "3104636980": [
+   [
+    "Snapmaker",
+    "PVA",
+    "Snapmaker Dual PVA"
+   ]
+  ],
+  "31046369800": [
+   [
+    "Snapmaker",
+    "PVA",
+    "Snapmaker PVA"
+   ]
+  ],
+  "3177068229": [
+   [
+    "Snapmaker",
+    "PLA",
+    "Snapmaker PLA"
+   ]
+  ],
+  "3383257822": [
+   [
+    "Snapmaker",
+    "PLA",
+    "Snapmaker J1 PLA Eco"
+   ]
+  ],
+  "3492897526": [
+   [
+    "Snapmaker",
+    "Breakaway Support",
+    "Snapmaker J1 Breakaway"
+   ]
+  ],
+  "3493177425": [
+   [
+    "Snapmaker",
+    "PA-CF",
+    "Snapmaker Dual PA-CF"
+   ]
+  ],
+  "34931774250": [
+   [
+    "Snapmaker",
+    "PA-CF",
+    "Snapmaker PA-CF"
+   ]
+  ],
+  "3503790988": [
+   [
+    "Snapmaker",
+    "PLA",
+    "Snapmaker Dual PLA Matte"
+   ]
+  ],
+  "377675245": [
+   [
+    "Snapmaker",
+    "PLA",
+    "Snapmaker J1 PLA"
+   ]
+  ],
+  "3806593857": [
+   [
+    "Snapmaker",
+    "PLA-CF",
+    "Snapmaker J1 PLA-CF"
+   ]
+  ],
+  "3811508002": [
+   [
+    "Snapmaker",
+    "ABS",
+    "Snapmaker ABS"
+   ]
+  ],
+  "3864371306": [
+   [
+    "Snapmaker",
+    "PLA-CF",
+    "Snapmaker PLA-CF"
+   ]
+  ],
+  "4012961186": [
+   [
+    "Snapmaker",
+    "PLA",
+    "Snapmaker J1 PLA Metal"
+   ]
+  ],
+  "4092268632": [
+   [
+    "Snapmaker",
+    "TPU",
+    "Snapmaker J1 TPU"
+   ]
+  ],
+  "4227461134": [
+   [
+    "Snapmaker",
+    "PVA",
+    "Snapmaker J1 PVA"
+   ]
+  ],
+  "4235401834": [
+   [
+    "Snapmaker",
+    "PETG-CF",
+    "Snapmaker J1 PETG-CF"
+   ]
+  ],
+  "581236806": [
+   [
+    "Snapmaker",
+    "PA-CF",
+    "Snapmaker PA-CF"
+   ]
+  ],
+  "AZ01-1": [
+   [
+    "Aliz",
+    "PETG-CF",
+    "AliZ PETG-CF"
+   ]
+  ],
+  "AZ01-2": [
+   [
+    "Aliz",
+    "PETG",
+    "AliZ PETG-Metal"
+   ]
+  ],
+  "AliZ001": [
+   [
+    "Aliz",
+    "PETG",
+    "AliZ PETG"
+   ]
+  ],
+  "AliZ002": [
+   [
+    "Aliz",
+    "PLA",
+    "AliZ PLA"
+   ]
+  ],
+  "AliZ003": [
+   [
+    "Aliz",
+    "PA-CF",
+    "AliZ PA-CF"
+   ]
+  ],
+  "BSFI001": [
+   [
+    "Generic",
+    "PLA",
+    "Blocks Generic PLA"
+   ]
+  ],
+  "BSFI002": [
+   [
+    "Generic",
+    "PETG",
+    "Blocks Generic PETG"
+   ]
+  ],
+  "BSFI003": [
+   [
+    "Generic",
+    "TPU",
+    "Blocks Generic TPU"
+   ]
+  ],
+  "BSFI004": [
+   [
+    "Generic",
+    "ABS",
+    "Blocks Generic ABS"
+   ]
+  ],
+  "BSFI005": [
+   [
+    "Generic",
+    "ASA",
+    "Blocks Generic ASA"
+   ]
+  ],
+  "BSFI006": [
+   [
+    "Generic",
+    "PA",
+    "Blocks Generic PA"
+   ]
+  ],
+  "BSFI007": [
+   [
+    "Generic",
+    "PA-CF",
+    "Blocks Generic PA-CF"
+   ]
+  ],
+  "BSFI008": [
+   [
+    "Generic",
+    "PC",
+    "Blocks Generic PC"
+   ]
+  ],
+  "BSFI009": [
+   [
+    "Generic",
+    "PVA",
+    "Blocks Generic PVA"
+   ]
+  ],
+  "BSFI010": [
+   [
+    "Generic",
+    "PLA-CF",
+    "Blocks Generic PLA-CF"
+   ]
+  ],
+  "CX30DB20": [
+   [
+    "COEX 3D",
+    "TPU",
+    "COEX TPE 30D"
+   ]
+  ],
+  "CX40DB20": [
+   [
+    "COEX 3D",
+    "TPU",
+    "COEX TPE 40D"
+   ]
+  ],
+  "CX60AB17": [
+   [
+    "COEX 3D",
+    "TPU",
+    "COEX TPU 60A"
+   ]
+  ],
+  "CX60DB19": [
+   [
+    "COEX 3D",
+    "TPU",
+    "COEX TPE 60D"
+   ]
+  ],
+  "CXABPB09": [
+   [
+    "COEX 3D",
+    "ABS",
+    "COEX ABS PRIME"
+   ]
+  ],
+  "CXABSB01": [
+   [
+    "COEX 3D",
+    "ABS",
+    "COEX ABS"
+   ]
+  ],
+  "CXASAB04": [
+   [
+    "COEX 3D",
+    "ASA",
+    "COEX ASA PRIME"
+   ]
+  ],
+  "CXPACB23": [
+   [
+    "COEX 3D",
+    "PA-CF",
+    "COEX NYLEX PA6-CF"
+   ]
+  ],
+  "CXPAUB21": [
+   [
+    "COEX 3D",
+    "PA",
+    "COEX NYLEX UNFILLED"
+   ]
+  ],
+  "CXPCTB15": [
+   [
+    "COEX 3D",
+    "PCTG",
+    "COEX PCTG PRIME"
+   ]
+  ],
+  "CXPETB13": [
+   [
+    "COEX 3D",
+    "PETG",
+    "COEX PETG"
+   ]
+  ],
+  "CXPLAB02": [
+   [
+    "COEX 3D",
+    "PLA",
+    "COEX PLA"
+   ]
+  ],
+  "CXPLAB08": [
+   [
+    "COEX 3D",
+    "PLA",
+    "COEX PLA PRIME"
+   ]
+  ],
+  "CXPLSB03": [
+   [
+    "COEX 3D",
+    "PLA",
+    "COEX PLA+Silk"
+   ]
+  ],
+  "DFL99": [
+   [
+    "Volumic",
+    "PLA",
+    "Désactivé"
+   ]
+  ],
+  "DREMC001": [
+   [
+    "DREMC",
+    "PLA",
+    "DREMC PLA+"
+   ]
+  ],
+  "DREMC002": [
+   [
+    "DREMC",
+    "PETG",
+    "DREMC PETG"
+   ]
+  ],
+  "DREMC003": [
+   [
+    "DREMC",
+    "ABS",
+    "DREMC ABS"
+   ]
+  ],
+  "DREMC004": [
+   [
+    "DREMC",
+    "ABS",
+    "DREMC ABS+"
+   ]
+  ],
+  "DREMC005": [
+   [
+    "DREMC",
+    "ASA",
+    "DREMC ASA"
+   ]
+  ],
+  "DREMC006": [
+   [
+    "DREMC",
+    "PA6-CF",
+    "DREMC PA6-CF"
+   ]
+  ],
+  "DREMC007": [
+   [
+    "DREMC",
+    "PA-CF",
+    "DREMC PA12-CF"
+   ]
+  ],
+  "DREMC008": [
+   [
+    "DREMC",
+    "PET-CF",
+    "DREMC PET-CF"
+   ]
+  ],
+  "DREMC009": [
+   [
+    "DREMC",
+    "ABS-GF",
+    "DREMC ABS-GF"
+   ]
+  ],
+  "DREMC010": [
+   [
+    "DREMC",
+    "PPA-CF",
+    "DREMC PPA-CF"
+   ],
+   [
+    "DREMC",
+    "TPU",
+    "DREMC TPU 95A"
+   ]
+  ],
+  "DREMC011": [
+   [
+    "DREMC",
+    "PLA",
+    "DREMC PLA+ HS"
+   ]
+  ],
+  "DREMC012": [
+   [
+    "DREMC",
+    "ASA",
+    "DREMC ASA CF"
+   ]
+  ],
+  "DREMC013": [
+   [
+    "DREMC",
+    "ASA",
+    "DREMC ASA GF"
+   ]
+  ],
+  "E1001": [
+   [
+    "eSUN",
+    "PLA",
+    "eSUN PLA+"
+   ]
+  ],
+  "E1002": [
+   [
+    "eSUN",
+    "PLA",
+    "eSUN PLA-Silk"
+   ]
+  ],
+  "E1003": [
+   [
+    "eSUN",
+    "PLA",
+    "eSUN PLA-Matte"
+   ]
+  ],
+  "E1004": [
+   [
+    "eSUN",
+    "PLA",
+    "eSUN PLA-Lite"
+   ]
+  ],
+  "E1005": [
+   [
+    "eSUN",
+    "PLA-CF",
+    "eSUN PLA-CF"
+   ]
+  ],
+  "E1006": [
+   [
+    "eSUN",
+    "PLA",
+    "eSUN PLA-HS"
+   ]
+  ],
+  "E2001": [
+   [
+    "eSUN",
+    "PETG",
+    "eSUN PETG"
+   ]
+  ],
+  "E2002": [
+   [
+    "eSUN",
+    "PETG",
+    "eSUN PETG+HS"
+   ]
+  ],
+  "E2003": [
+   [
+    "eSUN",
+    "PETG",
+    "eSUN PETG-Basic"
+   ]
+  ],
+  "E3001": [
+   [
+    "eSUN",
+    "ABS",
+    "eSUN ABS+"
+   ]
+  ],
+  "E4001": [
+   [
+    "eSUN",
+    "ASA",
+    "eSUN ASA+"
+   ]
+  ],
+  "E8001": [
+   [
+    "eSUN",
+    "PET",
+    "eSUN PET-Basic"
+   ]
+  ],
+  "EABSB00": [
+   [
+    "Elegoo",
+    "ABS",
+    "Elegoo ABS"
+   ]
+  ],
+  "EASAB00": [
+   [
+    "Elegoo",
+    "ASA",
+    "Elegoo ASA"
+   ]
+  ],
+  "EFL33": [
+   [
+    "Eryone",
+    "PP-CF",
+    "Eryone PP-CF"
+   ]
+  ],
+  "EFL40": [
+   [
+    "Eryone",
+    "PLA-CF",
+    "Eryone PLA-CF"
+   ]
+  ],
+  "EFL43": [
+   [
+    "Eryone",
+    "PETG-CF",
+    "Eryone PETG-CF"
+   ]
+  ],
+  "EFL71": [
+   [
+    "Eryone",
+    "PA",
+    "Eryone PA"
+   ]
+  ],
+  "EFL72": [
+   [
+    "Eryone",
+    "PA-CF",
+    "Eryone PA-CF"
+   ]
+  ],
+  "EFL73": [
+   [
+    "Eryone",
+    "PA-GF",
+    "Eryone PA-GF"
+   ]
+  ],
+  "EFL81": [
+   [
+    "Eryone",
+    "ABS-CF",
+    "Eryone ABS-CF"
+   ]
+  ],
+  "EFL82": [
+   [
+    "Eryone",
+    "ASA-CF",
+    "Eryone ASA-CF"
+   ]
+  ],
+  "EFL90": [
+   [
+    "Eryone",
+    "PLA",
+    "Eryone PLA"
+   ]
+  ],
+  "EFL91": [
+   [
+    "Eryone",
+    "ABS",
+    "Eryone ABS"
+   ]
+  ],
+  "EFL92": [
+   [
+    "Eryone",
+    "ASA",
+    "Eryone ASA"
+   ]
+  ],
+  "EFL93": [
+   [
+    "Eryone",
+    "PETG",
+    "Eryone PETG"
+   ]
+  ],
+  "EFL941": [
+   [
+    "Eryone",
+    "PLA Silk",
+    "Eryone Silk PLA"
+   ]
+  ],
+  "EFL95": [
+   [
+    "Eryone",
+    "TPU",
+    "Eryone TPU"
+   ]
+  ],
+  "EPAHTB00": [
+   [
+    "Elegoo",
+    "PA",
+    "Elegoo PAHT"
+   ]
+  ],
+  "EPCB00": [
+   [
+    "Elegoo",
+    "PC",
+    "Elegoo PC"
+   ]
+  ],
+  "EPETGB00": [
+   [
+    "Elegoo",
+    "PETG",
+    "Elegoo PETG"
+   ]
+  ],
+  "EPLAB00": [
+   [
+    "Elegoo",
+    "PLA",
+    "Elegoo PLA"
+   ]
+  ],
+  "ESN02": [
+   [
+    "eSUN",
+    "PLA-AERO",
+    "eSUN ePLA-LW"
+   ]
+  ],
+  "ESN03": [
+   [
+    "eSUN",
+    "PETG",
+    "eSUN PETG"
+   ]
+  ],
+  "ETPUB00": [
+   [
+    "Elegoo",
+    "TPU",
+    "Elegoo TPU"
+   ]
+  ],
+  "FDPLAST01": [
+   [
+    "FDplast",
+    "ABS",
+    "FDplast ABS"
+   ]
+  ],
+  "FDPLAST02": [
+   [
+    "FDplast",
+    "HIPS",
+    "FDplast HIPS"
+   ]
+  ],
+  "FDPLAST03": [
+   [
+    "FDplast",
+    "PETG",
+    "FDplast PETG"
+   ]
+  ],
+  "FDPLAST04": [
+   [
+    "FDplast",
+    "PLA",
+    "FDplast PLA"
+   ]
+  ],
+  "FDPLAST05": [
+   [
+    "FDplast",
+    "SBS",
+    "FDplast SBS"
+   ]
+  ],
+  "FDPLAST06": [
+   [
+    "FDplast",
+    "TPU",
+    "FDplast TPU"
+   ]
+  ],
+  "FFF01": [
+   [
+    "Flashforge",
+    "PLA",
+    "Flashforge PLA"
+   ]
+  ],
+  "FFF02": [
+   [
+    "Flashforge",
+    "ABS",
+    "Flashforge ABS"
+   ]
+  ],
+  "FFF03": [
+   [
+    "Flashforge",
+    "PETG",
+    "Flashforge PETG"
+   ],
+   [
+    "Generic",
+    "PETG",
+    "Generic PETG"
+   ]
+  ],
+  "FFG01": [
+   [
+    "Generic",
+    "PLA",
+    "Flashforge Generic PLA"
+   ]
+  ],
+  "FILAR0001": [
+   [
+    "FilAr",
+    "PLA",
+    "FilAr PLA Bronce"
+   ]
+  ],
+  "FILAR0002": [
+   [
+    "FilAr",
+    "PLA",
+    "FilAr PLA Gris Plata"
+   ]
+  ],
+  "FILAR0003": [
+   [
+    "FilAr",
+    "PLA",
+    "FilAr PLA Cobre"
+   ]
+  ],
+  "FILAR0004": [
+   [
+    "FilAr",
+    "PLA",
+    "FilAr PLA Titanio"
+   ]
+  ],
+  "FILAR0005": [
+   [
+    "FilAr",
+    "PLA",
+    "FilAr PLA Tabaco"
+   ]
+  ],
+  "FILAR0006": [
+   [
+    "FilAr",
+    "PLA",
+    "FilAr PLA Cafe con Leche"
+   ]
+  ],
+  "FILAR0007": [
+   [
+    "FilAr",
+    "PLA",
+    "FilAr PLA Manteca"
+   ]
+  ],
+  "FILAR0008": [
+   [
+    "FilAr",
+    "PLA",
+    "FilAr PLA Marron Oxido"
+   ]
+  ],
+  "FILAR0009": [
+   [
+    "FilAr",
+    "PLA",
+    "FilAr PLA Carpincho"
+   ]
+  ],
+  "FILAR0010": [
+   [
+    "FilAr",
+    "PLA",
+    "FilAr PLA Rosa Amaranto"
+   ]
+  ],
+  "FILAR0011": [
+   [
+    "FilAr",
+    "PLA",
+    "FilAr PLA Rosa Flamenco"
+   ]
+  ],
+  "FILAR0012": [
+   [
+    "FilAr",
+    "PLA",
+    "FilAr PLA Piel"
+   ]
+  ],
+  "FILAR0013": [
+   [
+    "FilAr",
+    "PLA",
+    "FilAr PLA Verde FilAr"
+   ]
+  ],
+  "FILAR0014": [
+   [
+    "FilAr",
+    "PLA",
+    "FilAr PLA Verde Manzana"
+   ]
+  ],
+  "FILAR0015": [
+   [
+    "FilAr",
+    "PLA",
+    "FilAr PLA Verde Pixel"
+   ]
+  ],
+  "FILAR0016": [
+   [
+    "FilAr",
+    "PLA",
+    "FilAr PLA Verde Oliva"
+   ]
+  ],
+  "FILAR0017": [
+   [
+    "FilAr",
+    "PLA",
+    "FilAr PLA Blanco Antartida"
+   ]
+  ],
+  "FILAR0018": [
+   [
+    "FilAr",
+    "PLA",
+    "FilAr PLA Blanco Calido"
+   ]
+  ],
+  "FILAR0019": [
+   [
+    "FilAr",
+    "PLA",
+    "FilAr PLA Negro Azabache"
+   ]
+  ],
+  "FILAR0020": [
+   [
+    "FilAr",
+    "PLA",
+    "FilAr PLA Naranja Tigre"
+   ]
+  ],
+  "FILAR0021": [
+   [
+    "FilAr",
+    "PLA",
+    "FilAr PLA Rojo de Carreras"
+   ]
+  ],
+  "FILAR0022": [
+   [
+    "FilAr",
+    "PLA",
+    "FilAr PLA Amarillo Lirio"
+   ]
+  ],
+  "FILAR0023": [
+   [
+    "FilAr",
+    "PLA",
+    "FilAr PLA Violeta Jacaranda"
+   ]
+  ],
+  "FILAR0024": [
+   [
+    "FilAr",
+    "PLA",
+    "FilAr PLA Gris Pizarra"
+   ]
+  ],
+  "FILAR0025": [
+   [
+    "FilAr",
+    "PLA",
+    "FilAr PLA Gris Ceniza"
+   ]
+  ],
+  "FILAR0026": [
+   [
+    "FilAr",
+    "PLA",
+    "FilAr PLA Azul Francia"
+   ]
+  ],
+  "FILAR0027": [
+   [
+    "FilAr",
+    "PLA",
+    "FilAr PLA Celeste Cielo"
+   ]
+  ],
+  "FILAR0028": [
+   [
+    "FilAr",
+    "PLA",
+    "FilAr PLA Oro"
+   ]
+  ],
+  "FILAR0029": [
+   [
+    "FilAr",
+    "PLA",
+    "FilAr PLA Dorado"
+   ]
+  ],
+  "FILAR0030": [
+   [
+    "FilAr",
+    "PLA",
+    "FilAr PLA-mate Amarillo"
+   ]
+  ],
+  "FILAR0031": [
+   [
+    "FilAr",
+    "PLA",
+    "FilAr PLA-mate Azul"
+   ]
+  ],
+  "FILAR0032": [
+   [
+    "FilAr",
+    "PLA",
+    "FilAr PLA-mate Beige"
+   ]
+  ],
+  "FILAR0033": [
+   [
+    "FilAr",
+    "PLA",
+    "FilAr PLA-mate Blanco"
+   ]
+  ],
+  "FILAR0034": [
+   [
+    "FilAr",
+    "PLA",
+    "FilAr PLA-mate Bordo"
+   ]
+  ],
+  "FILAR0035": [
+   [
+    "FilAr",
+    "PLA",
+    "FilAr PLA-mate Celeste Cielo"
+   ]
+  ],
+  "FILAR0036": [
+   [
+    "FilAr",
+    "PLA",
+    "FilAr PLA-mate Chocolate"
+   ]
+  ],
+  "FILAR0037": [
+   [
+    "FilAr",
+    "PLA",
+    "FilAr PLA-mate Gris"
+   ]
+  ],
+  "FILAR0038": [
+   [
+    "FilAr",
+    "PLA",
+    "FilAr PLA-mate Marron"
+   ]
+  ],
+  "FILAR0039": [
+   [
+    "FilAr",
+    "PLA",
+    "FilAr PLA-mate Naranja"
+   ]
+  ],
+  "FILAR0040": [
+   [
+    "FilAr",
+    "PLA",
+    "FilAr PLA-mate Negro"
+   ]
+  ],
+  "FILAR0041": [
+   [
+    "FilAr",
+    "PLA",
+    "FilAr PLA-mate Piel"
+   ]
+  ],
+  "FILAR0042": [
+   [
+    "FilAr",
+    "PLA",
+    "FilAr PLA-mate Rojo"
+   ]
+  ],
+  "FILAR0043": [
+   [
+    "FilAr",
+    "PLA",
+    "FilAr PLA-mate Rosa"
+   ]
+  ],
+  "FILAR0044": [
+   [
+    "FilAr",
+    "PLA",
+    "FilAr PLA-mate Uva"
+   ]
+  ],
+  "FILAR0045": [
+   [
+    "FilAr",
+    "PLA",
+    "FilAr PLA-mate Verde"
+   ]
+  ],
+  "FILAR0046": [
+   [
+    "FilAr",
+    "PLA",
+    "FilAr PLA-mate Violeta"
+   ]
+  ],
+  "FILAR0047": [
+   [
+    "FilAr",
+    "PETG",
+    "FilAr PETG Amarillo Lima"
+   ]
+  ],
+  "FILAR0048": [
+   [
+    "FilAr",
+    "PETG",
+    "FilAr PETG Amarillo Radiante"
+   ]
+  ],
+  "FILAR0049": [
+   [
+    "FilAr",
+    "PETG",
+    "FilAr PETG Azul Boreal"
+   ]
+  ],
+  "FILAR0050": [
+   [
+    "FilAr",
+    "PETG",
+    "FilAr PETG Azul Francia"
+   ]
+  ],
+  "FILAR0051": [
+   [
+    "FilAr",
+    "PETG",
+    "FilAr PETG Azul Imperial"
+   ]
+  ],
+  "FILAR0052": [
+   [
+    "FilAr",
+    "PETG",
+    "FilAr PETG Blanco Antartida"
+   ]
+  ],
+  "FILAR0053": [
+   [
+    "FilAr",
+    "PETG",
+    "FilAr PETG Cian"
+   ]
+  ],
+  "FILAR0054": [
+   [
+    "FilAr",
+    "PETG",
+    "FilAr PETG Coral"
+   ]
+  ],
+  "FILAR0055": [
+   [
+    "FilAr",
+    "PETG",
+    "FilAr PETG Cristal"
+   ]
+  ],
+  "FILAR0056": [
+   [
+    "FilAr",
+    "PETG",
+    "FilAr PETG Gris Ceniza"
+   ]
+  ],
+  "FILAR0057": [
+   [
+    "FilAr",
+    "PETG",
+    "FilAr PETG Gris Plata"
+   ]
+  ],
+  "FILAR0058": [
+   [
+    "FilAr",
+    "PETG",
+    "FilAr PETG Magenta"
+   ]
+  ],
+  "FILAR0059": [
+   [
+    "FilAr",
+    "PETG",
+    "FilAr PETG Negro Azabache"
+   ]
+  ],
+  "FILAR0060": [
+   [
+    "FilAr",
+    "PETG",
+    "FilAr PETG Rojo Carmesi"
+   ]
+  ],
+  "FILARB01": [
+   [
+    "FilAr",
+    "PLA",
+    "FilAr PLA"
+   ]
+  ],
+  "FILARB02": [
+   [
+    "FilAr",
+    "PLA",
+    "FilAr PLA-mate"
+   ]
+  ],
+  "FILARB03": [
+   [
+    "FilAr",
+    "PETG",
+    "FilAr PETG"
+   ]
+  ],
+  "FILL3D001": [
+   [
+    "FILL3D",
+    "PLA",
+    "FILL3D PLA Turbo"
+   ]
+  ],
+  "FILL3D002": [
+   [
+    "FILL3D",
+    "PLA",
+    "FILL3D PLA Basic"
+   ]
+  ],
+  "FILL3D003": [
+   [
+    "FILL3D",
+    "PETG",
+    "FILL3D PETG"
+   ]
+  ],
+  "FILL3D004": [
+   [
+    "FILL3D",
+    "PP",
+    "FILL3D PP"
+   ]
+  ],
+  "FILL3D005": [
+   [
+    "FILL3D",
+    "PP",
+    "FILL3D PPCF"
+   ]
+  ],
+  "FILL3D006": [
+   [
+    "FILL3D",
+    "PA",
+    "FILL3D PA"
+   ]
+  ],
+  "FILL3D007": [
+   [
+    "FILL3D",
+    "PETG-CF",
+    "FILL3D PETG CF"
+   ]
+  ],
+  "GABSB00": [
+   [
+    "Generic",
+    "ABS",
+    "Generic ABS"
+   ]
+  ],
+  "GASAB00": [
+   [
+    "Generic",
+    "ASA",
+    "Generic ASA"
+   ]
+  ],
+  "GFA00": [
+   [
+    "Afinia",
+    "PLA",
+    "Afinia PLA"
+   ],
+   [
+    "Afinia",
+    "PLA",
+    "Afinia Value PLA"
+   ],
+   [
+    "Orca Arena",
+    "PLA",
+    "Arena PLA Basic"
+   ],
+   [
+    "Tiertime",
+    "PLA",
+    "Tiertime PLA"
+   ],
+   [
+    "WonderMaker",
+    "PLA",
+    "WonderMaker PLA Basic"
+   ]
+  ],
+  "GFA00_01": [
+   [
+    "Afinia",
+    "PLA",
+    "Afinia PLA"
+   ],
+   [
+    "Tiertime",
+    "PLA",
+    "Tiertime PLA"
+   ]
+  ],
+  "GFA01": [
+   [
+    "Orca Arena",
+    "PLA",
+    "Arena PLA Matte"
+   ],
+   [
+    "WonderMaker",
+    "PLA",
+    "WonderMaker PLA Matte"
+   ]
+  ],
+  "GFA02": [
+   [
+    "Orca Arena",
+    "PLA",
+    "Arena PLA Metal"
+   ],
+   [
+    "WonderMaker",
+    "PLA",
+    "WonderMaker PLA Metal"
+   ]
+  ],
+  "GFA03": [
+   [
+    "Orca Arena",
+    "PLA",
+    "Arena PLA Impact"
+   ]
+  ],
+  "GFA05": [
+   [
+    "Generic",
+    "PLA",
+    "Qidi Generic PLA Silk"
+   ],
+   [
+    "Orca Arena",
+    "PLA",
+    "Arena PLA Silk"
+   ],
+   [
+    "WonderMaker",
+    "PLA",
+    "WonderMaker PLA Silk"
+   ]
+  ],
+  "GFA07": [
+   [
+    "Orca Arena",
+    "PLA",
+    "Arena PLA Marble"
+   ],
+   [
+    "WonderMaker",
+    "PLA",
+    "WonderMaker PLA Marble"
+   ]
+  ],
+  "GFA08": [
+   [
+    "Orca Arena",
+    "PLA",
+    "Arena PLA Sparkle"
+   ]
+  ],
+  "GFA09": [
+   [
+    "Orca Arena",
+    "PLA",
+    "Arena PLA Tough"
+   ]
+  ],
+  "GFA16": [
+   [
+    "WonderMaker",
+    "PLA",
+    "WonderMaker PLA Wood"
+   ]
+  ],
+  "GFA50": [
+   [
+    "Orca Arena",
+    "PLA-CF",
+    "Arena PLA-CF"
+   ],
+   [
+    "Tiertime",
+    "PLA-CF",
+    "Tiertime PLA-CF"
+   ]
+  ],
+  "GFA50_01": [
+   [
+    "Tiertime",
+    "PLA-CF",
+    "Tiertime PLA-CF"
+   ]
+  ],
+  "GFA99": [
+   [
+    "Anycubic",
+    "ASA",
+    "Anycubic ASA"
+   ],
+   [
+    "CoLiDo",
+    "PLA",
+    "CoLiDo Generic PLA"
+   ],
+   [
+    "CoLiDo",
+    "PLA",
+    "CoLiDo PLA+"
+   ],
+   [
+    "Generic",
+    "ASA",
+    "Anycubic ASA"
+   ]
+  ],
+  "GFASA": [
+   [
+    "Anycubic",
+    "ASA",
+    "Anycubic ASA"
+   ],
+   [
+    "Generic",
+    "ASA",
+    "Anycubic ASA"
+   ]
+  ],
+  "GFB00": [
+   [
+    "Afinia",
+    "ABS",
+    "Afinia ABS"
+   ],
+   [
+    "Afinia",
+    "ABS",
+    "Afinia ABS+"
+   ],
+   [
+    "Afinia",
+    "ABS",
+    "Afinia Value ABS"
+   ],
+   [
+    "Orca Arena",
+    "ABS",
+    "Arena ABS"
+   ],
+   [
+    "Tiertime",
+    "ABS",
+    "Tiertime ABS"
+   ],
+   [
+    "WonderMaker",
+    "ABS",
+    "WonderMaker ABS"
+   ]
+  ],
+  "GFB00_01": [
+   [
+    "Afinia",
+    "ABS",
+    "Afinia ABS"
+   ],
+   [
+    "Tiertime",
+    "ABS",
+    "Tiertime ABS"
+   ]
+  ],
+  "GFB01": [
+   [
+    "Tiertime",
+    "ASA",
+    "Tiertime ASA"
+   ],
+   [
+    "WonderMaker",
+    "ASA",
+    "WonderMaker ASA"
+   ]
+  ],
+  "GFB01_01": [
+   [
+    "Tiertime",
+    "ASA",
+    "Tiertime ASA"
+   ]
+  ],
+  "GFB98": [
+   [
+    "Generic",
+    "ASA",
+    "Anker Generic ASA"
+   ],
+   [
+    "Generic",
+    "ASA",
+    "Anycubic Generic ASA"
+   ],
+   [
+    "Generic",
+    "ASA",
+    "Artillery Generic ASA"
+   ],
+   [
+    "Generic",
+    "ASA",
+    "Creality Generic ASA"
+   ],
+   [
+    "Generic",
+    "ASA",
+    "FLSun Generic ASA"
+   ],
+   [
+    "Generic",
+    "ASA",
+    "FLSun S1 ASA"
+   ],
+   [
+    "Generic",
+    "ASA",
+    "FLSun T1 ASA"
+   ],
+   [
+    "Generic",
+    "ASA",
+    "OrcaArena Generic ASA"
+   ],
+   [
+    "Generic",
+    "ASA",
+    "RatRig Generic ASA"
+   ],
+   [
+    "Generic",
+    "ASA",
+    "SecKit Generic ASA"
+   ],
+   [
+    "Generic",
+    "ASA",
+    "Tiertime Generic ASA"
+   ],
+   [
+    "Generic",
+    "ASA",
+    "Vzbot Generic ASA"
+   ],
+   [
+    "Generic",
+    "ASA",
+    "fdm_filament_asa"
+   ]
+  ],
+  "GFB98_01": [
+   [
+    "Generic",
+    "ASA",
+    "Tiertime Generic ASA"
+   ]
+  ],
+  "GFB98_2": [
+   [
+    "Generic",
+    "ASA",
+    "Prusa Generic ASA"
+   ]
+  ],
+  "GFB98_3": [
+   [
+    "Generic",
+    "ASA",
+    "Prusa Generic ASA"
+   ]
+  ],
+  "GFB98_4": [
+   [
+    "Generic",
+    "ASA",
+    "Prusa Generic ASA"
+   ]
+  ],
+  "GFB98_5": [
+   [
+    "Generic",
+    "ASA",
+    "Prusa Generic ASA"
+   ],
+   [
+    "Generic",
+    "ASA",
+    "Prusa Generic ASA HF"
+   ]
+  ],
+  "GFB98_6": [
+   [
+    "Generic",
+    "ASA",
+    "Prusa Generic ASA HF"
+   ]
+  ],
+  "GFB98_7": [
+   [
+    "Generic",
+    "ASA",
+    "Prusa Generic ASA HF"
+   ]
+  ],
+  "GFB99": [
+   [
+    "CoLiDo",
+    "ABS",
+    "CoLiDo ABS"
+   ],
+   [
+    "CoLiDo",
+    "ABS",
+    "CoLiDo Generic ABS"
+   ],
+   [
+    "FlyingBear",
+    "ABS",
+    "FlyingBear Generic ABS"
+   ],
+   [
+    "Generic",
+    "ABS",
+    "Anker Generic ABS"
+   ],
+   [
+    "Generic",
+    "ABS",
+    "Anycubic Generic ABS"
+   ],
+   [
+    "Generic",
+    "ABS",
+    "Artillery Generic ABS"
+   ],
+   [
+    "Generic",
+    "ABS",
+    "Chuanying ABS"
+   ],
+   [
+    "Generic",
+    "ABS",
+    "Chuanying Generic ABS"
+   ],
+   [
+    "Generic",
+    "ABS",
+    "Comgrow Generic ABS"
+   ],
+   [
+    "Generic",
+    "ABS",
+    "Creality Generic ABS"
+   ],
+   [
+    "Generic",
+    "ABS",
+    "FLSun Generic ABS"
+   ],
+   [
+    "Generic",
+    "ABS",
+    "FLSun S1 ABS"
+   ],
+   [
+    "Generic",
+    "ABS",
+    "FLSun T1 ABS"
+   ],
+   [
+    "Generic",
+    "ABS",
+    "Flashforge ABS"
+   ],
+   [
+    "Generic",
+    "ABS",
+    "Flashforge Generic ABS"
+   ],
+   [
+    "Generic",
+    "ABS",
+    "Generic ABS"
+   ],
+   [
+    "Generic",
+    "ABS",
+    "Lulzbot 2.85mm ABS"
+   ],
+   [
+    "Generic",
+    "ABS",
+    "OrcaArena Generic ABS"
+   ],
+   [
+    "Generic",
+    "ABS",
+    "Prusa Generic ABS"
+   ],
+   [
+    "Generic",
+    "ABS",
+    "Qidi Generic ABS"
+   ],
+   [
+    "Generic",
+    "ABS",
+    "RatRig Generic ABS"
+   ],
+   [
+    "Generic",
+    "ABS",
+    "SecKit Generic ABS"
+   ],
+   [
+    "Generic",
+    "ABS",
+    "Tiertime Generic ABS"
+   ],
+   [
+    "Generic",
+    "ABS",
+    "Vzbot Generic ABS"
+   ],
+   [
+    "Generic",
+    "TPU",
+    "DeltaMaker Generic TPU"
+   ],
+   [
+    "InfiMech",
+    "ABS",
+    "InfiMech Generic ABS"
+   ],
+   [
+    "Volumic",
+    "ABS",
+    "Volumic ABS Ultra"
+   ],
+   [
+    "Volumic",
+    "ABS",
+    "Volumic ABS Ultra (Performance)"
+   ]
+  ],
+  "GFB99_01": [
+   [
+    "Generic",
+    "ABS",
+    "Tiertime Generic ABS"
+   ]
+  ],
+  "GFB99_2": [
+   [
+    "Generic",
+    "ABS",
+    "Prusa Generic ABS"
+   ]
+  ],
+  "GFB99_3": [
+   [
+    "Generic",
+    "ABS",
+    "Prusa Generic ABS"
+   ]
+  ],
+  "GFB99_4": [
+   [
+    "Generic",
+    "ABS",
+    "Prusa Generic ABS"
+   ]
+  ],
+  "GFB99_5": [
+   [
+    "Generic",
+    "ABS",
+    "Prusa Generic ABS"
+   ],
+   [
+    "Generic",
+    "ABS",
+    "Prusa Generic ABS HF"
+   ]
+  ],
+  "GFB99_6": [
+   [
+    "Generic",
+    "ABS",
+    "Prusa Generic ABS HF"
+   ]
+  ],
+  "GFB99_7": [
+   [
+    "Generic",
+    "ABS",
+    "Prusa Generic ABS HF"
+   ]
+  ],
+  "GFC00": [
+   [
+    "Orca Arena",
+    "PC",
+    "Arena PC"
+   ],
+   [
+    "Tiertime",
+    "PC",
+    "Tiertime PC"
+   ]
+  ],
+  "GFC00_01": [
+   [
+    "Tiertime",
+    "PC",
+    "Tiertime PC"
+   ]
+  ],
+  "GFC98": [
+   [
+    "Generic",
+    "PC-CF",
+    "fdm_filament_pccf"
+   ]
+  ],
+  "GFC99": [
+   [
+    "FlyingBear",
+    "PC",
+    "FlyingBear Generic PC"
+   ],
+   [
+    "Generic",
+    "PC",
+    "Anker Generic PC"
+   ],
+   [
+    "Generic",
+    "PC",
+    "Anycubic Generic PC"
+   ],
+   [
+    "Generic",
+    "PC",
+    "Creality Generic PC"
+   ],
+   [
+    "Generic",
+    "PC",
+    "FLSun Generic PC"
+   ],
+   [
+    "Generic",
+    "PC",
+    "Generic PC"
+   ],
+   [
+    "Generic",
+    "PC",
+    "OrcaArena Generic PC"
+   ],
+   [
+    "Generic",
+    "PC",
+    "Qidi Generic PC"
+   ],
+   [
+    "Generic",
+    "PC",
+    "RatRig Generic PC"
+   ],
+   [
+    "Generic",
+    "PC",
+    "SecKit Generic PC"
+   ],
+   [
+    "Generic",
+    "PC",
+    "Tiertime Generic PC"
+   ],
+   [
+    "Generic",
+    "PC",
+    "Vzbot Generic PC"
+   ],
+   [
+    "Generic",
+    "PC",
+    "fdm_filament_pc"
+   ],
+   [
+    "InfiMech",
+    "PC",
+    "InfiMech Generic PC"
+   ],
+   [
+    "Volumic",
+    "PC",
+    "Volumic PC"
+   ],
+   [
+    "Volumic",
+    "PC",
+    "Volumic PC (Performance)"
+   ]
+  ],
+  "GFC99_01": [
+   [
+    "Generic",
+    "PC",
+    "Tiertime Generic PC"
+   ]
+  ],
+  "GFC99_1": [
+   [
+    "Generic",
+    "PC",
+    "Prusa Generic PC"
+   ]
+  ],
+  "GFC99_2": [
+   [
+    "Generic",
+    "PC",
+    "Prusa Generic PC"
+   ]
+  ],
+  "GFC99_3": [
+   [
+    "Generic",
+    "PC",
+    "Prusa Generic PC"
+   ]
+  ],
+  "GFC99_4": [
+   [
+    "Generic",
+    "PC",
+    "Prusa Generic PC"
+   ],
+   [
+    "Generic",
+    "PC",
+    "Prusa Generic PC HF"
+   ]
+  ],
+  "GFC99_5": [
+   [
+    "Generic",
+    "PC",
+    "Prusa Generic PC HF"
+   ]
+  ],
+  "GFC99_6": [
+   [
+    "Generic",
+    "PC",
+    "Prusa Generic PC HF"
+   ]
+  ],
+  "GFG00": [
+   [
+    "Orca Arena",
+    "PETG",
+    "Arena PETG Basic"
+   ],
+   [
+    "Tiertime",
+    "PETG",
+    "Tiertime PETG"
+   ],
+   [
+    "WonderMaker",
+    "PETG",
+    "WonderMaker PETG Basic"
+   ]
+  ],
+  "GFG00_01": [
+   [
+    "Tiertime",
+    "PETG",
+    "Tiertime PETG"
+   ]
+  ],
+  "GFG01": [
+   [
+    "Generic",
+    "PETG",
+    "re3D Greengate rPETG"
+   ],
+   [
+    "re3D",
+    "PETG",
+    "re3D Greengate rPETG"
+   ]
+  ],
+  "GFG02": [
+   [
+    "re3D",
+    "PP",
+    "re3D rPP"
+   ]
+  ],
+  "GFG03": [
+   [
+    "re3D",
+    "PETG",
+    "re3D PETG"
+   ]
+  ],
+  "GFG50": [
+   [
+    "Orca Arena",
+    "PETG-CF",
+    "Arena PETG-CF"
+   ]
+  ],
+  "GFG60": [
+   [
+    "Polymaker",
+    "PETG",
+    "PolyLite PETG"
+   ]
+  ],
+  "GFG97": [
+   [
+    "Generic",
+    "PCTG",
+    "Tiertime Generic PCTG"
+   ]
+  ],
+  "GFG97-01": [
+   [
+    "Generic",
+    "PCTG",
+    "Tiertime Generic PCTG"
+   ]
+  ],
+  "GFG98": [
+   [
+    "Generic",
+    "PETG-CF",
+    "Anker Generic PETG-CF"
+   ],
+   [
+    "Generic",
+    "PETG-CF",
+    "Qidi Generic PETG-CF"
+   ],
+   [
+    "Generic",
+    "PETG-CF",
+    "Tiertime Generic PETG-CF"
+   ],
+   [
+    "Orca Arena",
+    "PETG-CF",
+    "OrcaArena Generic PETG-CF"
+   ],
+   [
+    "Volumic",
+    "PETG",
+    "Volumic PETG Ultra carbone"
+   ],
+   [
+    "Volumic",
+    "PETG",
+    "Volumic PETG Ultra carbone (Performance)"
+   ]
+  ],
+  "GFG98_01": [
+   [
+    "Generic",
+    "PETG-CF",
+    "Tiertime Generic PETG-CF"
+   ]
+  ],
+  "GFG99": [
+   [
+    "CoLiDo",
+    "PETG",
+    "CoLiDo Generic PETG"
+   ],
+   [
+    "CoLiDo",
+    "PETG",
+    "CoLiDo PETG"
+   ],
+   [
+    "FlyingBear",
+    "PETG",
+    "FlyingBear Generic PETG"
+   ],
+   [
+    "FlyingBear",
+    "PETG Basic",
+    "FlyingBear PETG Basic"
+   ],
+   [
+    "Generic",
+    "PEEK",
+    "MM Generic PEEK"
+   ],
+   [
+    "Generic",
+    "PETG",
+    "Anker Generic PETG"
+   ],
+   [
+    "Generic",
+    "PETG",
+    "Anycubic Generic PETG"
+   ],
+   [
+    "Generic",
+    "PETG",
+    "Artillery Generic PETG"
+   ],
+   [
+    "Generic",
+    "PETG",
+    "C1 Generic PETG"
+   ],
+   [
+    "Generic",
+    "PETG",
+    "Chuanying Generic PETG"
+   ],
+   [
+    "Generic",
+    "PETG",
+    "Chuanying PETG"
+   ],
+   [
+    "Generic",
+    "PETG",
+    "Comgrow Generic PETG"
+   ],
+   [
+    "Generic",
+    "PETG",
+    "Creality Generic PETG"
+   ],
+   [
+    "Generic",
+    "PETG",
+    "DeltaMaker Generic PETG"
+   ],
+   [
+    "Generic",
+    "PETG",
+    "FLSun Generic PETG"
+   ],
+   [
+    "Generic",
+    "PETG",
+    "FLSun S1 PETG"
+   ],
+   [
+    "Generic",
+    "PETG",
+    "FLSun T1 PETG"
+   ],
+   [
+    "Generic",
+    "PETG",
+    "Flashforge Generic PETG"
+   ],
+   [
+    "Generic",
+    "PETG",
+    "Flashforge PETG"
+   ],
+   [
+    "Generic",
+    "PETG",
+    "Generic PETG"
+   ],
+   [
+    "Generic",
+    "PETG",
+    "Lulzbot 2.85mm PETG"
+   ],
+   [
+    "Generic",
+    "PETG",
+    "OrcaArena Generic PETG"
+   ],
+   [
+    "Generic",
+    "PETG",
+    "Qidi Generic PETG"
+   ],
+   [
+    "Generic",
+    "PETG",
+    "RatRig Generic PETG"
+   ],
+   [
+    "Generic",
+    "PETG",
+    "SecKit Generic PETG"
+   ],
+   [
+    "Generic",
+    "PETG",
+    "Tiertime Generic PETG"
+   ],
+   [
+    "Generic",
+    "PETG",
+    "Vzbot Generic PETG"
+   ],
+   [
+    "Generic",
+    "PETG",
+    "Yumi Generic PETG"
+   ],
+   [
+    "InfiMech",
+    "PETG",
+    "InfiMech Generic PETG"
+   ],
+   [
+    "Volumic",
+    "PETG",
+    "Volumic PETG Ultra"
+   ],
+   [
+    "Volumic",
+    "PETG",
+    "Volumic PETG Ultra (Performance)"
+   ],
+   [
+    "Yumi",
+    "PETG",
+    "YUMI PETG"
+   ],
+   [
+    "re3D",
+    "PC",
+    "re3D PC"
+   ]
+  ],
+  "GFG99_01": [
+   [
+    "Generic",
+    "PETG",
+    "Tiertime Generic PETG"
+   ]
+  ],
+  "GFG99_2": [
+   [
+    "Generic",
+    "PETG",
+    "Prusa Generic PETG"
+   ]
+  ],
+  "GFG99_3": [
+   [
+    "Generic",
+    "PETG",
+    "Prusa Generic PETG"
+   ]
+  ],
+  "GFG99_4": [
+   [
+    "Generic",
+    "PETG",
+    "Prusa Generic PETG"
+   ]
+  ],
+  "GFG99_5": [
+   [
+    "Generic",
+    "PETG",
+    "Prusa Generic PETG"
+   ],
+   [
+    "Generic",
+    "PETG",
+    "Prusa Generic PETG HF"
+   ]
+  ],
+  "GFG99_6": [
+   [
+    "Generic",
+    "PETG",
+    "Prusa Generic PETG HF"
+   ]
+  ],
+  "GFG99_7": [
+   [
+    "Generic",
+    "PETG",
+    "Prusa Generic PETG HF"
+   ]
+  ],
+  "GFL00": [
+   [
+    "Polymaker",
+    "PLA",
+    "PolyLite PLA"
+   ]
+  ],
+  "GFL01": [
+   [
+    "Polymaker",
+    "PLA",
+    "PolyTerra PLA"
+   ]
+  ],
+  "GFL06": [
+   [
+    "Polymaker",
+    "PETG",
+    "Fiberon PETG-ESD"
+   ]
+  ],
+  "GFL100": [
+   [
+    "Generic",
+    "PLA",
+    "Generic PLA"
+   ],
+   [
+    "Generic",
+    "PLA",
+    "TwoTrees Generic HS PLA"
+   ]
+  ],
+  "GFL106": [
+   [
+    "Generic",
+    "PLA",
+    "Generic PLA"
+   ]
+  ],
+  "GFL108": [
+   [
+    "Generic",
+    "PLA",
+    "Generic PLA"
+   ]
+  ],
+  "GFL200": [
+   [
+    "Generic",
+    "ABS",
+    "Generic ABS"
+   ]
+  ],
+  "GFL204": [
+   [
+    "Generic",
+    "ABS",
+    "Generic ABS"
+   ]
+  ],
+  "GFL206": [
+   [
+    "Generic",
+    "ABS",
+    "Generic ABS"
+   ]
+  ],
+  "GFL208": [
+   [
+    "Generic",
+    "ABS",
+    "Generic ABS"
+   ]
+  ],
+  "GFL300": [
+   [
+    "Generic",
+    "PETG",
+    "Generic PETG"
+   ]
+  ],
+  "GFL304": [
+   [
+    "Generic",
+    "PETG",
+    "Generic PETG"
+   ]
+  ],
+  "GFL306": [
+   [
+    "Generic",
+    "PETG",
+    "Generic PETG"
+   ]
+  ],
+  "GFL308": [
+   [
+    "Generic",
+    "PETG",
+    "Generic PETG"
+   ]
+  ],
+  "GFL400": [
+   [
+    "Generic",
+    "PA",
+    "Generic PA"
+   ]
+  ],
+  "GFL404": [
+   [
+    "Generic",
+    "PA",
+    "Generic PA"
+   ]
+  ],
+  "GFL406": [
+   [
+    "Generic",
+    "PA",
+    "Generic PA"
+   ]
+  ],
+  "GFL408": [
+   [
+    "Generic",
+    "PA",
+    "Generic PA"
+   ]
+  ],
+  "GFL500": [
+   [
+    "Generic",
+    "ABS",
+    "Generic ABS HT"
+   ]
+  ],
+  "GFL504": [
+   [
+    "Generic",
+    "ABS",
+    "Generic ABS HT"
+   ]
+  ],
+  "GFL506": [
+   [
+    "Generic",
+    "ABS",
+    "Generic ABS HT"
+   ]
+  ],
+  "GFL508": [
+   [
+    "Generic",
+    "ABS",
+    "Generic ABS HT"
+   ]
+  ],
+  "GFL56": [
+   [
+    "Polymaker",
+    "PA-CF",
+    "Fiberon PA12-CF10"
+   ]
+  ],
+  "GFL57": [
+   [
+    "Polymaker",
+    "PA6-CF",
+    "Fiberon PA6-CF20"
+   ]
+  ],
+  "GFL62": [
+   [
+    "Polymaker",
+    "PLA",
+    "PolyLite CosPLA"
+   ]
+  ],
+  "GFL63": [
+   [
+    "Polymaker",
+    "PLA",
+    "PolyLite PLA Galaxy"
+   ]
+  ],
+  "GFL64": [
+   [
+    "Polymaker",
+    "PLA",
+    "PolyLite PLA Glow"
+   ]
+  ],
+  "GFL65": [
+   [
+    "Polymaker",
+    "PLA",
+    "PolyLite PLA Luminous"
+   ]
+  ],
+  "GFL66": [
+   [
+    "Polymaker",
+    "PLA",
+    "PolyLite PLA Neon"
+   ]
+  ],
+  "GFL67": [
+   [
+    "Polymaker",
+    "PLA",
+    "PolyLite PLA Starlight"
+   ]
+  ],
+  "GFL68": [
+   [
+    "Polymaker",
+    "PLA",
+    "PolyLite PLA Translucent"
+   ]
+  ],
+  "GFL69": [
+   [
+    "Polymaker",
+    "PLA",
+    "PolyTerra PLA Marble"
+   ]
+  ],
+  "GFL70": [
+   [
+    "Polymaker",
+    "PLA",
+    "PolyTerra PLA+"
+   ]
+  ],
+  "GFL71": [
+   [
+    "Polymaker",
+    "ASA",
+    "Fiberon ASA-CF08"
+   ]
+  ],
+  "GFL72": [
+   [
+    "Polymaker",
+    "PA-CF",
+    "Fiberon PA612-ESD"
+   ]
+  ],
+  "GFL73": [
+   [
+    "Polymaker",
+    "ABS",
+    "Fiberon PPS-GF20"
+   ]
+  ],
+  "GFL74": [
+   [
+    "Polymaker",
+    "PETG",
+    "PolyLite PETG Translucent"
+   ]
+  ],
+  "GFL75": [
+   [
+    "Polymaker",
+    "PLA",
+    "PolyLite PLA Pro Metallic"
+   ]
+  ],
+  "GFL76": [
+   [
+    "Polymaker",
+    "PETG",
+    "Polymaker PETG"
+   ]
+  ],
+  "GFL77": [
+   [
+    "Polymaker",
+    "PETG",
+    "Polymaker PETG Galaxy"
+   ]
+  ],
+  "GFL78": [
+   [
+    "Polymaker",
+    "PLA",
+    "Polymaker PLA"
+   ]
+  ],
+  "GFL79": [
+   [
+    "Polymaker",
+    "PLA",
+    "Polymaker PLA Pro"
+   ]
+  ],
+  "GFL80": [
+   [
+    "Polymaker",
+    "PLA",
+    "Polymaker PLA Pro Metallic"
+   ]
+  ],
+  "GFL94": [
+   [
+    "Anycubic",
+    "PLA",
+    "Anycubic PLA Slik"
+   ]
+  ],
+  "GFL95": [
+   [
+    "Generic",
+    "PLA",
+    "Anker Generic PLA+"
+   ],
+   [
+    "Generic",
+    "PLA",
+    "Tiertime Generic PLA High Speed"
+   ]
+  ],
+  "GFL95_01": [
+   [
+    "Generic",
+    "PLA",
+    "Tiertime Generic PLA High Speed"
+   ]
+  ],
+  "GFL96": [
+   [
+    "Generic",
+    "PLA",
+    "Anker Generic PLA Silk"
+   ],
+   [
+    "Generic",
+    "PLA",
+    "Tiertime Generic PLA Silk"
+   ]
+  ],
+  "GFL96_01": [
+   [
+    "Generic",
+    "PLA",
+    "Tiertime Generic PLA Silk"
+   ]
+  ],
+  "GFL97": [
+   [
+    "Anycubic",
+    "PLA",
+    "Anycubic PLA SE"
+   ]
+  ],
+  "GFL98": [
+   [
+    "Anycubic",
+    "PLA",
+    "Anycubic PLA Glow"
+   ],
+   [
+    "Generic",
+    "PLA-CF",
+    "Anker Generic PLA-CF"
+   ],
+   [
+    "Generic",
+    "PLA-CF",
+    "Anycubic Generic PLA-CF"
+   ],
+   [
+    "Generic",
+    "PLA-CF",
+    "Artillery Generic PLA-CF"
+   ],
+   [
+    "Generic",
+    "PLA-CF",
+    "Creality Generic PLA-CF"
+   ],
+   [
+    "Generic",
+    "PLA-CF",
+    "FLSun Generic PLA-CF"
+   ],
+   [
+    "Generic",
+    "PLA-CF",
+    "Generic PLA-CF"
+   ],
+   [
+    "Generic",
+    "PLA-CF",
+    "OrcaArena Generic PLA-CF"
+   ],
+   [
+    "Generic",
+    "PLA-CF",
+    "Qidi Generic PLA-CF"
+   ],
+   [
+    "Generic",
+    "PLA-CF",
+    "RatRig Generic PLA-CF"
+   ],
+   [
+    "Generic",
+    "PLA-CF",
+    "SecKit Generic PLA-CF"
+   ],
+   [
+    "Generic",
+    "PLA-CF",
+    "Tiertime Generic PLA-CF"
+   ],
+   [
+    "Generic",
+    "PLA-CF",
+    "Vzbot Generic PLA-CF"
+   ]
+  ],
+  "GFL98_01": [
+   [
+    "Generic",
+    "PLA-CF",
+    "Tiertime Generic PLA-CF"
+   ]
+  ],
+  "GFL98_1": [
+   [
+    "Generic",
+    "PLA-CF",
+    "Prusa Generic PLA-CF"
+   ]
+  ],
+  "GFL98_3": [
+   [
+    "Generic",
+    "PLA-CF",
+    "Prusa Generic PLA-CF"
+   ]
+  ],
+  "GFL98_4": [
+   [
+    "Generic",
+    "PLA-CF",
+    "Prusa Generic PLA-CF"
+   ]
+  ],
+  "GFL98_5": [
+   [
+    "Generic",
+    "PLA-CF",
+    "Prusa Generic PLA-CF"
+   ]
+  ],
+  "GFL99": [
+   [
+    "Co Print",
+    "PLA",
+    "CoPrint Generic PLA"
+   ],
+   [
+    "FlyingBear",
+    "PLA",
+    "FlyingBear Generic PLA"
+   ],
+   [
+    "Generic",
+    "ASA",
+    "Flashforge ASA"
+   ],
+   [
+    "Generic",
+    "PLA",
+    "Anker Generic PLA"
+   ],
+   [
+    "Generic",
+    "PLA",
+    "Anycubic Generic PLA"
+   ],
+   [
+    "Generic",
+    "PLA",
+    "Artillery Generic PLA"
+   ],
+   [
+    "Generic",
+    "PLA",
+    "C1 Generic PLA"
+   ],
+   [
+    "Generic",
+    "PLA",
+    "Chuanying Generic PLA"
+   ],
+   [
+    "Generic",
+    "PLA",
+    "Comgrow Generic PLA"
+   ],
+   [
+    "Generic",
+    "PLA",
+    "Comgrow T300 PLA"
+   ],
+   [
+    "Generic",
+    "PLA",
+    "Creality Generic PLA"
+   ],
+   [
+    "Generic",
+    "PLA",
+    "DeltaMaker Generic PLA"
+   ],
+   [
+    "Generic",
+    "PLA",
+    "Dremel Generic PLA"
+   ],
+   [
+    "Generic",
+    "PLA",
+    "FLSun Generic PLA"
+   ],
+   [
+    "Generic",
+    "PLA",
+    "FLSun S1 PLA Generic"
+   ],
+   [
+    "Generic",
+    "PLA",
+    "FLSun T1 PLA Generic"
+   ],
+   [
+    "Generic",
+    "PLA",
+    "Flashforge PLA-SILK"
+   ],
+   [
+    "Generic",
+    "PLA",
+    "Generic PLA"
+   ],
+   [
+    "Generic",
+    "PLA",
+    "Generic PLA High Speed"
+   ],
+   [
+    "Generic",
+    "PLA",
+    "Lulzbot 2.85mm PLA"
+   ],
+   [
+    "Generic",
+    "PLA",
+    "OrcaArena Generic PLA"
+   ],
+   [
+    "Generic",
+    "PLA",
+    "Peopoly Generic PLA"
+   ],
+   [
+    "Generic",
+    "PLA",
+    "Phrozen PLA"
+   ],
+   [
+    "Generic",
+    "PLA",
+    "Prusa Generic PLA"
+   ],
+   [
+    "Generic",
+    "PLA",
+    "Qidi Generic PLA"
+   ],
+   [
+    "Generic",
+    "PLA",
+    "RatRig Generic PLA"
+   ],
+   [
+    "Generic",
+    "PLA",
+    "SecKit Generic PLA"
+   ],
+   [
+    "Generic",
+    "PLA",
+    "Sovol SV07 PLA"
+   ],
+   [
+    "Generic",
+    "PLA",
+    "Tiertime Generic PLA"
+   ],
+   [
+    "Generic",
+    "PLA",
+    "Vzbot Generic PLA"
+   ],
+   [
+    "Generic",
+    "PLA",
+    "Yumi Generic PLA"
+   ],
+   [
+    "InfiMech",
+    "PLA",
+    "InfiMech Generic PLA"
+   ],
+   [
+    "Volumic",
+    "PLA",
+    "Volumic PLA Ultra"
+   ],
+   [
+    "Volumic",
+    "PLA",
+    "Volumic PLA Ultra (Performance)"
+   ],
+   [
+    "re3D",
+    "PLA",
+    "re3D PLA"
+   ]
+  ],
+  "GFL99_01": [
+   [
+    "Generic",
+    "PLA",
+    "Tiertime Generic PLA"
+   ]
+  ],
+  "GFL99_2": [
+   [
+    "Generic",
+    "PLA",
+    "Prusa Generic PLA"
+   ]
+  ],
+  "GFL99_3": [
+   [
+    "Generic",
+    "PLA",
+    "Prusa Generic PLA"
+   ]
+  ],
+  "GFL99_4": [
+   [
+    "Generic",
+    "PLA",
+    "Prusa Generic PLA"
+   ]
+  ],
+  "GFL99_5": [
+   [
+    "Generic",
+    "PLA",
+    "Prusa Generic PLA"
+   ],
+   [
+    "Generic",
+    "PLA",
+    "Prusa Generic PLA HF"
+   ]
+  ],
+  "GFL99_6": [
+   [
+    "Generic",
+    "PLA",
+    "Prusa Generic PLA HF"
+   ]
+  ],
+  "GFL99_7": [
+   [
+    "Generic",
+    "PLA",
+    "Prusa Generic PLA HF"
+   ]
+  ],
+  "GFLLK10PETG": [
+   [
+    "Generic",
+    "PETG",
+    "Generic PETG"
+   ]
+  ],
+  "GFLLK10PLA": [
+   [
+    "Generic",
+    "PLA",
+    "Generic PLA"
+   ]
+  ],
+  "GFLLK10PPETG": [
+   [
+    "Generic",
+    "PETG",
+    "Generic PETG"
+   ]
+  ],
+  "GFLLK10PPLA": [
+   [
+    "Generic",
+    "PLA",
+    "Generic PLA"
+   ]
+  ],
+  "GFN03": [
+   [
+    "Orca Arena",
+    "PA-CF",
+    "Arena PA-CF"
+   ]
+  ],
+  "GFN04": [
+   [
+    "Orca Arena",
+    "PA-CF",
+    "Arena PAHT-CF"
+   ]
+  ],
+  "GFN05": [
+   [
+    "Tiertime",
+    "PA6-CF",
+    "Tiertime PA6-CF"
+   ]
+  ],
+  "GFN05_01": [
+   [
+    "Tiertime",
+    "PA6-CF",
+    "Tiertime PA6-CF"
+   ]
+  ],
+  "GFN96": [
+   [
+    "Generic",
+    "PPA-GF",
+    "Tiertime Generic PPA-GF"
+   ]
+  ],
+  "GFN96_01": [
+   [
+    "Generic",
+    "PPA-GF",
+    "Tiertime Generic PPA-GF"
+   ]
+  ],
+  "GFN97": [
+   [
+    "Generic",
+    "PPA-CF",
+    "Tiertime Generic PPA-CF"
+   ]
+  ],
+  "GFN97_01": [
+   [
+    "Generic",
+    "PPA-CF",
+    "Tiertime Generic PPA-CF"
+   ]
+  ],
+  "GFN98": [
+   [
+    "FlyingBear",
+    "PA-CF",
+    "FlyingBear Generic PA-CF"
+   ],
+   [
+    "Generic",
+    "PA-CF",
+    "Anker Generic PA-CF"
+   ],
+   [
+    "Generic",
+    "PA-CF",
+    "Anycubic Generic PA-CF"
+   ],
+   [
+    "Generic",
+    "PA-CF",
+    "Creality Generic PA-CF"
+   ],
+   [
+    "Generic",
+    "PA-CF",
+    "FLSun Generic PA-CF"
+   ],
+   [
+    "Generic",
+    "PA-CF",
+    "OrcaArena Generic PA-CF"
+   ],
+   [
+    "Generic",
+    "PA-CF",
+    "Qidi Generic PA-CF"
+   ],
+   [
+    "Generic",
+    "PA-CF",
+    "RatRig Generic PA-CF"
+   ],
+   [
+    "Generic",
+    "PA-CF",
+    "SecKit Generic PA-CF"
+   ],
+   [
+    "Generic",
+    "PA-CF",
+    "Tiertime Generic PA-CF"
+   ],
+   [
+    "Generic",
+    "PA-CF",
+    "Vzbot Generic PA-CF"
+   ],
+   [
+    "Generic",
+    "PA11-CF",
+    "fdm_filament_pa11cf"
+   ],
+   [
+    "InfiMech",
+    "PA-CF",
+    "InfiMech Generic PA-CF"
+   ]
+  ],
+  "GFN98_02": [
+   [
+    "Generic",
+    "PA-CF",
+    "Tiertime Generic PA-CF"
+   ]
+  ],
+  "GFN98_1": [
+   [
+    "Generic",
+    "PA-CF",
+    "Prusa Generic PA-CF"
+   ]
+  ],
+  "GFN98_2": [
+   [
+    "Generic",
+    "PA-CF",
+    "Prusa Generic PA-CF"
+   ]
+  ],
+  "GFN98_3": [
+   [
+    "Generic",
+    "PA-CF",
+    "Prusa Generic PA-CF"
+   ]
+  ],
+  "GFN98_4": [
+   [
+    "Generic",
+    "PA-CF",
+    "Prusa Generic PA-CF"
+   ]
+  ],
+  "GFN99": [
+   [
+    "Generic",
+    "PA",
+    "Anker Generic PA"
+   ],
+   [
+    "Generic",
+    "PA",
+    "Anycubic Generic PA"
+   ],
+   [
+    "Generic",
+    "PA",
+    "FLSun Generic PA"
+   ],
+   [
+    "Generic",
+    "PA",
+    "OrcaArena Generic PA"
+   ],
+   [
+    "Generic",
+    "PA",
+    "Prusa Generic PA"
+   ],
+   [
+    "Generic",
+    "PA",
+    "Qidi Generic PA"
+   ],
+   [
+    "Generic",
+    "PA",
+    "RatRig Generic PA"
+   ],
+   [
+    "Generic",
+    "PA",
+    "SecKit Generic PA"
+   ],
+   [
+    "Generic",
+    "PA",
+    "Tiertime Generic PA"
+   ],
+   [
+    "Generic",
+    "PA",
+    "Vzbot Generic PA"
+   ],
+   [
+    "Volumic",
+    "PA",
+    "Volumic NYLON Ultra"
+   ],
+   [
+    "Volumic",
+    "PA",
+    "Volumic NYLON Ultra (Performance)"
+   ]
+  ],
+  "GFN99_01": [
+   [
+    "Generic",
+    "PA",
+    "Tiertime Generic PA"
+   ]
+  ],
+  "GFN99_1": [
+   [
+    "Generic",
+    "PA",
+    "Prusa Generic PA"
+   ]
+  ],
+  "GFN99_2": [
+   [
+    "Generic",
+    "PA",
+    "Prusa Generic PA"
+   ]
+  ],
+  "GFN99_3": [
+   [
+    "Generic",
+    "PA",
+    "Prusa Generic PA"
+   ]
+  ],
+  "GFN99_4": [
+   [
+    "Generic",
+    "PA",
+    "Prusa Generic PA"
+   ]
+  ],
+  "GFOT001": [
+   [
+    "Overture",
+    "PLA",
+    "Overture PLA Pro"
+   ]
+  ],
+  "GFOT002": [
+   [
+    "Overture",
+    "PLA",
+    "Overture Silk PLA"
+   ]
+  ],
+  "GFOT003": [
+   [
+    "Overture",
+    "PLA",
+    "Overture Easy PLA"
+   ]
+  ],
+  "GFOT004": [
+   [
+    "Overture",
+    "PLA",
+    "Overture Rock PLA"
+   ]
+  ],
+  "GFOT005": [
+   [
+    "Overture",
+    "PLA",
+    "Overture Super PLA+"
+   ]
+  ],
+  "GFOT006": [
+   [
+    "Overture",
+    "PLA",
+    "Overture Air PLA"
+   ]
+  ],
+  "GFOT008": [
+   [
+    "Overture",
+    "TPU",
+    "Overture TPU"
+   ]
+  ],
+  "GFOT009": [
+   [
+    "Overture",
+    "ASA",
+    "Overture ASA"
+   ]
+  ],
+  "GFP95": [
+   [
+    "Generic",
+    "PP-GF",
+    "Tiertime Generic PP-GF"
+   ]
+  ],
+  "GFP95_01": [
+   [
+    "Generic",
+    "PP-GF",
+    "Tiertime Generic PP-GF"
+   ]
+  ],
+  "GFP96": [
+   [
+    "Generic",
+    "PP-CF",
+    "Tiertime Generic PP-CF"
+   ]
+  ],
+  "GFP96_01": [
+   [
+    "Generic",
+    "PP-CF",
+    "Tiertime Generic PP-CF"
+   ]
+  ],
+  "GFP97": [
+   [
+    "Generic",
+    "PP",
+    "Tiertime Generic PP"
+   ]
+  ],
+  "GFP97_01": [
+   [
+    "Generic",
+    "PP",
+    "Tiertime Generic PP"
+   ]
+  ],
+  "GFP98": [
+   [
+    "Generic",
+    "PE-CF",
+    "Tiertime Generic PE-CF"
+   ]
+  ],
+  "GFP98_01": [
+   [
+    "Generic",
+    "PE-CF",
+    "Tiertime Generic PE-CF"
+   ]
+  ],
+  "GFP99": [
+   [
+    "Generic",
+    "PE",
+    "Tiertime Generic PE"
+   ]
+  ],
+  "GFP99_01": [
+   [
+    "Generic",
+    "PE",
+    "Tiertime Generic PE"
+   ]
+  ],
+  "GFPA": [
+   [
+    "Anycubic",
+    "PA",
+    "Anycubic PA"
+   ]
+  ],
+  "GFPA6-CF": [
+   [
+    "Anycubic",
+    "PA6-CF",
+    "Anycubic PA6-CF"
+   ]
+  ],
+  "GFPAHT-CF": [
+   [
+    "Anycubic",
+    "PAHT-CF",
+    "Anycubic PAHT-CF"
+   ]
+  ],
+  "GFPC": [
+   [
+    "Anycubic",
+    "PC",
+    "Anycubic PC"
+   ]
+  ],
+  "GFPC-CF": [
+   [
+    "Anycubic",
+    "PC-CF",
+    "Anycubic PC-CF"
+   ]
+  ],
+  "GFPC-GF": [
+   [
+    "Anycubic",
+    "PC-GF",
+    "Anycubic PC-GF"
+   ]
+  ],
+  "GFPEBA": [
+   [
+    "Anycubic",
+    "PEBA",
+    "Anycubic PEBA"
+   ]
+  ],
+  "GFPET-CF": [
+   [
+    "Anycubic",
+    "PET-CF",
+    "Anycubic PET-CF"
+   ]
+  ],
+  "GFPETG": [
+   [
+    "Anycubic",
+    "PETG",
+    "Generic PETG"
+   ],
+   [
+    "Generic",
+    "PETG",
+    "Generic PETG"
+   ]
+  ],
+  "GFPETG-1": [
+   [
+    "Generic",
+    "PETG",
+    "Peopoly Generic PETG"
+   ]
+  ],
+  "GFPETG-CF": [
+   [
+    "Anycubic",
+    "PETG-CF",
+    "Anycubic PETG-CF"
+   ]
+  ],
+  "GFPLA Glow": [
+   [
+    "Anycubic",
+    "PLA",
+    "Anycubic PLA Glow"
+   ]
+  ],
+  "GFPLA Translucent": [
+   [
+    "Anycubic",
+    "PLA",
+    "Anycubic PLA Translucent"
+   ]
+  ],
+  "GFPLA-CF": [
+   [
+    "Anycubic",
+    "PLA-CF",
+    "Anycubic PLA-CF"
+   ]
+  ],
+  "GFPM001": [
+   [
+    "Polymaker",
+    "PLA",
+    "Panchroma PLA"
+   ]
+  ],
+  "GFPM002": [
+   [
+    "Polymaker",
+    "PLA",
+    "Panchroma PLA Matte"
+   ]
+  ],
+  "GFPM003": [
+   [
+    "Polymaker",
+    "PLA",
+    "Panchroma PLA Marble"
+   ]
+  ],
+  "GFPM004": [
+   [
+    "Polymaker",
+    "PLA",
+    "Panchroma PLA Silk"
+   ]
+  ],
+  "GFPM005": [
+   [
+    "Polymaker",
+    "PLA",
+    "Panchroma PLA Satin"
+   ]
+  ],
+  "GFPM006": [
+   [
+    "Polymaker",
+    "PLA",
+    "Panchroma PLA Translucent"
+   ]
+  ],
+  "GFPM007": [
+   [
+    "Polymaker",
+    "PLA",
+    "Panchroma PLA Galaxy"
+   ]
+  ],
+  "GFPM008": [
+   [
+    "Polymaker",
+    "PLA",
+    "Panchroma PLA Celestial"
+   ]
+  ],
+  "GFPM009": [
+   [
+    "Polymaker",
+    "PLA",
+    "Panchroma PLA Starlight"
+   ]
+  ],
+  "GFPM010": [
+   [
+    "Polymaker",
+    "PLA",
+    "Panchroma PLA Glow"
+   ]
+  ],
+  "GFPM011": [
+   [
+    "Polymaker",
+    "PLA",
+    "Panchroma PLA Luminous"
+   ]
+  ],
+  "GFPM012": [
+   [
+    "Polymaker",
+    "PLA",
+    "Panchroma PLA Metallic"
+   ]
+  ],
+  "GFPM013": [
+   [
+    "Polymaker",
+    "PLA",
+    "Panchroma PLA Neon"
+   ]
+  ],
+  "GFPM014": [
+   [
+    "Polymaker",
+    "PLA",
+    "Panchroma PLA UV Shift"
+   ]
+  ],
+  "GFPM015": [
+   [
+    "Polymaker",
+    "PLA",
+    "Panchroma PLA Temp Shift"
+   ]
+  ],
+  "GFPM016": [
+   [
+    "Polymaker",
+    "PLA",
+    "Panchroma CoPE"
+   ]
+  ],
+  "GFPM017": [
+   [
+    "Polymaker",
+    "PLA",
+    "Polymaker HT-PLA"
+   ]
+  ],
+  "GFPM018": [
+   [
+    "Polymaker",
+    "PLA",
+    "Polymaker HT-PLA-GF"
+   ]
+  ],
+  "GFPM019": [
+   [
+    "Polymaker",
+    "PLA",
+    "PolyLite PLA Pro"
+   ]
+  ],
+  "GFPVA": [
+   [
+    "Anycubic",
+    "PVA",
+    "Anycubic PVA"
+   ]
+  ],
+  "GFR98": [
+   [
+    "Generic",
+    "PHA",
+    "Tiertime Generic PHA"
+   ]
+  ],
+  "GFR98_01": [
+   [
+    "Generic",
+    "PHA",
+    "Tiertime Generic PHA"
+   ]
+  ],
+  "GFR99": [
+   [
+    "Generic",
+    "EVA",
+    "Tiertime Generic EVA"
+   ]
+  ],
+  "GFR99_01": [
+   [
+    "Generic",
+    "EVA",
+    "Tiertime Generic EVA"
+   ]
+  ],
+  "GFRH01": [
+   [
+    "Generic",
+    "ABS",
+    "fdm_filament_abs"
+   ]
+  ],
+  "GFRH02": [
+   [
+    "Generic",
+    "ASA",
+    "fdm_filament_asa"
+   ]
+  ],
+  "GFRH03": [
+   [
+    "Generic",
+    "PETG",
+    "fdm_filament_petg"
+   ]
+  ],
+  "GFRH04": [
+   [
+    "Generic",
+    "PLA",
+    "fdm_filament_pla"
+   ]
+  ],
+  "GFRH05": [
+   [
+    "Generic",
+    "TPU",
+    "fdm_filament_tpu"
+   ]
+  ],
+  "GFRH06": [
+   [
+    "Generic",
+    "PC-CF",
+    "fdm_filament_pccf"
+   ]
+  ],
+  "GFS00": [
+   [
+    "Orca Arena",
+    "PLA",
+    "Arena Support W"
+   ]
+  ],
+  "GFS01": [
+   [
+    "Orca Arena",
+    "PA",
+    "Arena Support G"
+   ]
+  ],
+  "GFS04": [
+   [
+    "Tiertime",
+    "PVA",
+    "Tiertime PVA"
+   ],
+   [
+    "WonderMaker",
+    "PVA",
+    "WonderMaker PVA"
+   ]
+  ],
+  "GFS04_01": [
+   [
+    "Tiertime",
+    "PVA",
+    "Tiertime PVA"
+   ]
+  ],
+  "GFS97": [
+   [
+    "Generic",
+    "BVOH",
+    "Tiertime Generic BVOH"
+   ]
+  ],
+  "GFS97_01": [
+   [
+    "Generic",
+    "BVOH",
+    "Tiertime Generic BVOH"
+   ]
+  ],
+  "GFS98": [
+   [
+    "Generic",
+    "HIPS",
+    "Tiertime Generic HIPS"
+   ],
+   [
+    "Generic",
+    "PVB",
+    "fdm_filament_pvb"
+   ]
+  ],
+  "GFS98_01": [
+   [
+    "Generic",
+    "HIPS",
+    "Tiertime Generic HIPS"
+   ]
+  ],
+  "GFS99": [
+   [
+    "Generic",
+    "PVA",
+    "Anker Generic PVA"
+   ],
+   [
+    "Generic",
+    "PVA",
+    "Anycubic Generic PVA"
+   ],
+   [
+    "Generic",
+    "PVA",
+    "FLSun Generic PVA"
+   ],
+   [
+    "Generic",
+    "PVA",
+    "Generic PVA"
+   ],
+   [
+    "Generic",
+    "PVA",
+    "OrcaArena Generic PVA"
+   ],
+   [
+    "Generic",
+    "PVA",
+    "Prusa Generic PVA"
+   ],
+   [
+    "Generic",
+    "PVA",
+    "Qidi Generic PVA"
+   ],
+   [
+    "Generic",
+    "PVA",
+    "RatRig Generic PVA"
+   ],
+   [
+    "Generic",
+    "PVA",
+    "SecKit Generic PVA"
+   ],
+   [
+    "Generic",
+    "PVA",
+    "Tiertime Generic PVA"
+   ],
+   [
+    "Generic",
+    "PVA",
+    "Vzbot Generic PVA"
+   ],
+   [
+    "Volumic",
+    "PVA",
+    "Volumic PVA"
+   ],
+   [
+    "Volumic",
+    "PVA",
+    "Volumic PVA-BVOH (Performance)"
+   ]
+  ],
+  "GFS99_01": [
+   [
+    "Generic",
+    "PVA",
+    "Tiertime Generic PVA"
+   ]
+  ],
+  "GFS99_1": [
+   [
+    "Generic",
+    "PVA",
+    "Prusa Generic PVA"
+   ]
+  ],
+  "GFS99_2": [
+   [
+    "Generic",
+    "PVA",
+    "Prusa Generic PVA"
+   ]
+  ],
+  "GFS99_3": [
+   [
+    "Generic",
+    "PVA",
+    "Prusa Generic PVA"
+   ]
+  ],
+  "GFS99_4": [
+   [
+    "Generic",
+    "PVA",
+    "Prusa Generic PVA"
+   ],
+   [
+    "Generic",
+    "PVA",
+    "Prusa Generic PVA HF"
+   ]
+  ],
+  "GFS99_5": [
+   [
+    "Generic",
+    "PVA",
+    "Prusa Generic PVA HF"
+   ]
+  ],
+  "GFS99_6": [
+   [
+    "Generic",
+    "PVA",
+    "Prusa Generic PVA HF"
+   ]
+  ],
+  "GFSEP001": [
+   [
+    "Eolas Prints",
+    "PLA",
+    "Eolas Prints PLA Premium"
+   ]
+  ],
+  "GFSEP002": [
+   [
+    "Eolas Prints",
+    "PLA",
+    "Eolas Prints PLA Matte"
+   ]
+  ],
+  "GFSEP003": [
+   [
+    "Eolas Prints",
+    "PLA",
+    "Eolas Prints PLA Silk"
+   ]
+  ],
+  "GFSEP004": [
+   [
+    "Eolas Prints",
+    "PLA",
+    "Eolas Prints PLA Neon"
+   ]
+  ],
+  "GFSEP005": [
+   [
+    "Eolas Prints",
+    "PLA",
+    "Eolas Prints PLA High Speed"
+   ]
+  ],
+  "GFSEP006": [
+   [
+    "Eolas Prints",
+    "PLA",
+    "Eolas Prints PLA INGEO 850"
+   ]
+  ],
+  "GFSEP007": [
+   [
+    "Eolas Prints",
+    "PLA",
+    "Eolas Prints PLA INGEO 870"
+   ]
+  ],
+  "GFSEP008": [
+   [
+    "Eolas Prints",
+    "PLA",
+    "Eolas Prints PLA Antibacterial"
+   ]
+  ],
+  "GFSEP009": [
+   [
+    "Eolas Prints",
+    "PLA",
+    "Eolas Prints PLA Transition"
+   ]
+  ],
+  "GFSEP010": [
+   [
+    "Eolas Prints",
+    "PETG",
+    "Eolas Prints PETG"
+   ]
+  ],
+  "GFSEP011": [
+   [
+    "Eolas Prints",
+    "PETG",
+    "Eolas Prints PETG UV Resistant"
+   ]
+  ],
+  "GFSEP012": [
+   [
+    "Eolas Prints",
+    "PETG",
+    "Eolas Prints PETG Transition"
+   ]
+  ],
+  "GFSEP013": [
+   [
+    "Eolas Prints",
+    "TPU",
+    "Eolas Prints TPU Flex 93A"
+   ]
+  ],
+  "GFSEP014": [
+   [
+    "Eolas Prints",
+    "TPU",
+    "Eolas Prints TPU Flex D53"
+   ]
+  ],
+  "GFSEP015": [
+   [
+    "Eolas Prints",
+    "TPU",
+    "Eolas Prints TPU D60 UV Resistant"
+   ]
+  ],
+  "GFSEP016": [
+   [
+    "Eolas Prints",
+    "TPU",
+    "Eolas Prints TPU Transition"
+   ]
+  ],
+  "GFSEP017": [
+   [
+    "Eolas Prints",
+    "ABS",
+    "Eolas Prints ABS"
+   ]
+  ],
+  "GFSEP018": [
+   [
+    "Eolas Prints",
+    "ASA",
+    "Eolas Prints ASA"
+   ]
+  ],
+  "GFSL99": [
+   [
+    "Generic",
+    "ABS",
+    "Peopoly Generic ABS"
+   ]
+  ],
+  "GFSNL02": [
+   [
+    "SUNLU",
+    "PLA",
+    "SUNLU PLA Matte"
+   ]
+  ],
+  "GFSNL03": [
+   [
+    "SUNLU",
+    "PLA",
+    "SUNLU PLA+"
+   ]
+  ],
+  "GFSNL04": [
+   [
+    "SUNLU",
+    "PLA",
+    "SUNLU PLA+ 2.0"
+   ]
+  ],
+  "GFSNL05": [
+   [
+    "SUNLU",
+    "PLA",
+    "SUNLU Silk PLA+"
+   ]
+  ],
+  "GFSNL06": [
+   [
+    "SUNLU",
+    "PLA",
+    "SUNLU PLA Marble"
+   ]
+  ],
+  "GFSNL07": [
+   [
+    "SUNLU",
+    "PLA",
+    "SUNLU Wood PLA"
+   ]
+  ],
+  "GFSNL08": [
+   [
+    "SUNLU",
+    "PETG",
+    "SUNLU PETG"
+   ]
+  ],
+  "GFT01": [
+   [
+    "Orca Arena",
+    "PET-CF",
+    "Arena PET-CF"
+   ],
+   [
+    "Tiertime",
+    "PET-CF",
+    "Tiertime PET-CF"
+   ],
+   [
+    "WonderMaker",
+    "PET-CF",
+    "WonderMaker PET-CF"
+   ]
+  ],
+  "GFT01_01": [
+   [
+    "Tiertime",
+    "PET-CF",
+    "Tiertime PET-CF"
+   ]
+  ],
+  "GFT02": [
+   [
+    "Generic",
+    "PETG",
+    "Prusa Generic PETG"
+   ]
+  ],
+  "GFT97": [
+   [
+    "Generic",
+    "PPS",
+    "Tiertime Generic PPS"
+   ]
+  ],
+  "GFT97_01": [
+   [
+    "Generic",
+    "PPS",
+    "Tiertime Generic PPS"
+   ]
+  ],
+  "GFT98": [
+   [
+    "Generic",
+    "PPS-CF",
+    "Tiertime Generic PPS-CF"
+   ]
+  ],
+  "GFT98_01": [
+   [
+    "Generic",
+    "PPS-CF",
+    "Tiertime Generic PPS-CF"
+   ]
+  ],
+  "GFTPU 95A": [
+   [
+    "Anycubic",
+    "TPU",
+    "Anycubic TPU 95A"
+   ]
+  ],
+  "GFTPU for ACE": [
+   [
+    "Anycubic",
+    "TPU",
+    "Anycubic TPU for ACE"
+   ]
+  ],
+  "GFU01": [
+   [
+    "Afinia",
+    "TPU",
+    "Afinia TPU"
+   ],
+   [
+    "Orca Arena",
+    "TPU",
+    "Arena TPU 95A"
+   ],
+   [
+    "Tiertime",
+    "TPU",
+    "Tiertime TPU 95A"
+   ],
+   [
+    "WonderMaker",
+    "TPU",
+    "WonderMaker TPU 95A"
+   ]
+  ],
+  "GFU01_01": [
+   [
+    "Afinia",
+    "TPU",
+    "Afinia TPU"
+   ],
+   [
+    "Tiertime",
+    "TPU",
+    "Tiertime TPU 95A"
+   ]
+  ],
+  "GFU99": [
+   [
+    "CoLiDo",
+    "TPU",
+    "CoLiDo Generic TPU"
+   ],
+   [
+    "FlyingBear",
+    "TPU",
+    "FlyingBear Generic TPU"
+   ],
+   [
+    "FlyingBear",
+    "TPU",
+    "FlyingBear TPU Basic"
+   ],
+   [
+    "Generic",
+    "FLEX",
+    "fdm_filament_flex"
+   ],
+   [
+    "Generic",
+    "TPU",
+    "Anker Generic TPU"
+   ],
+   [
+    "Generic",
+    "TPU",
+    "Anycubic Generic TPU"
+   ],
+   [
+    "Generic",
+    "TPU",
+    "Artillery Generic TPU"
+   ],
+   [
+    "Generic",
+    "TPU",
+    "Creality Generic TPU"
+   ],
+   [
+    "Generic",
+    "TPU",
+    "FLSun Generic TPU"
+   ],
+   [
+    "Generic",
+    "TPU",
+    "FLSun S1 TPU"
+   ],
+   [
+    "Generic",
+    "TPU",
+    "FLSun T1 TPU"
+   ],
+   [
+    "Generic",
+    "TPU",
+    "Generic TPU"
+   ],
+   [
+    "Generic",
+    "TPU",
+    "OrcaArena Generic TPU"
+   ],
+   [
+    "Generic",
+    "TPU",
+    "Prusa Generic TPU"
+   ],
+   [
+    "Generic",
+    "TPU",
+    "Qidi Generic TPU"
+   ],
+   [
+    "Generic",
+    "TPU",
+    "RatRig Generic TPU"
+   ],
+   [
+    "Generic",
+    "TPU",
+    "SecKit Generic TPU"
+   ],
+   [
+    "Generic",
+    "TPU",
+    "Tiertime Generic TPU"
+   ],
+   [
+    "Generic",
+    "TPU",
+    "TwoTrees Generic 95A TPU"
+   ],
+   [
+    "Generic",
+    "TPU",
+    "Vzbot Generic TPU"
+   ],
+   [
+    "InfiMech",
+    "TPU",
+    "InfiMech Generic TPU"
+   ],
+   [
+    "InfiMech",
+    "TPU",
+    "InfiMech TPU Basic"
+   ],
+   [
+    "Volumic",
+    "TPU",
+    "Volumic FLEX93 Ultra"
+   ],
+   [
+    "Volumic",
+    "TPU",
+    "Volumic FLEX93 Ultra (Performance)"
+   ],
+   [
+    "Yumi",
+    "PLA",
+    "YUMI PLA Bowden"
+   ],
+   [
+    "Yumi",
+    "PLA",
+    "YUMI PLA Direct Drive"
+   ]
+  ],
+  "GFU99_01": [
+   [
+    "Generic",
+    "TPU",
+    "Tiertime Generic TPU"
+   ]
+  ],
+  "GFU99_2": [
+   [
+    "Generic",
+    "FLEX",
+    "Prusa Generic TPU"
+   ]
+  ],
+  "GFU99_3": [
+   [
+    "Generic",
+    "FLEX",
+    "Prusa Generic TPU HF"
+   ]
+  ],
+  "GPAB00": [
+   [
+    "Generic",
+    "PA",
+    "Generic PA"
+   ]
+  ],
+  "GPCB00": [
+   [
+    "Generic",
+    "PC",
+    "Generic PC"
+   ]
+  ],
+  "GPETB00": [
+   [
+    "Generic",
+    "PET",
+    "Generic PET"
+   ]
+  ],
+  "GPETGB00": [
+   [
+    "Generic",
+    "PETG",
+    "Generic PETG"
+   ]
+  ],
+  "GPLAB00": [
+   [
+    "Generic",
+    "PLA",
+    "Generic PLA"
+   ]
+  ],
+  "Generic ABS @E3NG v1.2S": [
+   [
+    "Generic",
+    "ABS",
+    "Generic ABS"
+   ]
+  ],
+  "Generic ABS @MK4S": [
+   [
+    "Generic",
+    "ABS",
+    "Prusa Generic ABS"
+   ]
+  ],
+  "Generic ABS @MK4S 0.6": [
+   [
+    "Generic",
+    "ABS",
+    "Prusa Generic ABS"
+   ]
+  ],
+  "Generic ABS @MK4S 0.8": [
+   [
+    "Generic",
+    "ABS",
+    "Prusa Generic ABS"
+   ]
+  ],
+  "Generic ABS @MK4S HF0.4": [
+   [
+    "Generic",
+    "ABS",
+    "Prusa Generic ABS"
+   ]
+  ],
+  "Generic ABS @MK4S HF0.5": [
+   [
+    "Generic",
+    "ABS",
+    "Prusa Generic ABS"
+   ]
+  ],
+  "Generic ABS @MK4S HF0.6": [
+   [
+    "Generic",
+    "ABS",
+    "Prusa Generic ABS"
+   ]
+  ],
+  "Generic ABS @MK4S HF0.8": [
+   [
+    "Generic",
+    "ABS",
+    "Prusa Generic ABS"
+   ]
+  ],
+  "Generic ASA @E3NG v1.2S": [
+   [
+    "Generic",
+    "ASA",
+    "Generic ASA"
+   ]
+  ],
+  "Generic FLEX @MK4S": [
+   [
+    "Generic",
+    "FLEX",
+    "Prusa Generic TPU"
+   ]
+  ],
+  "Generic FLEX @MK4S 0.6": [
+   [
+    "Generic",
+    "FLEX",
+    "Prusa Generic TPU"
+   ]
+  ],
+  "Generic FLEX @MK4S 0.8": [
+   [
+    "Generic",
+    "FLEX",
+    "Prusa Generic TPU"
+   ]
+  ],
+  "Generic PCCF @E3NG v1.2S": [
+   [
+    "Generic",
+    "PC-CF",
+    "Generic PCCF"
+   ]
+  ],
+  "Generic PETG @E3NG v1.2S": [
+   [
+    "Generic",
+    "PETG",
+    "Generic PETG"
+   ]
+  ],
+  "Generic PETG @MK4S": [
+   [
+    "Generic",
+    "PETG",
+    "Prusa Generic PETG"
+   ]
+  ],
+  "Generic PETG @MK4S 0.6": [
+   [
+    "Generic",
+    "PETG",
+    "Prusa Generic PETG"
+   ]
+  ],
+  "Generic PETG @MK4S 0.8": [
+   [
+    "Generic",
+    "PETG",
+    "Prusa Generic PETG"
+   ]
+  ],
+  "Generic PETG @MK4S HF0.4": [
+   [
+    "Generic",
+    "PETG",
+    "Prusa Generic PETG"
+   ]
+  ],
+  "Generic PETG @MK4S HF0.5": [
+   [
+    "Generic",
+    "PETG",
+    "Prusa Generic PETG"
+   ]
+  ],
+  "Generic PETG @MK4S HF0.6": [
+   [
+    "Generic",
+    "PETG",
+    "Prusa Generic PETG"
+   ]
+  ],
+  "Generic PETG @MK4S HF0.8": [
+   [
+    "Generic",
+    "PETG",
+    "Prusa Generic PETG"
+   ]
+  ],
+  "Generic PLA @E3NG v1.2S": [
+   [
+    "Generic",
+    "PLA",
+    "Generic PLA"
+   ]
+  ],
+  "Generic PLA @MK4S": [
+   [
+    "Generic",
+    "PLA",
+    "Prusa Generic PLA"
+   ]
+  ],
+  "Generic PLA @MK4S 0.6": [
+   [
+    "Generic",
+    "PLA",
+    "Prusa Generic PLA"
+   ]
+  ],
+  "Generic PLA @MK4S 0.8": [
+   [
+    "Generic",
+    "PLA",
+    "Prusa Generic PLA"
+   ]
+  ],
+  "Generic PLA @MK4S HF0.4": [
+   [
+    "Generic",
+    "PLA",
+    "Prusa Generic PLA"
+   ]
+  ],
+  "Generic PLA @MK4S HF0.5": [
+   [
+    "Generic",
+    "PLA",
+    "Prusa Generic PLA"
+   ]
+  ],
+  "Generic PLA @MK4S HF0.6": [
+   [
+    "Generic",
+    "PLA",
+    "Prusa Generic PLA"
+   ]
+  ],
+  "Generic PLA @MK4S HF0.8": [
+   [
+    "Generic",
+    "PLA",
+    "Prusa Generic PLA"
+   ]
+  ],
+  "Generic PLA Silk @MK4S": [
+   [
+    "Generic",
+    "PLA",
+    "Prusa Generic PLA Silk"
+   ]
+  ],
+  "Generic PLA Silk @MK4S 0.6": [
+   [
+    "Generic",
+    "PLA",
+    "Prusa Generic PLA Silk"
+   ]
+  ],
+  "Generic PLA Silk @MK4S 0.8": [
+   [
+    "Generic",
+    "PLA",
+    "Prusa Generic PLA Silk"
+   ]
+  ],
+  "Generic TPU @E3NG v1.2S": [
+   [
+    "Generic",
+    "TPU",
+    "Generic TPU"
+   ]
+  ],
+  "IQM1": [
+   [
+    "iQ Materials",
+    "PACF Pro",
+    "Fiberthree PACF Pro P1"
+   ]
+  ],
+  "IQM1011": [
+   [
+    "iQ Materials",
+    "VXL90 Xioneer",
+    "VXL90 TiQ2 P2"
+   ]
+  ],
+  "IQM2": [
+   [
+    "iQ Materials",
+    "ABS Material4Print Natur",
+    "Material4Print ABS Natur P1"
+   ]
+  ],
+  "IQM3": [
+   [
+    "iQ Materials",
+    "PETG Polymax",
+    "Polymaker PETG Polymax black P1"
+   ]
+  ],
+  "IQM7": [
+   [
+    "iQ Materials",
+    "PACF Pro",
+    "Fiberthree PACF Pro P2"
+   ]
+  ],
+  "LHF_abs": [
+   [
+    "LH Stinger",
+    "ASA",
+    "LHS ABS"
+   ]
+  ],
+  "LHF_asa": [
+   [
+    "LH Stinger",
+    "ASA",
+    "LHS ASA"
+   ]
+  ],
+  "LHF_ftpuf": [
+   [
+    "LH Stinger",
+    "TPU",
+    "LHS TPU Foamy 78A"
+   ]
+  ],
+  "LHF_pccf": [
+   [
+    "LH Stinger",
+    "PC",
+    "LHS PC CF"
+   ]
+  ],
+  "LHF_pctg": [
+   [
+    "LH Stinger",
+    "PCTG",
+    "LHS PCTG"
+   ]
+  ],
+  "LHF_petg": [
+   [
+    "LH Stinger",
+    "PETG",
+    "LHS PETG"
+   ]
+  ],
+  "LHF_pla": [
+   [
+    "LH Stinger",
+    "PLA",
+    "LHS PLA"
+   ]
+  ],
+  "LHF_ptpu_pl": [
+   [
+    "LH Stinger",
+    "TPU",
+    "LHS TPU"
+   ]
+  ],
+  "NIT01": [
+   [
+    "NIT",
+    "ABS",
+    "NIT ABS"
+   ]
+  ],
+  "NIT02": [
+   [
+    "NIT",
+    "PLA",
+    "NIT PLA"
+   ]
+  ],
+  "NIT03": [
+   [
+    "NIT",
+    "PETG",
+    "NIT PETG"
+   ]
+  ],
+  "OEABSB00": [
+   [
+    "Elegoo",
+    "ABS",
+    "Elegoo ABS"
+   ]
+  ],
+  "OEASAB00": [
+   [
+    "Elegoo",
+    "ASA",
+    "Elegoo ASA"
+   ]
+  ],
+  "OEPAHTB0": [
+   [
+    "Elegoo",
+    "PA",
+    "Elegoo PAHT"
+   ]
+  ],
+  "OEPCB00": [
+   [
+    "Elegoo",
+    "PC",
+    "Elegoo PC"
+   ]
+  ],
+  "OEPETGB0": [
+   [
+    "Elegoo",
+    "PETG",
+    "Elegoo PETG"
+   ]
+  ],
+  "OEPLAB00": [
+   [
+    "Elegoo",
+    "PLA",
+    "Elegoo PLA"
+   ]
+  ],
+  "OETPUB00": [
+   [
+    "Elegoo",
+    "TPU",
+    "Elegoo TPU"
+   ]
+  ],
+  "OF09vOcG": [
+   [
+    "Elegoo",
+    "PLA",
+    "Elegoo PLA Galaxy"
+   ]
+  ],
+  "OF0Ee2jQ": [
+   [
+    "Snapmaker",
+    "TPU",
+    "Snapmaker Dual TPU High-Flow"
+   ]
+  ],
+  "OF0M6QAQ": [
+   [
+    "Elegoo",
+    "PLA",
+    "Elegoo PLA Galaxy"
+   ]
+  ],
+  "OF0SyJhk": [
+   [
+    "FusRock",
+    "PA6-CF",
+    "Flashforge PA6-CF"
+   ]
+  ],
+  "OF0TODnN": [
+   [
+    "Generic",
+    "PET-CF",
+    "Generic PET-CF"
+   ]
+  ],
+  "OF0TjJ0G": [
+   [
+    "QIDI",
+    "ASA-AERO",
+    "Qidi ASA-Aero"
+   ]
+  ],
+  "OF0UbONm": [
+   [
+    "Generic",
+    "S-PAHT",
+    "FusRock S-PAHT"
+   ]
+  ],
+  "OF0VEdLB": [
+   [
+    "Cubicon",
+    "PETG",
+    "Cubicon PETG"
+   ]
+  ],
+  "OF0Y5MLd": [
+   [
+    "QIDI",
+    "PETG-GF",
+    "QIDI PETG-GF"
+   ]
+  ],
+  "OF0wk0Pk": [
+   [
+    "Generic",
+    "PLA",
+    "Flashforge PLA  Pro"
+   ]
+  ],
+  "OF0z1XpN": [
+   [
+    "QIDI",
+    "PLA",
+    "QIDI PLA Rapido Silk"
+   ]
+  ],
+  "OF102WKM": [
+   [
+    "Elegoo",
+    "PETG",
+    "Elegoo PETG PRO"
+   ]
+  ],
+  "OF17cONC": [
+   [
+    "Polymaker",
+    "PLA",
+    "PolyTerra Dual PLA"
+   ]
+  ],
+  "OF1Zypyy": [
+   [
+    "QIDI",
+    "PETG",
+    "QIDI PETG Tough"
+   ]
+  ],
+  "OF22AxCm": [
+   [
+    "Generic",
+    "PETG",
+    "Polymaker PETG"
+   ]
+  ],
+  "OF2HQqTC": [
+   [
+    "Cubicon",
+    "PLA",
+    "Cubicon PLA+"
+   ]
+  ],
+  "OF2Psxdc": [
+   [
+    "Co Print",
+    "TPU",
+    "CoPrint Generic TPU"
+   ]
+  ],
+  "OF2UFmOo": [
+   [
+    "Bambu Lab",
+    "PLA",
+    "Bambu PLA"
+   ]
+  ],
+  "OF2tvNYA": [
+   [
+    "Generic",
+    "PLA",
+    "Sovol Zero PLA Silk"
+   ]
+  ],
+  "OF38Hyk4": [
+   [
+    "Generic",
+    "PETG",
+    "Flashforge PETG Pro"
+   ]
+  ],
+  "OF3GKs2i": [
+   [
+    "eSUN",
+    "PLA",
+    "eSUN PLA-Matte"
+   ]
+  ],
+  "OF3XeEuV": [
+   [
+    "QIDI",
+    "PET-GF",
+    "QIDI PET-GF"
+   ]
+  ],
+  "OF3YOOOs": [
+   [
+    "Generic",
+    "PETG-CF",
+    "Chuanying Generic PETG-CF10"
+   ]
+  ],
+  "OF3arl18": [
+   [
+    "Elegoo",
+    "PETG",
+    "Elegoo Rapid PETG"
+   ]
+  ],
+  "OF41QVDH": [
+   [
+    "Generic",
+    "PLA",
+    "Flashforge Generic PLA-Silk"
+   ]
+  ],
+  "OF43idK2": [
+   [
+    "Generic",
+    "PLA",
+    "Creality Generic PLA Matte"
+   ]
+  ],
+  "OF48G7He": [
+   [
+    "QIDI",
+    "PETG",
+    "QIDI PETG Tough 0.8 nozzle"
+   ]
+  ],
+  "OF4RKeng": [
+   [
+    "Generic",
+    "ASA",
+    "Flashforge Generic ASA"
+   ]
+  ],
+  "OF4fgpse": [
+   [
+    "Elegoo",
+    "PLA",
+    "Elegoo PLA Marble"
+   ]
+  ],
+  "OF4gzzE4": [
+   [
+    "QIDI",
+    "PET-CF",
+    "QIDI PET-CF"
+   ]
+  ],
+  "OF4jILJA": [
+   [
+    "FlyingBear",
+    "PC",
+    "FlyingBear PC"
+   ]
+  ],
+  "OF4m9A5w": [
+   [
+    "Generic",
+    "HIPS",
+    "Flashforge Generic HIPS"
+   ]
+  ],
+  "OF50NUZI": [
+   [
+    "FlyingBear",
+    "PLA",
+    "FlyingBear PLA Basic"
+   ]
+  ],
+  "OF57IbZT": [
+   [
+    "Artillery",
+    "PLA Basic",
+    "Artillery PLA Basic"
+   ]
+  ],
+  "OF5Bmdtg": [
+   [
+    "Generic",
+    "ABS",
+    "Sovol SV06 Plus ACE ABS"
+   ]
+  ],
+  "OF5J2axC": [
+   [
+    "Generic",
+    "PLA",
+    "Sovol Zero PLA Basic"
+   ]
+  ],
+  "OF5T1Y9R": [
+   [
+    "Generic",
+    "ABS",
+    "Flashforge ABS Basic"
+   ]
+  ],
+  "OF5UUaUM": [
+   [
+    "Generic",
+    "PLA",
+    "Qidi Generic PLA High Speed"
+   ]
+  ],
+  "OF5Ugv12": [
+   [
+    "Other",
+    "PLA",
+    "Other PLA"
+   ]
+  ],
+  "OF5kwfZu": [
+   [
+    "FusRock",
+    "PA-CF",
+    "FusRock Generic NexPA-CF25"
+   ]
+  ],
+  "OF60Lmeq": [
+   [
+    "Generic",
+    "PLA",
+    "Flashforge PLA Matte"
+   ]
+  ],
+  "OF6EOy1A": [
+   [
+    "Bambu Lab",
+    "PETG",
+    "Bambu PETG"
+   ]
+  ],
+  "OF6FM5F7": [
+   [
+    "Generic",
+    "PAHT",
+    "FusRock PAHT"
+   ]
+  ],
+  "OF6Mxzsg": [
+   [
+    "Generic",
+    "TPU",
+    "Generic TPU"
+   ]
+  ],
+  "OF6SEkeJ": [
+   [
+    "Generic",
+    "PET-CF",
+    "FusRock PET-CF"
+   ]
+  ],
+  "OF6XIeUW": [
+   [
+    "Generic",
+    "PLA-CF",
+    "Generic PLA-CF10"
+   ]
+  ],
+  "OF6XuVQE": [
+   [
+    "Cubicon",
+    "ABS",
+    "Cubicon ABS"
+   ]
+  ],
+  "OF70DKqH": [
+   [
+    "Snapmaker",
+    "TPU",
+    "Snapmaker TPE"
+   ]
+  ],
+  "OF79FFkO": [
+   [
+    "Elegoo",
+    "PC",
+    "Elegoo PC-FR"
+   ]
+  ],
+  "OF7M9vy4": [
+   [
+    "Generic",
+    "PLA",
+    "RatRig BigNozzle PLA"
+   ]
+  ],
+  "OF7cv1Ub": [
+   [
+    "QIDI",
+    "PLA-CF",
+    "QIDI PLA-CF"
+   ]
+  ],
+  "OF7f0eUZ": [
+   [
+    "Volumic",
+    "ASA",
+    "Volumic ASA Ultra"
+   ]
+  ],
+  "OF7tgL9c": [
+   [
+    "Generic",
+    "ASA",
+    "Chuanying Generic ASA"
+   ]
+  ],
+  "OF8HQmJD": [
+   [
+    "Elegoo",
+    "PLA",
+    "Elegoo PLA Sparkle"
+   ]
+  ],
+  "OF8WvPVL": [
+   [
+    "QIDI",
+    "ABS",
+    "QIDI ABS Rapido 0.8 nozzle"
+   ]
+  ],
+  "OF9RZyBz": [
+   [
+    "Polymaker",
+    "PA",
+    "Polymaker Generic S1"
+   ]
+  ],
+  "OF9qvJxV": [
+   [
+    "Elegoo",
+    "PLA",
+    "Elegoo PLA Translucent2"
+   ]
+  ],
+  "OF9sr3Vn": [
+   [
+    "Generic",
+    "PLA",
+    "Flashforge PLA Sparkle"
+   ]
+  ],
+  "OF9tjFbj": [
+   [
+    "Peopoly",
+    "PLA",
+    "Peopoly Lancer PLA-C"
+   ]
+  ],
+  "OF9vnvM8": [
+   [
+    "Artillery",
+    "PETG-CF",
+    "Artillery PETG-CF"
+   ]
+  ],
+  "OFAEqlWa": [
+   [
+    "Generic",
+    "PLA",
+    "Flashforge Generic PLA-SILK"
+   ]
+  ],
+  "OFAGqTQG": [
+   [
+    "Volumic",
+    "PP",
+    "Volumic PP Ultra"
+   ]
+  ],
+  "OFAGrVjP": [
+   [
+    "Generic",
+    "PLA",
+    "Flashforge PLA Silk"
+   ]
+  ],
+  "OFAHagT9": [
+   [
+    "Elegoo",
+    "PLA",
+    "Elegoo Rapid PLA+"
+   ]
+  ],
+  "OFAK2XjZ": [
+   [
+    "Other",
+    "ABS",
+    "Other ABS"
+   ]
+  ],
+  "OFAUDGEQ": [
+   [
+    "QIDI",
+    "PLA",
+    "QIDI PLA Rapido Matte"
+   ]
+  ],
+  "OFAUX5fB": [
+   [
+    "Generic",
+    "PETG",
+    "C1 Generic High Flow PETG"
+   ]
+  ],
+  "OFAbsMuV": [
+   [
+    "Snapmaker",
+    "TPU",
+    "Snapmaker Dual TPE"
+   ]
+  ],
+  "OFAdAYYk": [
+   [
+    "QIDI",
+    "PPS-CF",
+    "QIDI PPS-CF"
+   ]
+  ],
+  "OFAdZFD1": [
+   [
+    "FusRock",
+    "PET-GF",
+    "FusRock Generic PET-GF"
+   ]
+  ],
+  "OFAiqi5v": [
+   [
+    "Elegoo",
+    "ASA",
+    "Elegoo ASA-CF"
+   ]
+  ],
+  "OFAnyzjN": [
+   [
+    "HATCHBOX",
+    "PETG",
+    "HATCHBOX PETG"
+   ]
+  ],
+  "OFAtydxE": [
+   [
+    "Generic",
+    "S-Multi",
+    "FusRock S-Multi"
+   ]
+  ],
+  "OFBGxHgT": [
+   [
+    "FlyingBear",
+    "PLA",
+    "FlyingBear PLA"
+   ]
+  ],
+  "OFBRSZom": [
+   [
+    "Volumic",
+    "PPS-CF",
+    "PPS Carbone (Performance)"
+   ]
+  ],
+  "OFBvxnjM": [
+   [
+    "Elegoo",
+    "PETG",
+    "Elegoo PETG-GF"
+   ]
+  ],
+  "OFC2FSsV": [
+   [
+    "Overture",
+    "PLA",
+    "Overture PLA"
+   ]
+  ],
+  "OFC5CCeo": [
+   [
+    "Generic",
+    "PETG-CF",
+    "Flashforge Generic PETG-CF"
+   ]
+  ],
+  "OFCJaXZS": [
+   [
+    "Generic",
+    "PPS",
+    "Flashforge PPS"
+   ]
+  ],
+  "OFCKK3u9": [
+   [
+    "FlyingBear",
+    "PA-CF",
+    "FlyingBear PA-CF"
+   ]
+  ],
+  "OFCgpxn2": [
+   [
+    "Generic",
+    "ABS",
+    "Prusa Generic ABS HF"
+   ]
+  ],
+  "OFChH9xu": [
+   [
+    "Snapmaker",
+    "TPU",
+    "Snapmaker J1 TPE"
+   ]
+  ],
+  "OFD5e0sH": [
+   [
+    "Elegoo",
+    "PLA",
+    "Elegoo Rapid PLA+"
+   ]
+  ],
+  "OFDCk0cz": [
+   [
+    "Generic",
+    "PETG-CF",
+    "Generic PETG-CF"
+   ]
+  ],
+  "OFDMWB6t": [
+   [
+    "Elegoo",
+    "PLA",
+    "Elegoo PLA+"
+   ]
+  ],
+  "OFDNiRTx": [
+   [
+    "Elegoo",
+    "PLA",
+    "Elegoo PLA+"
+   ]
+  ],
+  "OFDkABjZ": [
+   [
+    "Generic",
+    "TPU-90A",
+    "Generic TPU-90A"
+   ]
+  ],
+  "OFDramZ2": [
+   [
+    "Co Print",
+    "PETG",
+    "CoPrint Generic PETG"
+   ]
+  ],
+  "OFE22Uba": [
+   [
+    "Generic",
+    "TPU-90A",
+    "Flashforge TPU-90A"
+   ]
+  ],
+  "OFEYKrjb": [
+   [
+    "Artillery",
+    "PETG",
+    "Artillery PETG"
+   ]
+  ],
+  "OFEdyZqS": [
+   [
+    "Anycubic",
+    "PLA",
+    "Anycubic PLA Luminous"
+   ]
+  ],
+  "OFFIL5pD": [
+   [
+    "QIDI",
+    "PA12-CF",
+    "QIDI PA12-CF"
+   ]
+  ],
+  "OFFenwbU": [
+   [
+    "Generic",
+    "PLA",
+    "FLSun S1 PLA Silk"
+   ]
+  ],
+  "OFFmJ8aR": [
+   [
+    "Other",
+    "PLA",
+    "Other PLA Hyper"
+   ]
+  ],
+  "OFFrbsvQ": [
+   [
+    "Other",
+    "TPU",
+    "Other TPU"
+   ]
+  ],
+  "OFG8vHw8": [
+   [
+    "Generic",
+    "ASA",
+    "Qidi Generic ASA"
+   ]
+  ],
+  "OFGFZhWu": [
+   [
+    "Generic",
+    "PETG",
+    "Sovol SV06 ACE PETG"
+   ]
+  ],
+  "OFGb4hPY": [
+   [
+    "Anycubic",
+    "PEBA",
+    "Anycubic PEBA 95A"
+   ]
+  ],
+  "OFGfdP6J": [
+   [
+    "FusRock",
+    "S-Multi",
+    "FusRock Generic S-Multi"
+   ],
+   [
+    "Generic",
+    "PET-CF",
+    "FusRock Generic S-Multi"
+   ]
+  ],
+  "OFHBTqyD": [
+   [
+    "Generic",
+    "PLA",
+    "Flashforge PLA Basic"
+   ]
+  ],
+  "OFHDaMut": [
+   [
+    "Volumic",
+    "PA6-CF",
+    "PA6 CF20 (Performance)"
+   ]
+  ],
+  "OFHL32M0": [
+   [
+    "Anycubic",
+    "TPU",
+    "Anycubic TPU"
+   ],
+   [
+    "Generic",
+    "TPU",
+    "Anycubic TPU"
+   ]
+  ],
+  "OFHtQDC9": [
+   [
+    "Elegoo",
+    "PLA",
+    "Elegoo PLA Basic"
+   ]
+  ],
+  "OFICPchn": [
+   [
+    "Elegoo",
+    "PLA",
+    "Elegoo PLA Basic"
+   ]
+  ],
+  "OFIGHU7W": [
+   [
+    "Elegoo",
+    "PETG",
+    "Elegoo PETG-CF"
+   ]
+  ],
+  "OFIl3ar9": [
+   [
+    "Generic",
+    "PETG",
+    "Sovol SV08 PETG"
+   ]
+  ],
+  "OFIzguhB": [
+   [
+    "Volumic",
+    "UNIV",
+    "Volumic UNIVERSAL Ultra"
+   ]
+  ],
+  "OFJIImD5": [
+   [
+    "Elegoo",
+    "PETG",
+    "Elegoo PET-CF"
+   ]
+  ],
+  "OFJfx0Cl": [
+   [
+    "Generic",
+    "PE-CF",
+    "Generic PE-CF"
+   ]
+  ],
+  "OFJsqMzx": [
+   [
+    "Generic",
+    "PLA",
+    "Generic PLA Matte"
+   ]
+  ],
+  "OFK39W9u": [
+   [
+    "Generic",
+    "PETG-CF",
+    "Flashforge Generic PETG-CF10"
+   ]
+  ],
+  "OFK820gS": [
+   [
+    "QIDI",
+    "ASA",
+    "QIDI ASA"
+   ]
+  ],
+  "OFKDnrjL": [
+   [
+    "Artillery",
+    "PLA Matte",
+    "Artillery PLA Matte"
+   ]
+  ],
+  "OFKH15Hd": [
+   [
+    "Generic",
+    "ABS",
+    "Sovol SV08 ABS"
+   ]
+  ],
+  "OFKWVi10": [
+   [
+    "Generic",
+    "PLA-CF",
+    "Flashforge Generic PLA-CF10"
+   ]
+  ],
+  "OFKZH00L": [
+   [
+    "FusRock",
+    "PET-CF",
+    "FusRock Generic PET-CF"
+   ],
+   [
+    "Generic",
+    "PET-CF",
+    "FusRock Generic PET-CF"
+   ]
+  ],
+  "OFKhtNBx": [
+   [
+    "Snapmaker",
+    "TPU",
+    "Snapmaker J1 TPU High-Flow"
+   ]
+  ],
+  "OFKjlAbC": [
+   [
+    "QIDI",
+    "UltraPA-CF25",
+    "QIDI UltraPA-CF25"
+   ]
+  ],
+  "OFKzh9lx": [
+   [
+    "InfiMech",
+    "PLA",
+    "InfiMech PLA"
+   ]
+  ],
+  "OFL4BLAC": [
+   [
+    "iQ Materials",
+    "HPP4GF25",
+    "Grauts HPP4GF25 P1"
+   ]
+  ],
+  "OFL4KniM": [
+   [
+    "Elegoo",
+    "TPU",
+    "Elegoo Rapid TPU 95A"
+   ]
+  ],
+  "OFL7U2MV": [
+   [
+    "RatRig",
+    "ABS",
+    "RatRig PunkFil ABS"
+   ]
+  ],
+  "OFL7vEML": [
+   [
+    "Generic",
+    "PC",
+    "FlashForge PC"
+   ]
+  ],
+  "OFLSBS99": [
+   [
+    "Generic",
+    "SBS",
+    "fdm_filament_sbs"
+   ]
+  ],
+  "OFLeFaUO": [
+   [
+    "Generic",
+    "PVA",
+    "Flashforge Generic PVA"
+   ]
+  ],
+  "OFLhOFQk": [
+   [
+    "Volumic",
+    "ASA",
+    "Volumic ASA Ultra (Performance)"
+   ]
+  ],
+  "OFLiTjQK": [
+   [
+    "Other",
+    "PA-CF",
+    "Other PA-CF"
+   ]
+  ],
+  "OFLriDvE": [
+   [
+    "Generic",
+    "PLA",
+    "Creality Generic PLA High Speed"
+   ]
+  ],
+  "OFLxO2Oc": [
+   [
+    "Generic",
+    "PET",
+    "FusRock PET"
+   ]
+  ],
+  "OFM3PeVe": [
+   [
+    "FusRock",
+    "ASA-CF",
+    "Flashforge ASA-CF"
+   ],
+   [
+    "Generic",
+    "ASA-CF",
+    "Flashforge ASA-CF"
+   ]
+  ],
+  "OFMCMXSG": [
+   [
+    "Generic",
+    "PP",
+    "Generic PP-GF"
+   ]
+  ],
+  "OFMHTnPP": [
+   [
+    "FusRock",
+    "PA-CF",
+    "Flashforge PA12-CF"
+   ]
+  ],
+  "OFMQJToc": [
+   [
+    "Elegoo",
+    "PETG",
+    "Elegoo PETG-GF"
+   ]
+  ],
+  "OFN0X7oN": [
+   [
+    "QIDI",
+    "PLA",
+    "QIDI PLA Basic"
+   ]
+  ],
+  "OFN0pBpo": [
+   [
+    "Generic",
+    "TPU",
+    "Qidi Generic TPU 95A"
+   ]
+  ],
+  "OFNQHqAV": [
+   [
+    "Cubicon",
+    "ABS",
+    "Cubicon ABSk"
+   ]
+  ],
+  "OFNRgSch": [
+   [
+    "Artillery",
+    "PC",
+    "Artillery PC"
+   ]
+  ],
+  "OFNX5uRT": [
+   [
+    "QIDI",
+    "TPU-AERO",
+    "QIDI TPU-Aero"
+   ]
+  ],
+  "OFNbajj9": [
+   [
+    "Generic",
+    "ASA",
+    "Creality Generic ASA-CF"
+   ]
+  ],
+  "OFNvrbnf": [
+   [
+    "Co Print",
+    "ABS",
+    "CoPrint Generic ABS"
+   ]
+  ],
+  "OFNz8rrn": [
+   [
+    "FlyingBear",
+    "PLA",
+    "FlyingBear PLA Hyper"
+   ]
+  ],
+  "OFO3IOWM": [
+   [
+    "Volumic",
+    "PETG-ESD",
+    "PETG ESD (Performance)"
+   ]
+  ],
+  "OFO5R9KJ": [
+   [
+    "Generic",
+    "TPU",
+    "Sovol Zero TPU"
+   ]
+  ],
+  "OFOJUJAS": [
+   [
+    "Cubicon",
+    "PA",
+    "Cubicon PA-CF"
+   ]
+  ],
+  "OFOSzSuh": [
+   [
+    "Generic",
+    "PA-CF",
+    "Flashforge PA-CF"
+   ]
+  ],
+  "OFOW9K96": [
+   [
+    "QIDI",
+    "TPU",
+    "Qidi TPU 95A-HF"
+   ]
+  ],
+  "OFOkTA0C": [
+   [
+    "Elegoo",
+    "PETG",
+    "Elegoo PETG Translucent"
+   ]
+  ],
+  "OFOp3Oef": [
+   [
+    "Generic",
+    "ABS",
+    "Generic ABS"
+   ]
+  ],
+  "OFOysPuE": [
+   [
+    "QIDI",
+    "TPU-GF",
+    "QIDI TPU-GF"
+   ]
+  ],
+  "OFP4poIv": [
+   [
+    "Generic",
+    "PLA",
+    "Sovol Zero PLA Silk HS Nozzle"
+   ]
+  ],
+  "OFPGelMX": [
+   [
+    "Volumic",
+    "PP",
+    "Volumic PP Ultra (Performance)"
+   ]
+  ],
+  "OFPJJxkF": [
+   [
+    "FusRock",
+    "PET-CF",
+    "Flashforge PET-CF"
+   ],
+   [
+    "Generic",
+    "PET-CF",
+    "Flashforge PET-CF"
+   ]
+  ],
+  "OFPJrlC3": [
+   [
+    "Generic",
+    "PLA-CF",
+    "Flashforge PLA-CF"
+   ]
+  ],
+  "OFPeGtB1": [
+   [
+    "Volumic",
+    "UNIV",
+    "Volumic UNIVERSAL Ultra (Performance)"
+   ]
+  ],
+  "OFPokkKe": [
+   [
+    "QIDI",
+    "PETG-CF",
+    "QIDI PETG-CF"
+   ]
+  ],
+  "OFPwi9X0": [
+   [
+    "HATCHBOX",
+    "ABS",
+    "HATCHBOX ABS"
+   ]
+  ],
+  "OFQ5xAKf": [
+   [
+    "Generic",
+    "PVA",
+    "Chuanying Generic PVA"
+   ]
+  ],
+  "OFQ9dI8j": [
+   [
+    "Generic",
+    "PC",
+    "Prusa Generic PC HF"
+   ]
+  ],
+  "OFQCAYAt": [
+   [
+    "FusRock",
+    "PPA-CF",
+    "Flashforge PPA-CF"
+   ],
+   [
+    "Generic",
+    "PPA-CF",
+    "Flashforge PPA-CF"
+   ]
+  ],
+  "OFQZINrX": [
+   [
+    "QIDI",
+    "ABS-GF",
+    "QIDI ABS-GF10"
+   ]
+  ],
+  "OFQhLoxN": [
+   [
+    "Elegoo",
+    "PLA",
+    "Elegoo PLA Wood"
+   ]
+  ],
+  "OFQkWxJy": [
+   [
+    "Elegoo",
+    "PLA",
+    "Elegoo PLA Matte"
+   ]
+  ],
+  "OFR8dTVW": [
+   [
+    "Generic",
+    "PLA",
+    "FLSun S1 PLA High Speed"
+   ]
+  ],
+  "OFRNU58t": [
+   [
+    "Generic",
+    "TPU",
+    "Flashforge TPU 95A"
+   ]
+  ],
+  "OFRR8LUh": [
+   [
+    "Generic",
+    "ASA",
+    "Generic ASA"
+   ]
+  ],
+  "OFRS2Ggt": [
+   [
+    "Generic",
+    "PP-CF",
+    "Generic PP-CF"
+   ]
+  ],
+  "OFRgDMDJ": [
+   [
+    "Generic",
+    "PETG",
+    "Flashforge PETG Transparent"
+   ]
+  ],
+  "OFS1ekCg": [
+   [
+    "Generic",
+    "PETG",
+    "RatRig BigNozzle PCTG"
+   ]
+  ],
+  "OFS3HrR1": [
+   [
+    "Other",
+    "PLA",
+    "Other PLA"
+   ]
+  ],
+  "OFSCm6pJ": [
+   [
+    "Elegoo",
+    "PETG",
+    "Elegoo PET-CF"
+   ]
+  ],
+  "OFSSuKRr": [
+   [
+    "QIDI",
+    "PETG",
+    "QIDI PETG Basic"
+   ]
+  ],
+  "OFSdF3B1": [
+   [
+    "Generic",
+    "PAHT-CF",
+    "FusRock PAHT-CF"
+   ]
+  ],
+  "OFSkBwxf": [
+   [
+    "Generic",
+    "ASA",
+    "RatRig BigNozzle ASA"
+   ]
+  ],
+  "OFSoZBK2": [
+   [
+    "Generic",
+    "PLA",
+    "Sovol SV06 Plus ACE PLA"
+   ]
+  ],
+  "OFSpTWdv": [
+   [
+    "Other",
+    "PA-CF",
+    "Other PA-CF"
+   ]
+  ],
+  "OFT3TqB6": [
+   [
+    "Elas",
+    "ASA",
+    "Elas ASA"
+   ]
+  ],
+  "OFTa6gPH": [
+   [
+    "Generic",
+    "PLA",
+    "Flashforge PLA Pro"
+   ]
+  ],
+  "OFTbdJyT": [
+   [
+    "Other",
+    "PC",
+    "Other PC"
+   ]
+  ],
+  "OFTbsWVg": [
+   [
+    "Artillery",
+    "TPU",
+    "Artillery TPU"
+   ]
+  ],
+  "OFToBodi": [
+   [
+    "QIDI",
+    "ABS",
+    "QIDI ABS Rapido Metal"
+   ]
+  ],
+  "OFTsGps3": [
+   [
+    "InfiMech",
+    "PC",
+    "InfiMech PC"
+   ]
+  ],
+  "OFTszIHE": [
+   [
+    "Generic",
+    "PLA",
+    "Creality Generic PLA Silk"
+   ]
+  ],
+  "OFUJw3Lx": [
+   [
+    "QIDI",
+    "PEBA",
+    "QIDI PEBA 95A"
+   ]
+  ],
+  "OFUYjPc4": [
+   [
+    "Generic",
+    "PLA",
+    "Dremel Generic PLA"
+   ]
+  ],
+  "OFUkpobY": [
+   [
+    "QIDI",
+    "PAHT-CF",
+    "QIDI PAHT-CF"
+   ]
+  ],
+  "OFUqBrgf": [
+   [
+    "Generic",
+    "TPU",
+    "Chuanying Generic TPU"
+   ]
+  ],
+  "OFV1szQh": [
+   [
+    "Peopoly",
+    "PETG",
+    "Peopoly Lancer PETG-C"
+   ]
+  ],
+  "OFV4hD1o": [
+   [
+    "QIDI",
+    "PLA",
+    "QIDI PLA Rapido Metal"
+   ]
+  ],
+  "OFVBNoov": [
+   [
+    "InfiMech",
+    "ABS",
+    "InfiMech ABS"
+   ]
+  ],
+  "OFVJXE4n": [
+   [
+    "Other",
+    "ABS",
+    "Other ABS"
+   ]
+  ],
+  "OFVLuVmD": [
+   [
+    "Elegoo",
+    "PETG",
+    "Elegoo Rapid PETG"
+   ]
+  ],
+  "OFVhG0yM": [
+   [
+    "QIDI",
+    "ABS",
+    "QIDI ABS Odorless"
+   ]
+  ],
+  "OFW8UdlP": [
+   [
+    "QIDI",
+    "ABS",
+    "QIDI ABS Rapido"
+   ]
+  ],
+  "OFWkCAdc": [
+   [
+    "QIDI",
+    "PETG",
+    "QIDI PETG Tough 0.2 nozzle"
+   ]
+  ],
+  "OFWs8KIZ": [
+   [
+    "Generic",
+    "ABS-CF",
+    "Flashforge ABS-CF"
+   ]
+  ],
+  "OFWv6JYn": [
+   [
+    "Generic",
+    "PLA",
+    "Flashforge PLA Metal"
+   ]
+  ],
+  "OFWyCd0Y": [
+   [
+    "QIDI",
+    "PA-S",
+    "QIDI Support For PET/PA"
+   ]
+  ],
+  "OFXA8vy9": [
+   [
+    "Artillery",
+    "PLA Basic+",
+    "Artillery PLA Basic+"
+   ]
+  ],
+  "OFXNO5Of": [
+   [
+    "QIDI",
+    "PLA",
+    "QIDI PLA Rapido 0.2 nozzle"
+   ]
+  ],
+  "OFXQX0tr": [
+   [
+    "RatRig",
+    "PETG-CF10",
+    "RatRig PunkFil PETG CF"
+   ]
+  ],
+  "OFXcfTEb": [
+   [
+    "Generic",
+    "PETG",
+    "Tinmorry PETG-ECO"
+   ]
+  ],
+  "OFXfgh61": [
+   [
+    "Generic",
+    "PA-CF",
+    "Prusa Generic PA-CF"
+   ]
+  ],
+  "OFXkwkn6": [
+   [
+    "QIDI",
+    "UltraPA",
+    "QIDI PA-Ultra"
+   ]
+  ],
+  "OFXmQgno": [
+   [
+    "eSUN",
+    "PLA",
+    "eSUN PLA-Marble"
+   ]
+  ],
+  "OFXv4FUi": [
+   [
+    "Generic",
+    "PLA",
+    "Flashforge PLA Galaxy"
+   ]
+  ],
+  "OFY1U4uM": [
+   [
+    "Generic",
+    "TPU",
+    "Sovol SV08 TPU"
+   ]
+  ],
+  "OFYG2Gfy": [
+   [
+    "Afinia",
+    "ABS",
+    "Afinia ABS+"
+   ]
+  ],
+  "OFYH00jV": [
+   [
+    "QIDI",
+    "ABS-GF",
+    "QIDI ABS-GF"
+   ]
+  ],
+  "OFYICbI4": [
+   [
+    "FusRock",
+    "PAHT-CF",
+    "FusRock Generic PAHT-CF"
+   ],
+   [
+    "Generic",
+    "PAHT-CF",
+    "FusRock Generic PAHT-CF"
+   ]
+  ],
+  "OFYRS7GZ": [
+   [
+    "Generic",
+    "TPU-95A",
+    "Generic TPU-95A"
+   ]
+  ],
+  "OFYZs7dN": [
+   [
+    "Generic",
+    "PLA",
+    "Flashforge Generic HS PLA"
+   ]
+  ],
+  "OFYehFGr": [
+   [
+    "Generic",
+    "TPU",
+    "RatRig BigNozzle TPU"
+   ]
+  ],
+  "OFYfZgxU": [
+   [
+    "FlyingBear",
+    "TPU",
+    "FlyingBear TPU"
+   ]
+  ],
+  "OFZAkPHG": [
+   [
+    "QIDI",
+    "PPS-GF",
+    "QIDI PPS-GF"
+   ]
+  ],
+  "OFZQFvHQ": [
+   [
+    "Generic",
+    "PETG",
+    "Flashforge HS PETG"
+   ]
+  ],
+  "OFZcrV9c": [
+   [
+    "FusRock",
+    "PPS-CF",
+    "Flashforge PPS-CF"
+   ],
+   [
+    "Generic",
+    "PPS-CF",
+    "Flashforge PPS-CF"
+   ]
+  ],
+  "OFZhdVnP": [
+   [
+    "eSUN",
+    "PLA",
+    "eSUN PLA-Basic"
+   ]
+  ],
+  "OFZjZ1k7": [
+   [
+    "Generic",
+    "PLA",
+    "Creality HF Generic PLA"
+   ]
+  ],
+  "OFa5cFqE": [
+   [
+    "QIDI",
+    "PAHT-S",
+    "QIDI Support For PAHT"
+   ]
+  ],
+  "OFa6L3Of": [
+   [
+    "QIDI",
+    "PC-ABS-FR",
+    "Qidi PC-ABS-FR"
+   ]
+  ],
+  "OFaKIoH2": [
+   [
+    "Elegoo",
+    "PLA",
+    "Elegoo PLA Sparkle"
+   ]
+  ],
+  "OFaKZ6JI": [
+   [
+    "Generic",
+    "PETG",
+    "Generic PETG Basic"
+   ]
+  ],
+  "OFaxQnfz": [
+   [
+    "Cubicon",
+    "PC",
+    "Cubicon PC"
+   ]
+  ],
+  "OFb3UzMZ": [
+   [
+    "InfiMech",
+    "PA-CF",
+    "InfiMech PA-CF"
+   ]
+  ],
+  "OFbK5wve": [
+   [
+    "Generic",
+    "TPU",
+    "Prusa Generic TPU HF"
+   ]
+  ],
+  "OFbS9rjH": [
+   [
+    "QIDI",
+    "PETG",
+    "QIDI PETG Rapido"
+   ]
+  ],
+  "OFbYP6Wb": [
+   [
+    "Elegoo",
+    "PLA",
+    "Elegoo PLA Marble"
+   ]
+  ],
+  "OFbgt3u3": [
+   [
+    "Elas",
+    "PLA",
+    "Elas PLA Basic"
+   ]
+  ],
+  "OFc2SnEp": [
+   [
+    "Artillery",
+    "PVA",
+    "Artillery PVA"
+   ]
+  ],
+  "OFcZZWnB": [
+   [
+    "Cubicon",
+    "ABS",
+    "Cubicon ABS-A100"
+   ]
+  ],
+  "OFceJcLf": [
+   [
+    "Polymaker",
+    "PLA",
+    "PolyLite PLA"
+   ]
+  ],
+  "OFcqs5g7": [
+   [
+    "Elegoo",
+    "PLA",
+    "Elegoo PLA Translucent2"
+   ]
+  ],
+  "OFcsHCy4": [
+   [
+    "Generic",
+    "PLA",
+    "Sovol SV08 PLA"
+   ]
+  ],
+  "OFcy60o4": [
+   [
+    "Generic",
+    "ASA",
+    "Flashforge ASA Basic"
+   ]
+  ],
+  "OFdLGn0R": [
+   [
+    "Generic",
+    "PLA",
+    "Creality Generic PLA Wood"
+   ]
+  ],
+  "OFdNORGt": [
+   [
+    "Generic",
+    "ASA-GF",
+    "Flashforge ASA-GF"
+   ]
+  ],
+  "OFdSGkUG": [
+   [
+    "Anycubic",
+    "PETG",
+    "Anycubic PETG"
+   ],
+   [
+    "Generic",
+    "PETG",
+    "Anycubic PETG"
+   ]
+  ],
+  "OFdhVJql": [
+   [
+    "Generic",
+    "PLA",
+    "Flashforge PLA Buint Ti"
+   ]
+  ],
+  "OFeFRwST": [
+   [
+    "Generic",
+    "PVA",
+    "Flashforge PVA"
+   ]
+  ],
+  "OFePPmng": [
+   [
+    "Snapmaker",
+    "ABS",
+    "Snapmaker J1 ABS Benchy"
+   ]
+  ],
+  "OFeWMAGH": [
+   [
+    "Generic",
+    "PLA",
+    "Flashforge HS PLA Burnt Ti"
+   ]
+  ],
+  "OFefhSuj": [
+   [
+    "InfiMech",
+    "PLA",
+    "InfiMech PLA Hyper"
+   ]
+  ],
+  "OFenGPBR": [
+   [
+    "Elegoo",
+    "PETG",
+    "Elegoo PETG Translucent"
+   ]
+  ],
+  "OFeybQvK": [
+   [
+    "QIDI",
+    "ABS",
+    "QIDI ABS Rapido 0.2 nozzle"
+   ]
+  ],
+  "OFf0JIqs": [
+   [
+    "Eryone",
+    "PP",
+    "Eryone PP"
+   ]
+  ],
+  "OFf2b9wu": [
+   [
+    "Anycubic",
+    "ABS",
+    "Anycubic ABS"
+   ],
+   [
+    "Generic",
+    "ABS",
+    "Anycubic ABS"
+   ]
+  ],
+  "OFfB1QKi": [
+   [
+    "Generic",
+    "PETG",
+    "Generic PETG HF"
+   ]
+  ],
+  "OFfJoIgg": [
+   [
+    "QIDI",
+    "PAHT-GF",
+    "QIDI PAHT-GF"
+   ]
+  ],
+  "OFfdxQok": [
+   [
+    "Generic",
+    "PLA",
+    "Generic PLA+"
+   ]
+  ],
+  "OFfiN1Lw": [
+   [
+    "Generic",
+    "PLA",
+    "Chuanying Generic HS PLA"
+   ]
+  ],
+  "OFfkPhrJ": [
+   [
+    "Generic",
+    "PLA",
+    "Creality HF Generic Speed PLA"
+   ]
+  ],
+  "OFfoA8kJ": [
+   [
+    "CoLiDo",
+    "PLA",
+    "CoLiDo PLA"
+   ]
+  ],
+  "OFftQOek": [
+   [
+    "Generic",
+    "PLA",
+    "Flashforge PLA  Matte"
+   ]
+  ],
+  "OFg4N6ZL": [
+   [
+    "FlyingBear",
+    "PETG",
+    "FlyingBear PETG"
+   ]
+  ],
+  "OFgJX0Fc": [
+   [
+    "Generic",
+    "PPS",
+    "FlashForge PPS"
+   ]
+  ],
+  "OFgK2Xvv": [
+   [
+    "Anycubic",
+    "PLA",
+    "Anycubic PLA"
+   ],
+   [
+    "Generic",
+    "PLA",
+    "Anycubic PLA"
+   ]
+  ],
+  "OFgMGSpF": [
+   [
+    "Generic",
+    "PETG",
+    "Sovol SV06 Plus ACE PETG"
+   ]
+  ],
+  "OFgNzLVh": [
+   [
+    "Generic",
+    "ABS",
+    "Sovol Zero ABS"
+   ]
+  ],
+  "OFgSK1hL": [
+   [
+    "Anycubic",
+    "PLA",
+    "Anycubic PLA High Speed"
+   ],
+   [
+    "Generic",
+    "PLA",
+    "Anycubic PLA High Speed"
+   ]
+  ],
+  "OFglpvEE": [
+   [
+    "Generic",
+    "TPU",
+    "Sovol SV06 ACE TPU"
+   ]
+  ],
+  "OFgrGfPy": [
+   [
+    "Anycubic",
+    "PLA",
+    "Anycubic PLA+"
+   ],
+   [
+    "Generic",
+    "PLA",
+    "Anycubic PLA+"
+   ]
+  ],
+  "OFgtZjeX": [
+   [
+    "Snapmaker",
+    "ABS",
+    "Snapmaker ABS Benchy"
+   ]
+  ],
+  "OFh5GUhZ": [
+   [
+    "Elegoo",
+    "PLA",
+    "Elegoo PLA Wood"
+   ]
+  ],
+  "OFhKNHC8": [
+   [
+    "Generic",
+    "PETG",
+    "Generic PETG PRO"
+   ]
+  ],
+  "OFhzHd2Y": [
+   [
+    "Generic",
+    "HIPS",
+    "Flashforge HIPS"
+   ]
+  ],
+  "OFi1ocNv": [
+   [
+    "Generic",
+    "PA",
+    "Flashforge PA"
+   ]
+  ],
+  "OFiJYDPC": [
+   [
+    "HATCHBOX",
+    "PLA",
+    "HATCHBOX PLA"
+   ]
+  ],
+  "OFic2uNr": [
+   [
+    "Generic",
+    "PLA",
+    "Sovol SV06 ACE PLA"
+   ]
+  ],
+  "OFicxmSa": [
+   [
+    "Generic",
+    "PLA",
+    "Prusa Generic PLA HF"
+   ]
+  ],
+  "OFidJLn8": [
+   [
+    "Polymaker",
+    "ABS",
+    "PolyLite ABS"
+   ]
+  ],
+  "OFiyGNbI": [
+   [
+    "Elegoo",
+    "PETG",
+    "Elegoo PETG-CF"
+   ]
+  ],
+  "OFjFPhUC": [
+   [
+    "Generic",
+    "PLA",
+    "Prusament rPLA"
+   ]
+  ],
+  "OFjZw7k1": [
+   [
+    "Polymaker",
+    "PLA",
+    "PolyTerra J1 PLA"
+   ]
+  ],
+  "OFjdTQd6": [
+   [
+    "Anycubic",
+    "PLA",
+    "Anycubic PLA Silk"
+   ],
+   [
+    "Generic",
+    "PLA",
+    "Anycubic PLA Silk"
+   ]
+  ],
+  "OFjepy6j": [
+   [
+    "FusRock",
+    "S-PAHT",
+    "FusRock Generic S-PAHT"
+   ],
+   [
+    "Generic",
+    "PA-CF",
+    "FusRock Generic S-PAHT"
+   ]
+  ],
+  "OFjj9Yiz": [
+   [
+    "Generic",
+    "PETG",
+    "RatRig BigNozzle PETG"
+   ]
+  ],
+  "OFjohFkg": [
+   [
+    "QIDI",
+    "PETG",
+    "QIDI PETG Translucent"
+   ]
+  ],
+  "OFjqPjjl": [
+   [
+    "Generic",
+    "PET",
+    "Generic PET"
+   ]
+  ],
+  "OFjurQ3I": [
+   [
+    "Generic",
+    "PETG",
+    "Sovol Zero PETG"
+   ]
+  ],
+  "OFk388hR": [
+   [
+    "Generic",
+    "PA6-CF",
+    "Generic PA6-CF"
+   ]
+  ],
+  "OFk6T5YH": [
+   [
+    "Generic",
+    "PETG",
+    "Sovol Zero PETG HS Nozzle"
+   ]
+  ],
+  "OFkaDtKx": [
+   [
+    "FusRock",
+    "PA-CF",
+    "Flashforge PA66-CF"
+   ]
+  ],
+  "OFkeeluv": [
+   [
+    "Generic",
+    "ASA",
+    "Prusa Generic ASA HF"
+   ]
+  ],
+  "OFkfK62J": [
+   [
+    "Elegoo",
+    "PLA",
+    "Elegoo PLA Silk"
+   ]
+  ],
+  "OFklg4aM": [
+   [
+    "Elegoo",
+    "PLA",
+    "Elegoo PLA PRO"
+   ]
+  ],
+  "OFkoT6jl": [
+   [
+    "Generic",
+    "PLA",
+    "Prusament PLA"
+   ]
+  ],
+  "OFlN56xW": [
+   [
+    "Generic",
+    "PLA",
+    "Chuanying Generic PLA-Silk"
+   ]
+  ],
+  "OFlNKZLP": [
+   [
+    "Generic",
+    "PLA",
+    "Flashforge PLA  Metal"
+   ]
+  ],
+  "OFlbn4FY": [
+   [
+    "Snapmaker",
+    "PLA",
+    "Snapmaker PLA Matte"
+   ]
+  ],
+  "OFlxnxDx": [
+   [
+    "Generic",
+    "SBS",
+    "Tiertime Generic SBS"
+   ]
+  ],
+  "OFlzQ0IS": [
+   [
+    "Peopoly",
+    "PET-CF",
+    "Peopoly Lancer PET-CF"
+   ]
+  ],
+  "OFm1VZed": [
+   [
+    "Generic",
+    "PLA-CF",
+    "Flashforge Generic PLA-CF"
+   ]
+  ],
+  "OFmF1xL9": [
+   [
+    "QIDI",
+    "ASA-CF",
+    "QIDI ASA-CF"
+   ]
+  ],
+  "OFmKNi3f": [
+   [
+    "QIDI",
+    "PLA",
+    "QIDI PLA Rapido"
+   ]
+  ],
+  "OFmOWC74": [
+   [
+    "Elegoo",
+    "PETG",
+    "Elegoo PETG PRO"
+   ]
+  ],
+  "OFmcJsqt": [
+   [
+    "InfiMech",
+    "TPU",
+    "InfiMech TPU"
+   ]
+  ],
+  "OFmduKVr": [
+   [
+    "Generic",
+    "PPS-CF",
+    "FlashForge PPS-CF"
+   ]
+  ],
+  "OFmeQjRP": [
+   [
+    "Elegoo",
+    "TPU",
+    "Elegoo Rapid TPU 95A"
+   ]
+  ],
+  "OFmgesco": [
+   [
+    "Generic",
+    "TPU",
+    "Flashforge TPU 65D"
+   ]
+  ],
+  "OFnLnZQo": [
+   [
+    "Cubicon",
+    "PC",
+    "Cubicon PC"
+   ]
+  ],
+  "OFnMW5jr": [
+   [
+    "FlyingBear",
+    "ABS",
+    "FlyingBear ABS"
+   ]
+  ],
+  "OFnRTkEq": [
+   [
+    "RatRig",
+    "PETG",
+    "RatRig PunkFil PETG"
+   ]
+  ],
+  "OFnY9ovF": [
+   [
+    "Artillery",
+    "PA-CF",
+    "Artillery PA-CF"
+   ]
+  ],
+  "OFnj7bPm": [
+   [
+    "QIDI",
+    "ABS",
+    "QIDI ABS Rapido 0.6 nozzle"
+   ]
+  ],
+  "OFnsWQTp": [
+   [
+    "QIDI",
+    "PLA",
+    "QIDI WOOD Rapido"
+   ]
+  ],
+  "OFnyirh9": [
+   [
+    "Artillery",
+    "PLA Silk",
+    "Artillery PLA Silk"
+   ]
+  ],
+  "OFo4VB3w": [
+   [
+    "Generic",
+    "ABS-CF",
+    "Generic ABS-CF"
+   ]
+  ],
+  "OFo9EwvK": [
+   [
+    "Generic",
+    "PETG-CF",
+    "Generic PETG-CF10"
+   ]
+  ],
+  "OFoAaHcF": [
+   [
+    "FusRock",
+    "PAHT-GF",
+    "FusRock Generic PAHT-GF"
+   ]
+  ],
+  "OFoJUGj6": [
+   [
+    "Generic",
+    "PLA",
+    "Flashforge HS PLA"
+   ]
+  ],
+  "OFoimrpo": [
+   [
+    "Generic",
+    "PETG-CF",
+    "Flashforge PETG-CF"
+   ]
+  ],
+  "OFp8lkYD": [
+   [
+    "FusRock",
+    "PPA-GF",
+    "Flashforge PPA-GF"
+   ]
+  ],
+  "OFp90N8a": [
+   [
+    "Artillery",
+    "PA",
+    "Artillery PA"
+   ]
+  ],
+  "OFpHq9gJ": [
+   [
+    "Generic",
+    "PETG",
+    "Prusament PETG"
+   ]
+  ],
+  "OFphFSUJ": [
+   [
+    "Generic",
+    "PETG",
+    "Prusa Generic PETG HF"
+   ]
+  ],
+  "OFpwg2Qh": [
+   [
+    "Elegoo",
+    "ASA",
+    "Elegoo ASA-CF"
+   ]
+  ],
+  "OFq6IhFg": [
+   [
+    "Cubicon",
+    "PLA",
+    "Cubicon PLA"
+   ]
+  ],
+  "OFqPp2yL": [
+   [
+    "QIDI",
+    "PETG",
+    "QIDI PETG Tough 0.6 nozzle"
+   ]
+  ],
+  "OFqRWRU6": [
+   [
+    "Generic",
+    "ABS-GF",
+    "Flashforge ABS-GF"
+   ]
+  ],
+  "OFqSTJ3I": [
+   [
+    "Generic",
+    "PLA",
+    "OrcaArena Generic PLA Silk"
+   ]
+  ],
+  "OFqh1Ngp": [
+   [
+    "Elegoo",
+    "PLA",
+    "Elegoo PLA-CF"
+   ]
+  ],
+  "OFqkcvDI": [
+   [
+    "Peopoly",
+    "ABS",
+    "Peopoly Lancer ABS-GF"
+   ]
+  ],
+  "OFqyIUDi": [
+   [
+    "QIDI",
+    "PLA-CF",
+    "Qidi PLA-CF"
+   ]
+  ],
+  "OFrbbq6E": [
+   [
+    "Other",
+    "PLA",
+    "Other PLA Hyper"
+   ]
+  ],
+  "OFrgQ1Ns": [
+   [
+    "Elas",
+    "PLA",
+    "Elas PLA Pro"
+   ]
+  ],
+  "OFs1CbB1": [
+   [
+    "QIDI",
+    "PLA",
+    "QIDI PLA Rapido 0.8 nozzle"
+   ]
+  ],
+  "OFs6lLH7": [
+   [
+    "Elegoo",
+    "PLA",
+    "Elegoo PLA Silk"
+   ]
+  ],
+  "OFsCOJv7": [
+   [
+    "Generic",
+    "TPU",
+    "Generic TPU"
+   ]
+  ],
+  "OFsKqcQW": [
+   [
+    "Elegoo",
+    "PLA",
+    "Elegoo PLA PRO"
+   ]
+  ],
+  "OFsLkLw6": [
+   [
+    "Generic",
+    "PLA",
+    "Generic PLA Matte"
+   ]
+  ],
+  "OFsNZcid": [
+   [
+    "Polymaker",
+    "PLA",
+    "PolyLite Dual PLA"
+   ]
+  ],
+  "OFsgANe3": [
+   [
+    "Generic",
+    "PAHT-CF",
+    "Flashforge PAHT-CF"
+   ]
+  ],
+  "OFsmPFwh": [
+   [
+    "Generic",
+    "TPU",
+    "Sovol SV06 Plus ACE TPU"
+   ]
+  ],
+  "OFt1YdX8": [
+   [
+    "Generic",
+    "PLA",
+    "FLSun T1 PLA Silk"
+   ]
+  ],
+  "OFt5bvKK": [
+   [
+    "Artillery",
+    "PETG Basic",
+    "Artillery PETG Basic"
+   ]
+  ],
+  "OFt9AiN5": [
+   [
+    "Generic",
+    "PA",
+    "Polymaker CoPA"
+   ]
+  ],
+  "OFtEFtsz": [
+   [
+    "Polymaker",
+    "PA",
+    "Polymaker Generic CoPA"
+   ]
+  ],
+  "OFtJMczs": [
+   [
+    "Generic",
+    "TPU-64D",
+    "Flashforge TPU-64D"
+   ]
+  ],
+  "OFtL05hE": [
+   [
+    "Generic",
+    "PLA",
+    "Sovol Zero PLA Basic HS Nozzle"
+   ]
+  ],
+  "OFtXBjvb": [
+   [
+    "Artillery",
+    "PLA Tough",
+    "Artillery PLA Tough"
+   ]
+  ],
+  "OFtcTs1o": [
+   [
+    "Generic",
+    "ABS",
+    "RatRig BigNozzle ABS"
+   ]
+  ],
+  "OFtemzzw": [
+   [
+    "Generic",
+    "ABS",
+    "Sovol SV06 ACE ABS"
+   ]
+  ],
+  "OFtet8ui": [
+   [
+    "Snapmaker",
+    "TPU",
+    "Snapmaker TPU High-Flow"
+   ]
+  ],
+  "OFti31HS": [
+   [
+    "Cubicon",
+    "PLA",
+    "Cubicon PLAi21"
+   ]
+  ],
+  "OFtmT4Nd": [
+   [
+    "Artillery",
+    "ASA",
+    "Artillery ASA"
+   ]
+  ],
+  "OFtwA91m": [
+   [
+    "Generic",
+    "PC",
+    "Sovol Zero PC"
+   ]
+  ],
+  "OFuPC4S8": [
+   [
+    "Elegoo",
+    "PLA",
+    "Elegoo PLA-CF"
+   ]
+  ],
+  "OFuPN3iW": [
+   [
+    "Other",
+    "PETG",
+    "Other PETG"
+   ]
+  ],
+  "OFuTFxVP": [
+   [
+    "Overture",
+    "ABS",
+    "Overture ABS"
+   ]
+  ],
+  "OFuXkYly": [
+   [
+    "Elegoo",
+    "PLA",
+    "Elegoo PLA Glow"
+   ]
+  ],
+  "OFuYvNS3": [
+   [
+    "Afinia",
+    "ABS",
+    "Afinia Value ABS"
+   ]
+  ],
+  "OFuidAEg": [
+   [
+    "Bambu Lab",
+    "ABS",
+    "Bambu ABS"
+   ]
+  ],
+  "OFuq9tqb": [
+   [
+    "InfiMech",
+    "PLA",
+    "InfiMech PLA Basic"
+   ]
+  ],
+  "OFuswXlp": [
+   [
+    "Generic",
+    "TPU",
+    "Generic TPU 85A"
+   ]
+  ],
+  "OFutwD6f": [
+   [
+    "Elegoo",
+    "PLA",
+    "Elegoo PLA Glow"
+   ]
+  ],
+  "OFuyJhLF": [
+   [
+    "Generic",
+    "PETG",
+    "Flashforge PETG Basic"
+   ]
+  ],
+  "OFv2NHLC": [
+   [
+    "QIDI",
+    "ABS-GF",
+    "QIDI ABS-GF25"
+   ]
+  ],
+  "OFv8SRZh": [
+   [
+    "Generic",
+    "PLA-CF",
+    "Prusa Generic PLA-CF"
+   ]
+  ],
+  "OFvGSn0l": [
+   [
+    "Generic",
+    "PETG",
+    "Creality Generic PETG-CF"
+   ]
+  ],
+  "OFvN3117": [
+   [
+    "QIDI",
+    "PLA",
+    "QIDI PLA Matte Basic"
+   ]
+  ],
+  "OFvOhSjO": [
+   [
+    "Other",
+    "TPU",
+    "Other TPU"
+   ]
+  ],
+  "OFvYfHPB": [
+   [
+    "Anycubic",
+    "PLA",
+    "Anycubic PLA Matte"
+   ]
+  ],
+  "OFvaXhYD": [
+   [
+    "InfiMech",
+    "PETG",
+    "InfiMech PETG"
+   ]
+  ],
+  "OFviQ9lH": [
+   [
+    "Generic",
+    "TPU",
+    "Flashforge Generic TPU"
+   ]
+  ],
+  "OFvsS7Fb": [
+   [
+    "Generic",
+    "TPU-64D",
+    "Generic TPU-64D"
+   ]
+  ],
+  "OFvw0owy": [
+   [
+    "Afinia",
+    "PLA",
+    "Afinia Value PLA"
+   ]
+  ],
+  "OFvxvkAd": [
+   [
+    "Artillery",
+    "PLA-CF",
+    "Artillery PLA-CF"
+   ]
+  ],
+  "OFw05rkF": [
+   [
+    "Other",
+    "PETG",
+    "Other PETG"
+   ]
+  ],
+  "OFw0qp7w": [
+   [
+    "Artillery",
+    "PET",
+    "Artillery PET"
+   ]
+  ],
+  "OFw1S8lL": [
+   [
+    "Artillery",
+    "ABS",
+    "Artillery ABS"
+   ]
+  ],
+  "OFw4OHWE": [
+   [
+    "Elas",
+    "PETG",
+    "Elas PETG Basic"
+   ]
+  ],
+  "OFwHPTvy": [
+   [
+    "Generic",
+    "PLA",
+    "Qidi Generic PLA+"
+   ]
+  ],
+  "OFwf0oWp": [
+   [
+    "Generic",
+    "PLA",
+    "Flashforge PLA Luminous"
+   ]
+  ],
+  "OFwyqcGn": [
+   [
+    "Elegoo",
+    "PLA",
+    "Elegoo PLA Matte"
+   ]
+  ],
+  "OFxLeRyT": [
+   [
+    "Generic",
+    "PVA",
+    "Prusa Generic PVA HF"
+   ]
+  ],
+  "OFxVzzn4": [
+   [
+    "Generic",
+    "PLA-CF",
+    "Chuanying Generic PLA-CF10"
+   ]
+  ],
+  "OFxfCy9m": [
+   [
+    "Volumic",
+    "PETG",
+    "Volumic PCTG Ultra (Performance)"
+   ]
+  ],
+  "OFxjFYxE": [
+   [
+    "Elegoo",
+    "PETG",
+    "Elegoo PETG HF"
+   ]
+  ],
+  "OFxlch4V": [
+   [
+    "CoLiDo",
+    "PLA",
+    "CoLiDo PLA Silk"
+   ]
+  ],
+  "OFxodd2u": [
+   [
+    "DeltaMaker",
+    "PLA",
+    "DeltaMaker Brand PLA"
+   ]
+  ],
+  "OFxxa5yn": [
+   [
+    "Snapmaker",
+    "ABS",
+    "Snapmaker Dual ABS Benchy"
+   ]
+  ],
+  "OFy7oQ1g": [
+   [
+    "Generic",
+    "ASA",
+    "Blocks Generic ASA-CF"
+   ]
+  ],
+  "OFyD1Zo8": [
+   [
+    "Other",
+    "PC",
+    "Other PC"
+   ]
+  ],
+  "OFyoW5W2": [
+   [
+    "Generic",
+    "PLA",
+    "Flashforge PLA Color Change"
+   ]
+  ],
+  "OFypQeKR": [
+   [
+    "Generic",
+    "PC-CF",
+    "Generic PC-CF"
+   ]
+  ],
+  "OFyt23xJ": [
+   [
+    "Generic",
+    "PLA",
+    "FLSun T1 PLA High Speed"
+   ]
+  ],
+  "OFyxAbO4": [
+   [
+    "Generic",
+    "TPU-95A",
+    "Flashforge TPU-95A"
+   ]
+  ],
+  "OFzFbFcl": [
+   [
+    "Elegoo",
+    "PC",
+    "Elegoo PC-FR"
+   ]
+  ],
+  "OFzQQeCi": [
+   [
+    "Generic",
+    "HIPS",
+    "Chuanying Generic HIPS"
+   ]
+  ],
+  "OFzb2BLs": [
+   [
+    "Generic",
+    "PETG",
+    "RatRig Generic PCTG"
+   ]
+  ],
+  "OFziUL2X": [
+   [
+    "Generic",
+    "PLA",
+    "Ginger Generic PLA"
+   ]
+  ],
+  "OFzrWlH5": [
+   [
+    "Elegoo",
+    "PETG",
+    "Elegoo PETG HF"
+   ]
+  ],
+  "OGFA00": [
+   [
+    "Bambu Lab",
+    "PLA",
+    "Bambu PLA Basic"
+   ]
+  ],
+  "OGFA01": [
+   [
+    "Bambu Lab",
+    "PLA",
+    "Bambu PLA Matte"
+   ]
+  ],
+  "OGFA02": [
+   [
+    "Bambu Lab",
+    "PLA",
+    "Bambu PLA Metal"
+   ]
+  ],
+  "OGFA03": [
+   [
+    "Bambu Lab",
+    "PLA",
+    "Bambu PLA Impact"
+   ]
+  ],
+  "OGFA05": [
+   [
+    "Bambu Lab",
+    "PLA",
+    "Bambu PLA Silk"
+   ]
+  ],
+  "OGFA06": [
+   [
+    "Bambu Lab",
+    "PLA",
+    "Bambu PLA Silk+"
+   ]
+  ],
+  "OGFA07": [
+   [
+    "Bambu Lab",
+    "PLA",
+    "Bambu PLA Marble"
+   ]
+  ],
+  "OGFA08": [
+   [
+    "Bambu Lab",
+    "PLA",
+    "Bambu PLA Sparkle"
+   ]
+  ],
+  "OGFA09": [
+   [
+    "Bambu Lab",
+    "PLA",
+    "Bambu PLA Tough"
+   ]
+  ],
+  "OGFA11": [
+   [
+    "Bambu Lab",
+    "PLA-AERO",
+    "Bambu PLA Aero"
+   ]
+  ],
+  "OGFA12": [
+   [
+    "Bambu Lab",
+    "PLA",
+    "Bambu PLA Glow"
+   ]
+  ],
+  "OGFA13": [
+   [
+    "Bambu Lab",
+    "PLA",
+    "Bambu PLA Dynamic"
+   ]
+  ],
+  "OGFA15": [
+   [
+    "Bambu Lab",
+    "PLA",
+    "Bambu PLA Galaxy"
+   ]
+  ],
+  "OGFA16": [
+   [
+    "Bambu Lab",
+    "PLA",
+    "Bambu PLA Wood"
+   ]
+  ],
+  "OGFA50": [
+   [
+    "Bambu Lab",
+    "PLA-CF",
+    "Bambu PLA-CF"
+   ]
+  ],
+  "OGFB00": [
+   [
+    "Bambu Lab",
+    "ABS",
+    "Bambu ABS"
+   ]
+  ],
+  "OGFB01": [
+   [
+    "Bambu Lab",
+    "ASA",
+    "Bambu ASA"
+   ]
+  ],
+  "OGFB02": [
+   [
+    "Bambu Lab",
+    "ASA-AERO",
+    "Bambu ASA-Aero"
+   ]
+  ],
+  "OGFB50": [
+   [
+    "Bambu Lab",
+    "ABS-GF",
+    "Bambu ABS-GF"
+   ]
+  ],
+  "OGFB51": [
+   [
+    "Bambu Lab",
+    "ASA-CF",
+    "Bambu ASA-CF"
+   ]
+  ],
+  "OGFB60": [
+   [
+    "Polymaker",
+    "ABS",
+    "PolyLite ABS"
+   ]
+  ],
+  "OGFB61": [
+   [
+    "Polymaker",
+    "ASA",
+    "PolyLite ASA"
+   ]
+  ],
+  "OGFB98": [
+   [
+    "Generic",
+    "ASA",
+    "Generic ASA"
+   ]
+  ],
+  "OGFB99": [
+   [
+    "Generic",
+    "ABS",
+    "Generic ABS"
+   ]
+  ],
+  "OGFC00": [
+   [
+    "Bambu Lab",
+    "PC",
+    "Bambu PC"
+   ]
+  ],
+  "OGFC01": [
+   [
+    "Bambu Lab",
+    "PC",
+    "Bambu PC FR"
+   ]
+  ],
+  "OGFC99": [
+   [
+    "Generic",
+    "PC",
+    "Generic PC"
+   ],
+   [
+    "Generic",
+    "PC",
+    "fdm_filament_pc"
+   ]
+  ],
+  "OGFG00": [
+   [
+    "Bambu Lab",
+    "PETG",
+    "Bambu PETG Basic"
+   ]
+  ],
+  "OGFG01": [
+   [
+    "Bambu Lab",
+    "PETG",
+    "Bambu PETG Translucent"
+   ]
+  ],
+  "OGFG02": [
+   [
+    "Bambu Lab",
+    "PETG",
+    "Bambu PETG HF"
+   ]
+  ],
+  "OGFG50": [
+   [
+    "Bambu Lab",
+    "PETG-CF",
+    "Bambu PETG-CF"
+   ]
+  ],
+  "OGFG60": [
+   [
+    "Polymaker",
+    "PETG",
+    "PolyLite PETG"
+   ]
+  ],
+  "OGFG97": [
+   [
+    "Generic",
+    "PCTG",
+    "fdm_filament_pctg"
+   ]
+  ],
+  "OGFG99": [
+   [
+    "Generic",
+    "PETG",
+    "Generic PETG"
+   ],
+   [
+    "Generic",
+    "PETG",
+    "fdm_filament_pet"
+   ]
+  ],
+  "OGFGG300": [
+   [
+    "GreenGate3D",
+    "PETG",
+    "GreenGate3D PETG"
+   ]
+  ],
+  "OGFL00": [
+   [
+    "Polymaker",
+    "PLA",
+    "PolyLite PLA"
+   ]
+  ],
+  "OGFL00-1": [
+   [
+    "Polymaker",
+    "PLA",
+    "PolyTerra Dual PLA"
+   ]
+  ],
+  "OGFL01": [
+   [
+    "Polymaker",
+    "PLA",
+    "PolyTerra PLA"
+   ]
+  ],
+  "OGFL03": [
+   [
+    "eSUN",
+    "PLA",
+    "eSUN PLA+"
+   ]
+  ],
+  "OGFL04": [
+   [
+    "Overture",
+    "PLA",
+    "Overture PLA"
+   ]
+  ],
+  "OGFL05": [
+   [
+    "Overture",
+    "PLA",
+    "Overture Matte PLA"
+   ]
+  ],
+  "OGFL06": [
+   [
+    "Polymaker",
+    "PETG",
+    "Fiberon PETG-ESD"
+   ]
+  ],
+  "OGFL50": [
+   [
+    "Polymaker",
+    "PA6-CF",
+    "Fiberon PA6-CF"
+   ]
+  ],
+  "OGFL51": [
+   [
+    "Polymaker",
+    "PA-GF",
+    "Fiberon PA6-GF"
+   ]
+  ],
+  "OGFL52": [
+   [
+    "Polymaker",
+    "PA-CF",
+    "Fiberon PA12-CF"
+   ]
+  ],
+  "OGFL53": [
+   [
+    "Polymaker",
+    "PA",
+    "Fiberon PA612-CF"
+   ]
+  ],
+  "OGFL54": [
+   [
+    "Polymaker",
+    "PET-CF",
+    "Fiberon PET-CF"
+   ]
+  ],
+  "OGFL55": [
+   [
+    "Polymaker",
+    "PETG-CF",
+    "Fiberon PETG-rCF"
+   ]
+  ],
+  "OGFL95": [
+   [
+    "Generic",
+    "PLA",
+    "Generic PLA High Speed"
+   ]
+  ],
+  "OGFL96": [
+   [
+    "Generic",
+    "PLA",
+    "Generic PLA Silk"
+   ],
+   [
+    "Generic",
+    "PLA",
+    "fdm_filament_pla_silk"
+   ]
+  ],
+  "OGFL98": [
+   [
+    "Generic",
+    "PLA-CF",
+    "Generic PLA-CF"
+   ]
+  ],
+  "OGFL99": [
+   [
+    "Generic",
+    "PLA",
+    "fdm_filament_pla"
+   ]
+  ],
+  "OGFLC99": [
+   [
+    "Generic",
+    "CoPE",
+    "fdm_filament_cope"
+   ]
+  ],
+  "OGFN03": [
+   [
+    "Bambu Lab",
+    "PA-CF",
+    "Bambu PA-CF"
+   ]
+  ],
+  "OGFN04": [
+   [
+    "Bambu Lab",
+    "PA-CF",
+    "Bambu PAHT-CF"
+   ]
+  ],
+  "OGFN05": [
+   [
+    "Bambu Lab",
+    "PA6-CF",
+    "Bambu PA6-CF"
+   ]
+  ],
+  "OGFN06": [
+   [
+    "Bambu Lab",
+    "PPA-CF",
+    "Bambu PPA-CF"
+   ]
+  ],
+  "OGFN08": [
+   [
+    "Bambu Lab",
+    "PA-GF",
+    "Bambu PA6-GF"
+   ]
+  ],
+  "OGFN96": [
+   [
+    "Generic",
+    "PPA-GF",
+    "Generic PPA-GF"
+   ]
+  ],
+  "OGFN97": [
+   [
+    "Generic",
+    "PPA-CF",
+    "fdm_filament_ppa"
+   ]
+  ],
+  "OGFN98": [
+   [
+    "Generic",
+    "PA-CF",
+    "Generic PA-CF"
+   ]
+  ],
+  "OGFN99": [
+   [
+    "Generic",
+    "PA",
+    "Generic PA"
+   ],
+   [
+    "Generic",
+    "PA",
+    "fdm_filament_pa"
+   ]
+  ],
+  "OGFNMK00": [
+   [
+    "Numakers",
+    "PLA",
+    "Numakers PLA+"
+   ]
+  ],
+  "OGFP97": [
+   [
+    "Generic",
+    "PP",
+    "fdm_filament_pp"
+   ]
+  ],
+  "OGFP99": [
+   [
+    "Generic",
+    "PE",
+    "fdm_filament_pe"
+   ]
+  ],
+  "OGFPM001": [
+   [
+    "Polymaker",
+    "PLA",
+    "Panchroma PLA"
+   ]
+  ],
+  "OGFPM002": [
+   [
+    "Polymaker",
+    "PLA",
+    "Panchroma PLA Matte"
+   ]
+  ],
+  "OGFPM003": [
+   [
+    "Polymaker",
+    "PLA",
+    "Panchroma PLA Marble"
+   ]
+  ],
+  "OGFPM004": [
+   [
+    "Polymaker",
+    "PLA",
+    "Panchroma PLA Silk"
+   ]
+  ],
+  "OGFPM005": [
+   [
+    "Polymaker",
+    "PLA",
+    "Panchroma PLA Satin"
+   ]
+  ],
+  "OGFPM006": [
+   [
+    "Polymaker",
+    "PLA",
+    "Panchroma PLA Translucent"
+   ]
+  ],
+  "OGFPM007": [
+   [
+    "Polymaker",
+    "PLA",
+    "Panchroma PLA Galaxy"
+   ]
+  ],
+  "OGFPM008": [
+   [
+    "Polymaker",
+    "PLA",
+    "Panchroma PLA Celestial"
+   ]
+  ],
+  "OGFPM009": [
+   [
+    "Polymaker",
+    "PLA",
+    "Panchroma PLA Starlight"
+   ]
+  ],
+  "OGFPM010": [
+   [
+    "Polymaker",
+    "PLA",
+    "Panchroma PLA Glow"
+   ]
+  ],
+  "OGFPM011": [
+   [
+    "Polymaker",
+    "PLA",
+    "Panchroma PLA Luminous"
+   ]
+  ],
+  "OGFPM012": [
+   [
+    "Polymaker",
+    "PLA",
+    "Panchroma PLA Metallic"
+   ]
+  ],
+  "OGFPM013": [
+   [
+    "Polymaker",
+    "PLA",
+    "Panchroma PLA Neon"
+   ]
+  ],
+  "OGFPM014": [
+   [
+    "Polymaker",
+    "PLA",
+    "Panchroma PLA UV Shift"
+   ]
+  ],
+  "OGFPM015": [
+   [
+    "Polymaker",
+    "PLA",
+    "Panchroma PLA Temp Shift"
+   ]
+  ],
+  "OGFPM016": [
+   [
+    "Polymaker",
+    "PLA",
+    "Panchroma CoPE"
+   ]
+  ],
+  "OGFPM017": [
+   [
+    "Polymaker",
+    "PLA",
+    "Polymaker HT-PLA"
+   ]
+  ],
+  "OGFPM018": [
+   [
+    "Polymaker",
+    "PLA",
+    "Polymaker HT-PLA-GF"
+   ]
+  ],
+  "OGFPM019": [
+   [
+    "Polymaker",
+    "PLA",
+    "PolyLite PLA Pro"
+   ]
+  ],
+  "OGFR00": [
+   [
+    "FusRock",
+    "ABS-GF",
+    "FusRock ABS-GF"
+   ]
+  ],
+  "OGFR98": [
+   [
+    "Generic",
+    "PHA",
+    "fdm_filament_pha"
+   ]
+  ],
+  "OGFR99": [
+   [
+    "Generic",
+    "EVA",
+    "fdm_filament_eva"
+   ]
+  ],
+  "OGFS00": [
+   [
+    "Bambu Lab",
+    "PLA",
+    "Bambu Support W"
+   ]
+  ],
+  "OGFS01": [
+   [
+    "Bambu Lab",
+    "PA",
+    "Bambu Support G"
+   ]
+  ],
+  "OGFS02": [
+   [
+    "Bambu Lab",
+    "PLA",
+    "Bambu Support For PLA"
+   ]
+  ],
+  "OGFS03": [
+   [
+    "Bambu Lab",
+    "PA",
+    "Bambu Support For PA/PET"
+   ]
+  ],
+  "OGFS04": [
+   [
+    "Bambu Lab",
+    "PVA",
+    "Bambu PVA"
+   ]
+  ],
+  "OGFS05": [
+   [
+    "Bambu Lab",
+    "PLA",
+    "Bambu Support For PLA/PETG"
+   ]
+  ],
+  "OGFS06": [
+   [
+    "Bambu Lab",
+    "ABS",
+    "Bambu Support for ABS"
+   ]
+  ],
+  "OGFS97": [
+   [
+    "Generic",
+    "BVOH",
+    "fdm_filament_bvoh"
+   ]
+  ],
+  "OGFS98": [
+   [
+    "Generic",
+    "HIPS",
+    "fdm_filament_hips"
+   ]
+  ],
+  "OGFS99": [
+   [
+    "Generic",
+    "PVA",
+    "Generic PVA"
+   ]
+  ],
+  "OGFSNL02": [
+   [
+    "SUNLU",
+    "PLA",
+    "SUNLU PLA Matte"
+   ]
+  ],
+  "OGFSNL03": [
+   [
+    "SUNLU",
+    "PLA",
+    "SUNLU PLA+"
+   ]
+  ],
+  "OGFSNL04": [
+   [
+    "SUNLU",
+    "PLA",
+    "SUNLU PLA+ 2.0"
+   ]
+  ],
+  "OGFSNL05": [
+   [
+    "SUNLU",
+    "PLA",
+    "SUNLU Silk PLA+"
+   ]
+  ],
+  "OGFSNL06": [
+   [
+    "SUNLU",
+    "PLA",
+    "SUNLU PLA Marble"
+   ]
+  ],
+  "OGFSNL07": [
+   [
+    "SUNLU",
+    "PLA",
+    "SUNLU Wood PLA"
+   ]
+  ],
+  "OGFSNL08": [
+   [
+    "Generic",
+    "PETG",
+    "SUNLU PETG"
+   ],
+   [
+    "SUNLU",
+    "PETG",
+    "SUNLU PETG"
+   ]
+  ],
+  "OGFT01": [
+   [
+    "Bambu Lab",
+    "PET-CF",
+    "Bambu PET-CF"
+   ]
+  ],
+  "OGFT02": [
+   [
+    "Bambu Lab",
+    "PPS-CF",
+    "Bambu PPS-CF"
+   ]
+  ],
+  "OGFU00": [
+   [
+    "Bambu Lab",
+    "TPU",
+    "Bambu TPU 95A HF"
+   ]
+  ],
+  "OGFU01": [
+   [
+    "Bambu Lab",
+    "TPU",
+    "Bambu TPU 95A"
+   ]
+  ],
+  "OGFU99": [
+   [
+    "Generic",
+    "TPU",
+    "Generic TPU"
+   ]
+  ],
+  "OVTABS08": [
+   [
+    "Overture",
+    "ABS",
+    "Overture ABS Basic"
+   ]
+  ],
+  "P1001": [
+   [
+    "Polymaker",
+    "PLA",
+    "Panchroma PLA Satin"
+   ]
+  ],
+  "P1002": [
+   [
+    "Polymaker",
+    "PLA",
+    "PolySonic PLA Pro"
+   ]
+  ],
+  "P1003": [
+   [
+    "Polymaker",
+    "PLA",
+    "Panchroma PLA Matte"
+   ]
+  ],
+  "P1004": [
+   [
+    "Polymaker",
+    "PLA",
+    "PolySonic PLA"
+   ]
+  ],
+  "P510cfa0": [
+   [
+    "Cubicon",
+    "PLA",
+    "Cubicon PLA"
+   ]
+  ],
+  "P510cfa1": [
+   [
+    "Cubicon",
+    "PLA",
+    "Cubicon PLA+"
+   ]
+  ],
+  "P510cfa2": [
+   [
+    "Cubicon",
+    "PLA",
+    "Cubicon PLAi21"
+   ]
+  ],
+  "P510cfb0": [
+   [
+    "Cubicon",
+    "ABS",
+    "Cubicon ABS"
+   ]
+  ],
+  "P510cfb1": [
+   [
+    "Cubicon",
+    "ABS",
+    "Cubicon ABS-A100"
+   ]
+  ],
+  "P510cfb2": [
+   [
+    "Cubicon",
+    "ABS",
+    "Cubicon ABSk"
+   ]
+  ],
+  "P510cfc0": [
+   [
+    "Cubicon",
+    "PETG",
+    "Cubicon PETG"
+   ]
+  ],
+  "P510cfd0": [
+   [
+    "Cubicon",
+    "PA",
+    "Cubicon PA-CF"
+   ]
+  ],
+  "P510eff9": [
+   [
+    "Generic",
+    "PETG",
+    "Ginger Generic PETG"
+   ]
+  ],
+  "Pfcf9c4c": [
+   [
+    "Artillery",
+    "PLA",
+    "Artillery PLA"
+   ]
+  ],
+  "Prusa Generic ABS @CORE One": [
+   [
+    "Generic",
+    "ABS",
+    "Prusa Generic ABS"
+   ]
+  ],
+  "Prusa Generic ABS @CORE One 0.6": [
+   [
+    "Generic",
+    "ABS",
+    "Prusa Generic ABS"
+   ]
+  ],
+  "Prusa Generic ABS @CORE One 0.8": [
+   [
+    "Generic",
+    "ABS",
+    "Prusa Generic ABS"
+   ]
+  ],
+  "Prusa Generic ABS @CORE One HF 0.4": [
+   [
+    "Generic",
+    "ABS",
+    "Prusa Generic ABS"
+   ]
+  ],
+  "Prusa Generic ABS @CORE One HF 0.5": [
+   [
+    "Generic",
+    "ABS",
+    "Prusa Generic ABS"
+   ]
+  ],
+  "Prusa Generic ABS @CORE One HF 0.6": [
+   [
+    "Generic",
+    "ABS",
+    "Prusa Generic ABS"
+   ]
+  ],
+  "Prusa Generic ABS @CORE One HF 0.8": [
+   [
+    "Generic",
+    "ABS",
+    "Prusa Generic ABS"
+   ]
+  ],
+  "Prusa Generic ASA @CORE One": [
+   [
+    "Prusa Polymers",
+    "ASA",
+    "Prusa Generic ASA"
+   ]
+  ],
+  "Prusa Generic ASA @CORE One 0.6": [
+   [
+    "Prusa Polymers",
+    "ASA",
+    "Prusa Generic ASA"
+   ]
+  ],
+  "Prusa Generic ASA @CORE One 0.8": [
+   [
+    "Prusa Polymers",
+    "ASA",
+    "Prusa Generic ASA"
+   ]
+  ],
+  "Prusa Generic ASA @CORE One HF 0.4": [
+   [
+    "Prusa Polymers",
+    "ASA",
+    "Prusa Generic ASA"
+   ]
+  ],
+  "Prusa Generic ASA @CORE One HF 0.5": [
+   [
+    "Prusa Polymers",
+    "ASA",
+    "Prusa Generic ASA"
+   ]
+  ],
+  "Prusa Generic ASA @CORE One HF 0.6": [
+   [
+    "Prusa Polymers",
+    "ASA",
+    "Prusa Generic ASA"
+   ]
+  ],
+  "Prusa Generic ASA @CORE One HF 0.8": [
+   [
+    "Prusa Polymers",
+    "ASA",
+    "Prusa Generic ASA"
+   ]
+  ],
+  "Prusa Generic PETG @CORE One": [
+   [
+    "Generic",
+    "PETG",
+    "Prusa Generic PETG"
+   ]
+  ],
+  "Prusa Generic PETG @CORE One 0.6": [
+   [
+    "Generic",
+    "PETG",
+    "Prusa Generic PETG"
+   ]
+  ],
+  "Prusa Generic PETG @CORE One 0.8": [
+   [
+    "Generic",
+    "PETG",
+    "Prusa Generic PETG"
+   ]
+  ],
+  "Prusa Generic PETG @CORE One HF 0.4": [
+   [
+    "Generic",
+    "PETG",
+    "Prusa Generic PETG"
+   ]
+  ],
+  "Prusa Generic PETG @CORE One HF 0.5": [
+   [
+    "Generic",
+    "PETG",
+    "Prusa Generic PETG"
+   ]
+  ],
+  "Prusa Generic PETG @CORE One HF 0.6": [
+   [
+    "Generic",
+    "PETG",
+    "Prusa Generic PETG"
+   ]
+  ],
+  "Prusa Generic PETG @CORE One HF 0.8": [
+   [
+    "Generic",
+    "PETG",
+    "Prusa Generic PETG"
+   ]
+  ],
+  "Prusa Generic PLA @CORE One": [
+   [
+    "Generic",
+    "PLA",
+    "Prusa Generic PLA"
+   ]
+  ],
+  "Prusa Generic PLA @CORE One 0.6": [
+   [
+    "Generic",
+    "PLA",
+    "Prusa Generic PLA"
+   ]
+  ],
+  "Prusa Generic PLA @CORE One 0.8": [
+   [
+    "Generic",
+    "PLA",
+    "Prusa Generic PLA"
+   ]
+  ],
+  "Prusa Generic PLA @CORE One HF 0.4": [
+   [
+    "Generic",
+    "PLA",
+    "Prusa Generic PLA"
+   ]
+  ],
+  "Prusa Generic PLA @CORE One HF 0.5": [
+   [
+    "Generic",
+    "PLA",
+    "Prusa Generic PLA"
+   ]
+  ],
+  "Prusa Generic PLA @CORE One HF 0.6": [
+   [
+    "Generic",
+    "PLA",
+    "Prusa Generic PLA"
+   ]
+  ],
+  "Prusa Generic PLA @CORE One HF 0.8": [
+   [
+    "Generic",
+    "PLA",
+    "Prusa Generic PLA"
+   ]
+  ],
+  "Prusa Generic PLA Silk @CORE One": [
+   [
+    "Generic",
+    "PLA",
+    "Prusa Generic PLA Silk"
+   ]
+  ],
+  "Prusa Generic PLA Silk @CORE One 0.6": [
+   [
+    "Generic",
+    "PLA",
+    "Prusa Generic PLA Silk"
+   ]
+  ],
+  "Prusa Generic PLA Silk @CORE One 0.8": [
+   [
+    "Generic",
+    "PLA",
+    "Prusa Generic PLA Silk"
+   ]
+  ],
+  "Prusa Generic TPU @CORE One": [
+   [
+    "Generic",
+    "FLEX",
+    "Prusa Generic TPU"
+   ]
+  ],
+  "Prusa Generic TPU @CORE One 0.6": [
+   [
+    "Generic",
+    "FLEX",
+    "Prusa Generic TPU"
+   ]
+  ],
+  "Prusa Generic TPU @CORE One 0.8": [
+   [
+    "Generic",
+    "FLEX",
+    "Prusa Generic TPU"
+   ]
+  ],
+  "Prusament ASA @CORE One": [
+   [
+    "Prusa Polymers",
+    "ASA",
+    "Prusament ASA"
+   ]
+  ],
+  "Prusament ASA @CORE One 0.6": [
+   [
+    "Prusa Polymers",
+    "ASA",
+    "Prusament ASA"
+   ]
+  ],
+  "Prusament ASA @CORE One 0.8": [
+   [
+    "Prusa Polymers",
+    "ASA",
+    "Prusament ASA"
+   ]
+  ],
+  "Prusament ASA @CORE One HF 0.4": [
+   [
+    "Prusa Polymers",
+    "ASA",
+    "Prusament ASA"
+   ]
+  ],
+  "Prusament ASA @CORE One HF 0.5": [
+   [
+    "Prusa Polymers",
+    "ASA",
+    "Prusament ASA"
+   ]
+  ],
+  "Prusament ASA @CORE One HF 0.6": [
+   [
+    "Prusa Polymers",
+    "ASA",
+    "Prusament ASA"
+   ]
+  ],
+  "Prusament ASA @CORE One HF 0.8": [
+   [
+    "Prusa Polymers",
+    "ASA",
+    "Prusament ASA"
+   ]
+  ],
+  "Prusament ASA @MK4S": [
+   [
+    "Generic",
+    "ASA",
+    "Prusa Generic ASA"
+   ]
+  ],
+  "Prusament ASA @MK4S 0.6": [
+   [
+    "Generic",
+    "ASA",
+    "Prusa Generic ASA"
+   ]
+  ],
+  "Prusament ASA @MK4S 0.8": [
+   [
+    "Generic",
+    "ASA",
+    "Prusa Generic ASA"
+   ]
+  ],
+  "Prusament ASA @MK4S HF0.4": [
+   [
+    "Generic",
+    "ASA",
+    "Prusa Generic ASA"
+   ]
+  ],
+  "Prusament ASA @MK4S HF0.5": [
+   [
+    "Generic",
+    "ASA",
+    "Prusa Generic ASA"
+   ]
+  ],
+  "Prusament ASA @MK4S HF0.6": [
+   [
+    "Generic",
+    "ASA",
+    "Prusa Generic ASA"
+   ]
+  ],
+  "Prusament ASA @MK4S HF0.8": [
+   [
+    "Generic",
+    "ASA",
+    "Prusa Generic ASA"
+   ]
+  ],
+  "Prusament PA-CF @CORE One": [
+   [
+    "Prusa Polymers",
+    "PA",
+    "Prusament PA-CF"
+   ]
+  ],
+  "Prusament PA-CF @CORE One 0.6": [
+   [
+    "Prusa Polymers",
+    "PA",
+    "Prusament PA-CF"
+   ]
+  ],
+  "Prusament PA-CF @CORE One 0.8": [
+   [
+    "Prusa Polymers",
+    "PA",
+    "Prusament PA-CF"
+   ]
+  ],
+  "Prusament PC Blend @CORE One": [
+   [
+    "Prusa Polymers",
+    "PC",
+    "Prusament PC Blend"
+   ]
+  ],
+  "Prusament PC Blend @CORE One 0.6": [
+   [
+    "Prusa Polymers",
+    "PC",
+    "Prusament PC Blend"
+   ]
+  ],
+  "Prusament PC Blend @CORE One 0.8": [
+   [
+    "Prusa Polymers",
+    "PC",
+    "Prusament PC Blend"
+   ]
+  ],
+  "Prusament PC Blend @CORE One HF 0.4": [
+   [
+    "Prusa Polymers",
+    "PC",
+    "Prusament PC Blend"
+   ]
+  ],
+  "Prusament PC Blend @CORE One HF 0.5": [
+   [
+    "Prusa Polymers",
+    "PC",
+    "Prusament PC Blend"
+   ]
+  ],
+  "Prusament PC Blend @CORE One HF 0.6": [
+   [
+    "Prusa Polymers",
+    "PC",
+    "Prusament PC Blend"
+   ]
+  ],
+  "Prusament PC Blend @CORE One HF 0.8": [
+   [
+    "Prusa Polymers",
+    "PC",
+    "Prusament PC Blend"
+   ]
+  ],
+  "Prusament PC-CF @CORE One": [
+   [
+    "Prusa Polymers",
+    "PC",
+    "Prusament PC-CF"
+   ]
+  ],
+  "Prusament PC-CF @CORE One 0.6": [
+   [
+    "Prusa Polymers",
+    "PC",
+    "Prusament PC-CF"
+   ]
+  ],
+  "Prusament PC-CF @CORE One 0.8": [
+   [
+    "Prusa Polymers",
+    "PC",
+    "Prusament PC-CF"
+   ]
+  ],
+  "Prusament PETG @CORE One": [
+   [
+    "Prusa Polymers",
+    "PETG",
+    "Prusament PETG"
+   ]
+  ],
+  "Prusament PETG @CORE One 0.6": [
+   [
+    "Prusa Polymers",
+    "PETG",
+    "Prusament PETG"
+   ]
+  ],
+  "Prusament PETG @CORE One 0.8": [
+   [
+    "Prusa Polymers",
+    "PETG",
+    "Prusament PETG"
+   ]
+  ],
+  "Prusament PETG @CORE One HF 0.4": [
+   [
+    "Prusa Polymers",
+    "PETG",
+    "Prusament PETG"
+   ]
+  ],
+  "Prusament PETG @CORE One HF 0.5": [
+   [
+    "Prusa Polymers",
+    "PETG",
+    "Prusament PETG"
+   ]
+  ],
+  "Prusament PETG @CORE One HF 0.6": [
+   [
+    "Prusa Polymers",
+    "PETG",
+    "Prusament PETG"
+   ]
+  ],
+  "Prusament PETG @CORE One HF 0.8": [
+   [
+    "Prusa Polymers",
+    "PETG",
+    "Prusament PETG"
+   ]
+  ],
+  "Prusament PLA @CORE One": [
+   [
+    "Prusa Polymers",
+    "PLA",
+    "Prusament PLA"
+   ]
+  ],
+  "Prusament PLA @CORE One 0.6": [
+   [
+    "Prusa Polymers",
+    "PLA",
+    "Prusament PLA"
+   ]
+  ],
+  "Prusament PLA @CORE One 0.8": [
+   [
+    "Prusa Polymers",
+    "PLA",
+    "Prusament PLA"
+   ]
+  ],
+  "Prusament PLA @CORE One HF 0.4": [
+   [
+    "Prusa Polymers",
+    "PLA",
+    "Prusament PLA"
+   ]
+  ],
+  "Prusament PLA @CORE One HF 0.5": [
+   [
+    "Prusa Polymers",
+    "PLA",
+    "Prusament PLA"
+   ]
+  ],
+  "Prusament PLA @CORE One HF 0.6": [
+   [
+    "Prusa Polymers",
+    "PLA",
+    "Prusament PLA"
+   ]
+  ],
+  "Prusament PLA @CORE One HF 0.8": [
+   [
+    "Prusa Polymers",
+    "PLA",
+    "Prusament PLA"
+   ]
+  ],
+  "Prusament PVB @CORE One": [
+   [
+    "Prusa Polymers",
+    "PVB",
+    "Prusament PVB"
+   ]
+  ],
+  "Prusament PVB @CORE One 0.6": [
+   [
+    "Prusa Polymers",
+    "PVB",
+    "Prusament PVB"
+   ]
+  ],
+  "Prusament PVB @CORE One 0.8": [
+   [
+    "Prusa Polymers",
+    "PVB",
+    "Prusament PVB"
+   ]
+  ],
+  "Prusament rPLA @CORE One": [
+   [
+    "Prusa Polymers",
+    "PLA",
+    "Prusament rPLA"
+   ]
+  ],
+  "Prusament rPLA @CORE One 0.6": [
+   [
+    "Prusa Polymers",
+    "PLA",
+    "Prusament rPLA"
+   ]
+  ],
+  "Prusament rPLA @CORE One 0.8": [
+   [
+    "Prusa Polymers",
+    "PLA",
+    "Prusament rPLA"
+   ]
+  ],
+  "SMCFB001": [
+   [
+    "SeeMeCNC",
+    "ABS",
+    "SeeMeCNC ABS"
+   ]
+  ],
+  "SMCFG001": [
+   [
+    "SeeMeCNC",
+    "PETG",
+    "SeeMeCNC PETG"
+   ]
+  ],
+  "SMCFG002": [
+   [
+    "SeeMeCNC",
+    "PETG-CF",
+    "SeeMeCNC PETG-CF"
+   ]
+  ],
+  "SMCFL001": [
+   [
+    "SeeMeCNC",
+    "PLA",
+    "SeeMeCNC PLA"
+   ]
+  ],
+  "SMCFN001": [
+   [
+    "SeeMeCNC",
+    "PA-CF",
+    "SeeMeCNC PA-CF"
+   ]
+  ],
+  "SMCFU001": [
+   [
+    "SeeMeCNC",
+    "TPU",
+    "SeeMeCNC TPU"
+   ]
+  ],
+  "VLMNT01": [
+   [
+    "Valment",
+    "PLA",
+    "Valment PLA"
+   ]
+  ],
+  "VLMNT02": [
+   [
+    "Valment",
+    "PLA",
+    "Valment PLA Silk"
+   ]
+  ],
+  "VLMNT03": [
+   [
+    "Valment",
+    "PLA-CF",
+    "Valment PLA-CF"
+   ]
+  ],
+  "VLMNT04": [
+   [
+    "Valment",
+    "PLA",
+    "Valment PLA Galaxy"
+   ]
+  ]
+ }
 }

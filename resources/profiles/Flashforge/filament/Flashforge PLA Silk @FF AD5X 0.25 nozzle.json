@@ -31,7 +31,7 @@
 		"Flashforge PLA Silk @FF AD5X 0.25 nozzle"
 	],
 	"filament_type": [
-		"SILK"
+		"PLA"
 	],
 	"compatible_printers": [
 		"Flashforge AD5X 0.25 nozzle"

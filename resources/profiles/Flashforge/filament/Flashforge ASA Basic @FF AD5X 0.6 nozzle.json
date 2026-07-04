@@ -27,6 +27,9 @@
 	"filament_settings_id": [
 		"Flashforge ASA Basic @FF AD5X 0.6 nozzle"
 	],
+	"filament_type": [
+		"ASA"
+	],
 	"compatible_printers": [
 		"Flashforge AD5X 0.6 nozzle"
 	],

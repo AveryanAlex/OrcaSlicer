@@ -4,5 +4,8 @@
 	"inherits": "fdm_filament_pe",
 	"from": "system",
 	"filament_id": "OFJfx0Cl",
-	"instantiation": "false"
+	"instantiation": "false",
+	"filament_type": [
+		"PE-CF"
+	]
 }
