@@ -1,5 +1,9 @@
 # filament_id plan v2: the `get_filament_id` (P+md5) proposal, validated
 
+> **Status note:** the verdict in §0-§4 and §7-§8 stands. The work items in §5 are
+> superseded by `filament_id_plan_v3.md` (OFL-as-catalog, content-addressed triple key,
+> succession ledger): W1/W3 are carried into v3.0, W2/W5 carry unchanged, W4 is dropped.
+
 Follow-up to `filament_id_plan.md` (v1, implemented on `feature/filament_id`: deterministic
 `OF*` mint + snapshot ledger + 30-vendor migration, tree-wide validator `-f` = 0).
 
