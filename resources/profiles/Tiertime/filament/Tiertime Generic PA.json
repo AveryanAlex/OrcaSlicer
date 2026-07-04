@@ -3,7 +3,7 @@
 	"name": "Tiertime Generic PA",
 	"inherits": "fdm_filament_pa",
 	"from": "system",
-	"filament_id": "GFN99",
+	"filament_id": "OFQswlnF",
 	"setting_id": "DmP33sDwKcBDRmDK",
 	"instantiation": "true",
 	"chamber_temperatures": [

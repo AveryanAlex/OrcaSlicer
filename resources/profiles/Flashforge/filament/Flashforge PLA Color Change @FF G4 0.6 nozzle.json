@@ -4,7 +4,7 @@
 	"inherits": "Flashforge Generic PLA @G3U 0.6 Nozzle",
 	"from": "system",
 	"setting_id": "zsOdmFGBSF9UySMN",
-	"filament_id": "OFyoW5W2",
+	"filament_id": "OFkwIWwc",
 	"instantiation": "true",
 	"activate_air_filtration": [
 		"1"

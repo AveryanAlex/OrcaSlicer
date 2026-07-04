@@ -3,7 +3,7 @@
 	"name": "OrcaArena Generic PVA @base",
 	"inherits": "fdm_filament_pva",
 	"from": "system",
-	"filament_id": "GFS99",
+	"filament_id": "OFdLdGgJ",
 	"instantiation": "false",
 	"filament_flow_ratio": [
 		"0.95"

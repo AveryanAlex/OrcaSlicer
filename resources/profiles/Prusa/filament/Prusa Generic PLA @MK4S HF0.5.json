@@ -4,7 +4,7 @@
 	"inherits": "Prusa Generic PLA @MK4S HF0.4",
 	"from": "system",
 	"setting_id": "WH3bJGQGSliMx6ta",
-	"filament_id": "Generic PLA @MK4S HF0.5",
+	"filament_id": "OFiCHnso",
 	"instantiation": "true",
 	"compatible_printers": [
 		"Prusa MK4S HF0.5 nozzle"

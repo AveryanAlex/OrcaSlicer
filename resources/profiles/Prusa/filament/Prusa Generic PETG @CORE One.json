@@ -4,7 +4,7 @@
 	"inherits": "fdm_filament_pet",
 	"from": "system",
 	"setting_id": "VbFWb2QCAMxcrTAW",
-	"filament_id": "Prusa Generic PETG @CORE One",
+	"filament_id": "OF1Id239",
 	"instantiation": "true",
 	"chamber_temperature": [
 		"35"

@@ -60,6 +60,11 @@ Run from anywhere:  python3 scripts/assign_filament_ids.py
                      drops listed never-shipped ids from lineage instead)
   --add-hint "OLD=NEW"
                      record a cross-island succession hint (standalone)
+  --retire "OLD=NEW"
+                     retire a vanished non-island shipped id with an explicit
+                     successor (standalone; for lineage the claim vote can no
+                     longer see because the claims migrated while another
+                     declarer kept the id alive)
   --remint VENDOR    re-derive VENDOR's declared ids from their triples and
                      rewrite mismatches in place (repeatable)
   --drop-redundant-ids VENDOR
@@ -1121,6 +1126,69 @@ def add_hints(pairs, profiles_dir=PROFILES_DIR, retired_path=RETIRED_PATH):
     return 0
 
 
+def retire_ids(pairs, profiles_dir=PROFILES_DIR, retired_path=RETIRED_PATH):
+    """--retire "OLD=NEW": retire a vanished non-island id with an explicit successor.
+
+    For shipped ids whose lineage the claim vote can no longer see: the id
+    vanished from the tree in an earlier phase's shadow — another declarer kept
+    it alive while its claims migrated — so no --update-snapshot run ever saw
+    the id vanish while its claims could still vote. OLD must be absent from
+    the tree (declared or effective) and outside every reserved id space
+    (island ids forward via --add-hint; user-custom ids are never system ids),
+    and must not already be retired or hinted. NEW must be a live tree id.
+    Appends {"claims": [], "successor": NEW}. All pairs validate before
+    anything is written. Returns 0 on success.
+    """
+    _utf8_console()
+    analysis = analyze_tree(profiles_dir)
+    errors = 0
+    for msg in analysis["read_errors"]:
+        print_error(msg)
+        errors += 1
+    ledger = load_ledger(retired_path)
+    live = set(analysis["ids"])
+    declared_anywhere = set()
+    for vids in analysis["declared_ids"].values():
+        declared_anywhere |= set(vids)
+    parsed = []
+    for pair in pairs:
+        if "=" not in pair:
+            print_error(f'--retire expects "OLD=NEW", got "{pair}"')
+            errors += 1
+            continue
+        old, new = pair.split("=", 1)
+        is_reserved, _island = reserved_space_owner(old)
+        if old in ledger["retired"]:
+            print_error(f'--retire: "{old}" is already retired')
+            errors += 1
+        elif old in ledger["hints"]:
+            print_error(f'--retire: "{old}" is a hint key; it already forwards')
+            errors += 1
+        elif is_reserved:
+            print_error(
+                f'--retire: "{old}" sits in a reserved id space; island ids '
+                f"forward via --add-hint, user-custom ids are never retired")
+            errors += 1
+        elif old in live or old in declared_anywhere:
+            print_error(
+                f'--retire: "{old}" still lives in the tree; re-mint or delete '
+                f"its declarers first (an id that vanishes normally gets its "
+                f"successor voted by --update-snapshot)")
+            errors += 1
+        elif new not in live:
+            print_error(f'--retire: successor "{new}" is not a live tree id')
+            errors += 1
+        else:
+            parsed.append((old, new))
+    if errors:
+        return 1
+    for old, new in parsed:
+        ledger["retired"][old] = {"claims": [], "successor": new}
+        print_info(f'retired: "{old}" -> "{new}"')
+    write_ledger(retired_path, {"retired": ledger["retired"], "hints": ledger["hints"]})
+    return 0
+
+
 # ---------------------------------------------------------------------------
 # Byte-preserving profile edits
 # ---------------------------------------------------------------------------
@@ -1336,6 +1404,9 @@ def remint_vendors(vendor_list, profiles_dir=PROFILES_DIR, retired_path=RETIRED_
     triple; rewrite mismatching declarations in place (byte-preserving). Never
     touches the snapshot — run --update-snapshot afterwards and review the diff.
 
+    A declaration already equal to ANY salt iteration of its own triple is
+    mint-conformant (check 3) and left alone — deliberate salt splits (distinct
+    presets of one product kept apart for per-printer AMS matching) survive.
     A candidate id is blocked when it is a retired key, a hints key, or occurs
     in the tree with any triple set other than exactly {T}. Equal-triple reuse
     is convergence: the same product must end up under the same id everywhere.
@@ -1393,6 +1464,13 @@ def remint_vendors(vendor_list, profiles_dir=PROFILES_DIR, retired_path=RETIRED_
             if is_island_declaration(vendor, fid):
                 continue
             scanned += 1
+            # Any salt iteration of the declarer's own triple is already
+            # mint-conformant (check 3) — leave it. This keeps deliberate salt
+            # splits (two presets of one product that must stay distinct for
+            # per-printer AMS matching, validator -f) stable across re-mints.
+            if fid in {generate_filament_id(*rec["triple"], salt=s)
+                       for s in range(MAX_CHECK_SALT + 1)}:
+                continue
             want = want_id(rec["triple"])
             if fid == want:
                 continue
@@ -1481,6 +1559,10 @@ def main(argv=None):
                         help="record a cross-island succession hint (island-owned "
                              "live id -> live id) in the shipped ledger; standalone, "
                              "repeatable")
+    parser.add_argument("--retire", metavar='"OLD=NEW"', action="append",
+                        help="retire a vanished non-island shipped id with an "
+                             "explicit successor (for lineage the claim vote can "
+                             "no longer see); standalone, repeatable")
     parser.add_argument("--remint", metavar="VENDOR", action="append",
                         help="re-derive VENDOR's declared filament_ids from their "
                              "triples and rewrite mismatches in place; repeatable")
@@ -1507,9 +1589,15 @@ def main(argv=None):
         return 0
 
     if args.add_hint:
-        if args.update_snapshot or args.check or args.remint or args.drop_redundant_ids:
+        if (args.update_snapshot or args.check or args.remint
+                or args.drop_redundant_ids or args.retire):
             parser.error("--add-hint runs standalone")
         return add_hints(args.add_hint, args.profiles, RETIRED_PATH)
+
+    if args.retire:
+        if args.update_snapshot or args.check or args.remint or args.drop_redundant_ids:
+            parser.error("--retire runs standalone")
+        return retire_ids(args.retire, args.profiles, RETIRED_PATH)
 
     if args.remint:
         if args.update_snapshot or args.check or args.drop_redundant_ids:

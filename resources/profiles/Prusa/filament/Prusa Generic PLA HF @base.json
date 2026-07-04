@@ -3,6 +3,6 @@
 	"name": "Prusa Generic PLA HF @base",
 	"inherits": "fdm_filament_pla",
 	"from": "system",
-	"filament_id": "OFicxmSa",
+	"filament_id": "OFl4ItvQ",
 	"instantiation": "false"
 }

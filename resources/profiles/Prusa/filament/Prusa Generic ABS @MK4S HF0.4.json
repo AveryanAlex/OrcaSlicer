@@ -4,7 +4,7 @@
 	"inherits": "Prusa Generic ABS @MK4S",
 	"from": "system",
 	"setting_id": "8iqhyZkLiVCvZYLa",
-	"filament_id": "Generic ABS @MK4S HF0.4",
+	"filament_id": "OFvGc67v",
 	"instantiation": "true",
 	"compatible_printers": [
 		"Prusa MK4S HF0.4 nozzle"

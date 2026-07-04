@@ -4,7 +4,7 @@
 	"inherits": "fdm_filament_tpu",
 	"from": "system",
 	"setting_id": "zQEeIIKWSgsDqlpI",
-	"filament_id": "OFviQ9lH",
+	"filament_id": "OFC20UMj",
 	"instantiation": "true",
 	"additional_cooling_fan_speed": [
 		"100"

@@ -4,7 +4,7 @@
 	"inherits": "Flashforge Generic PETG @G3U 0.6 Nozzle",
 	"from": "system",
 	"setting_id": "K8WkJmFy2V1zhYQO",
-	"filament_id": "OFRgDMDJ",
+	"filament_id": "OFMyLYV8",
 	"instantiation": "true",
 	"additional_cooling_fan_speed": [
 		"40"

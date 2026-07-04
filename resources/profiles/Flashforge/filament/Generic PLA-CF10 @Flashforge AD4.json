@@ -4,7 +4,7 @@
 	"inherits": "Flashforge Generic PLA-CF10",
 	"from": "system",
 	"setting_id": "F8r0b3G228QEK53U",
-	"filament_id": "OF6XIeUW",
+	"filament_id": "OFX2zcrM",
 	"instantiation": "true",
 	"additional_cooling_fan_speed": [
 		"100"

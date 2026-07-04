@@ -4,7 +4,7 @@
 	"inherits": "Generic PA-CF @System",
 	"from": "system",
 	"setting_id": "nJF1lCOavNNh4yHs",
-	"filament_id": "OFSdF3B1",
+	"filament_id": "OFYtS9zg",
 	"instantiation": "true",
 	"activate_chamber_temp_control": [
 		"1"

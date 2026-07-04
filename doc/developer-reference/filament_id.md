@@ -112,9 +112,14 @@ python scripts/assign_filament_ids.py --check            # 4. verify — the sam
 `--mint "filament_vendor/filament_type/family_name"` prints the id a triple would mint without
 touching anything. The default run is idempotent and never rewrites a valid existing id.
 Maintenance modes (normally only used by id migrations): `--remint VENDOR` re-derives a
-vendor's declared ids from their triples, `--drop-redundant-ids VENDOR` deletes declarations
-that merely re-declare an inherited OFL id, and `--add-hint "OLD=NEW"` records a cross-island
-succession hint.
+vendor's declared ids from their triples (a declaration already equal to a salt iteration
+of its own triple is conformant and left alone — deliberate salt splits keeping two
+presets of one product apart for per-printer AMS matching survive),
+`--drop-redundant-ids VENDOR` deletes declarations
+that merely re-declare an inherited OFL id, `--add-hint "OLD=NEW"` records a cross-island
+succession hint, and `--retire "OLD=NEW"` records succession for a shipped non-island id
+that vanished while another declarer kept it alive (lineage the automatic claim vote can no
+longer see).
 
 If you skip the tooling, CI fails and prints the remedy: the expected id for your family, and
 the instruction to run `python scripts/assign_filament_ids.py --update-snapshot` and commit
@@ -141,7 +146,8 @@ calibration history, filament-id preset lookup): a live preset always wins first
 installs resolve `GF*` natively and behavior is unchanged wherever the raw id still exists.
 This is what makes identity-driven re-mints (structure rule 5) safe: the old id keeps
 resolving to the family's current preset instead of degrading to a `Generic <type>` fallback.
-The file is append-only and maintained exclusively by `--update-snapshot` / `--add-hint`.
+The file is append-only and maintained exclusively by `--update-snapshot` / `--add-hint` /
+`--retire`.
 
 ## How CI enforces this
 

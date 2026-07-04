@@ -4,7 +4,7 @@
 	"inherits": "fdm_filament_tpu",
 	"from": "system",
 	"setting_id": "YqQSUrG195dCz67L",
-	"filament_id": "GFU99",
+	"filament_id": "OFdHsxB4",
 	"instantiation": "true",
 	"compatible_printers": [
 		"TwoTrees SK1 0.4 nozzle"

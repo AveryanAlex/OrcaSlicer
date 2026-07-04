@@ -3,7 +3,7 @@
 	"name": "Prusament rPLA @base",
 	"inherits": "fdm_filament_pla",
 	"from": "system",
-	"filament_id": "OFjFPhUC",
+	"filament_id": "OFWRITFw",
 	"instantiation": "false",
 	"filament_vendor": [
 		"Prusa Polymers"

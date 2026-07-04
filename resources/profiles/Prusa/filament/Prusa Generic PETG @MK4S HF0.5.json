@@ -4,7 +4,7 @@
 	"inherits": "Prusa Generic PETG @MK4S HF0.4",
 	"from": "system",
 	"setting_id": "vO26JgugJEsX5z6a",
-	"filament_id": "Generic PETG @MK4S HF0.5",
+	"filament_id": "OF1Id239",
 	"instantiation": "true",
 	"compatible_printers": [
 		"Prusa MK4S HF0.5 nozzle"

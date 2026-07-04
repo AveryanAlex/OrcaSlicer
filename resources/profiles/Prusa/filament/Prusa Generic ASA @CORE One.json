@@ -4,7 +4,7 @@
 	"inherits": "fdm_filament_asa",
 	"from": "system",
 	"setting_id": "Pg9KDqFB63PFJo3Q",
-	"filament_id": "Prusa Generic ASA @CORE One",
+	"filament_id": "OFoJcr46",
 	"instantiation": "true",
 	"chamber_temperature": [
 		"40"

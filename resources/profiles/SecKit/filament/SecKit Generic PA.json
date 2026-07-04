@@ -4,7 +4,7 @@
 	"inherits": "fdm_filament_pa",
 	"from": "system",
 	"setting_id": "GlgeZsK719DDjaPo",
-	"filament_id": "GFN99",
+	"filament_id": "OF8CXrvm",
 	"instantiation": "true",
 	"nozzle_temperature_initial_layer": [
 		"270"

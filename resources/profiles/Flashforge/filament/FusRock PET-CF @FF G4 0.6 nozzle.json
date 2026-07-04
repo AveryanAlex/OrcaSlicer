@@ -4,7 +4,7 @@
 	"inherits": "FusRock Generic PET-CF @G3U 0.6 Nozzle",
 	"from": "system",
 	"setting_id": "A8PDgw1jZE2m3bem",
-	"filament_id": "OF6SEkeJ",
+	"filament_id": "OFB8wSps",
 	"instantiation": "true",
 	"complete_print_exhaust_fan_speed": [
 		"40"

@@ -3,7 +3,7 @@
 	"name": "Elegoo PAHT @base",
 	"inherits": "fdm_filament_pa",
 	"from": "system",
-	"filament_id": "EPAHTB00",
+	"filament_id": "OF0h7ERL",
 	"instantiation": "false",
 	"filament_density": [
 		"1.25"

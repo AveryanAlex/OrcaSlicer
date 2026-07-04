@@ -3,7 +3,7 @@
 	"name": "Creality Generic PC",
 	"inherits": "fdm_filament_pc",
 	"from": "system",
-	"filament_id": "GFC99",
+	"filament_id": "OFe8UJXH",
 	"instantiation": "false",
 	"filament_max_volumetric_speed": [
 		"16"

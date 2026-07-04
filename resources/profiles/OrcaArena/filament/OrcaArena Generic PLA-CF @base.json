@@ -3,7 +3,7 @@
 	"name": "OrcaArena Generic PLA-CF @base",
 	"inherits": "fdm_filament_pla",
 	"from": "system",
-	"filament_id": "GFL98",
+	"filament_id": "OFx0ZzFV",
 	"instantiation": "false",
 	"required_nozzle_HRC": [
 		"40"

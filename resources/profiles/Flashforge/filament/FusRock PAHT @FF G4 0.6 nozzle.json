@@ -4,7 +4,7 @@
 	"inherits": "FusRock Generic S-PAHT @G3U 0.6 Nozzle",
 	"from": "system",
 	"setting_id": "3SCkpXXK8VcQBMQn",
-	"filament_id": "OF6FM5F7",
+	"filament_id": "OF42ZDpN",
 	"instantiation": "true",
 	"close_fan_the_first_x_layers": [
 		"2"

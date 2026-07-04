@@ -4,7 +4,7 @@
 	"inherits": "fdm_filament_pet",
 	"from": "system",
 	"setting_id": "SG4Gt87iS1ql3s8S",
-	"filament_id": "OFzb2BLs",
+	"filament_id": "OFUrStd6",
 	"instantiation": "true",
 	"reduce_fan_stop_start_freq": [
 		"1"

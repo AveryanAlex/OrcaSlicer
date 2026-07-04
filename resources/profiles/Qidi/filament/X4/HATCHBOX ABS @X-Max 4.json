@@ -3,7 +3,7 @@
 	"name": "HATCHBOX ABS@X-Max 4-Series",
 	"inherits": "fdm_filament_x4_common",
 	"from": "system",
-	"filament_id": "OFPwi9X0",
+	"filament_id": "OFwLBAGf",
 	"instantiation": "false",
 	"box_temperature_range_high": [
 		"45"

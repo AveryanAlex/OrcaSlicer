@@ -4,7 +4,7 @@
 	"inherits": "fdm_filament_pet",
 	"from": "system",
 	"setting_id": "PlC4Ek7d09ytYZqJ",
-	"filament_id": "OFK39W9u",
+	"filament_id": "OFlNWVr5",
 	"instantiation": "true",
 	"additional_cooling_fan_speed": [
 		"100"

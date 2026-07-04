@@ -4,7 +4,7 @@
 	"inherits": "Generic PLA @System",
 	"from": "system",
 	"setting_id": "0RkkIcIUFgwOFTBY",
-	"filament_id": "OFXv4FUi",
+	"filament_id": "OF5NQFKI",
 	"instantiation": "true",
 	"additional_cooling_fan_speed": [
 		"40"

@@ -3,7 +3,7 @@
 	"name": "Anker Generic PETG @base",
 	"inherits": "fdm_filament_pet",
 	"from": "system",
-	"filament_id": "GFG99",
+	"filament_id": "OFgvOmM2",
 	"instantiation": "false",
 	"filament_type": [
 		"PETG"

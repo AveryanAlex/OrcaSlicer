@@ -3,7 +3,7 @@
 	"name": "OrcaArena Generic PLA Silk @base",
 	"inherits": "fdm_filament_pla",
 	"from": "system",
-	"filament_id": "OFqSTJ3I",
+	"filament_id": "OFbeeFkl",
 	"instantiation": "false",
 	"filament_flow_ratio": [
 		"0.98"

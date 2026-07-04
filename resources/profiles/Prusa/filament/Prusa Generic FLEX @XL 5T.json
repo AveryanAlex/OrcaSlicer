@@ -4,6 +4,7 @@
 	"inherits": "fdm_filament_flex",
 	"from": "system",
 	"setting_id": "PaXKTb31IFVovWiK",
+	"filament_id": "OFl2SXmv",
 	"instantiation": "true",
 	"filament_loading_speed_start": "3",
 	"filament_loading_speed": "28",

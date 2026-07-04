@@ -4,7 +4,7 @@
 	"inherits": "Prusa Generic ASA @MK4S HF0.4",
 	"from": "system",
 	"setting_id": "meEXtenGq7N4dWf3",
-	"filament_id": "Prusament ASA @MK4S HF0.5",
+	"filament_id": "OFoJcr46",
 	"instantiation": "true",
 	"compatible_printers": [
 		"Prusa MK4S HF0.5 nozzle"

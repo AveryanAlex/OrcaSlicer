@@ -3,7 +3,7 @@
 	"name": "OrcaArena Generic PETG @base",
 	"inherits": "fdm_filament_pet",
 	"from": "system",
-	"filament_id": "GFG99",
+	"filament_id": "OFgSEwOZ",
 	"instantiation": "false",
 	"reduce_fan_stop_start_freq": [
 		"1"

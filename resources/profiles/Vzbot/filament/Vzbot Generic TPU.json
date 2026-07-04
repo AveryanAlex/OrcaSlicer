@@ -4,7 +4,7 @@
 	"inherits": "fdm_filament_tpu",
 	"from": "system",
 	"setting_id": "YlhTF1F3OA2qj6o2",
-	"filament_id": "GFU99",
+	"filament_id": "OFGGyAgJ",
 	"instantiation": "true",
 	"filament_max_volumetric_speed": [
 		"50"

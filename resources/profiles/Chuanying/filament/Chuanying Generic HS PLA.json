@@ -4,7 +4,7 @@
 	"inherits": "fdm_filament_pla",
 	"from": "system",
 	"setting_id": "YZT1Uv73b8ArVoX3",
-	"filament_id": "OFfiN1Lw",
+	"filament_id": "OFdXgp2K",
 	"instantiation": "true",
 	"bed_temperature_difference": [
 		"10"

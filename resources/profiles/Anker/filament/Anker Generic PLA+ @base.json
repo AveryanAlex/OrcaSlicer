@@ -3,7 +3,7 @@
 	"name": "Anker Generic PLA+ @base",
 	"inherits": "fdm_filament_pla",
 	"from": "system",
-	"filament_id": "GFL95",
+	"filament_id": "OFIYTy8S",
 	"instantiation": "false",
 	"filament_cost": [
 		"25"

@@ -4,7 +4,7 @@
 	"inherits": "fdm_filament_flex",
 	"from": "system",
 	"setting_id": "VR2WfERGWPIWTRha",
-	"filament_id": "Prusa Generic TPU @CORE One",
+	"filament_id": "OFbenYUK",
 	"instantiation": "true",
 	"chamber_temperature": [
 		"30"

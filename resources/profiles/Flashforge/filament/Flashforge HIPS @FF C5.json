@@ -4,7 +4,7 @@
 	"inherits": "Generic HIPS @System",
 	"from": "system",
 	"setting_id": "ckwc7U0Q2eKHmCxY",
-	"filament_id": "OFhzHd2Y",
+	"filament_id": "OFaz8VoR",
 	"instantiation": "true",
 	"compatible_printers": [
 		"Flashforge Creator 5 0.4 nozzle",

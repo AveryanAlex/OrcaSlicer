@@ -4,7 +4,7 @@
 	"inherits": "Flashforge Generic ABS @G3U",
 	"from": "system",
 	"setting_id": "hF0h4ye3hMDtEba1",
-	"filament_id": "OFcy60o4",
+	"filament_id": "OFaBwRvT",
 	"instantiation": "true",
 	"activate_chamber_temp_control": [
 		"1"

@@ -153,6 +153,12 @@ class SyntheticTree:
             rc = afi.add_hints(pairs, self.profiles, self.retired)
         return rc, buf.getvalue()
 
+    def retire(self, pairs):
+        buf = io.StringIO()
+        with contextlib.redirect_stdout(buf):
+            rc = afi.retire_ids(pairs, self.profiles, self.retired)
+        return rc, buf.getvalue()
+
 
 def make_clean_tree():
     """Baseline tree: OFL base+generic, a vendor family, a clean tuned generic."""
@@ -1049,6 +1055,65 @@ class TestAddHint(SyntheticTreeCase):
         self.assertIn('expects "OLD=NEW"', out)
 
 
+class TestRetire(SyntheticTreeCase):
+    def test_retires_vanished_id_with_successor(self):
+        rc, out = self.t.retire(["OFOLD001=AX01"])
+        self.assertEqual(rc, 0, out)
+        self.assertEqual(load_json_file(self.t.retired)["retired"]["OFOLD001"],
+                         {"claims": [], "successor": "AX01"})
+        errors, out = self.t.check()
+        self.assertEqual(errors, 0, out)
+
+    def test_rejects_live_old(self):
+        rc, out = self.t.retire(["AX01=OGFL99"])
+        self.assertEqual(rc, 1)
+        self.assertIn("still lives in the tree", out)
+        self.assertEqual(afi.load_ledger(self.t.retired)["retired"], {})
+
+    def test_rejects_declaration_only_old(self):
+        # The inert-fork case: an id declared by a claim-less root still lives
+        # in the tree; the declaration must be deleted before --retire.
+        self.t.write_preset("VendorA", preset("ZOLD @base", filament_id="ZDECL01",
+                                              instantiation=False,
+                                              filament_vendor="ZV",
+                                              filament_type="PLA"))
+        rc, out = self.t.retire(["ZDECL01=AX01"])
+        self.assertEqual(rc, 1)
+        self.assertIn("still lives in the tree", out)
+
+    def test_rejects_island_space_old(self):
+        rc, out = self.t.retire(["GFXX99=AX01"])
+        self.assertEqual(rc, 1)
+        self.assertIn("reserved id space", out)
+
+    def test_rejects_user_space_old(self):
+        rc, out = self.t.retire(["P1234ABC=AX01"])
+        self.assertEqual(rc, 1)
+        self.assertIn("reserved id space", out)
+
+    def test_rejects_already_retired_old(self):
+        self.t.write_ledger(retired={"ROLD": {"claims": [], "successor": None}})
+        rc, out = self.t.retire(["ROLD=AX01"])
+        self.assertEqual(rc, 1)
+        self.assertIn("already retired", out)
+
+    def test_rejects_hinted_old(self):
+        self.t.write_ledger(hints={"HOLD": "AX01"})
+        rc, out = self.t.retire(["HOLD=AX01"])
+        self.assertEqual(rc, 1)
+        self.assertIn("hint key", out)
+
+    def test_rejects_dead_successor(self):
+        rc, out = self.t.retire(["OFOLD001=OFnope99"])
+        self.assertEqual(rc, 1)
+        self.assertIn("not a live tree id", out)
+
+    def test_rejects_malformed_pair(self):
+        rc, out = self.t.retire(["OFOLD001"])
+        self.assertEqual(rc, 1)
+        self.assertIn('expects "OLD=NEW"', out)
+
+
 # ---------------------------------------------------------------------------
 # default run: mint + insert
 # ---------------------------------------------------------------------------
@@ -1260,6 +1325,21 @@ class TestRemint(SyntheticTreeCase):
         # idempotent: a second run over the same vendor rewrites nothing
         changed, errors, _out = self.t.remint(["VendorA"])
         self.assertEqual((changed, errors), (0, 0))
+
+    def test_salted_declaration_survives_remint(self):
+        # A deliberate salt split (a second preset of one product kept on its
+        # own id for per-printer AMS disambiguation) is mint-conformant and
+        # must not be converged back onto salt 0.
+        salt1 = afi.generate_filament_id(*self.TRIPLE, salt=1)
+        self.t.write_preset("VendorA", preset("APLA @legacy",
+                                              filament_id=salt1,
+                                              inherits="APLA @base",
+                                              compatible_printers=["P2 0.4 nozzle"]))
+        changed, errors, out = self.t.remint(["VendorA"])
+        self.assertEqual(errors, 0, out)
+        self.assertEqual(changed, 1)  # only the non-conformant AX01 root
+        legacy = load_json_file(self.t.preset_path("VendorA", "APLA @legacy"))
+        self.assertEqual(legacy["filament_id"], salt1)
 
     def test_same_triple_converges_within_run(self):
         self.t.add_vendor("VendorB", [

@@ -3,6 +3,6 @@
 	"name": "Prusa Generic PETG @base",
 	"inherits": "fdm_filament_pet",
 	"from": "system",
-	"filament_id": "GFT02",
+	"filament_id": "OF1Id239",
 	"instantiation": "false"
 }

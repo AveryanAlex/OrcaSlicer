@@ -4,7 +4,7 @@
 	"inherits": "Flashforge Generic PLA",
 	"from": "system",
 	"setting_id": "KR0LUSD7wd55oNI6",
-	"filament_id": "OFm1VZed",
+	"filament_id": "OFYlthXI",
 	"instantiation": "true",
 	"compatible_printers": [
 		"Flashforge Guider 3 Ultra 0.6 Nozzle"

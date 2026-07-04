@@ -1,5 +1,120 @@
 {
  "hints": {
+  "GFA00_01": "OF9HCdyQ",
+  "GFA03": "OFjXrKFO",
+  "GFA50_01": "OF7OqDp3",
+  "GFA99": "OF0yFLkY",
+  "GFASA": "OF0yFLkY",
+  "GFB00_01": "OFNQKF0M",
+  "GFB01_01": "OFdrYBmI",
+  "GFB98": "OFLPAxz3",
+  "GFB98_01": "OFUaVAdj",
+  "GFB98_2": "OFoJcr46",
+  "GFB98_3": "OFoJcr46",
+  "GFB98_4": "OFoJcr46",
+  "GFB98_5": "OFK4LdYI",
+  "GFB98_6": "OFK4LdYI",
+  "GFB98_7": "OFK4LdYI",
+  "GFB99": "OFY9muEs",
+  "GFB99_01": "OFNLXV8X",
+  "GFB99_2": "OFvGc67v",
+  "GFB99_3": "OFvGc67v",
+  "GFB99_4": "OFvGc67v",
+  "GFB99_5": "OFvGc67v",
+  "GFB99_6": "OFyeSq8A",
+  "GFB99_7": "OFyeSq8A",
+  "GFC00_01": "OFdXVjGZ",
+  "GFC98": "OFjz0a3m",
+  "GFC99": "OFLakOUI",
+  "GFC99_01": "OFN7aNHe",
+  "GFC99_1": "OF97ru74",
+  "GFC99_2": "OF97ru74",
+  "GFC99_3": "OF97ru74",
+  "GFC99_4": "OF97ru74",
+  "GFC99_5": "OFq5QANf",
+  "GFC99_6": "OFq5QANf",
+  "GFG00_01": "OFObyktP",
+  "GFG03": "OF3F63OE",
+  "GFG96": "OF7lOgYF",
+  "GFG97": "OFu1evlr",
+  "GFG97-01": "OFTKFAZ4",
+  "GFG98": "OFoYSJKi",
+  "GFG98_01": "OFWadebJ",
+  "GFG99": "OFYPdQJh",
+  "GFG99_01": "OF1uR1t2",
+  "GFG99_2": "OF1Id239",
+  "GFG99_3": "OF1Id239",
+  "GFG99_4": "OF1Id239",
+  "GFG99_5": "OF1Id239",
+  "GFG99_6": "OFOKYhi6",
+  "GFG99_7": "OFOKYhi6",
+  "GFL100": "OFBpcB0a",
+  "GFL106": "OFDSrzZ8",
+  "GFL108": "OFDSrzZ8",
+  "GFL204": "OFY9muEs",
+  "GFL206": "OFY9muEs",
+  "GFL208": "OFY9muEs",
+  "GFL304": "OFYPdQJh",
+  "GFL306": "OFYPdQJh",
+  "GFL308": "OFYPdQJh",
+  "GFL404": "OFg8ndtj",
+  "GFL406": "OFg8ndtj",
+  "GFL408": "OFg8ndtj",
+  "GFL504": "OFsP8PKH",
+  "GFL506": "OFsP8PKH",
+  "GFL508": "OFsP8PKH",
+  "GFL71": "OF0omtEb",
+  "GFL72": "OFFZ458u",
+  "GFL73": "OFeVzkSU",
+  "GFL74": "OF0VpkBM",
+  "GFL75": "OFnXwW8l",
+  "GFL76": "OF6H51Xx",
+  "GFL77": "OFtFtiS0",
+  "GFL78": "OFelDBgv",
+  "GFL79": "OF5oXk4M",
+  "GFL80": "OFHknN4v",
+  "GFL94": "OFrGJ4tR",
+  "GFL95": "OFmpMwxS",
+  "GFL95_01": "OFodPDxO",
+  "GFL96": "OFesA6rF",
+  "GFL96_01": "OF0GIkJm",
+  "GFL97": "OFCp3Bgo",
+  "GFL98": "OFWbdGsC",
+  "GFL98_01": "OFgVJhVt",
+  "GFL98_1": "OFQ7I5vC",
+  "GFL98_3": "OFQ7I5vC",
+  "GFL98_4": "OFQ7I5vC",
+  "GFL98_5": "OFQ7I5vC",
+  "GFL99": "OFDSrzZ8",
+  "GFL99_01": "OFuSwKgm",
+  "GFL99_2": "OFiCHnso",
+  "GFL99_3": "OFiCHnso",
+  "GFL99_4": "OFiCHnso",
+  "GFL99_5": "OFiCHnso",
+  "GFL99_6": "OFl4ItvQ",
+  "GFL99_7": "OFl4ItvQ",
+  "GFLLK10PETG": "OFYPdQJh",
+  "GFLLK10PLA": "OFDSrzZ8",
+  "GFLLK10PPETG": "OFYPdQJh",
+  "GFLLK10PPLA": "OFDSrzZ8",
+  "GFLSBS99": "OFhQfUQY",
+  "GFN05_01": "OFe8tuNb",
+  "GFN96": "OF8Tlg47",
+  "GFN96_01": "OFptvi3F",
+  "GFN97": "OF8tPByX",
+  "GFN97_01": "OFSPdsuW",
+  "GFN98": "OFQLcbps",
+  "GFN98_02": "OFHa3RZT",
+  "GFN98_1": "OFfznI0Q",
+  "GFN98_2": "OFfznI0Q",
+  "GFN98_3": "OFfznI0Q",
+  "GFN98_4": "OFfznI0Q",
+  "GFN99": "OFg8ndtj",
+  "GFN99_01": "OFQswlnF",
+  "GFN99_1": "OFIy3kLw",
+  "GFN99_2": "OFIy3kLw",
+  "GFN99_3": "OFIy3kLw",
+  "GFN99_4": "OFIy3kLw",
   "GFOT001": "OFxA1p01",
   "GFOT002": "OFGkyftV",
   "GFOT003": "OF1Pke8t",
@@ -8,6 +123,48 @@
   "GFOT006": "OFcfQk4h",
   "GFOT008": "OFcvKkrs",
   "GFOT009": "OFM91vZs",
+  "GFP95": "OFNiSLfL",
+  "GFP95_01": "OFkYkQGO",
+  "GFP96": "OFXkm8q1",
+  "GFP96_01": "OFMTBcnz",
+  "GFP97": "OF1UNk9P",
+  "GFP97_01": "OF3s929u",
+  "GFP98": "OFd0Fv0k",
+  "GFP98_01": "OFkUaDnU",
+  "GFP99": "OFPklMI1",
+  "GFP99_01": "OFKuTr12",
+  "GFPA": "OFzS7zt4",
+  "GFPA6-CF": "OFQe7sAx",
+  "GFPAHT-CF": "OFaEuvNF",
+  "GFPC": "OFZtkHRq",
+  "GFPC-CF": "OFeIyhUx",
+  "GFPC-GF": "OFxJRuVF",
+  "GFPEBA": "OFjLAYgO",
+  "GFPET-CF": "OFRhCTUg",
+  "GFPETG": "OFYPdQJh",
+  "GFPETG-1": "OFIeCuXj",
+  "GFPETG-CF": "OF9UJOGF",
+  "GFPLA Glow": "OF5PtjTp",
+  "GFPLA Translucent": "OF7c9fln",
+  "GFPLA-CF": "OFZ0mR5b",
+  "GFPVA": "OFTkj6DR",
+  "GFR98": "OF74KeQR",
+  "GFR98_01": "OFxvKuYW",
+  "GFR99": "OFCD8qiU",
+  "GFR99_01": "OFrnJJEa",
+  "GFS04_01": "OFyreocX",
+  "GFS97": "OFo2UF2C",
+  "GFS97_01": "OFGDaEHO",
+  "GFS98": "OFsFon5l",
+  "GFS98_01": "OFW9uIkE",
+  "GFS99": "OFDvXujf",
+  "GFS99_01": "OFMZAoqa",
+  "GFS99_1": "OFcCzEkS",
+  "GFS99_2": "OFcCzEkS",
+  "GFS99_3": "OFcCzEkS",
+  "GFS99_4": "OFcCzEkS",
+  "GFS99_5": "OFoT8F7Y",
+  "GFS99_6": "OFoT8F7Y",
   "GFSEP001": "OFtudokz",
   "GFSEP002": "OFf5awy4",
   "GFSEP003": "OFbP8zEO",
@@ -25,9 +182,777 @@
   "GFSEP015": "OFvVy7yo",
   "GFSEP016": "OFTOPcx0",
   "GFSEP017": "OFXCBZTA",
-  "GFSEP018": "OFlSNkhc"
+  "GFSEP018": "OFlSNkhc",
+  "GFSL99": "OFqOk9Ww",
+  "GFT01_01": "OFCnywiC",
+  "GFT97_01": "OFvPomQf",
+  "GFT98_01": "OFGzUNbm",
+  "GFTPU 95A": "OFML2aVd",
+  "GFTPU for ACE": "OF0FfcAG",
+  "GFU01_01": "OFDJU6R3",
+  "GFU99": "OFgbpcy9",
+  "GFU99_01": "OFCVUEaV",
+  "GFU99_2": "OFbenYUK",
+  "GFU99_3": "OFU3zwPc"
  },
  "retired": {
+  "00001": {
+   "claims": [
+    "Creality/Generic PLA"
+   ],
+   "successor": "OFDSrzZ8"
+  },
+  "00002": {
+   "claims": [
+    "Creality/Generic PLA-Silk"
+   ],
+   "successor": "OFi6PfUM"
+  },
+  "00003": {
+   "claims": [
+    "Creality/Generic PETG"
+   ],
+   "successor": "OFYPdQJh"
+  },
+  "00004": {
+   "claims": [
+    "Creality/Generic ABS"
+   ],
+   "successor": "OFY9muEs"
+  },
+  "00005": {
+   "claims": [
+    "Creality/Generic TPU"
+   ],
+   "successor": "OFgbpcy9"
+  },
+  "00006": {
+   "claims": [
+    "Creality/Generic PLA-CF"
+   ],
+   "successor": "OFWbdGsC"
+  },
+  "00007": {
+   "claims": [
+    "Creality/Generic ASA"
+   ],
+   "successor": "OFLPAxz3"
+  },
+  "00008": {
+   "claims": [
+    "Creality/Generic PA"
+   ],
+   "successor": "OFg8ndtj"
+  },
+  "00009": {
+   "claims": [
+    "Creality/Generic PA-CF"
+   ],
+   "successor": "OFQLcbps"
+  },
+  "00010": {
+   "claims": [
+    "Creality/Generic BVOH"
+   ],
+   "successor": "OFo2UF2C"
+  },
+  "00011": {
+   "claims": [
+    "Creality/Generic PVA"
+   ],
+   "successor": "OFDvXujf"
+  },
+  "00012": {
+   "claims": [
+    "Creality/Generic HIPS"
+   ],
+   "successor": "OFsFon5l"
+  },
+  "00013": {
+   "claims": [
+    "Creality/Generic PET-CF"
+   ],
+   "successor": "OFQdaVZS"
+  },
+  "00014": {
+   "claims": [
+    "Creality/Generic PETG-CF"
+   ],
+   "successor": "OFoYSJKi"
+  },
+  "00015": {
+   "claims": [
+    "Creality/Generic PA6-CF"
+   ],
+   "successor": "OFhTPf6L"
+  },
+  "00016": {
+   "claims": [
+    "Creality/Generic PAHT-CF"
+   ],
+   "successor": "OFH7b12v"
+  },
+  "00017": {
+   "claims": [
+    "Creality/Generic PPS"
+   ],
+   "successor": "OFq9svOz"
+  },
+  "00018": {
+   "claims": [
+    "Creality/Generic PPS-CF"
+   ],
+   "successor": "OF6rdQ6M"
+  },
+  "00019": {
+   "claims": [
+    "Creality/Generic PP"
+   ],
+   "successor": "OF1UNk9P"
+  },
+  "00020": {
+   "claims": [
+    "Creality/Generic PET"
+   ],
+   "successor": "OF6MOPWx"
+  },
+  "00021": {
+   "claims": [
+    "Creality/Generic PC"
+   ],
+   "successor": "OFLakOUI"
+  },
+  "00022": {
+   "claims": [
+    "Creality/Generic PA612-CF"
+   ],
+   "successor": "OF8eaY7j"
+  },
+  "00023": {
+   "claims": [
+    "Creality/Generic Support for PA"
+   ],
+   "successor": "OFDtop41"
+  },
+  "00024": {
+   "claims": [
+    "Creality/Generic Support for PLA"
+   ],
+   "successor": "OFin64Qg"
+  },
+  "00025": {
+   "claims": [
+    "Creality/Generic PA12-CF"
+   ],
+   "successor": "OFM4iJlv"
+  },
+  "00026": {
+   "claims": [
+    "Creality/Generic TPU 64D"
+   ],
+   "successor": "OFF3cuzT"
+  },
+  "00027": {
+   "claims": [
+    "Creality/Generic PETG-GF"
+   ],
+   "successor": "OFyLWVF3"
+  },
+  "00031": {
+   "claims": [
+    "Creality/Generic PP-CF"
+   ],
+   "successor": "OFXkm8q1"
+  },
+  "00032": {
+   "claims": [
+    "Creality/Generic PCTG"
+   ],
+   "successor": "OFu1evlr"
+  },
+  "00033": {
+   "claims": [
+    "Creality/Generic ASA-CF"
+   ],
+   "successor": "OF53eLVD"
+  },
+  "00034": {
+   "claims": [
+    "Creality/Generic PA6-GF"
+   ],
+   "successor": "OFh9u9c0"
+  },
+  "00035": {
+   "claims": [
+    "Creality/eSUN PLA-LW"
+   ],
+   "successor": "OFi5RSve"
+  },
+  "01001": {
+   "claims": [
+    "Creality/Creality Hyper PLA",
+    "Creality/Hyper PLA"
+   ],
+   "successor": "OFAIrQXu"
+  },
+  "01002": {
+   "claims": [
+    "Creality/Hyper L-W PLA"
+   ],
+   "successor": "OF70zbGS"
+  },
+  "01003": {
+   "claims": [
+    "Creality/Hyper Luminous"
+   ],
+   "successor": "OFC1PzXz"
+  },
+  "01004": {
+   "claims": [
+    "Creality/Hyper Stardust"
+   ],
+   "successor": "OFXnToSX"
+  },
+  "01601": {
+   "claims": [
+    "Creality/Soleyin Ultra PLA"
+   ],
+   "successor": "OF02UAVh"
+  },
+  "02001": {
+   "claims": [
+    "Creality/Creality Hyper PLA-CF",
+    "Creality/Hyper PLA-CF"
+   ],
+   "successor": "OFGwT5Av"
+  },
+  "03001": {
+   "claims": [
+    "Creality/Creality Hyper ABS",
+    "Creality/Hyper ABS"
+   ],
+   "successor": "OF8GnyFU"
+  },
+  "04001": {
+   "claims": [
+    "Creality/CR-PLA",
+    "Creality/Creality Generic PLA"
+   ],
+   "successor": "OFACSw9O"
+  },
+  "05001": {
+   "claims": [
+    "Creality/CR-Silk",
+    "Creality/Creality Silk PLA"
+   ],
+   "successor": "OF3OMgrI"
+  },
+  "06001": {
+   "claims": [
+    "Creality/CR-PETG",
+    "Creality/Creality Generic PETG"
+   ],
+   "successor": "OF3WQaKK"
+  },
+  "06002": {
+   "claims": [
+    "Creality/Hyper PETG"
+   ],
+   "successor": "OFujZSdh"
+  },
+  "06003": {
+   "claims": [
+    "Creality/Hyper PETG-CF"
+   ],
+   "successor": "OFusbWjj"
+  },
+  "06004": {
+   "claims": [
+    "Creality/Hyper PETG-GF"
+   ],
+   "successor": "OFLgwqp2"
+  },
+  "06005": {
+   "claims": [
+    "Creality/Soleyin Basic PETG"
+   ],
+   "successor": "OFBLktDy"
+  },
+  "07001": {
+   "claims": [
+    "Creality/CR-ABS",
+    "Creality/Creality Generic ABS"
+   ],
+   "successor": "OFGwZmgS"
+  },
+  "07002": {
+   "claims": [
+    "Creality/Hyper PC"
+   ],
+   "successor": "OFUF7oA4"
+  },
+  "08001": {
+   "claims": [
+    "Creality/Ender-PLA"
+   ],
+   "successor": "OFWao3Ic"
+  },
+  "09001": {
+   "claims": [
+    "Creality/EN-PLA+"
+   ],
+   "successor": "OFks6esg"
+  },
+  "09002": {
+   "claims": [
+    "Creality/ENDER FAST PLA"
+   ],
+   "successor": "OFfSqS4R"
+  },
+  "10001": {
+   "claims": [
+    "Creality/Creality Generic TPU",
+    "Creality/HP-TPU"
+   ],
+   "successor": "OFGcMkEB"
+  },
+  "1009481135": {
+   "claims": [
+    "Snapmaker/Snapmaker J1 PET"
+   ],
+   "successor": "OF8Jl6NT"
+  },
+  "1042511226": {
+   "claims": [
+    "Snapmaker/Snapmaker Dual PETG-CF"
+   ],
+   "successor": "OF3msXEa"
+  },
+  "10425112260": {
+   "claims": [
+    "Snapmaker/Snapmaker PETG-CF"
+   ],
+   "successor": "OFOwQuZM"
+  },
+  "11001": {
+   "claims": [
+    "Creality/CR-Nylon",
+    "Creality/Creality Generic PA"
+   ],
+   "successor": "OFMqYusc"
+  },
+  "1172603684": {
+   "claims": [
+    "Snapmaker/Snapmaker J1 PETG"
+   ],
+   "successor": "OFQMTRc8"
+  },
+  "1181363872": {
+   "claims": [
+    "Snapmaker/Snapmaker Dual PLA Silk"
+   ],
+   "successor": "OFyj3m13"
+  },
+  "11813638720": {
+   "claims": [
+    "Snapmaker/Snapmaker PLA Silk"
+   ],
+   "successor": "OFWgFOjn"
+  },
+  "1192769348": {
+   "claims": [
+    "Snapmaker/Snapmaker J1 PLA Matte"
+   ],
+   "successor": "OFY3AB7j"
+  },
+  "12002": {
+   "claims": [
+    "Creality/Hyper PPA-CF"
+   ],
+   "successor": "OFNvBIL0"
+  },
+  "12003": {
+   "claims": [
+    "Creality/Hyper PAHT-CF"
+   ],
+   "successor": "OF4APyxe"
+  },
+  "12004": {
+   "claims": [
+    "Creality/Hyper PA612-CF"
+   ],
+   "successor": "OFhkN0a7"
+  },
+  "12005": {
+   "claims": [
+    "Creality/Hyper PA6-CF"
+   ],
+   "successor": "OFn2GlhY"
+  },
+  "1207881278": {
+   "claims": [
+    "Snapmaker/Snapmaker Dual Breakaway"
+   ],
+   "successor": "OFfmHUkQ"
+  },
+  "1210173120": {
+   "claims": [
+    "Snapmaker/Snapmaker J1 PA-CF"
+   ],
+   "successor": "OFYEtXuk"
+  },
+  "1223824394": {
+   "claims": [
+    "Snapmaker/Snapmaker J1 ABS"
+   ],
+   "successor": "OFy14TRA"
+  },
+  "1247172706": {
+   "claims": [
+    "Snapmaker/Snapmaker Dual ASA"
+   ],
+   "successor": "OFKUEXPA"
+  },
+  "12471727060": {
+   "claims": [
+    "Snapmaker/Snapmaker ASA"
+   ],
+   "successor": "OF1d7c3A"
+  },
+  "13001": {
+   "claims": [
+    "Creality/CR-PLA Carbon"
+   ],
+   "successor": "OFrM4hdm"
+  },
+  "1344609062": {
+   "claims": [
+    "Snapmaker/Snapmaker PVA"
+   ],
+   "successor": "OFyhjiNs"
+  },
+  "1355502217": {
+   "claims": [
+    "Snapmaker/Snapmaker PETG-CF"
+   ],
+   "successor": "OFOwQuZM"
+  },
+  "1393866034": {
+   "claims": [
+    "Snapmaker/PolyLite Dual PLA",
+    "Snapmaker/PolyLite J1 PLA",
+    "Snapmaker/PolyLite PLA"
+   ],
+   "successor": "OF5CgdDq"
+  },
+  "14001": {
+   "claims": [
+    "Creality/CR-PLA Matte"
+   ],
+   "successor": "OFM0xjBG"
+  },
+  "1417031127": {
+   "claims": [
+    "Snapmaker/Snapmaker Dual PLA"
+   ],
+   "successor": "OFZivHGL"
+  },
+  "14170311270": {
+   "claims": [
+    "Snapmaker/Snapmaker PLA"
+   ],
+   "successor": "OFlufQpZ"
+  },
+  "141703112701": {
+   "claims": [
+    "Snapmaker/Snapmaker PLA SnapSpeed"
+   ],
+   "successor": "OFwhLMs4"
+  },
+  "1417031127011": {
+   "claims": [
+    "Snapmaker/Snapmaker PLA Lite"
+   ],
+   "successor": "OFEOnBj6"
+  },
+  "144877656": {
+   "claims": [
+    "Snapmaker/Snapmaker J1 ASA"
+   ],
+   "successor": "OFt7SngH"
+  },
+  "1480063856": {
+   "claims": [
+    "Snapmaker/Snapmaker TPU"
+   ],
+   "successor": "OF65InrS"
+  },
+  "15001": {
+   "claims": [
+    "Creality/CR-PLA Fluo"
+   ],
+   "successor": "OFgpQwkk"
+  },
+  "1528786603": {
+   "claims": [
+    "Snapmaker/Snapmaker J1 PLA Silk"
+   ],
+   "successor": "OFQ1KzO8"
+  },
+  "16001": {
+   "claims": [
+    "Creality/CR-TPU"
+   ],
+   "successor": "OFG2RkhN"
+  },
+  "1655727393": {
+   "claims": [
+    "Snapmaker/Snapmaker PLA Silk"
+   ],
+   "successor": "OFWgFOjn"
+  },
+  "168223792": {
+   "claims": [
+    "Snapmaker/Snapmaker Dual ABS"
+   ],
+   "successor": "OFJhT2fd"
+  },
+  "1682237920": {
+   "claims": [
+    "Snapmaker/Snapmaker ABS"
+   ],
+   "successor": "OF72YYTd"
+  },
+  "1695556157": {
+   "claims": [
+    "Snapmaker/Snapmaker PLA Eco"
+   ],
+   "successor": "OFpu74Qe"
+  },
+  "17001": {
+   "claims": [
+    "Creality/CR-Wood"
+   ],
+   "successor": "OFGxC8gB"
+  },
+  "1702147325": {
+   "claims": [
+    "Snapmaker/Snapmaker Dual PLA-CF"
+   ],
+   "successor": "OF6ATsCF"
+  },
+  "17021473250": {
+   "claims": [
+    "Snapmaker/Snapmaker PLA-CF"
+   ],
+   "successor": "OFhQf8ou"
+  },
+  "18001": {
+   "claims": [
+    "Creality/HP Ultra PLA"
+   ],
+   "successor": "OFCJpR7a"
+  },
+  "1895495477": {
+   "claims": [
+    "Snapmaker/Snapmaker PETG"
+   ],
+   "successor": "OF4WB37S"
+  },
+  "19001": {
+   "claims": [
+    "Creality/Creality Generic ASA",
+    "Creality/HP-ASA"
+   ],
+   "successor": "OFPHLnoe"
+  },
+  "200803790": {
+   "claims": [
+    "Snapmaker/Snapmaker Dual PLA Eco"
+   ],
+   "successor": "OFyPG8v2"
+  },
+  "2008037900": {
+   "claims": [
+    "Snapmaker/Snapmaker PLA Eco"
+   ],
+   "successor": "OFpu74Qe"
+  },
+  "2029994346": {
+   "claims": [
+    "Snapmaker/Snapmaker Dual PLA Metal"
+   ],
+   "successor": "OFg3cWVt"
+  },
+  "20299943460": {
+   "claims": [
+    "Snapmaker/Snapmaker PLA Metal"
+   ],
+   "successor": "OFtybfNX"
+  },
+  "2128577941": {
+   "claims": [
+    "Snapmaker/Snapmaker Dual PET"
+   ],
+   "successor": "OFUIfGoh"
+  },
+  "21285779410": {
+   "claims": [
+    "Snapmaker/Snapmaker PET"
+   ],
+   "successor": "OFQYaiGg"
+  },
+  "2209001062": {
+   "claims": [
+    "Snapmaker/Snapmaker Dual PETG"
+   ],
+   "successor": "OFBlFMVp"
+  },
+  "22090010620": {
+   "claims": [
+    "Snapmaker/Snapmaker PETG"
+   ],
+   "successor": "OF4WB37S"
+  },
+  "2549587591": {
+   "claims": [
+    "Snapmaker/Snapmaker PET"
+   ],
+   "successor": "OFQYaiGg"
+  },
+  "2742961008": {
+   "claims": [
+    "Snapmaker/Snapmaker ASA"
+   ],
+   "successor": "OF1d7c3A"
+  },
+  "29001": {
+   "claims": [
+    "Creality/Hyper Marble"
+   ],
+   "successor": "OFLzx3J4"
+  },
+  "2971656290": {
+   "claims": [
+    "Snapmaker/Snapmaker Dual TPU"
+   ],
+   "successor": "OFjkdnyN"
+  },
+  "29716562900": {
+   "claims": [
+    "Snapmaker/Snapmaker TPU"
+   ],
+   "successor": "OF65InrS"
+  },
+  "297165629001": {
+   "claims": [
+    "Snapmaker/Snapmaker TPU 95A"
+   ],
+   "successor": "OFKo87c6"
+  },
+  "3104636980": {
+   "claims": [
+    "Snapmaker/Snapmaker Dual PVA"
+   ],
+   "successor": "OFDKIKyw"
+  },
+  "31046369800": {
+   "claims": [
+    "Snapmaker/Snapmaker PVA"
+   ],
+   "successor": "OFyhjiNs"
+  },
+  "3177068229": {
+   "claims": [
+    "Snapmaker/Snapmaker PLA"
+   ],
+   "successor": "OFlufQpZ"
+  },
+  "3383257822": {
+   "claims": [
+    "Snapmaker/Snapmaker J1 PLA Eco"
+   ],
+   "successor": "OFLbdkrE"
+  },
+  "3492897526": {
+   "claims": [
+    "Snapmaker/Snapmaker J1 Breakaway"
+   ],
+   "successor": "OFeTATC7"
+  },
+  "3493177425": {
+   "claims": [
+    "Snapmaker/Snapmaker Dual PA-CF"
+   ],
+   "successor": "OFRooa0F"
+  },
+  "34931774250": {
+   "claims": [
+    "Snapmaker/Snapmaker PA-CF"
+   ],
+   "successor": "OFEmsric"
+  },
+  "3503790988": {
+   "claims": [
+    "Snapmaker/Snapmaker Dual PLA Matte"
+   ],
+   "successor": "OFlIsW6f"
+  },
+  "377675245": {
+   "claims": [
+    "Snapmaker/Snapmaker J1 PLA"
+   ],
+   "successor": "OFSa39yP"
+  },
+  "3806593857": {
+   "claims": [
+    "Snapmaker/Snapmaker J1 PLA-CF"
+   ],
+   "successor": "OFdD5Wbu"
+  },
+  "3811508002": {
+   "claims": [
+    "Snapmaker/Snapmaker ABS"
+   ],
+   "successor": "OF72YYTd"
+  },
+  "3864371306": {
+   "claims": [
+    "Snapmaker/Snapmaker PLA-CF"
+   ],
+   "successor": "OFhQf8ou"
+  },
+  "4012961186": {
+   "claims": [
+    "Snapmaker/Snapmaker J1 PLA Metal"
+   ],
+   "successor": "OFt0JbR7"
+  },
+  "4092268632": {
+   "claims": [
+    "Snapmaker/Snapmaker J1 TPU"
+   ],
+   "successor": "OFyrnlUn"
+  },
+  "4227461134": {
+   "claims": [
+    "Snapmaker/Snapmaker Breakaway Support For PLA",
+    "Snapmaker/Snapmaker J1 PVA"
+   ],
+   "successor": "OF6TuVAg"
+  },
+  "4235401834": {
+   "claims": [
+    "Snapmaker/Snapmaker J1 PETG-CF"
+   ],
+   "successor": "OFxYB4Sw"
+  },
+  "581236806": {
+   "claims": [
+    "Snapmaker/Snapmaker PA-CF"
+   ],
+   "successor": "OFEmsric"
+  },
   "AZ01-1": {
    "claims": [
     "BBL/AliZ PETG-CF",
@@ -62,6 +987,66 @@
     "OrcaFilamentLibrary/AliZ PA-CF"
    ],
    "successor": "OFd4zw5l"
+  },
+  "BSFI001": {
+   "claims": [
+    "Blocks/Blocks Generic PLA"
+   ],
+   "successor": "OFNYewRS"
+  },
+  "BSFI002": {
+   "claims": [
+    "Blocks/Blocks Generic PETG"
+   ],
+   "successor": "OFrgGex8"
+  },
+  "BSFI003": {
+   "claims": [
+    "Blocks/Blocks Generic TPU"
+   ],
+   "successor": "OFMEbuBE"
+  },
+  "BSFI004": {
+   "claims": [
+    "Blocks/Blocks Generic ABS"
+   ],
+   "successor": "OFma52eS"
+  },
+  "BSFI005": {
+   "claims": [
+    "Blocks/Blocks Generic ASA"
+   ],
+   "successor": "OFB9dx27"
+  },
+  "BSFI006": {
+   "claims": [
+    "Blocks/Blocks Generic PA"
+   ],
+   "successor": "OFiUSDih"
+  },
+  "BSFI007": {
+   "claims": [
+    "Blocks/Blocks Generic PA-CF"
+   ],
+   "successor": "OF8bLDu7"
+  },
+  "BSFI008": {
+   "claims": [
+    "Blocks/Blocks Generic PC"
+   ],
+   "successor": "OFahE7HP"
+  },
+  "BSFI009": {
+   "claims": [
+    "Blocks/Blocks Generic PVA"
+   ],
+   "successor": "OFiorRtJ"
+  },
+  "BSFI010": {
+   "claims": [
+    "Blocks/Blocks Generic PLA-CF"
+   ],
+   "successor": "OFupq0tY"
   },
   "CX30DB20": {
    "claims": [
@@ -160,6 +1145,12 @@
    ],
    "successor": "OF0pzFLc"
   },
+  "DFL99": {
+   "claims": [
+    "Volumic/Désactivé"
+   ],
+   "successor": "OFCuaCer"
+  },
   "DREMC001": {
    "claims": [],
    "successor": null
@@ -218,6 +1209,198 @@
    "claims": [],
    "successor": null
   },
+  "E1001": {
+   "claims": [
+    "Creality/eSUN PLA+"
+   ],
+   "successor": "OFqINlYj"
+  },
+  "E1002": {
+   "claims": [
+    "Creality/eSUN PLA-Silk"
+   ],
+   "successor": "OFIRUqWi"
+  },
+  "E1003": {
+   "claims": [
+    "Creality/eSUN PLA-Matte"
+   ],
+   "successor": "OFDETOM6"
+  },
+  "E1004": {
+   "claims": [
+    "Creality/eSUN PLA-Lite"
+   ],
+   "successor": "OFhbolij"
+  },
+  "E1005": {
+   "claims": [
+    "Creality/eSUN PLA-CF"
+   ],
+   "successor": "OFnHc3D6"
+  },
+  "E1006": {
+   "claims": [
+    "Creality/eSUN PLA-HS"
+   ],
+   "successor": "OFOHOf2F"
+  },
+  "E2001": {
+   "claims": [
+    "Creality/eSUN PETG"
+   ],
+   "successor": "OF3kBrdA"
+  },
+  "E2002": {
+   "claims": [
+    "Creality/eSUN PETG+HS"
+   ],
+   "successor": "OFrdZ0cK"
+  },
+  "E2003": {
+   "claims": [
+    "Creality/eSUN PETG-Basic"
+   ],
+   "successor": "OFFbQscs"
+  },
+  "E3001": {
+   "claims": [
+    "Creality/eSUN ABS+"
+   ],
+   "successor": "OFTXduCM"
+  },
+  "E4001": {
+   "claims": [
+    "Creality/eSUN ASA+"
+   ],
+   "successor": "OFUmS5z5"
+  },
+  "E8001": {
+   "claims": [
+    "Creality/eSUN PET-Basic"
+   ],
+   "successor": "OFHaYaB1"
+  },
+  "EABSB00": {
+   "claims": [
+    "Elegoo/Elegoo ABS"
+   ],
+   "successor": "OFxOHhZw"
+  },
+  "EASAB00": {
+   "claims": [
+    "Elegoo/Elegoo ASA"
+   ],
+   "successor": "OFobDOW5"
+  },
+  "EFL33": {
+   "claims": [
+    "Eryone/Eryone PP-CF"
+   ],
+   "successor": "OFbh7HcA"
+  },
+  "EFL40": {
+   "claims": [
+    "Eryone/Eryone PLA-CF"
+   ],
+   "successor": "OFilAA3b"
+  },
+  "EFL43": {
+   "claims": [
+    "Eryone/Eryone PETG-CF"
+   ],
+   "successor": "OFNstOna"
+  },
+  "EFL71": {
+   "claims": [
+    "Eryone/Eryone PA"
+   ],
+   "successor": "OFS4jbj3"
+  },
+  "EFL72": {
+   "claims": [
+    "Eryone/Eryone PA-CF"
+   ],
+   "successor": "OFp9wdmf"
+  },
+  "EFL73": {
+   "claims": [
+    "Eryone/Eryone PA-GF"
+   ],
+   "successor": "OFkq7rPy"
+  },
+  "EFL81": {
+   "claims": [
+    "Eryone/Eryone ABS-CF"
+   ],
+   "successor": "OFQ1zgm3"
+  },
+  "EFL82": {
+   "claims": [
+    "Eryone/Eryone ASA-CF"
+   ],
+   "successor": "OFwyt1xt"
+  },
+  "EFL90": {
+   "claims": [
+    "Eryone/Eryone PLA"
+   ],
+   "successor": "OFmKU2Ha"
+  },
+  "EFL91": {
+   "claims": [
+    "Eryone/Eryone ABS"
+   ],
+   "successor": "OFOzwywz"
+  },
+  "EFL92": {
+   "claims": [
+    "Eryone/Eryone ASA"
+   ],
+   "successor": "OFVtIasg"
+  },
+  "EFL93": {
+   "claims": [
+    "Eryone/Eryone PETG"
+   ],
+   "successor": "OF8kJys9"
+  },
+  "EFL941": {
+   "claims": [
+    "Eryone/Eryone Silk PLA"
+   ],
+   "successor": "OF7nBAd3"
+  },
+  "EFL95": {
+   "claims": [
+    "Eryone/Eryone TPU"
+   ],
+   "successor": "OFhUjPA5"
+  },
+  "EPAHTB00": {
+   "claims": [
+    "Elegoo/Elegoo PAHT-CF"
+   ],
+   "successor": "OF0h7ERL"
+  },
+  "EPCB00": {
+   "claims": [
+    "Elegoo/Elegoo PC"
+   ],
+   "successor": "OFUyDDNv"
+  },
+  "EPETGB00": {
+   "claims": [
+    "Elegoo/Elegoo PETG"
+   ],
+   "successor": "OFLcd093"
+  },
+  "EPLAB00": {
+   "claims": [
+    "Elegoo/Elegoo PLA"
+   ],
+   "successor": "OFvgE0Zh"
+  },
   "ESN02": {
    "claims": [
     "OrcaFilamentLibrary/eSUN ePLA-LW"
@@ -229,6 +1412,12 @@
     "OrcaFilamentLibrary/eSUN PETG"
    ],
    "successor": "OF3kBrdA"
+  },
+  "ETPUB00": {
+   "claims": [
+    "Elegoo/Elegoo TPU 95A"
+   ],
+   "successor": "OFmhJs5V"
   },
   "FDPLAST01": {
    "claims": [
@@ -265,6 +1454,31 @@
     "OrcaFilamentLibrary/FDplast TPU"
    ],
    "successor": "OFfmZrI3"
+  },
+  "FFF01": {
+   "claims": [
+    "Flashforge/Flashforge PLA"
+   ],
+   "successor": "OFDKgoqx"
+  },
+  "FFF02": {
+   "claims": [
+    "Flashforge/Flashforge ABS"
+   ],
+   "successor": "OF5SJ3jz"
+  },
+  "FFF03": {
+   "claims": [
+    "Flashforge/Flashforge PETG",
+    "Flashforge/Generic PETG"
+   ],
+   "successor": "OFMpxamb"
+  },
+  "FFG01": {
+   "claims": [
+    "Flashforge/Flashforge Generic PLA"
+   ],
+   "successor": "OFtTHNTj"
   },
   "FILAR0001": {
    "claims": [
@@ -680,53 +1894,373 @@
    ],
    "successor": "OFOiJfLM"
   },
+  "GABSB00": {
+   "claims": [
+    "Elegoo/Generic ABS"
+   ],
+   "successor": "OFY9muEs"
+  },
+  "GASAB00": {
+   "claims": [
+    "Elegoo/Generic ASA",
+    "Elegoo/Generic ASA-CF"
+   ],
+   "successor": "OFLPAxz3"
+  },
   "GFABS": {
    "claims": [
     "Anycubic/Anycubic ABS"
    ],
-   "successor": "OFf2b9wu"
+   "successor": "OF223rZv"
   },
   "GFL92": {
    "claims": [
     "Anycubic/Anycubic PLA"
    ],
-   "successor": "OFgK2Xvv"
+   "successor": "OFmjN2bc"
   },
   "GFL93": {
    "claims": [
     "Anycubic/Anycubic PLA+"
    ],
-   "successor": "OFgrGfPy"
+   "successor": "OFnmp6rt"
   },
   "GFPLA": {
    "claims": [
     "Anycubic/Anycubic PLA"
    ],
-   "successor": "OFgK2Xvv"
+   "successor": "OFmjN2bc"
   },
   "GFPLA High Speed": {
    "claims": [
     "Anycubic/Anycubic PLA High Speed"
    ],
-   "successor": "OFgSK1hL"
+   "successor": "OFjVOWfJ"
   },
   "GFPLA Matte": {
    "claims": [
     "Anycubic/Anycubic PLA Matte"
    ],
-   "successor": "OFvYfHPB"
+   "successor": "OFIE3vOf"
   },
   "GFPLA Silk": {
    "claims": [
     "Anycubic/Anycubic PLA Silk"
    ],
-   "successor": "OFjdTQd6"
+   "successor": "OFFwJWea"
   },
   "GFPLA+": {
    "claims": [
     "Anycubic/Anycubic PLA+"
    ],
-   "successor": "OFgrGfPy"
+   "successor": "OFnmp6rt"
+  },
+  "GPAB00": {
+   "claims": [
+    "Elegoo/Generic PA"
+   ],
+   "successor": "OFg8ndtj"
+  },
+  "GPCB00": {
+   "claims": [
+    "Elegoo/Generic PC"
+   ],
+   "successor": "OFLakOUI"
+  },
+  "GPETB00": {
+   "claims": [
+    "Elegoo/Generic PET"
+   ],
+   "successor": "OF6MOPWx"
+  },
+  "GPETGB00": {
+   "claims": [
+    "Elegoo/Generic PETG",
+    "Elegoo/Generic PETG-CF"
+   ],
+   "successor": "OFYPdQJh"
+  },
+  "GPLAB00": {
+   "claims": [
+    "Elegoo/Generic PLA"
+   ],
+   "successor": "OFDSrzZ8"
+  },
+  "Generic ABS @E3NG v1.2S": {
+   "claims": [
+    "RH3D/Generic ABS"
+   ],
+   "successor": "OFY9muEs"
+  },
+  "Generic ABS @MK4S": {
+   "claims": [
+    "Prusa/Prusa Generic ABS"
+   ],
+   "successor": "OFvGc67v"
+  },
+  "Generic ABS @MK4S 0.6": {
+   "claims": [
+    "Prusa/Prusa Generic ABS"
+   ],
+   "successor": "OFvGc67v"
+  },
+  "Generic ABS @MK4S 0.8": {
+   "claims": [
+    "Prusa/Prusa Generic ABS"
+   ],
+   "successor": "OFvGc67v"
+  },
+  "Generic ABS @MK4S HF0.4": {
+   "claims": [
+    "Prusa/Prusa Generic ABS"
+   ],
+   "successor": "OFvGc67v"
+  },
+  "Generic ABS @MK4S HF0.5": {
+   "claims": [
+    "Prusa/Prusa Generic ABS"
+   ],
+   "successor": "OFvGc67v"
+  },
+  "Generic ABS @MK4S HF0.6": {
+   "claims": [
+    "Prusa/Prusa Generic ABS"
+   ],
+   "successor": "OFvGc67v"
+  },
+  "Generic ABS @MK4S HF0.8": {
+   "claims": [
+    "Prusa/Prusa Generic ABS"
+   ],
+   "successor": "OFvGc67v"
+  },
+  "Generic ASA @E3NG v1.2S": {
+   "claims": [
+    "RH3D/Generic ASA"
+   ],
+   "successor": "OFLPAxz3"
+  },
+  "Generic FLEX @MK4S": {
+   "claims": [
+    "Prusa/Prusa Generic TPU"
+   ],
+   "successor": "OFbenYUK"
+  },
+  "Generic FLEX @MK4S 0.6": {
+   "claims": [
+    "Prusa/Prusa Generic TPU"
+   ],
+   "successor": "OFbenYUK"
+  },
+  "Generic FLEX @MK4S 0.8": {
+   "claims": [
+    "Prusa/Prusa Generic TPU"
+   ],
+   "successor": "OFbenYUK"
+  },
+  "Generic PCCF @E3NG v1.2S": {
+   "claims": [
+    "RH3D/Generic PCCF"
+   ],
+   "successor": "OFC5f4Ay"
+  },
+  "Generic PETG @E3NG v1.2S": {
+   "claims": [
+    "RH3D/Generic PETG"
+   ],
+   "successor": "OFYPdQJh"
+  },
+  "Generic PETG @MK4S": {
+   "claims": [
+    "Prusa/Prusa Generic PETG"
+   ],
+   "successor": "OF1Id239"
+  },
+  "Generic PETG @MK4S 0.6": {
+   "claims": [
+    "Prusa/Prusa Generic PETG"
+   ],
+   "successor": "OF1Id239"
+  },
+  "Generic PETG @MK4S 0.8": {
+   "claims": [
+    "Prusa/Prusa Generic PETG"
+   ],
+   "successor": "OF1Id239"
+  },
+  "Generic PETG @MK4S HF0.4": {
+   "claims": [
+    "Prusa/Prusa Generic PETG"
+   ],
+   "successor": "OF1Id239"
+  },
+  "Generic PETG @MK4S HF0.5": {
+   "claims": [
+    "Prusa/Prusa Generic PETG"
+   ],
+   "successor": "OF1Id239"
+  },
+  "Generic PETG @MK4S HF0.6": {
+   "claims": [
+    "Prusa/Prusa Generic PETG"
+   ],
+   "successor": "OF1Id239"
+  },
+  "Generic PETG @MK4S HF0.8": {
+   "claims": [
+    "Prusa/Prusa Generic PETG"
+   ],
+   "successor": "OF1Id239"
+  },
+  "Generic PLA @E3NG v1.2S": {
+   "claims": [
+    "RH3D/Generic PLA"
+   ],
+   "successor": "OFDSrzZ8"
+  },
+  "Generic PLA @MK4S": {
+   "claims": [
+    "Prusa/Prusa Generic PLA"
+   ],
+   "successor": "OFiCHnso"
+  },
+  "Generic PLA @MK4S 0.6": {
+   "claims": [
+    "Prusa/Prusa Generic PLA"
+   ],
+   "successor": "OFiCHnso"
+  },
+  "Generic PLA @MK4S 0.8": {
+   "claims": [
+    "Prusa/Prusa Generic PLA"
+   ],
+   "successor": "OFiCHnso"
+  },
+  "Generic PLA @MK4S HF0.4": {
+   "claims": [
+    "Prusa/Prusa Generic PLA"
+   ],
+   "successor": "OFiCHnso"
+  },
+  "Generic PLA @MK4S HF0.5": {
+   "claims": [
+    "Prusa/Prusa Generic PLA"
+   ],
+   "successor": "OFiCHnso"
+  },
+  "Generic PLA @MK4S HF0.6": {
+   "claims": [
+    "Prusa/Prusa Generic PLA"
+   ],
+   "successor": "OFiCHnso"
+  },
+  "Generic PLA @MK4S HF0.8": {
+   "claims": [
+    "Prusa/Prusa Generic PLA"
+   ],
+   "successor": "OFiCHnso"
+  },
+  "Generic PLA Silk @MK4S": {
+   "claims": [
+    "Prusa/Prusa Generic PLA Silk"
+   ],
+   "successor": "OFHFZ1Te"
+  },
+  "Generic PLA Silk @MK4S 0.6": {
+   "claims": [
+    "Prusa/Prusa Generic PLA Silk"
+   ],
+   "successor": "OFHFZ1Te"
+  },
+  "Generic PLA Silk @MK4S 0.8": {
+   "claims": [
+    "Prusa/Prusa Generic PLA Silk"
+   ],
+   "successor": "OFHFZ1Te"
+  },
+  "Generic TPU @E3NG v1.2S": {
+   "claims": [
+    "RH3D/Generic TPU"
+   ],
+   "successor": "OFgbpcy9"
+  },
+  "IQM1": {
+   "claims": [
+    "iQ/Fiberthree PACF Pro P1"
+   ],
+   "successor": "OFjUGUIK"
+  },
+  "IQM1011": {
+   "claims": [
+    "iQ/VXL90 TiQ2 P2"
+   ],
+   "successor": "OFOJPAAS"
+  },
+  "IQM2": {
+   "claims": [
+    "iQ/Material4Print ABS Natur P1"
+   ],
+   "successor": "OFJWKoYG"
+  },
+  "IQM3": {
+   "claims": [
+    "iQ/Polymaker PETG Polymax black P1"
+   ],
+   "successor": "OFaeIx7W"
+  },
+  "IQM7": {
+   "claims": [
+    "iQ/Fiberthree PACF Pro P2"
+   ],
+   "successor": "OF6kj4jI"
+  },
+  "LHF_abs": {
+   "claims": [
+    "LH/LHS ABS"
+   ],
+   "successor": "OFztQ7rO"
+  },
+  "LHF_asa": {
+   "claims": [
+    "LH/LHS ASA"
+   ],
+   "successor": "OFaP2SsH"
+  },
+  "LHF_ftpuf": {
+   "claims": [
+    "LH/LHS TPU Foamy 78A"
+   ],
+   "successor": "OFngcE81"
+  },
+  "LHF_pccf": {
+   "claims": [
+    "LH/LHS PC CF"
+   ],
+   "successor": "OFu0fjPJ"
+  },
+  "LHF_pctg": {
+   "claims": [
+    "LH/LHS PCTG"
+   ],
+   "successor": "OFBJAdLw"
+  },
+  "LHF_petg": {
+   "claims": [
+    "LH/LHS PETG"
+   ],
+   "successor": "OFRJ325z"
+  },
+  "LHF_pla": {
+   "claims": [
+    "LH/LHS PLA"
+   ],
+   "successor": "OFyoBZdm"
+  },
+  "LHF_ptpu_pl": {
+   "claims": [
+    "LH/LHS TPU"
+   ],
+   "successor": "OFIZMQwM"
   },
   "NIT01": {
    "claims": [
@@ -953,6 +2487,10 @@
    ],
    "successor": "OFg57Nmc"
   },
+  "OGFC99": {
+   "claims": [],
+   "successor": "OFLakOUI"
+  },
   "OGFG00": {
    "claims": [
     "OrcaFilamentLibrary/Bambu PETG Basic"
@@ -988,6 +2526,10 @@
     "OrcaFilamentLibrary/Generic PCTG"
    ],
    "successor": "OFu1evlr"
+  },
+  "OGFG99": {
+   "claims": [],
+   "successor": "OFYPdQJh"
   },
   "OGFGG300": {
    "claims": [
@@ -1080,6 +2622,13 @@
    ],
    "successor": "OFmpMwxS"
   },
+  "OGFL96": {
+   "claims": [
+    "Flashforge/Generic PLA Silk",
+    "Sovol/Generic PLA Silk"
+   ],
+   "successor": "OFesA6rF"
+  },
   "OGFL98": {
    "claims": [
     "OrcaFilamentLibrary/Generic PLA-CF"
@@ -1148,6 +2697,10 @@
     "OrcaFilamentLibrary/Generic PA-CF"
    ],
    "successor": "OFQLcbps"
+  },
+  "OGFN99": {
+   "claims": [],
+   "successor": "OFg8ndtj"
   },
   "OGFNMK00": {
    "claims": [
@@ -1396,6 +2949,12 @@
    ],
    "successor": "OFLJ8S6I"
   },
+  "OGFSNL08": {
+   "claims": [
+    "Sovol/SUNLU PETG"
+   ],
+   "successor": "OF2GCW1l"
+  },
   "OGFT01": {
    "claims": [
     "OrcaFilamentLibrary/Bambu PET-CF"
@@ -1431,42 +2990,648 @@
    ],
    "successor": "OFDvqJ6n"
   },
+  "P1001": {
+   "claims": [
+    "Creality/Panchroma PLA Satin"
+   ],
+   "successor": "OFPkCJKE"
+  },
+  "P1002": {
+   "claims": [
+    "Creality/PolySonic PLA Pro"
+   ],
+   "successor": "OFKbdiiJ"
+  },
+  "P1003": {
+   "claims": [
+    "Creality/Panchroma PLA Matte"
+   ],
+   "successor": "OFrOh600"
+  },
+  "P1004": {
+   "claims": [
+    "Creality/PolySonic PLA"
+   ],
+   "successor": "OF66KUAN"
+  },
   "P11851ba": {
    "claims": [
     "Artillery/Artillery PET"
    ],
-   "successor": "OFw0qp7w"
+   "successor": "OFb5EEM3"
   },
   "P284941e": {
    "claims": [
     "Artillery/Artillery PETG",
     "Artillery/Artillery PETG Basic"
    ],
-   "successor": "OFEYKrjb"
+   "successor": "OFilnglt"
   },
   "P2fbf0c0": {
    "claims": [
     "Artillery/Artillery TPU"
    ],
-   "successor": "OFTbsWVg"
+   "successor": "OFcJDtTx"
   },
   "P39db358": {
    "claims": [
     "Artillery/Artillery ABS"
    ],
-   "successor": "OFw1S8lL"
+   "successor": "OFgXgt98"
+  },
+  "P510cfa0": {
+   "claims": [
+    "Cubicon/Cubicon PLA"
+   ],
+   "successor": "OFEwRwmL"
+  },
+  "P510cfa1": {
+   "claims": [
+    "Cubicon/Cubicon PLA+"
+   ],
+   "successor": "OF7tt7DO"
+  },
+  "P510cfa2": {
+   "claims": [
+    "Cubicon/Cubicon PLAi21"
+   ],
+   "successor": "OFRhBryT"
+  },
+  "P510cfb0": {
+   "claims": [
+    "Cubicon/Cubicon ABS"
+   ],
+   "successor": "OFpDo5Ix"
+  },
+  "P510cfb1": {
+   "claims": [
+    "Cubicon/Cubicon ABS-A100"
+   ],
+   "successor": "OFy8tYJE"
+  },
+  "P510cfb2": {
+   "claims": [
+    "Cubicon/Cubicon ABSk"
+   ],
+   "successor": "OForhBi4"
+  },
+  "P510cfc0": {
+   "claims": [
+    "Cubicon/Cubicon PETG"
+   ],
+   "successor": "OFoBTKmn"
+  },
+  "P510cfd0": {
+   "claims": [
+    "Cubicon/Cubicon PA-CF"
+   ],
+   "successor": "OFiEz2XI"
+  },
+  "P510eff9": {
+   "claims": [
+    "Ginger Additive/Ginger Generic PETG"
+   ],
+   "successor": "OFsGqI4y"
   },
   "P8163162": {
    "claims": [
     "Artillery/Artillery PVA"
    ],
-   "successor": "OFc2SnEp"
+   "successor": "OFkx5MEe"
   },
   "P87436f6": {
    "claims": [
     "Artillery/Artillery ASA"
    ],
-   "successor": "OFtmT4Nd"
+   "successor": "OF5YVJXH"
+  },
+  "Pfcf9c4c": {
+   "claims": [
+    "Artillery/Artillery PLA"
+   ],
+   "successor": "OFzY7N3Z"
+  },
+  "Prusa Generic ABS @CORE One": {
+   "claims": [
+    "Prusa/Prusa Generic ABS"
+   ],
+   "successor": "OFvGc67v"
+  },
+  "Prusa Generic ABS @CORE One 0.6": {
+   "claims": [
+    "Prusa/Prusa Generic ABS"
+   ],
+   "successor": "OFvGc67v"
+  },
+  "Prusa Generic ABS @CORE One 0.8": {
+   "claims": [
+    "Prusa/Prusa Generic ABS"
+   ],
+   "successor": "OFvGc67v"
+  },
+  "Prusa Generic ABS @CORE One HF 0.4": {
+   "claims": [
+    "Prusa/Prusa Generic ABS"
+   ],
+   "successor": "OFvGc67v"
+  },
+  "Prusa Generic ABS @CORE One HF 0.5": {
+   "claims": [
+    "Prusa/Prusa Generic ABS"
+   ],
+   "successor": "OFvGc67v"
+  },
+  "Prusa Generic ABS @CORE One HF 0.6": {
+   "claims": [
+    "Prusa/Prusa Generic ABS"
+   ],
+   "successor": "OFvGc67v"
+  },
+  "Prusa Generic ABS @CORE One HF 0.8": {
+   "claims": [
+    "Prusa/Prusa Generic ABS"
+   ],
+   "successor": "OFvGc67v"
+  },
+  "Prusa Generic ASA @CORE One": {
+   "claims": [
+    "Prusa/Prusa Generic ASA"
+   ],
+   "successor": "OFoJcr46"
+  },
+  "Prusa Generic ASA @CORE One 0.6": {
+   "claims": [
+    "Prusa/Prusa Generic ASA"
+   ],
+   "successor": "OFoJcr46"
+  },
+  "Prusa Generic ASA @CORE One 0.8": {
+   "claims": [
+    "Prusa/Prusa Generic ASA"
+   ],
+   "successor": "OFoJcr46"
+  },
+  "Prusa Generic ASA @CORE One HF 0.4": {
+   "claims": [
+    "Prusa/Prusa Generic ASA"
+   ],
+   "successor": "OFoJcr46"
+  },
+  "Prusa Generic ASA @CORE One HF 0.5": {
+   "claims": [
+    "Prusa/Prusa Generic ASA"
+   ],
+   "successor": "OFoJcr46"
+  },
+  "Prusa Generic ASA @CORE One HF 0.6": {
+   "claims": [
+    "Prusa/Prusa Generic ASA"
+   ],
+   "successor": "OFoJcr46"
+  },
+  "Prusa Generic ASA @CORE One HF 0.8": {
+   "claims": [
+    "Prusa/Prusa Generic ASA"
+   ],
+   "successor": "OFoJcr46"
+  },
+  "Prusa Generic PETG @CORE One": {
+   "claims": [
+    "Prusa/Prusa Generic PETG"
+   ],
+   "successor": "OF1Id239"
+  },
+  "Prusa Generic PETG @CORE One 0.6": {
+   "claims": [
+    "Prusa/Prusa Generic PETG"
+   ],
+   "successor": "OF1Id239"
+  },
+  "Prusa Generic PETG @CORE One 0.8": {
+   "claims": [
+    "Prusa/Prusa Generic PETG"
+   ],
+   "successor": "OF1Id239"
+  },
+  "Prusa Generic PETG @CORE One HF 0.4": {
+   "claims": [
+    "Prusa/Prusa Generic PETG"
+   ],
+   "successor": "OF1Id239"
+  },
+  "Prusa Generic PETG @CORE One HF 0.5": {
+   "claims": [
+    "Prusa/Prusa Generic PETG"
+   ],
+   "successor": "OF1Id239"
+  },
+  "Prusa Generic PETG @CORE One HF 0.6": {
+   "claims": [
+    "Prusa/Prusa Generic PETG"
+   ],
+   "successor": "OF1Id239"
+  },
+  "Prusa Generic PETG @CORE One HF 0.8": {
+   "claims": [
+    "Prusa/Prusa Generic PETG"
+   ],
+   "successor": "OF1Id239"
+  },
+  "Prusa Generic PLA @CORE One": {
+   "claims": [
+    "Prusa/Prusa Generic PLA"
+   ],
+   "successor": "OFiCHnso"
+  },
+  "Prusa Generic PLA @CORE One 0.6": {
+   "claims": [
+    "Prusa/Prusa Generic PLA"
+   ],
+   "successor": "OFiCHnso"
+  },
+  "Prusa Generic PLA @CORE One 0.8": {
+   "claims": [
+    "Prusa/Prusa Generic PLA"
+   ],
+   "successor": "OFiCHnso"
+  },
+  "Prusa Generic PLA @CORE One HF 0.4": {
+   "claims": [
+    "Prusa/Prusa Generic PLA"
+   ],
+   "successor": "OFiCHnso"
+  },
+  "Prusa Generic PLA @CORE One HF 0.5": {
+   "claims": [
+    "Prusa/Prusa Generic PLA"
+   ],
+   "successor": "OFiCHnso"
+  },
+  "Prusa Generic PLA @CORE One HF 0.6": {
+   "claims": [
+    "Prusa/Prusa Generic PLA"
+   ],
+   "successor": "OFiCHnso"
+  },
+  "Prusa Generic PLA @CORE One HF 0.8": {
+   "claims": [
+    "Prusa/Prusa Generic PLA"
+   ],
+   "successor": "OFiCHnso"
+  },
+  "Prusa Generic PLA Silk @CORE One": {
+   "claims": [
+    "Prusa/Prusa Generic PLA Silk"
+   ],
+   "successor": "OFHFZ1Te"
+  },
+  "Prusa Generic PLA Silk @CORE One 0.6": {
+   "claims": [
+    "Prusa/Prusa Generic PLA Silk"
+   ],
+   "successor": "OFHFZ1Te"
+  },
+  "Prusa Generic PLA Silk @CORE One 0.8": {
+   "claims": [
+    "Prusa/Prusa Generic PLA Silk"
+   ],
+   "successor": "OFHFZ1Te"
+  },
+  "Prusa Generic TPU @CORE One": {
+   "claims": [
+    "Prusa/Prusa Generic TPU"
+   ],
+   "successor": "OFbenYUK"
+  },
+  "Prusa Generic TPU @CORE One 0.6": {
+   "claims": [
+    "Prusa/Prusa Generic TPU"
+   ],
+   "successor": "OFbenYUK"
+  },
+  "Prusa Generic TPU @CORE One 0.8": {
+   "claims": [
+    "Prusa/Prusa Generic TPU"
+   ],
+   "successor": "OFbenYUK"
+  },
+  "Prusament ASA @CORE One": {
+   "claims": [
+    "Prusa/Prusament ASA"
+   ],
+   "successor": "OFmFwUWM"
+  },
+  "Prusament ASA @CORE One 0.6": {
+   "claims": [
+    "Prusa/Prusament ASA"
+   ],
+   "successor": "OFmFwUWM"
+  },
+  "Prusament ASA @CORE One 0.8": {
+   "claims": [
+    "Prusa/Prusament ASA"
+   ],
+   "successor": "OFmFwUWM"
+  },
+  "Prusament ASA @CORE One HF 0.4": {
+   "claims": [
+    "Prusa/Prusament ASA"
+   ],
+   "successor": "OFmFwUWM"
+  },
+  "Prusament ASA @CORE One HF 0.5": {
+   "claims": [
+    "Prusa/Prusament ASA"
+   ],
+   "successor": "OFmFwUWM"
+  },
+  "Prusament ASA @CORE One HF 0.6": {
+   "claims": [
+    "Prusa/Prusament ASA"
+   ],
+   "successor": "OFmFwUWM"
+  },
+  "Prusament ASA @CORE One HF 0.8": {
+   "claims": [
+    "Prusa/Prusament ASA"
+   ],
+   "successor": "OFmFwUWM"
+  },
+  "Prusament ASA @MK4S": {
+   "claims": [
+    "Prusa/Prusa Generic ASA"
+   ],
+   "successor": "OFoJcr46"
+  },
+  "Prusament ASA @MK4S 0.6": {
+   "claims": [
+    "Prusa/Prusa Generic ASA"
+   ],
+   "successor": "OFoJcr46"
+  },
+  "Prusament ASA @MK4S 0.8": {
+   "claims": [
+    "Prusa/Prusa Generic ASA"
+   ],
+   "successor": "OFoJcr46"
+  },
+  "Prusament ASA @MK4S HF0.4": {
+   "claims": [
+    "Prusa/Prusa Generic ASA"
+   ],
+   "successor": "OFoJcr46"
+  },
+  "Prusament ASA @MK4S HF0.5": {
+   "claims": [
+    "Prusa/Prusa Generic ASA"
+   ],
+   "successor": "OFoJcr46"
+  },
+  "Prusament ASA @MK4S HF0.6": {
+   "claims": [
+    "Prusa/Prusa Generic ASA"
+   ],
+   "successor": "OFoJcr46"
+  },
+  "Prusament ASA @MK4S HF0.8": {
+   "claims": [
+    "Prusa/Prusa Generic ASA"
+   ],
+   "successor": "OFoJcr46"
+  },
+  "Prusament PA-CF @CORE One": {
+   "claims": [
+    "Prusa/Prusament PA-CF"
+   ],
+   "successor": "OF54SvEe"
+  },
+  "Prusament PA-CF @CORE One 0.6": {
+   "claims": [
+    "Prusa/Prusament PA-CF"
+   ],
+   "successor": "OF54SvEe"
+  },
+  "Prusament PA-CF @CORE One 0.8": {
+   "claims": [
+    "Prusa/Prusament PA-CF"
+   ],
+   "successor": "OF54SvEe"
+  },
+  "Prusament PC Blend @CORE One": {
+   "claims": [
+    "Prusa/Prusament PC Blend"
+   ],
+   "successor": "OFvDbkFq"
+  },
+  "Prusament PC Blend @CORE One 0.6": {
+   "claims": [
+    "Prusa/Prusament PC Blend"
+   ],
+   "successor": "OFvDbkFq"
+  },
+  "Prusament PC Blend @CORE One 0.8": {
+   "claims": [
+    "Prusa/Prusament PC Blend"
+   ],
+   "successor": "OFvDbkFq"
+  },
+  "Prusament PC Blend @CORE One HF 0.4": {
+   "claims": [
+    "Prusa/Prusament PC Blend"
+   ],
+   "successor": "OFvDbkFq"
+  },
+  "Prusament PC Blend @CORE One HF 0.5": {
+   "claims": [
+    "Prusa/Prusament PC Blend"
+   ],
+   "successor": "OFvDbkFq"
+  },
+  "Prusament PC Blend @CORE One HF 0.6": {
+   "claims": [
+    "Prusa/Prusament PC Blend"
+   ],
+   "successor": "OFvDbkFq"
+  },
+  "Prusament PC Blend @CORE One HF 0.8": {
+   "claims": [
+    "Prusa/Prusament PC Blend"
+   ],
+   "successor": "OFvDbkFq"
+  },
+  "Prusament PC-CF @CORE One": {
+   "claims": [
+    "Prusa/Prusament PC-CF"
+   ],
+   "successor": "OFjz0a3m"
+  },
+  "Prusament PC-CF @CORE One 0.6": {
+   "claims": [
+    "Prusa/Prusament PC-CF"
+   ],
+   "successor": "OFjz0a3m"
+  },
+  "Prusament PC-CF @CORE One 0.8": {
+   "claims": [
+    "Prusa/Prusament PC-CF"
+   ],
+   "successor": "OFjz0a3m"
+  },
+  "Prusament PETG @CORE One": {
+   "claims": [
+    "Prusa/Prusament PETG"
+   ],
+   "successor": "OFkR8E2c"
+  },
+  "Prusament PETG @CORE One 0.6": {
+   "claims": [
+    "Prusa/Prusament PETG"
+   ],
+   "successor": "OFkR8E2c"
+  },
+  "Prusament PETG @CORE One 0.8": {
+   "claims": [
+    "Prusa/Prusament PETG"
+   ],
+   "successor": "OFkR8E2c"
+  },
+  "Prusament PETG @CORE One HF 0.4": {
+   "claims": [
+    "Prusa/Prusament PETG"
+   ],
+   "successor": "OFkR8E2c"
+  },
+  "Prusament PETG @CORE One HF 0.5": {
+   "claims": [
+    "Prusa/Prusament PETG"
+   ],
+   "successor": "OFkR8E2c"
+  },
+  "Prusament PETG @CORE One HF 0.6": {
+   "claims": [
+    "Prusa/Prusament PETG"
+   ],
+   "successor": "OFkR8E2c"
+  },
+  "Prusament PETG @CORE One HF 0.8": {
+   "claims": [
+    "Prusa/Prusament PETG"
+   ],
+   "successor": "OFkR8E2c"
+  },
+  "Prusament PLA @CORE One": {
+   "claims": [
+    "Prusa/Prusament PLA"
+   ],
+   "successor": "OFnO4wnf"
+  },
+  "Prusament PLA @CORE One 0.6": {
+   "claims": [
+    "Prusa/Prusament PLA"
+   ],
+   "successor": "OFnO4wnf"
+  },
+  "Prusament PLA @CORE One 0.8": {
+   "claims": [
+    "Prusa/Prusament PLA"
+   ],
+   "successor": "OFnO4wnf"
+  },
+  "Prusament PLA @CORE One HF 0.4": {
+   "claims": [
+    "Prusa/Prusament PLA"
+   ],
+   "successor": "OFnO4wnf"
+  },
+  "Prusament PLA @CORE One HF 0.5": {
+   "claims": [
+    "Prusa/Prusament PLA"
+   ],
+   "successor": "OFnO4wnf"
+  },
+  "Prusament PLA @CORE One HF 0.6": {
+   "claims": [
+    "Prusa/Prusament PLA"
+   ],
+   "successor": "OFnO4wnf"
+  },
+  "Prusament PLA @CORE One HF 0.8": {
+   "claims": [
+    "Prusa/Prusament PLA"
+   ],
+   "successor": "OFnO4wnf"
+  },
+  "Prusament PVB @CORE One": {
+   "claims": [
+    "Prusa/Prusament PVB"
+   ],
+   "successor": "OFh7mvPO"
+  },
+  "Prusament PVB @CORE One 0.6": {
+   "claims": [
+    "Prusa/Prusament PVB"
+   ],
+   "successor": "OFh7mvPO"
+  },
+  "Prusament PVB @CORE One 0.8": {
+   "claims": [
+    "Prusa/Prusament PVB"
+   ],
+   "successor": "OFh7mvPO"
+  },
+  "Prusament rPLA @CORE One": {
+   "claims": [
+    "Prusa/Prusament rPLA"
+   ],
+   "successor": "OFWRITFw"
+  },
+  "Prusament rPLA @CORE One 0.6": {
+   "claims": [
+    "Prusa/Prusament rPLA"
+   ],
+   "successor": "OFWRITFw"
+  },
+  "Prusament rPLA @CORE One 0.8": {
+   "claims": [
+    "Prusa/Prusament rPLA"
+   ],
+   "successor": "OFWRITFw"
+  },
+  "SMCFB001": {
+   "claims": [
+    "SeeMeCNC/SeeMeCNC ABS"
+   ],
+   "successor": "OFR0gODA"
+  },
+  "SMCFG001": {
+   "claims": [
+    "SeeMeCNC/SeeMeCNC PETG"
+   ],
+   "successor": "OFxDHUX8"
+  },
+  "SMCFG002": {
+   "claims": [
+    "SeeMeCNC/SeeMeCNC PETG-CF"
+   ],
+   "successor": "OFaRjiIm"
+  },
+  "SMCFL001": {
+   "claims": [
+    "SeeMeCNC/SeeMeCNC PLA"
+   ],
+   "successor": "OFbSChKb"
+  },
+  "SMCFN001": {
+   "claims": [
+    "SeeMeCNC/SeeMeCNC PA-CF"
+   ],
+   "successor": "OF0b7M1z"
+  },
+  "SMCFU001": {
+   "claims": [
+    "SeeMeCNC/SeeMeCNC TPU"
+   ],
+   "successor": "OFyFyLIp"
   },
   "VLMNT01": {
    "claims": [

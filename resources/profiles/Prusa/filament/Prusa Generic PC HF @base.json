@@ -3,6 +3,6 @@
 	"name": "Prusa Generic PC HF @base",
 	"inherits": "fdm_filament_pc",
 	"from": "system",
-	"filament_id": "OFQ9dI8j",
+	"filament_id": "OFq5QANf",
 	"instantiation": "false"
 }

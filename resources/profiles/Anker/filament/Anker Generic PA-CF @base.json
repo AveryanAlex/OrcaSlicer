@@ -3,7 +3,7 @@
 	"name": "Anker Generic PA-CF @base",
 	"inherits": "fdm_filament_pa",
 	"from": "system",
-	"filament_id": "GFN98",
+	"filament_id": "OF7uE5KB",
 	"instantiation": "false",
 	"filament_type": [
 		"PA-CF"

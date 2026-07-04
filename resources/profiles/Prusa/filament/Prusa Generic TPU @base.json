@@ -3,6 +3,6 @@
 	"name": "Prusa Generic TPU @base",
 	"inherits": "fdm_filament_tpu",
 	"from": "system",
-	"filament_id": "GFU99",
+	"filament_id": "OFbenYUK",
 	"instantiation": "false"
 }

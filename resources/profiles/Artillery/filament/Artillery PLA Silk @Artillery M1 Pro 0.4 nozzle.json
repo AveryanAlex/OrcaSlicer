@@ -4,7 +4,7 @@
 	"inherits": "Artillery Generic PLA",
 	"from": "system",
 	"setting_id": "BWMjPUWXwumQoY5H",
-	"filament_id": "OFnyirh9",
+	"filament_id": "OFLbXwoL",
 	"instantiation": "true",
 	"complete_print_exhaust_fan_speed": [
 		"0"

@@ -3,7 +3,7 @@
 	"name": "Anker Generic PLA Silk @base",
 	"inherits": "fdm_filament_pla",
 	"from": "system",
-	"filament_id": "GFL96",
+	"filament_id": "OFXyyfX6",
 	"instantiation": "false",
 	"filament_cost": [
 		"20"

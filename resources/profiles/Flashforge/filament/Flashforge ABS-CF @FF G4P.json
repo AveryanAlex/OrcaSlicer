@@ -4,7 +4,7 @@
 	"inherits": "Flashforge Generic ABS",
 	"from": "system",
 	"setting_id": "NzJJs6yrSik5xuyX",
-	"filament_id": "OFWs8KIZ",
+	"filament_id": "OFi7Bf0F",
 	"instantiation": "true",
 	"complete_print_exhaust_fan_speed": [
 		"50"
