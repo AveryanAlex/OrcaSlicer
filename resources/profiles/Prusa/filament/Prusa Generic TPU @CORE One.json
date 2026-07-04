@@ -72,7 +72,7 @@
 		"M900 K0 ; Filament gcode\n\nM142 S36 ; set heatbreak target temp"
 	],
 	"filament_type": [
-		"FLEX"
+		"TPU"
 	],
 	"filament_vendor": [
 		"Generic"

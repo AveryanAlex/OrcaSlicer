@@ -4,5 +4,8 @@
 	"inherits": "fdm_filament_pet",
 	"from": "system",
 	"filament_id": "OFpHq9gJ",
-	"instantiation": "false"
+	"instantiation": "false",
+	"filament_vendor": [
+		"Prusa Polymers"
+	]
 }

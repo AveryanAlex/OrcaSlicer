@@ -4,6 +4,7 @@
 	"inherits": "fdm_filament_pc",
 	"from": "system",
 	"setting_id": "uAzPBVsMr6eS1XXS",
+	"filament_id": "OF97ru74",
 	"instantiation": "true",
 	"filament_max_volumetric_speed": [
 		"7"

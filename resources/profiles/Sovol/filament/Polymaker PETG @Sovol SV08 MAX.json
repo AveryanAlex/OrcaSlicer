@@ -6,6 +6,9 @@
 	"from": "system",
 	"instantiation": "true",
 	"inherits": "Generic PETG @System",
+	"filament_vendor": [
+		"Polymaker"
+	],
 	"filament_flow_ratio": [
 		"0.98"
 	],

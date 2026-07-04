@@ -77,7 +77,7 @@
 	"filament_unloading_speed": "90",
 	"filament_unloading_speed_start": "100",
 	"filament_vendor": [
-		"Creality"
+		"Generic"
 	],
 	"filament_wipe": "nil",
 	"filament_wipe_distance": "nil",
