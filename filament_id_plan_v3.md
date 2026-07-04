@@ -143,7 +143,11 @@ gains a succession entry pointing at its replacement; the 26 GF-shaped ids OFL d
 (measured at v3.0: only one of them, `GFOT001`, is also declared by BBL) are released to
 the BBL island space with hints at the re-minted families — two-island purity. Snapshot
 regenerated; full gate battery + fixture overlays (this phase touches preset-visibility
-machinery only via ids, but the fixtures are cheap insurance).
+machinery only via ids, but the fixtures are cheap insurance). Implementation notes
+(v3.1, executed): OFL generic ids relocate from the fdm_filament_* template bases onto
+the product-named "Generic X @System" presets first, so their triples carry the product
+name; `fdm_filament_pc` keeps a (transitional) declaration because 7 Prusa presets
+inherit it directly — the v3.2 Prusa worksheet re-homes them and deletes it.
 
 **v3.2 — vendor bundles, worksheet-per-vendor (v1 machinery).** Three sub-cases:
   (a) the **391 unshipped v1 `OF*` mints** re-derive under the triple key — no succession

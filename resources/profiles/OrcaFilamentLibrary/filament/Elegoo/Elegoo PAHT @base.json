@@ -3,7 +3,7 @@
 	"name": "Elegoo PAHT @base",
 	"inherits": "fdm_filament_pa",
 	"from": "system",
-	"filament_id": "OEPAHTB0",
+	"filament_id": "OF0h7ERL",
 	"instantiation": "false",
 	"activate_air_filtration": [
 		"1"

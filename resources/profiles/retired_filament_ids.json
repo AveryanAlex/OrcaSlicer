@@ -1,6 +1,685 @@
 {
- "hints": {},
+ "hints": {
+  "GFOT001": "OFxA1p01",
+  "GFOT002": "OFGkyftV",
+  "GFOT003": "OF1Pke8t",
+  "GFOT004": "OFMZvH0z",
+  "GFOT005": "OF2pj5l5",
+  "GFOT006": "OFcfQk4h",
+  "GFOT008": "OFcvKkrs",
+  "GFOT009": "OFM91vZs",
+  "GFSEP001": "OFtudokz",
+  "GFSEP002": "OFf5awy4",
+  "GFSEP003": "OFbP8zEO",
+  "GFSEP004": "OFrFBEfd",
+  "GFSEP005": "OFvzvwCu",
+  "GFSEP006": "OFH2nN08",
+  "GFSEP007": "OFPc4zVY",
+  "GFSEP008": "OFkzr35f",
+  "GFSEP009": "OFHfzQXo",
+  "GFSEP010": "OFhWhL1i",
+  "GFSEP011": "OFx8Lmsd",
+  "GFSEP012": "OFRiFnfQ",
+  "GFSEP013": "OFhfd722",
+  "GFSEP014": "OFIegjmD",
+  "GFSEP015": "OFvVy7yo",
+  "GFSEP016": "OFTOPcx0",
+  "GFSEP017": "OFXCBZTA",
+  "GFSEP018": "OFlSNkhc"
+ },
  "retired": {
+  "AZ01-1": {
+   "claims": [
+    "BBL/AliZ PETG-CF",
+    "OrcaFilamentLibrary/AliZ PETG-CF"
+   ],
+   "successor": "OFJOFnOZ"
+  },
+  "AZ01-2": {
+   "claims": [
+    "BBL/AliZ PETG-Metal",
+    "OrcaFilamentLibrary/AliZ PETG-Metal"
+   ],
+   "successor": "OFOABq7t"
+  },
+  "AliZ001": {
+   "claims": [
+    "BBL/AliZ PETG",
+    "OrcaFilamentLibrary/AliZ PETG"
+   ],
+   "successor": "OFocyw69"
+  },
+  "AliZ002": {
+   "claims": [
+    "BBL/AliZ PLA",
+    "OrcaFilamentLibrary/AliZ PLA"
+   ],
+   "successor": "OFyxayW4"
+  },
+  "AliZ003": {
+   "claims": [
+    "BBL/AliZ PA-CF",
+    "OrcaFilamentLibrary/AliZ PA-CF"
+   ],
+   "successor": "OFd4zw5l"
+  },
+  "CX30DB20": {
+   "claims": [
+    "BBL/COEX TPE 30D",
+    "OrcaFilamentLibrary/COEX TPE 30D"
+   ],
+   "successor": "OFVptRxp"
+  },
+  "CX40DB20": {
+   "claims": [
+    "BBL/COEX TPE 40D",
+    "OrcaFilamentLibrary/COEX TPE 40D"
+   ],
+   "successor": "OFfnXFie"
+  },
+  "CX60AB17": {
+   "claims": [
+    "BBL/COEX TPU 60A",
+    "OrcaFilamentLibrary/COEX TPU 60A"
+   ],
+   "successor": "OFE0NFRh"
+  },
+  "CX60DB19": {
+   "claims": [
+    "BBL/COEX TPE 60D",
+    "OrcaFilamentLibrary/COEX TPE 60D"
+   ],
+   "successor": "OFfr4XNO"
+  },
+  "CXABPB09": {
+   "claims": [
+    "BBL/COEX ABS PRIME",
+    "OrcaFilamentLibrary/COEX ABS PRIME"
+   ],
+   "successor": "OFuWCQXN"
+  },
+  "CXABSB01": {
+   "claims": [
+    "BBL/COEX ABS",
+    "OrcaFilamentLibrary/COEX ABS"
+   ],
+   "successor": "OF99UMPq"
+  },
+  "CXASAB04": {
+   "claims": [
+    "BBL/COEX ASA PRIME",
+    "OrcaFilamentLibrary/COEX ASA PRIME"
+   ],
+   "successor": "OFtpXCCv"
+  },
+  "CXPACB23": {
+   "claims": [
+    "BBL/COEX NYLEX PA6-CF",
+    "OrcaFilamentLibrary/COEX NYLEX PA6-CF"
+   ],
+   "successor": "OF0NgY1y"
+  },
+  "CXPAUB21": {
+   "claims": [
+    "BBL/COEX NYLEX UNFILLED "
+   ],
+   "successor": "OFJs1ToM"
+  },
+  "CXPCTB15": {
+   "claims": [
+    "BBL/COEX PCTG PRIME",
+    "OrcaFilamentLibrary/COEX PCTG PRIME"
+   ],
+   "successor": "OFwu7IAG"
+  },
+  "CXPETB13": {
+   "claims": [
+    "BBL/COEX PETG",
+    "OrcaFilamentLibrary/COEX PETG"
+   ],
+   "successor": "OFvTVZc3"
+  },
+  "CXPLAB02": {
+   "claims": [
+    "BBL/COEX PLA",
+    "OrcaFilamentLibrary/COEX PLA"
+   ],
+   "successor": "OFhlCNqq"
+  },
+  "CXPLAB08": {
+   "claims": [
+    "BBL/COEX PLA PRIME",
+    "OrcaFilamentLibrary/COEX PLA PRIME"
+   ],
+   "successor": "OFd2vX0G"
+  },
+  "CXPLSB03": {
+   "claims": [
+    "BBL/COEX PLA+Silk",
+    "OrcaFilamentLibrary/COEX PLA+Silk"
+   ],
+   "successor": "OF0pzFLc"
+  },
+  "DREMC001": {
+   "claims": [],
+   "successor": null
+  },
+  "DREMC002": {
+   "claims": [],
+   "successor": null
+  },
+  "DREMC003": {
+   "claims": [],
+   "successor": null
+  },
+  "DREMC004": {
+   "claims": [],
+   "successor": null
+  },
+  "DREMC005": {
+   "claims": [],
+   "successor": null
+  },
+  "DREMC006": {
+   "claims": [
+    "OrcaFilamentLibrary/DREMC PA6-CF"
+   ],
+   "successor": "OFsoykbm"
+  },
+  "DREMC007": {
+   "claims": [],
+   "successor": null
+  },
+  "DREMC008": {
+   "claims": [],
+   "successor": null
+  },
+  "DREMC009": {
+   "claims": [
+    "OrcaFilamentLibrary/DREMC ABS-GF"
+   ],
+   "successor": "OFCidU7j"
+  },
+  "DREMC010": {
+   "claims": [
+    "OrcaFilamentLibrary/DREMC PPA-CF"
+   ],
+   "successor": "OFiWaoqD"
+  },
+  "DREMC011": {
+   "claims": [],
+   "successor": null
+  },
+  "DREMC012": {
+   "claims": [],
+   "successor": null
+  },
+  "DREMC013": {
+   "claims": [],
+   "successor": null
+  },
+  "ESN02": {
+   "claims": [
+    "OrcaFilamentLibrary/eSUN ePLA-LW"
+   ],
+   "successor": "OFRzR5mi"
+  },
+  "ESN03": {
+   "claims": [
+    "OrcaFilamentLibrary/eSUN PETG"
+   ],
+   "successor": "OF3kBrdA"
+  },
+  "FDPLAST01": {
+   "claims": [
+    "OrcaFilamentLibrary/FDplast ABS"
+   ],
+   "successor": "OFjorDcx"
+  },
+  "FDPLAST02": {
+   "claims": [
+    "OrcaFilamentLibrary/FDplast HIPS"
+   ],
+   "successor": "OFmJAd3A"
+  },
+  "FDPLAST03": {
+   "claims": [
+    "OrcaFilamentLibrary/FDplast PETG"
+   ],
+   "successor": "OFfJSCzm"
+  },
+  "FDPLAST04": {
+   "claims": [
+    "OrcaFilamentLibrary/FDplast PLA"
+   ],
+   "successor": "OFtr8eZw"
+  },
+  "FDPLAST05": {
+   "claims": [
+    "OrcaFilamentLibrary/FDplast SBS"
+   ],
+   "successor": "OFtRn8X8"
+  },
+  "FDPLAST06": {
+   "claims": [
+    "OrcaFilamentLibrary/FDplast TPU"
+   ],
+   "successor": "OFfmZrI3"
+  },
+  "FILAR0001": {
+   "claims": [
+    "OrcaFilamentLibrary/FilAr PLA Bronce"
+   ],
+   "successor": "OFWTRJ1K"
+  },
+  "FILAR0002": {
+   "claims": [
+    "OrcaFilamentLibrary/FilAr PLA Gris Plata"
+   ],
+   "successor": "OFKKajh6"
+  },
+  "FILAR0003": {
+   "claims": [
+    "OrcaFilamentLibrary/FilAr PLA Cobre"
+   ],
+   "successor": "OFNemJM6"
+  },
+  "FILAR0004": {
+   "claims": [
+    "OrcaFilamentLibrary/FilAr PLA Titanio"
+   ],
+   "successor": "OFQWIKbV"
+  },
+  "FILAR0005": {
+   "claims": [
+    "OrcaFilamentLibrary/FilAr PLA Tabaco"
+   ],
+   "successor": "OFjT9PkZ"
+  },
+  "FILAR0006": {
+   "claims": [
+    "OrcaFilamentLibrary/FilAr PLA Cafe con Leche"
+   ],
+   "successor": "OFWwF7K7"
+  },
+  "FILAR0007": {
+   "claims": [
+    "OrcaFilamentLibrary/FilAr PLA Manteca"
+   ],
+   "successor": "OFexaZU2"
+  },
+  "FILAR0008": {
+   "claims": [
+    "OrcaFilamentLibrary/FilAr PLA Marron Oxido"
+   ],
+   "successor": "OFAt6ec0"
+  },
+  "FILAR0009": {
+   "claims": [
+    "OrcaFilamentLibrary/FilAr PLA Carpincho"
+   ],
+   "successor": "OFKWWgyp"
+  },
+  "FILAR0010": {
+   "claims": [
+    "OrcaFilamentLibrary/FilAr PLA Rosa Amaranto"
+   ],
+   "successor": "OFPqX3x2"
+  },
+  "FILAR0011": {
+   "claims": [
+    "OrcaFilamentLibrary/FilAr PLA Rosa Flamenco"
+   ],
+   "successor": "OFZ4QbfK"
+  },
+  "FILAR0012": {
+   "claims": [
+    "OrcaFilamentLibrary/FilAr PLA Piel"
+   ],
+   "successor": "OFsDXRpS"
+  },
+  "FILAR0013": {
+   "claims": [
+    "OrcaFilamentLibrary/FilAr PLA Verde FilAr"
+   ],
+   "successor": "OFvPPMxL"
+  },
+  "FILAR0014": {
+   "claims": [
+    "OrcaFilamentLibrary/FilAr PLA Verde Manzana"
+   ],
+   "successor": "OFdb8YNz"
+  },
+  "FILAR0015": {
+   "claims": [
+    "OrcaFilamentLibrary/FilAr PLA Verde Pixel"
+   ],
+   "successor": "OFkGvN4d"
+  },
+  "FILAR0016": {
+   "claims": [
+    "OrcaFilamentLibrary/FilAr PLA Verde Oliva"
+   ],
+   "successor": "OFkoLUtR"
+  },
+  "FILAR0017": {
+   "claims": [
+    "OrcaFilamentLibrary/FilAr PLA Blanco Antartida"
+   ],
+   "successor": "OFHAccHz"
+  },
+  "FILAR0018": {
+   "claims": [
+    "OrcaFilamentLibrary/FilAr PLA Blanco Calido"
+   ],
+   "successor": "OFKTSiYF"
+  },
+  "FILAR0019": {
+   "claims": [
+    "OrcaFilamentLibrary/FilAr PLA Negro Azabache"
+   ],
+   "successor": "OFgMWJ8T"
+  },
+  "FILAR0020": {
+   "claims": [
+    "OrcaFilamentLibrary/FilAr PLA Naranja Tigre"
+   ],
+   "successor": "OFKZ9skj"
+  },
+  "FILAR0021": {
+   "claims": [
+    "OrcaFilamentLibrary/FilAr PLA Rojo de Carreras"
+   ],
+   "successor": "OFaEesXQ"
+  },
+  "FILAR0022": {
+   "claims": [
+    "OrcaFilamentLibrary/FilAr PLA Amarillo Lirio"
+   ],
+   "successor": "OF8aFWfQ"
+  },
+  "FILAR0023": {
+   "claims": [
+    "OrcaFilamentLibrary/FilAr PLA Violeta Jacaranda"
+   ],
+   "successor": "OFP26zNb"
+  },
+  "FILAR0024": {
+   "claims": [
+    "OrcaFilamentLibrary/FilAr PLA Gris Pizarra"
+   ],
+   "successor": "OFTlRzpe"
+  },
+  "FILAR0025": {
+   "claims": [
+    "OrcaFilamentLibrary/FilAr PLA Gris Ceniza"
+   ],
+   "successor": "OFIamQnD"
+  },
+  "FILAR0026": {
+   "claims": [
+    "OrcaFilamentLibrary/FilAr PLA Azul Francia"
+   ],
+   "successor": "OFnYVFk2"
+  },
+  "FILAR0027": {
+   "claims": [
+    "OrcaFilamentLibrary/FilAr PLA Celeste Cielo"
+   ],
+   "successor": "OFaDOaNt"
+  },
+  "FILAR0028": {
+   "claims": [
+    "OrcaFilamentLibrary/FilAr PLA Oro"
+   ],
+   "successor": "OF5nlfKY"
+  },
+  "FILAR0029": {
+   "claims": [
+    "OrcaFilamentLibrary/FilAr PLA Dorado"
+   ],
+   "successor": "OF5P4jgA"
+  },
+  "FILAR0030": {
+   "claims": [
+    "OrcaFilamentLibrary/FilAr PLA-mate Amarillo"
+   ],
+   "successor": "OFj3bTjw"
+  },
+  "FILAR0031": {
+   "claims": [
+    "OrcaFilamentLibrary/FilAr PLA-mate Azul"
+   ],
+   "successor": "OF5vgi2G"
+  },
+  "FILAR0032": {
+   "claims": [
+    "OrcaFilamentLibrary/FilAr PLA-mate Beige"
+   ],
+   "successor": "OFGcLA5R"
+  },
+  "FILAR0033": {
+   "claims": [
+    "OrcaFilamentLibrary/FilAr PLA-mate Blanco"
+   ],
+   "successor": "OFtefokm"
+  },
+  "FILAR0034": {
+   "claims": [
+    "OrcaFilamentLibrary/FilAr PLA-mate Bordo"
+   ],
+   "successor": "OFiDpM1B"
+  },
+  "FILAR0035": {
+   "claims": [
+    "OrcaFilamentLibrary/FilAr PLA-mate Celeste Cielo"
+   ],
+   "successor": "OFqtx549"
+  },
+  "FILAR0036": {
+   "claims": [
+    "OrcaFilamentLibrary/FilAr PLA-mate Chocolate"
+   ],
+   "successor": "OFdzlrhi"
+  },
+  "FILAR0037": {
+   "claims": [
+    "OrcaFilamentLibrary/FilAr PLA-mate Gris"
+   ],
+   "successor": "OFGVwfK0"
+  },
+  "FILAR0038": {
+   "claims": [
+    "OrcaFilamentLibrary/FilAr PLA-mate Marron"
+   ],
+   "successor": "OF8jh0Lk"
+  },
+  "FILAR0039": {
+   "claims": [
+    "OrcaFilamentLibrary/FilAr PLA-mate Naranja"
+   ],
+   "successor": "OFmaeU4a"
+  },
+  "FILAR0040": {
+   "claims": [
+    "OrcaFilamentLibrary/FilAr PLA-mate Negro"
+   ],
+   "successor": "OFufTAK9"
+  },
+  "FILAR0041": {
+   "claims": [
+    "OrcaFilamentLibrary/FilAr PLA-mate Piel"
+   ],
+   "successor": "OFfZcoKr"
+  },
+  "FILAR0042": {
+   "claims": [
+    "OrcaFilamentLibrary/FilAr PLA-mate Rojo"
+   ],
+   "successor": "OFIBXa0k"
+  },
+  "FILAR0043": {
+   "claims": [
+    "OrcaFilamentLibrary/FilAr PLA-mate Rosa"
+   ],
+   "successor": "OFausr3F"
+  },
+  "FILAR0044": {
+   "claims": [
+    "OrcaFilamentLibrary/FilAr PLA-mate Uva"
+   ],
+   "successor": "OFEZ449N"
+  },
+  "FILAR0045": {
+   "claims": [
+    "OrcaFilamentLibrary/FilAr PLA-mate Verde"
+   ],
+   "successor": "OFCjG251"
+  },
+  "FILAR0046": {
+   "claims": [
+    "OrcaFilamentLibrary/FilAr PLA-mate Violeta"
+   ],
+   "successor": "OF2EK9F1"
+  },
+  "FILAR0047": {
+   "claims": [
+    "OrcaFilamentLibrary/FilAr PETG Amarillo Lima"
+   ],
+   "successor": "OFt6e0US"
+  },
+  "FILAR0048": {
+   "claims": [
+    "OrcaFilamentLibrary/FilAr PETG Amarillo Radiante"
+   ],
+   "successor": "OF0Vtzaw"
+  },
+  "FILAR0049": {
+   "claims": [
+    "OrcaFilamentLibrary/FilAr PETG Azul Boreal"
+   ],
+   "successor": "OFNU9YIW"
+  },
+  "FILAR0050": {
+   "claims": [
+    "OrcaFilamentLibrary/FilAr PETG Azul Francia"
+   ],
+   "successor": "OF44VYzK"
+  },
+  "FILAR0051": {
+   "claims": [
+    "OrcaFilamentLibrary/FilAr PETG Azul Imperial"
+   ],
+   "successor": "OF2Z1nT5"
+  },
+  "FILAR0052": {
+   "claims": [
+    "OrcaFilamentLibrary/FilAr PETG Blanco Antartida"
+   ],
+   "successor": "OFsXQXbs"
+  },
+  "FILAR0053": {
+   "claims": [
+    "OrcaFilamentLibrary/FilAr PETG Cian"
+   ],
+   "successor": "OFnejEt4"
+  },
+  "FILAR0054": {
+   "claims": [
+    "OrcaFilamentLibrary/FilAr PETG Coral"
+   ],
+   "successor": "OFysxCep"
+  },
+  "FILAR0055": {
+   "claims": [
+    "OrcaFilamentLibrary/FilAr PETG Cristal"
+   ],
+   "successor": "OFJQDUk3"
+  },
+  "FILAR0056": {
+   "claims": [
+    "OrcaFilamentLibrary/FilAr PETG Gris Ceniza"
+   ],
+   "successor": "OFybzvQN"
+  },
+  "FILAR0057": {
+   "claims": [
+    "OrcaFilamentLibrary/FilAr PETG Gris Plata"
+   ],
+   "successor": "OFgpLTMR"
+  },
+  "FILAR0058": {
+   "claims": [
+    "OrcaFilamentLibrary/FilAr PETG Magenta"
+   ],
+   "successor": "OFurdQxc"
+  },
+  "FILAR0059": {
+   "claims": [
+    "OrcaFilamentLibrary/FilAr PETG Negro Azabache"
+   ],
+   "successor": "OFq8gfS4"
+  },
+  "FILAR0060": {
+   "claims": [
+    "OrcaFilamentLibrary/FilAr PETG Rojo Carmesi"
+   ],
+   "successor": "OFPbyOSk"
+  },
+  "FILARB01": {
+   "claims": [],
+   "successor": null
+  },
+  "FILARB02": {
+   "claims": [],
+   "successor": null
+  },
+  "FILARB03": {
+   "claims": [],
+   "successor": null
+  },
+  "FILL3D001": {
+   "claims": [
+    "OrcaFilamentLibrary/FILL3D PLA Turbo"
+   ],
+   "successor": "OFoSknDB"
+  },
+  "FILL3D002": {
+   "claims": [
+    "OrcaFilamentLibrary/FILL3D PLA Basic"
+   ],
+   "successor": "OFDpW3J8"
+  },
+  "FILL3D003": {
+   "claims": [
+    "OrcaFilamentLibrary/FILL3D PETG"
+   ],
+   "successor": "OFQbjX3s"
+  },
+  "FILL3D004": {
+   "claims": [
+    "OrcaFilamentLibrary/FILL3D PP"
+   ],
+   "successor": "OFPWPlSC"
+  },
+  "FILL3D005": {
+   "claims": [
+    "OrcaFilamentLibrary/FILL3D PPCF"
+   ],
+   "successor": "OFg8hMzT"
+  },
+  "FILL3D006": {
+   "claims": [
+    "OrcaFilamentLibrary/FILL3D PA"
+   ],
+   "successor": "OFJNeELv"
+  },
+  "FILL3D007": {
+   "claims": [
+    "OrcaFilamentLibrary/FILL3D PETG CF"
+   ],
+   "successor": "OFOiJfLM"
+  },
   "GFABS": {
    "claims": [
     "Anycubic/Anycubic ABS"
@@ -49,6 +728,709 @@
    ],
    "successor": "OFgrGfPy"
   },
+  "NIT01": {
+   "claims": [
+    "OrcaFilamentLibrary/NIT ABS"
+   ],
+   "successor": "OFhWc5Bv"
+  },
+  "NIT02": {
+   "claims": [
+    "OrcaFilamentLibrary/NIT PLA"
+   ],
+   "successor": "OFwRJ4g0"
+  },
+  "NIT03": {
+   "claims": [
+    "OrcaFilamentLibrary/NIT PETG"
+   ],
+   "successor": "OFJu1XwK"
+  },
+  "OEABSB00": {
+   "claims": [
+    "OrcaFilamentLibrary/Elegoo ABS"
+   ],
+   "successor": "OFxOHhZw"
+  },
+  "OEASAB00": {
+   "claims": [
+    "OrcaFilamentLibrary/Elegoo ASA"
+   ],
+   "successor": "OFobDOW5"
+  },
+  "OEPAHTB0": {
+   "claims": [
+    "OrcaFilamentLibrary/Elegoo PAHT-CF"
+   ],
+   "successor": "OF0h7ERL"
+  },
+  "OEPCB00": {
+   "claims": [
+    "OrcaFilamentLibrary/Elegoo PC"
+   ],
+   "successor": "OFUyDDNv"
+  },
+  "OEPETGB0": {
+   "claims": [
+    "OrcaFilamentLibrary/Elegoo PETG"
+   ],
+   "successor": "OFLcd093"
+  },
+  "OEPLAB00": {
+   "claims": [
+    "OrcaFilamentLibrary/Elegoo PLA"
+   ],
+   "successor": "OFvgE0Zh"
+  },
+  "OETPUB00": {
+   "claims": [
+    "OrcaFilamentLibrary/Elegoo TPU 95A"
+   ],
+   "successor": "OFmhJs5V"
+  },
+  "OFLSBS99": {
+   "claims": [
+    "OrcaFilamentLibrary/Generic SBS"
+   ],
+   "successor": "OFhQfUQY"
+  },
+  "OGFA00": {
+   "claims": [
+    "OrcaFilamentLibrary/Bambu PLA Basic"
+   ],
+   "successor": "OFoiVqVM"
+  },
+  "OGFA01": {
+   "claims": [
+    "OrcaFilamentLibrary/Bambu PLA Matte"
+   ],
+   "successor": "OFXIbw5D"
+  },
+  "OGFA02": {
+   "claims": [
+    "OrcaFilamentLibrary/Bambu PLA Metal"
+   ],
+   "successor": "OFrKLeE3"
+  },
+  "OGFA03": {
+   "claims": [
+    "OrcaFilamentLibrary/Bambu PLA Impact"
+   ],
+   "successor": "OFTGHyNC"
+  },
+  "OGFA05": {
+   "claims": [
+    "OrcaFilamentLibrary/Bambu PLA Silk"
+   ],
+   "successor": "OFEGNJD4"
+  },
+  "OGFA06": {
+   "claims": [
+    "OrcaFilamentLibrary/Bambu PLA Silk+"
+   ],
+   "successor": "OFUanySo"
+  },
+  "OGFA07": {
+   "claims": [
+    "OrcaFilamentLibrary/Bambu PLA Marble"
+   ],
+   "successor": "OF9OlTWH"
+  },
+  "OGFA08": {
+   "claims": [
+    "OrcaFilamentLibrary/Bambu PLA Sparkle"
+   ],
+   "successor": "OFDxfPgH"
+  },
+  "OGFA09": {
+   "claims": [
+    "OrcaFilamentLibrary/Bambu PLA Tough"
+   ],
+   "successor": "OFaQMgRH"
+  },
+  "OGFA11": {
+   "claims": [
+    "OrcaFilamentLibrary/Bambu PLA Aero"
+   ],
+   "successor": "OFBSW57R"
+  },
+  "OGFA12": {
+   "claims": [
+    "OrcaFilamentLibrary/Bambu PLA Glow"
+   ],
+   "successor": "OFEkPBwx"
+  },
+  "OGFA13": {
+   "claims": [
+    "OrcaFilamentLibrary/Bambu PLA Dynamic"
+   ],
+   "successor": "OFDGigEI"
+  },
+  "OGFA15": {
+   "claims": [
+    "OrcaFilamentLibrary/Bambu PLA Galaxy"
+   ],
+   "successor": "OFQ3e56w"
+  },
+  "OGFA16": {
+   "claims": [
+    "OrcaFilamentLibrary/Bambu PLA Wood"
+   ],
+   "successor": "OFMjtqTC"
+  },
+  "OGFA50": {
+   "claims": [
+    "OrcaFilamentLibrary/Bambu PLA-CF"
+   ],
+   "successor": "OFEswT5W"
+  },
+  "OGFB00": {
+   "claims": [
+    "OrcaFilamentLibrary/Bambu ABS"
+   ],
+   "successor": "OFhuaUQB"
+  },
+  "OGFB01": {
+   "claims": [
+    "OrcaFilamentLibrary/Bambu ASA"
+   ],
+   "successor": "OFfBpSRI"
+  },
+  "OGFB02": {
+   "claims": [
+    "OrcaFilamentLibrary/Bambu ASA-Aero"
+   ],
+   "successor": "OFXzQ4yL"
+  },
+  "OGFB50": {
+   "claims": [
+    "OrcaFilamentLibrary/Bambu ABS-GF"
+   ],
+   "successor": "OFknl9Iz"
+  },
+  "OGFB51": {
+   "claims": [
+    "OrcaFilamentLibrary/Bambu ASA-CF"
+   ],
+   "successor": "OF0wBGNx"
+  },
+  "OGFB60": {
+   "claims": [
+    "OrcaFilamentLibrary/PolyLite ABS"
+   ],
+   "successor": "OFOvv91M"
+  },
+  "OGFB61": {
+   "claims": [
+    "OrcaFilamentLibrary/PolyLite ASA"
+   ],
+   "successor": "OFvrXuV7"
+  },
+  "OGFB98": {
+   "claims": [
+    "Custom/Generic ASA",
+    "OrcaFilamentLibrary/Generic ASA"
+   ],
+   "successor": "OFLPAxz3"
+  },
+  "OGFB99": {
+   "claims": [
+    "Custom/Generic ABS",
+    "OrcaFilamentLibrary/Generic ABS",
+    "Sovol/Generic ABS"
+   ],
+   "successor": "OFY9muEs"
+  },
+  "OGFC00": {
+   "claims": [
+    "OrcaFilamentLibrary/Bambu PC"
+   ],
+   "successor": "OFKhMPeX"
+  },
+  "OGFC01": {
+   "claims": [
+    "OrcaFilamentLibrary/Bambu PC FR"
+   ],
+   "successor": "OFg57Nmc"
+  },
+  "OGFG00": {
+   "claims": [
+    "OrcaFilamentLibrary/Bambu PETG Basic"
+   ],
+   "successor": "OFFvzqcd"
+  },
+  "OGFG01": {
+   "claims": [
+    "OrcaFilamentLibrary/Bambu PETG Translucent"
+   ],
+   "successor": "OFwPrlCM"
+  },
+  "OGFG02": {
+   "claims": [
+    "OrcaFilamentLibrary/Bambu PETG HF"
+   ],
+   "successor": "OFovEIbw"
+  },
+  "OGFG50": {
+   "claims": [
+    "OrcaFilamentLibrary/Bambu PETG-CF"
+   ],
+   "successor": "OFTRZ8Y4"
+  },
+  "OGFG60": {
+   "claims": [
+    "OrcaFilamentLibrary/PolyLite PETG"
+   ],
+   "successor": "OF0UJcb6"
+  },
+  "OGFG97": {
+   "claims": [
+    "OrcaFilamentLibrary/Generic PCTG"
+   ],
+   "successor": "OFu1evlr"
+  },
+  "OGFGG300": {
+   "claims": [
+    "OrcaFilamentLibrary/GreenGate3D PETG"
+   ],
+   "successor": "OFhMO9Kh"
+  },
+  "OGFL00": {
+   "claims": [
+    "OrcaFilamentLibrary/PolyLite PLA"
+   ],
+   "successor": "OF5CgdDq"
+  },
+  "OGFL00-1": {
+   "claims": [
+    "OrcaFilamentLibrary/PolyTerra Dual PLA"
+   ],
+   "successor": "OFCccVrQ"
+  },
+  "OGFL01": {
+   "claims": [
+    "OrcaFilamentLibrary/PolyTerra PLA",
+    "Snapmaker/PolyTerra PLA"
+   ],
+   "successor": "OFW29a9R"
+  },
+  "OGFL03": {
+   "claims": [
+    "OrcaFilamentLibrary/eSUN PLA+"
+   ],
+   "successor": "OFqINlYj"
+  },
+  "OGFL04": {
+   "claims": [
+    "OrcaFilamentLibrary/Overture PLA"
+   ],
+   "successor": "OFc3xdm9"
+  },
+  "OGFL05": {
+   "claims": [
+    "OrcaFilamentLibrary/Overture Matte PLA"
+   ],
+   "successor": "OFBw6eEG"
+  },
+  "OGFL06": {
+   "claims": [
+    "OrcaFilamentLibrary/Fiberon PETG-ESD"
+   ],
+   "successor": "OFcytyoA"
+  },
+  "OGFL50": {
+   "claims": [
+    "OrcaFilamentLibrary/Fiberon PA6-CF"
+   ],
+   "successor": "OFkOviHk"
+  },
+  "OGFL51": {
+   "claims": [
+    "OrcaFilamentLibrary/Fiberon PA6-GF"
+   ],
+   "successor": "OFwaYjL6"
+  },
+  "OGFL52": {
+   "claims": [
+    "OrcaFilamentLibrary/Fiberon PA12-CF"
+   ],
+   "successor": "OFX0ycRQ"
+  },
+  "OGFL53": {
+   "claims": [
+    "OrcaFilamentLibrary/Fiberon PA612-CF"
+   ],
+   "successor": "OFS2tn6G"
+  },
+  "OGFL54": {
+   "claims": [
+    "OrcaFilamentLibrary/Fiberon PET-CF"
+   ],
+   "successor": "OFHWSM21"
+  },
+  "OGFL55": {
+   "claims": [
+    "OrcaFilamentLibrary/Fiberon PETG-rCF"
+   ],
+   "successor": "OFk8t9mz"
+  },
+  "OGFL95": {
+   "claims": [
+    "OrcaFilamentLibrary/Generic PLA High Speed"
+   ],
+   "successor": "OFmpMwxS"
+  },
+  "OGFL98": {
+   "claims": [
+    "OrcaFilamentLibrary/Generic PLA-CF"
+   ],
+   "successor": "OFWbdGsC"
+  },
+  "OGFL99": {
+   "claims": [
+    "Flashforge/Generic PLA",
+    "OrcaFilamentLibrary/Generic PLA",
+    "Sovol/Generic PLA"
+   ],
+   "successor": "OFDSrzZ8"
+  },
+  "OGFLC99": {
+   "claims": [
+    "OrcaFilamentLibrary/Generic CoPE"
+   ],
+   "successor": "OFjt9en1"
+  },
+  "OGFN03": {
+   "claims": [
+    "OrcaFilamentLibrary/Bambu PA-CF"
+   ],
+   "successor": "OFFNYwWR"
+  },
+  "OGFN04": {
+   "claims": [
+    "OrcaFilamentLibrary/Bambu PAHT-CF"
+   ],
+   "successor": "OF2VFe4J"
+  },
+  "OGFN05": {
+   "claims": [
+    "OrcaFilamentLibrary/Bambu PA6-CF"
+   ],
+   "successor": "OFniMuTN"
+  },
+  "OGFN06": {
+   "claims": [
+    "OrcaFilamentLibrary/Bambu PPA-CF"
+   ],
+   "successor": "OF54B0S0"
+  },
+  "OGFN08": {
+   "claims": [
+    "OrcaFilamentLibrary/Bambu PA6-GF"
+   ],
+   "successor": "OFNk8bxk"
+  },
+  "OGFN96": {
+   "claims": [
+    "OrcaFilamentLibrary/Generic PPA-GF"
+   ],
+   "successor": "OF8Tlg47"
+  },
+  "OGFN97": {
+   "claims": [
+    "OrcaFilamentLibrary/Generic PPA-CF"
+   ],
+   "successor": "OF8tPByX"
+  },
+  "OGFN98": {
+   "claims": [
+    "Custom/Generic PA-CF",
+    "OrcaFilamentLibrary/Generic PA-CF"
+   ],
+   "successor": "OFQLcbps"
+  },
+  "OGFNMK00": {
+   "claims": [
+    "OrcaFilamentLibrary/Numakers PLA+"
+   ],
+   "successor": "OFqGRZyH"
+  },
+  "OGFP97": {
+   "claims": [
+    "OrcaFilamentLibrary/Generic PP"
+   ],
+   "successor": "OF1UNk9P"
+  },
+  "OGFP99": {
+   "claims": [
+    "OrcaFilamentLibrary/Generic PE"
+   ],
+   "successor": "OFPklMI1"
+  },
+  "OGFPM001": {
+   "claims": [
+    "OrcaFilamentLibrary/Panchroma PLA"
+   ],
+   "successor": "OFsRDvTM"
+  },
+  "OGFPM002": {
+   "claims": [
+    "OrcaFilamentLibrary/Panchroma PLA Matte"
+   ],
+   "successor": "OFrOh600"
+  },
+  "OGFPM003": {
+   "claims": [
+    "OrcaFilamentLibrary/Panchroma PLA Marble"
+   ],
+   "successor": "OFKiSMWR"
+  },
+  "OGFPM004": {
+   "claims": [
+    "OrcaFilamentLibrary/Panchroma PLA Silk"
+   ],
+   "successor": "OFS8lTQt"
+  },
+  "OGFPM005": {
+   "claims": [
+    "OrcaFilamentLibrary/Panchroma PLA Satin"
+   ],
+   "successor": "OFPkCJKE"
+  },
+  "OGFPM006": {
+   "claims": [
+    "OrcaFilamentLibrary/Panchroma PLA Translucent"
+   ],
+   "successor": "OFCIUsWh"
+  },
+  "OGFPM007": {
+   "claims": [
+    "OrcaFilamentLibrary/Panchroma PLA Galaxy"
+   ],
+   "successor": "OFFkCLBl"
+  },
+  "OGFPM008": {
+   "claims": [
+    "OrcaFilamentLibrary/Panchroma PLA Celestial"
+   ],
+   "successor": "OFRiYgMK"
+  },
+  "OGFPM009": {
+   "claims": [
+    "OrcaFilamentLibrary/Panchroma PLA Starlight"
+   ],
+   "successor": "OFC78WGQ"
+  },
+  "OGFPM010": {
+   "claims": [
+    "OrcaFilamentLibrary/Panchroma PLA Glow"
+   ],
+   "successor": "OF0gGRWk"
+  },
+  "OGFPM011": {
+   "claims": [
+    "OrcaFilamentLibrary/Panchroma PLA Luminous"
+   ],
+   "successor": "OF0kCNDK"
+  },
+  "OGFPM012": {
+   "claims": [
+    "OrcaFilamentLibrary/Panchroma PLA Metallic"
+   ],
+   "successor": "OFjb0wos"
+  },
+  "OGFPM013": {
+   "claims": [
+    "OrcaFilamentLibrary/Panchroma PLA Neon"
+   ],
+   "successor": "OFO1GEq6"
+  },
+  "OGFPM014": {
+   "claims": [
+    "OrcaFilamentLibrary/Panchroma PLA UV Shift"
+   ],
+   "successor": "OF1N1qMK"
+  },
+  "OGFPM015": {
+   "claims": [
+    "OrcaFilamentLibrary/Panchroma PLA Temp Shift"
+   ],
+   "successor": "OFhASRWj"
+  },
+  "OGFPM016": {
+   "claims": [
+    "OrcaFilamentLibrary/Panchroma CoPE"
+   ],
+   "successor": "OFqw2PQA"
+  },
+  "OGFPM017": {
+   "claims": [
+    "OrcaFilamentLibrary/Polymaker HT-PLA"
+   ],
+   "successor": "OFPoyiFs"
+  },
+  "OGFPM018": {
+   "claims": [
+    "OrcaFilamentLibrary/Polymaker HT-PLA-GF"
+   ],
+   "successor": "OFlwmqrC"
+  },
+  "OGFPM019": {
+   "claims": [
+    "OrcaFilamentLibrary/PolyLite PLA Pro"
+   ],
+   "successor": "OFF9OKoY"
+  },
+  "OGFR00": {
+   "claims": [
+    "OrcaFilamentLibrary/FusRock ABS-GF"
+   ],
+   "successor": "OFmn9NZL"
+  },
+  "OGFR98": {
+   "claims": [
+    "OrcaFilamentLibrary/Generic PHA"
+   ],
+   "successor": "OF74KeQR"
+  },
+  "OGFR99": {
+   "claims": [
+    "OrcaFilamentLibrary/Generic EVA"
+   ],
+   "successor": "OFCD8qiU"
+  },
+  "OGFS00": {
+   "claims": [
+    "OrcaFilamentLibrary/Bambu Support W"
+   ],
+   "successor": "OFsHSVZc"
+  },
+  "OGFS01": {
+   "claims": [
+    "OrcaFilamentLibrary/Bambu Support G"
+   ],
+   "successor": "OFQHiNJs"
+  },
+  "OGFS02": {
+   "claims": [
+    "OrcaFilamentLibrary/Bambu Support For PLA"
+   ],
+   "successor": "OFAnyRUI"
+  },
+  "OGFS03": {
+   "claims": [
+    "OrcaFilamentLibrary/Bambu Support For PA/PET"
+   ],
+   "successor": "OFMTK0UC"
+  },
+  "OGFS04": {
+   "claims": [
+    "OrcaFilamentLibrary/Bambu PVA"
+   ],
+   "successor": "OFzyIxba"
+  },
+  "OGFS05": {
+   "claims": [
+    "OrcaFilamentLibrary/Bambu Support For PLA/PETG"
+   ],
+   "successor": "OFIfnzxC"
+  },
+  "OGFS06": {
+   "claims": [
+    "OrcaFilamentLibrary/Bambu Support for ABS"
+   ],
+   "successor": "OFf6mfQO"
+  },
+  "OGFS97": {
+   "claims": [
+    "Flashforge/Generic BVOH",
+    "OrcaFilamentLibrary/Generic BVOH"
+   ],
+   "successor": "OFo2UF2C"
+  },
+  "OGFS98": {
+   "claims": [
+    "OrcaFilamentLibrary/Generic HIPS"
+   ],
+   "successor": "OFsFon5l"
+  },
+  "OGFS99": {
+   "claims": [
+    "OrcaFilamentLibrary/Generic PVA"
+   ],
+   "successor": "OFDvXujf"
+  },
+  "OGFSNL02": {
+   "claims": [
+    "OrcaFilamentLibrary/SUNLU PLA Matte"
+   ],
+   "successor": "OFpW4gdi"
+  },
+  "OGFSNL03": {
+   "claims": [
+    "OrcaFilamentLibrary/SUNLU PLA+"
+   ],
+   "successor": "OFMUWNkp"
+  },
+  "OGFSNL04": {
+   "claims": [
+    "OrcaFilamentLibrary/SUNLU PLA+ 2.0"
+   ],
+   "successor": "OFHmPYRy"
+  },
+  "OGFSNL05": {
+   "claims": [
+    "OrcaFilamentLibrary/SUNLU Silk PLA+"
+   ],
+   "successor": "OFpPGSKG"
+  },
+  "OGFSNL06": {
+   "claims": [
+    "OrcaFilamentLibrary/SUNLU PLA Marble"
+   ],
+   "successor": "OFxUwUeW"
+  },
+  "OGFSNL07": {
+   "claims": [
+    "OrcaFilamentLibrary/SUNLU Wood PLA"
+   ],
+   "successor": "OFLJ8S6I"
+  },
+  "OGFT01": {
+   "claims": [
+    "OrcaFilamentLibrary/Bambu PET-CF"
+   ],
+   "successor": "OFHa48An"
+  },
+  "OGFT02": {
+   "claims": [],
+   "successor": null
+  },
+  "OGFU00": {
+   "claims": [
+    "OrcaFilamentLibrary/Bambu TPU 95A HF"
+   ],
+   "successor": "OFvKUnLh"
+  },
+  "OGFU01": {
+   "claims": [
+    "OrcaFilamentLibrary/Bambu TPU 95A"
+   ],
+   "successor": "OFVCkX5w"
+  },
+  "OGFU99": {
+   "claims": [
+    "OrcaFilamentLibrary/Generic TPU",
+    "Sovol/Generic TPU"
+   ],
+   "successor": "OFgbpcy9"
+  },
+  "OVTABS08": {
+   "claims": [
+    "OrcaFilamentLibrary/Overture ABS Basic"
+   ],
+   "successor": "OFDvqJ6n"
+  },
   "P11851ba": {
    "claims": [
     "Artillery/Artillery PET"
@@ -85,6 +1467,30 @@
     "Artillery/Artillery ASA"
    ],
    "successor": "OFtmT4Nd"
+  },
+  "VLMNT01": {
+   "claims": [
+    "OrcaFilamentLibrary/Valment PLA"
+   ],
+   "successor": "OFDe8uyM"
+  },
+  "VLMNT02": {
+   "claims": [
+    "OrcaFilamentLibrary/Valment PLA Silk"
+   ],
+   "successor": "OFpBlrvY"
+  },
+  "VLMNT03": {
+   "claims": [
+    "OrcaFilamentLibrary/Valment PLA-CF"
+   ],
+   "successor": "OFfq5YXA"
+  },
+  "VLMNT04": {
+   "claims": [
+    "OrcaFilamentLibrary/Valment PLA Galaxy"
+   ],
+   "successor": "OFB5SmWk"
   }
  }
 }

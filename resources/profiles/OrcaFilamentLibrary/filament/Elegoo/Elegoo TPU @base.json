@@ -3,7 +3,7 @@
 	"name": "Elegoo TPU @base",
 	"inherits": "fdm_filament_tpu",
 	"from": "system",
-	"filament_id": "OETPUB00",
+	"filament_id": "OFmhJs5V",
 	"instantiation": "false",
 	"filament_density": [
 		"1.21"
