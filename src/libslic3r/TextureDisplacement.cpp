@@ -3,32 +3,65 @@
 #include <algorithm>
 #include <cassert>
 #include <cmath>
+#include <iterator>
+#include <limits>
+#include <map>
+#include <mutex>
+#include <numeric>
 #include <optional>
+#include <queue>
+#include <unordered_map>
+#include <unordered_set>
 
+#include "MeshBoolean.hpp"
 #include "Model.hpp"
 #include "PNGReadWrite.hpp"
 #include "TriangleSelector.hpp"
 
 namespace Slic3r {
 
-float DecodedHeightTexture::sample(const Vec2f &uv) const
+float DecodedHeightTexture::sample(const Vec2f &uv, bool tile_enabled, TextureTileMethod tile_method) const
 {
     if (empty())
         return 0.f;
 
-    auto wrap01 = [](float x) {
+    auto repeat01 = [](float x) {
         x = std::fmod(x, 1.f);
         return x < 0.f ? x + 1.f : x;
     };
+    // Standard mirrored-repeat: reflect back and forth every other unit, so tile edges always
+    // line up with themselves instead of jumping from one edge of the image to the other.
+    auto mirrored_repeat01 = [](float x) {
+        x = std::fmod(std::abs(x), 2.f);
+        return x > 1.f ? 2.f - x : x;
+    };
 
-    const float fx = wrap01(uv.x()) * float(width);
-    const float fy = wrap01(uv.y()) * float(height);
-    int x0 = int(std::floor(fx)) % width;
-    int y0 = int(std::floor(fy)) % height;
-    if (x0 < 0) x0 += width;
-    if (y0 < 0) y0 += height;
-    const int   x1 = (x0 + 1) % width;
-    const int   y1 = (y0 + 1) % height;
+    if (!tile_enabled && (uv.x() < 0.f || uv.x() >= 1.f || uv.y() < 0.f || uv.y() >= 1.f))
+        // Outside the single, non-repeating placement entirely: no texture there, not "smeared
+        // edge pixel" -- clamping the *coordinate* to [0, 1] would otherwise keep returning the
+        // border row/column's height forever in every direction, stretching it out to infinity.
+        return 0.f;
+
+    float u, v;
+    if (!tile_enabled) {
+        u = uv.x();
+        v = uv.y();
+    } else if (tile_method == TextureTileMethod::MirroredRepeat) {
+        u = mirrored_repeat01(uv.x());
+        v = mirrored_repeat01(uv.y());
+    } else {
+        u = repeat01(uv.x());
+        v = repeat01(uv.y());
+    }
+
+    const float fx = u * float(width);
+    const float fy = v * float(height);
+    int x0 = std::clamp(int(std::floor(fx)), 0, width - 1);
+    int y0 = std::clamp(int(std::floor(fy)), 0, height - 1);
+    // Neighbour for bilinear filtering: wrap for tiling methods, clamp at the edge otherwise (a
+    // repeating neighbour would incorrectly blend against the opposite edge of the image).
+    const int   x1 = tile_enabled ? (x0 + 1) % width  : std::min(x0 + 1, width - 1);
+    const int   y1 = tile_enabled ? (y0 + 1) % height : std::min(y0 + 1, height - 1);
     const float tx = fx - std::floor(fx);
     const float ty = fy - std::floor(fy);
 
@@ -38,58 +71,963 @@ float DecodedHeightTexture::sample(const Vec2f &uv) const
     return top * (1.f - ty) + bottom * ty;
 }
 
+namespace {
+// Decoding a PNG (zlib inflate + defilter) is real work, and image_data never changes in place
+// once assigned to a layer (a new texture always gets a brand new image_data), so the decoded
+// result can be cached for the lifetime of that specific image_data allocation. This matters
+// because the GUI's live preview calls decode_height_texture() again on every rebuild (every
+// paint stroke / parameter tweak), which would otherwise re-decode the same unchanged bytes over
+// and over. Keyed by a weak_ptr (not just the raw pointer) so a freed image_data's address being
+// reused by an unrelated later allocation can never alias a stale cache entry: a weak_ptr to a
+// destroyed object always fails to lock, forcing a correct re-decode instead of a false hit.
+struct DecodedTextureCache
+{
+    std::mutex mutex;
+    std::unordered_map<const void *, std::pair<std::weak_ptr<const std::vector<unsigned char>>, DecodedHeightTexture>> entries;
+};
+DecodedTextureCache g_decoded_texture_cache;
+} // namespace
+
+namespace {
+// A few passes of a separable box blur approximate a Gaussian, cheaply. `radius` is in pixels; 0 is
+// a no-op. Wraps at the edges so a tiling height map stays seamless after smoothing. Operates on the
+// grayscale byte buffer in place.
+void smooth_height_pixels(std::vector<uint8_t> &pixels, int width, int height, int radius)
+{
+    if (radius <= 0 || width <= 0 || height <= 0 || pixels.size() != size_t(width) * size_t(height))
+        return;
+
+    const int   window = 2 * radius + 1;
+    const float inv     = 1.f / float(window);
+    std::vector<uint8_t> tmp(pixels.size());
+
+    for (int pass = 0; pass < 2; ++pass) { // two passes -> smoother than a single box
+        // Horizontal.
+        for (int y = 0; y < height; ++y) {
+            const size_t row = size_t(y) * width;
+            for (int x = 0; x < width; ++x) {
+                float sum = 0.f;
+                for (int k = -radius; k <= radius; ++k) {
+                    int sx = x + k;
+                    sx = (sx % width + width) % width; // wrap
+                    sum += float(pixels[row + size_t(sx)]);
+                }
+                tmp[row + size_t(x)] = uint8_t(std::lround(sum * inv));
+            }
+        }
+        // Vertical.
+        for (int x = 0; x < width; ++x)
+            for (int y = 0; y < height; ++y) {
+                float sum = 0.f;
+                for (int k = -radius; k <= radius; ++k) {
+                    int sy = y + k;
+                    sy = (sy % height + height) % height; // wrap
+                    sum += float(tmp[size_t(sy) * width + size_t(x)]);
+                }
+                pixels[size_t(y) * width + size_t(x)] = uint8_t(std::lround(sum * inv));
+            }
+    }
+}
+} // namespace
+
 DecodedHeightTexture decode_height_texture(const TextureDisplacementLayer &layer)
 {
     DecodedHeightTexture result;
     if (layer.empty())
         return result;
 
-    const png::ReadBuf rbuf{ layer.image_data->data(), layer.image_data->size() };
-    if (!png::is_png(rbuf))
-        // Only 8-bit grayscale PNG height maps are supported. The GUI is responsible for
-        // converting any imported image (jpg, color png, ...) to that format on import, so this
-        // code never needs a dependency on wxWidgets/libjpeg to decode arbitrary user images.
-        return result;
+    // The raw (unsmoothed) decode is what gets cached, keyed by the image_data allocation -- decoding
+    // a PNG is the expensive part and never changes for a given image. Smoothing is applied afterwards
+    // to a throwaway copy, so moving the smoothing slider never invalidates the decode cache.
+    const void *key = layer.image_data.get();
+    bool        have_raw = false;
+    {
+        std::lock_guard<std::mutex> lock(g_decoded_texture_cache.mutex);
+        auto it = g_decoded_texture_cache.entries.find(key);
+        if (it != g_decoded_texture_cache.entries.end() && it->second.first.lock() == layer.image_data) {
+            result   = it->second.second;
+            have_raw = true;
+        }
+    }
 
-    png::ImageGreyscale img;
-    if (!png::decode_png(rbuf, img) || img.cols == 0 || img.rows == 0)
-        return result;
+    if (!have_raw) {
+        const png::ReadBuf rbuf{ layer.image_data->data(), layer.image_data->size() };
+        if (!png::is_png(rbuf))
+            // Only 8-bit grayscale PNG height maps are supported. The GUI is responsible for
+            // converting any imported image (jpg, color png, ...) to that format on import, so this
+            // code never needs a dependency on wxWidgets/libjpeg to decode arbitrary user images.
+            return result;
 
-    result.width  = int(img.cols);
-    result.height = int(img.rows);
-    result.pixels = std::move(img.buf);
+        png::ImageGreyscale img;
+        if (!png::decode_png(rbuf, img) || img.cols == 0 || img.rows == 0)
+            return result;
+
+        result.width  = int(img.cols);
+        result.height = int(img.rows);
+        result.pixels = std::move(img.buf);
+
+        std::lock_guard<std::mutex> lock(g_decoded_texture_cache.mutex);
+        // Opportunistically drop entries for image_data that no longer exists anywhere, so the
+        // cache doesn't grow without bound across many add/remove-texture cycles in a long session.
+        auto &entries = g_decoded_texture_cache.entries;
+        for (auto it = entries.begin(); it != entries.end();)
+            it = it->second.first.expired() ? entries.erase(it) : std::next(it);
+        entries[key] = { std::weak_ptr<const std::vector<unsigned char>>(layer.image_data), result };
+    }
+
+    // Smoothing radius scales with the texture so the effect is resolution-independent; capped so the
+    // blur stays affordable on large maps.
+    if (layer.smoothing > 0.f) {
+        const int max_radius = std::clamp(int(std::lround(0.02f * std::min(result.width, result.height))), 1, 32);
+        const int radius     = std::max(1, int(std::lround(layer.smoothing * float(max_radius))));
+        smooth_height_pixels(result.pixels, result.width, result.height, radius);
+    }
     return result;
 }
 
-Vec2f project_texture_displacement_uv(const Vec3f &position, const Vec3f &normal, const TextureDisplacementLayer &layer)
+Vec2f project_planar(const Vec3f &position, const Vec3f &normal)
 {
-    // Planar-project onto the two axes orthogonal to the dominant component of `normal`. Using a
-    // single projection axis for an entire patch (rather than per-vertex normals) avoids visible
-    // seams where the local normal direction changes. Proper seam-aware UV parametrization is a
-    // later-phase improvement.
+    // Planar-project onto the two axes orthogonal to the dominant component of `normal`. Called
+    // with each vertex's *own* normal (TextureProjectionMethod::Triplanar), this is a standard
+    // tri-planar/cube projection; a patch spanning several differently-oriented faces gets each
+    // face projected along its own best-fit axis instead of all faces sharing one axis picked
+    // from a single averaged normal (which looks correct on one face but visibly distorts on any
+    // other face in the same patch -- exactly the bug an earlier version of this feature had).
     const Vec3f n = normal.cwiseAbs();
-    Vec2f       planar;
     if (n.x() >= n.y() && n.x() >= n.z())
-        planar = Vec2f(position.y(), position.z());
-    else if (n.y() >= n.x() && n.y() >= n.z())
-        planar = Vec2f(position.x(), position.z());
-    else
-        planar = Vec2f(position.x(), position.y());
+        return Vec2f(position.y(), position.z());
+    if (n.y() >= n.x() && n.y() >= n.z())
+        return Vec2f(position.x(), position.z());
+    return Vec2f(position.x(), position.y());
+}
 
+namespace {
+// Wrapped around patch_axis, centered at patch_center. u is the arc length (mm) around the axis at
+// this point's own radius, v is the signed distance along the axis -- a reasonable approximation
+// for roughly cylindrical selections, not an exact fit for arbitrary geometry.
+Vec2f project_cylindrical(const Vec3f &position, const Vec3f &patch_center, const Vec3f &patch_axis)
+{
+    Vec3f up = patch_axis;
+    up       = (up.norm() > 1e-8f) ? Vec3f(up.normalized()) : Vec3f::UnitZ();
+    const Vec3f arbitrary = (std::abs(up.dot(Vec3f::UnitZ())) < 0.9f) ? Vec3f::UnitZ() : Vec3f::UnitX();
+    const Vec3f right     = Vec3f(up.cross(arbitrary).normalized());
+    const Vec3f fwd       = Vec3f(right.cross(up).normalized());
+
+    const Vec3f rel        = position - patch_center;
+    const float along_axis = rel.dot(up);
+    const float x          = rel.dot(right);
+    const float y          = rel.dot(fwd);
+    const float radius     = std::sqrt(x * x + y * y);
+    const float angle      = std::atan2(y, x);
+
+    return Vec2f(angle * radius, along_axis);
+}
+
+// Longitude/latitude around patch_center. u/v are scaled by this point's own distance from the
+// center so the result is in roughly the same mm-ish units tiling_scale expects, rather than bare
+// radians -- again an approximation, not an exact geodesic parametrization.
+Vec2f project_spherical(const Vec3f &position, const Vec3f &patch_center)
+{
+    const Vec3f rel    = position - patch_center;
+    const float radius = rel.norm();
+    if (radius < 1e-8f)
+        return Vec2f::Zero();
+
+    const Vec3f dir       = rel / radius;
+    const float longitude = std::atan2(dir.y(), dir.x());
+    const float latitude  = std::asin(std::clamp(dir.z(), -1.f, 1.f));
+    return Vec2f(longitude, latitude) * radius;
+}
+
+// CGAL's LSCM parameterizer expects a clean mesh with no isolated (unreferenced) vertices -- but
+// `patch` here (from TriangleSelector::get_facets_strict()) carries the *entire* mesh's vertex
+// array, only its `indices` filtered to the painted triangles. Build a compacted copy referencing
+// only the vertices `patch.indices` actually uses, plus a map back to the original vertex index so
+// the resulting per-vertex UVs can be looked up by the caller's own (uncompacted) indexing.
+indexed_triangle_set compact_patch_with_map(const indexed_triangle_set &patch, std::vector<int> &original_to_compact)
+{
+    original_to_compact.assign(patch.vertices.size(), -1);
+    indexed_triangle_set compact;
+    compact.vertices.reserve(patch.vertices.size());
+    compact.indices.reserve(patch.indices.size());
+    for (const stl_triangle_vertex_indices &tri : patch.indices) {
+        stl_triangle_vertex_indices new_tri;
+        for (int i = 0; i < 3; ++i) {
+            const int vi = tri[i];
+            if (original_to_compact[vi] < 0) {
+                original_to_compact[vi] = int(compact.vertices.size());
+                compact.vertices.push_back(patch.vertices[vi]);
+            }
+            new_tri[i] = original_to_compact[vi];
+        }
+        compact.indices.push_back(new_tri);
+    }
+    return compact;
+}
+
+} // namespace
+
+namespace {
+
+// Union-find over triangles, used to grow charts.
+struct UnionFind
+{
+    std::vector<int> parent;
+    explicit UnionFind(size_t n) : parent(n) { std::iota(parent.begin(), parent.end(), 0); }
+    int find(int x)
+    {
+        while (parent[size_t(x)] != x) {
+            parent[size_t(x)] = parent[size_t(parent[size_t(x)])]; // path halving
+            x                 = parent[size_t(x)];
+        }
+        return x;
+    }
+    void unite(int a, int b)
+    {
+        a = find(a);
+        b = find(b);
+        if (a != b)
+            parent[size_t(b)] = a;
+    }
+};
+
+uint64_t undirected_edge_key(int a, int b)
+{
+    if (a > b)
+        std::swap(a, b);
+    return (uint64_t(uint32_t(a)) << 32) | uint32_t(b);
+}
+
+Vec3f face_normal(const indexed_triangle_set &mesh, const stl_triangle_vertex_indices &tri)
+{
+    const Vec3f n   = (mesh.vertices[tri[1]] - mesh.vertices[tri[0]]).cross(mesh.vertices[tri[2]] - mesh.vertices[tri[0]]);
+    const float len = n.norm();
+    return (len > 1e-12f) ? Vec3f(n / len) : Vec3f::UnitZ();
+}
+
+// Groups triangles into charts: two triangles sharing an edge join the same chart only if the angle
+// between their normals is below `seam_angle_deg`. Everything sharper than that is a seam, and the
+// unwrap gets cut there instead of being forced to flatten across it.
+std::vector<int> segment_into_charts(const indexed_triangle_set &mesh, const std::vector<Vec3f> &normals,
+                                      float seam_angle_deg, const std::unordered_set<uint64_t> &seam_keys,
+                                      int &chart_count)
+{
+    const int   n_faces       = int(mesh.indices.size());
+    const float cos_threshold = std::cos(std::clamp(seam_angle_deg, 0.f, 180.f) * float(M_PI) / 180.f);
+
+    // Each shared edge, with the (up to two) faces on it.
+    std::unordered_map<uint64_t, std::pair<int, int>> edge_faces;
+    edge_faces.reserve(size_t(n_faces) * 3);
+    for (int f = 0; f < n_faces; ++f) {
+        const stl_triangle_vertex_indices &tri = mesh.indices[size_t(f)];
+        for (int i = 0; i < 3; ++i) {
+            const uint64_t key        = undirected_edge_key(tri[i], tri[(i + 1) % 3]);
+            const auto [it, inserted] = edge_faces.emplace(key, std::make_pair(f, -1));
+            if (!inserted)
+                it->second.second = f;
+        }
+    }
+
+    // The chart-join test compares a *neighbourhood-averaged* normal per face -- the face plus its
+    // edge-adjacent neighbours (~5 samples) -- rather than the single face normal. On a finely
+    // tessellated curved surface this stops one noisy triangle from spuriously cutting (or a lone
+    // near-flat sliver from wrongly merging) a chart, while a genuine sharp crease, where the whole
+    // neighbourhood on each side agrees, still cuts. This is the "use 5 points, not one" refinement.
+    std::vector<Vec3f> smoothed(mesh.indices.size());
+    for (int f = 0; f < n_faces; ++f) {
+        Vec3f                              acc = normals[size_t(f)];
+        const stl_triangle_vertex_indices &tri = mesh.indices[size_t(f)];
+        for (int i = 0; i < 3; ++i) {
+            const auto it = edge_faces.find(undirected_edge_key(tri[i], tri[(i + 1) % 3]));
+            if (it == edge_faces.end())
+                continue;
+            const int nb = (it->second.first == f) ? it->second.second : it->second.first;
+            if (nb >= 0)
+                acc += normals[size_t(nb)];
+        }
+        smoothed[size_t(f)] = (acc.norm() > 1e-8f) ? Vec3f(acc.normalized()) : normals[size_t(f)];
+    }
+
+    UnionFind uf(mesh.indices.size());
+    for (const auto &[key, fp] : edge_faces) {
+        if (fp.second < 0)
+            continue; // a boundary edge of the patch, nothing on the far side to join
+        // A manually/auto marked seam always cuts, whatever the dihedral angle -- that is exactly
+        // what lets "mark seam" / "cut island" split a chart that is otherwise flat enough to merge.
+        if (!seam_keys.empty() && seam_keys.count(key))
+            continue;
+        if (smoothed[size_t(fp.first)].dot(smoothed[size_t(fp.second)]) >= cos_threshold)
+            uf.unite(fp.first, fp.second);
+    }
+
+    std::vector<int>             chart_of(mesh.indices.size(), -1);
+    std::unordered_map<int, int> root_to_chart;
+    chart_count = 0;
+    for (int f = 0; f < n_faces; ++f) {
+        const auto [it, inserted] = root_to_chart.emplace(uf.find(f), chart_count);
+        if (inserted)
+            ++chart_count;
+        chart_of[size_t(f)] = it->second;
+    }
+    return chart_of;
+}
+
+// Projects a chart onto an orthonormal basis of its own average normal. This is *isometric* for a
+// flat chart -- lengths and angles come out exactly right -- which is why a flat chart never needs a
+// solve at all, and why this also serves as the fallback for a chart LSCM cannot handle.
+std::vector<Vec2f> project_to_tangent_plane(const indexed_triangle_set &chart, const Vec3f &normal)
+{
+    const Vec3f seed = (std::abs(normal.z()) < 0.9f) ? Vec3f::UnitZ() : Vec3f::UnitX();
+    const Vec3f u    = Vec3f(seed.cross(normal).normalized());
+    const Vec3f v    = Vec3f(normal.cross(u).normalized());
+
+    std::vector<Vec2f> uvs(chart.vertices.size());
+    for (size_t i = 0; i < chart.vertices.size(); ++i)
+        uvs[i] = Vec2f(chart.vertices[i].dot(u), chart.vertices[i].dot(v));
+    return uvs;
+}
+
+float area_3d(const indexed_triangle_set &mesh)
+{
+    float area = 0.f;
+    for (const stl_triangle_vertex_indices &t : mesh.indices)
+        area += 0.5f * (mesh.vertices[t[1]] - mesh.vertices[t[0]]).cross(mesh.vertices[t[2]] - mesh.vertices[t[0]]).norm();
+    return area;
+}
+
+float area_2d(const std::vector<Vec2f> &uvs, const std::vector<stl_triangle_vertex_indices> &indices)
+{
+    float area = 0.f;
+    for (const stl_triangle_vertex_indices &t : indices) {
+        const Vec2f e0 = uvs[size_t(t[1])] - uvs[size_t(t[0])];
+        const Vec2f e1 = uvs[size_t(t[2])] - uvs[size_t(t[0])];
+        area += 0.5f * std::abs(e0.x() * e1.y() - e0.y() * e1.x());
+    }
+    return area;
+}
+
+// FNV-1a over the patch's geometry plus the seam angle. The unwrap depends on nothing else about a
+// layer -- not depth, tiling, rotation, offset or even which texture is on it -- so keying the cache
+// on just this is what lets every one of those sliders be dragged without paying for a re-solve.
+uint64_t unwrap_cache_key(const indexed_triangle_set &patch, float seam_angle_deg, float padding_mm,
+                          const std::vector<std::pair<int, int>> &seam_edges)
+{
+    uint64_t   h   = 1469598103934665603ull;
+    const auto mix = [&h](const void *data, size_t bytes) {
+        const unsigned char *p = static_cast<const unsigned char *>(data);
+        for (size_t i = 0; i < bytes; ++i) {
+            h ^= p[i];
+            h *= 1099511628211ull;
+        }
+    };
+    mix(patch.vertices.data(), patch.vertices.size() * sizeof(Vec3f));
+    mix(patch.indices.data(), patch.indices.size() * sizeof(stl_triangle_vertex_indices));
+    mix(&seam_angle_deg, sizeof(seam_angle_deg));
+    mix(&padding_mm, sizeof(padding_mm));
+    mix(seam_edges.data(), seam_edges.size() * sizeof(std::pair<int, int>));
+    return h;
+}
+
+struct UnwrapCache
+{
+    std::mutex                                mutex;
+    std::unordered_map<uint64_t, PatchUnwrap> entries;
+};
+UnwrapCache  g_unwrap_cache;
+const size_t UNWRAP_CACHE_MAX_ENTRIES = 8;
+
+} // namespace
+
+PatchUnwrap compute_patch_unwrap(const indexed_triangle_set &patch, float seam_angle_deg, float padding_mm,
+                                 const std::vector<std::pair<int, int>> &seam_edges)
+{
+    PatchUnwrap result;
+    if (patch.indices.empty())
+        return result;
+
+    const uint64_t key = unwrap_cache_key(patch, seam_angle_deg, padding_mm, seam_edges);
+    {
+        std::lock_guard<std::mutex> lock(g_unwrap_cache.mutex);
+        if (auto it = g_unwrap_cache.entries.find(key); it != g_unwrap_cache.entries.end())
+            return it->second;
+    }
+
+    // CGAL wants a mesh with no unreferenced vertices; `patch` carries the whole mesh's vertex array
+    // (see get_facets_strict()), so compact it and keep the map back to the caller's numbering.
+    std::vector<int>           patch_to_compact;
+    const indexed_triangle_set compact = compact_patch_with_map(patch, patch_to_compact);
+    std::vector<int>           compact_to_patch(compact.vertices.size(), -1);
+    for (size_t vi = 0; vi < patch_to_compact.size(); ++vi)
+        if (patch_to_compact[vi] >= 0)
+            compact_to_patch[size_t(patch_to_compact[vi])] = int(vi);
+
+    std::vector<Vec3f> normals(compact.indices.size());
+    for (size_t f = 0; f < compact.indices.size(); ++f)
+        normals[f] = face_normal(compact, compact.indices[f]);
+
+    // Seam edges arrive in patch (== mesh) vertex space; translate to the compact numbering the
+    // segmentation runs in. An edge whose endpoints didn't both survive compaction is simply ignored.
+    std::unordered_set<uint64_t> seam_keys;
+    seam_keys.reserve(seam_edges.size() * 2);
+    for (const auto &[a, b] : seam_edges) {
+        if (a < 0 || b < 0 || size_t(a) >= patch_to_compact.size() || size_t(b) >= patch_to_compact.size())
+            continue;
+        const int ca = patch_to_compact[size_t(a)];
+        const int cb = patch_to_compact[size_t(b)];
+        if (ca >= 0 && cb >= 0)
+            seam_keys.insert(undirected_edge_key(ca, cb));
+    }
+
+    // Once the user has marked seams by hand, those seams define the islands: the automatic
+    // sharp-angle cutting must not keep splitting faces the user left un-seamed, or islands the user
+    // meant to be one piece never merge (the "seam angle overrides it" the user hit). So when any
+    // manual seam exists, the angle threshold is dropped to 180 degrees - nothing is cut except the
+    // marked seams. With no manual seams, the seam angle behaves exactly as before.
+    const float effective_seam_angle = seam_keys.empty() ? seam_angle_deg : 180.f;
+    int                    chart_count = 0;
+    const std::vector<int> chart_of    = segment_into_charts(compact, normals, effective_seam_angle, seam_keys, chart_count);
+
+    struct FlatChart
+    {
+        std::vector<Vec2f>                       uvs;
+        std::vector<int>                         to_patch; // chart vertex -> patch vertex
+        std::vector<stl_triangle_vertex_indices> indices;  // chart-local
+        Vec2f                                    min  = Vec2f::Zero();
+        Vec2f                                    size = Vec2f::Zero();
+    };
+    // static_cast, not size_t(...): the latter is a most-vexing-parse and declares a function.
+    std::vector<FlatChart> charts(static_cast<size_t>(chart_count));
+
+    for (int c = 0; c < chart_count; ++c) {
+        FlatChart &chart = charts[size_t(c)];
+
+        // Build the chart's own sub-mesh. Each chart gets its *own* compact->local vertex map, which
+        // is exactly what duplicates a seam vertex: it appears once in each chart that touches it,
+        // free to hold a different UV in each.
+        indexed_triangle_set chart_mesh;
+        std::vector<int>     compact_to_local(compact.vertices.size(), -1);
+        Vec3f                normal_sum = Vec3f::Zero();
+        for (size_t f = 0; f < compact.indices.size(); ++f) {
+            if (chart_of[f] != c)
+                continue;
+            const stl_triangle_vertex_indices &tri = compact.indices[f];
+            // Area-weighted, so a chart's average normal isn't dragged around by slivers.
+            normal_sum += (compact.vertices[tri[1]] - compact.vertices[tri[0]]).cross(compact.vertices[tri[2]] - compact.vertices[tri[0]]);
+
+            stl_triangle_vertex_indices local_tri;
+            for (int i = 0; i < 3; ++i) {
+                const int cv = tri[i];
+                if (compact_to_local[size_t(cv)] < 0) {
+                    compact_to_local[size_t(cv)] = int(chart_mesh.vertices.size());
+                    chart_mesh.vertices.push_back(compact.vertices[size_t(cv)]);
+                    chart.to_patch.push_back(compact_to_patch[size_t(cv)]);
+                }
+                local_tri[i] = compact_to_local[size_t(cv)];
+            }
+            chart_mesh.indices.push_back(local_tri);
+        }
+        if (chart_mesh.indices.empty())
+            continue;
+
+        const Vec3f chart_normal = (normal_sum.norm() > 1e-12f) ? Vec3f(normal_sum.normalized()) : Vec3f::UnitZ();
+
+        // Is the chart flat? Charts are grown by a *pairwise* angle threshold, so a chart can still
+        // curve gradually across many triangles -- being merged is not the same as being planar. But
+        // when it is planar (a cube face, and after seam-cutting that is the common case), the
+        // tangent-plane projection is already the exact answer, and skipping the solve is the single
+        // biggest speed-up here.
+        bool planar = true;
+        for (size_t f = 0; f < compact.indices.size() && planar; ++f)
+            if (chart_of[f] == c)
+                planar = normals[f].dot(chart_normal) >= 0.9998f; // ~1 degree
+
+        // Measured before chart_mesh.indices is moved out from under it, below -- area_3d() iterates
+        // those indices, so taking it afterwards silently measures an empty mesh and returns 0.
+        const float mesh_area_3d = area_3d(chart_mesh);
+
+        std::optional<std::vector<Vec2f>> uvs;
+        if (!planar)
+            uvs = MeshBoolean::cgal::parameterize_lscm(chart_mesh);
+        // Flat chart, or one LSCM refused (not a topological disk -- closed, or holed).
+        chart.uvs = uvs ? std::move(*uvs) : project_to_tangent_plane(chart_mesh, chart_normal);
+        chart.indices = std::move(chart_mesh.indices);
+
+        // LSCM's output is only defined up to a similarity, so charts come back at arbitrary and
+        // mutually inconsistent scales. Rescale each to its true surface area, so `Tile size (mm)`
+        // means the same thing on every chart and the texture doesn't change density across a seam.
+        const float uv_area = area_2d(chart.uvs, chart.indices);
+        if (uv_area > 1e-12f && mesh_area_3d > 1e-12f) {
+            const float scale = std::sqrt(mesh_area_3d / uv_area);
+            for (Vec2f &uv : chart.uvs)
+                uv *= scale;
+        }
+
+        Vec2f lo(std::numeric_limits<float>::max(), std::numeric_limits<float>::max());
+        Vec2f hi(std::numeric_limits<float>::lowest(), std::numeric_limits<float>::lowest());
+        for (const Vec2f &uv : chart.uvs) {
+            lo = lo.cwiseMin(uv);
+            hi = hi.cwiseMax(uv);
+        }
+        chart.min  = lo;
+        chart.size = hi - lo;
+    }
+
+    // Shelf-pack the charts side by side so they don't overlap. Overlap would be harmless for a
+    // repeating texture but wrong for a non-tiled (decal) one, and it makes the UV editor unreadable.
+    float total_area = 0.f;
+    float widest     = 0.f;
+    for (const FlatChart &chart : charts) {
+        total_area = total_area + chart.size.x() * chart.size.y();
+        widest     = std::max(widest, chart.size.x());
+    }
+    const float shelf_width = std::max(widest, std::sqrt(std::max(total_area, 0.f)) * 1.4f);
+    // Negative padding means auto: a small fraction of the packed size, which is scale-independent
+    // and so does something sensible for a 5 mm patch and a 500 mm one alike.
+    const float margin      = (padding_mm >= 0.f) ? padding_mm : std::max(shelf_width * 0.02f, 1e-4f);
+
+    std::vector<int> order(charts.size());
+    std::iota(order.begin(), order.end(), 0);
+    std::sort(order.begin(), order.end(), // tallest first: the usual way to keep shelves tight
+              [&charts](int a, int b) { return charts[size_t(a)].size.y() > charts[size_t(b)].size.y(); });
+
+    float cursor_x = 0.f, cursor_y = 0.f, row_height = 0.f;
+    for (const int c : order) {
+        FlatChart &chart = charts[size_t(c)];
+        if (chart.uvs.empty())
+            continue;
+        if (cursor_x > 0.f && cursor_x + chart.size.x() > shelf_width) {
+            cursor_x   = 0.f;
+            cursor_y  += row_height + margin;
+            row_height = 0.f;
+        }
+        const Vec2f translation = Vec2f(cursor_x, cursor_y) - chart.min;
+        for (Vec2f &uv : chart.uvs)
+            uv += translation;
+
+        cursor_x  += chart.size.x() + margin;
+        row_height = std::max(row_height, chart.size.y());
+    }
+
+    // Concatenate the packed charts into the flat, duplicated-vertex form PatchUnwrap describes.
+    result.chart_centroid.assign(size_t(chart_count), Vec2f::Zero());
+    for (int c = 0; c < chart_count; ++c) {
+        FlatChart &chart = charts[size_t(c)];
+        const int  base  = int(result.uvs.size());
+        result.uvs.insert(result.uvs.end(), chart.uvs.begin(), chart.uvs.end());
+        result.source_vertex.insert(result.source_vertex.end(), chart.to_patch.begin(), chart.to_patch.end());
+        result.vertex_chart.insert(result.vertex_chart.end(), chart.uvs.size(), c);
+        for (const stl_triangle_vertex_indices &tri : chart.indices)
+            result.indices.emplace_back(tri[0] + base, tri[1] + base, tri[2] + base);
+
+        if (!chart.uvs.empty()) {
+            Vec2f sum = Vec2f::Zero();
+            for (const Vec2f &uv : chart.uvs)
+                sum += uv;
+            result.chart_centroid[size_t(c)] = sum / float(chart.uvs.size());
+        }
+    }
+    result.chart_count = chart_count;
+
+    // Island outlines: an edge used by exactly one triangle. Charts have disjoint vertex sets (seam
+    // vertices are duplicated), so an edge along a seam shows up once in each chart and is correctly
+    // reported as a boundary of both.
+    {
+        std::unordered_map<uint64_t, int> edge_use;
+        edge_use.reserve(result.indices.size() * 3);
+        for (const stl_triangle_vertex_indices &tri : result.indices)
+            for (int i = 0; i < 3; ++i)
+                ++edge_use[undirected_edge_key(tri[i], tri[(i + 1) % 3])];
+        for (const stl_triangle_vertex_indices &tri : result.indices)
+            for (int i = 0; i < 3; ++i) {
+                const int a = tri[i], b = tri[(i + 1) % 3];
+                if (edge_use[undirected_edge_key(a, b)] == 1)
+                    result.boundary_edges.emplace_back(a, b);
+            }
+    }
+
+    {
+        std::lock_guard<std::mutex> lock(g_unwrap_cache.mutex);
+        // A patch changes on every paint stroke, so this would grow without bound over a session.
+        // Nothing here is worth an LRU: the working set is "the patch I am editing right now".
+        if (g_unwrap_cache.entries.size() >= UNWRAP_CACHE_MAX_ENTRIES)
+            g_unwrap_cache.entries.clear();
+        g_unwrap_cache.entries.emplace(key, result);
+    }
+    return result;
+}
+
+Eigen::Matrix<float, 2, 3> island_transform_matrix(int chart, const PatchUnwrap &unwrap, const std::vector<TextureIsland> &islands)
+{
+    Eigen::Matrix<float, 2, 3> m;
+    m << 1.f, 0.f, 0.f,
+         0.f, 1.f, 0.f;
+    if (chart < 0 || size_t(chart) >= islands.size() || size_t(chart) >= unwrap.chart_centroid.size())
+        return m; // no hand placement for this island: leave it where the packing put it
+
+    const TextureIsland &island = islands[size_t(chart)];
+    const Vec2f          centre = unwrap.chart_centroid[size_t(chart)];
+
+    const float rad = island.rotation_deg * float(M_PI) / 180.f;
+    const float s   = island.scale;
+    const float cs  = std::cos(rad) * s;
+    const float sn  = std::sin(rad) * s;
+
+    // uv -> centre + R*S*(uv - centre) + offset, with the linear part and the constant part split
+    // out so this can be handed to a shader as-is.
+    Eigen::Matrix2f linear;
+    linear << cs, -sn,
+              sn,  cs;
+    const Vec2f translation = centre + island.offset - linear * centre;
+
+    m.block<2, 2>(0, 0) = linear;
+    m.col(2)            = translation;
+    return m;
+}
+
+Vec2f apply_island_transform(const Vec2f &uv, int chart, const PatchUnwrap &unwrap, const std::vector<TextureIsland> &islands)
+{
+    const Eigen::Matrix<float, 2, 3> m = island_transform_matrix(chart, unwrap, islands);
+    return m.block<2, 2>(0, 0) * uv + m.col(2);
+}
+
+namespace {
+// One chart's copy of a shared mesh edge: the uv-vertex indices of its two endpoints, ordered so that
+// .first is always the lower-numbered base vertex (so two charts' copies line up by base vertex).
+struct ChartEdge { int chart = -1; int uv_lo = -1; int uv_hi = -1; };
+
+// base edge (lo,hi mesh vertex) -> every chart that has it on its boundary. A mesh edge shared by two
+// charts is a seam between them and appears once in each chart's boundary (charts have disjoint uv
+// vertices), so its entry lists both charts.
+std::map<std::pair<int, int>, std::vector<ChartEdge>> build_shared_edges(const PatchUnwrap &u)
+{
+    std::map<std::pair<int, int>, std::vector<ChartEdge>> edges;
+    for (const auto &[ua, ub] : u.boundary_edges) {
+        if (ua < 0 || ub < 0 || size_t(ua) >= u.source_vertex.size() || size_t(ub) >= u.source_vertex.size())
+            continue;
+        const int ba = u.source_vertex[size_t(ua)], bb = u.source_vertex[size_t(ub)];
+        if (ba < 0 || bb < 0 || ba == bb)
+            continue;
+        const int chart = (size_t(ua) < u.vertex_chart.size()) ? u.vertex_chart[size_t(ua)] : -1;
+        if (chart < 0)
+            continue;
+        const std::pair<int, int> key{ std::min(ba, bb), std::max(ba, bb) };
+        // Order the uv endpoints to match the base-vertex order in the key.
+        ChartEdge e{ chart, ua, ub };
+        if (u.source_vertex[size_t(ua)] != key.first)
+            std::swap(e.uv_lo, e.uv_hi);
+        edges[key].push_back(e);
+    }
+    return edges;
+}
+
+// Solve the placement that maps child's raw uv edge (rc0->rc1) onto the parent's placed edge
+// (pp0->pp1): a rigid rotation about the child chart's centroid plus an offset, scale kept at 1 so the
+// texel density is unchanged. cen is the child chart's centroid.
+TextureIsland solve_edge_alignment(const Vec2f &rc0, const Vec2f &rc1, const Vec2f &pp0, const Vec2f &pp1, const Vec2f &cen)
+{
+    const Vec2f dP = pp1 - pp0, dC = rc1 - rc0;
+    const float rho = std::atan2(dP.y(), dP.x()) - std::atan2(dC.y(), dC.x());
+    const float cs = std::cos(rho), sn = std::sin(rho);
+    const auto  rot = [&](const Vec2f &v) { return Vec2f(v.x() * cs - v.y() * sn, v.x() * sn + v.y() * cs); };
+
+    TextureIsland island;
+    island.scale        = 1.f;
+    island.rotation_deg = rho * 180.f / float(M_PI);
+    island.offset       = pp0 - (rot(rc0 - cen) + cen); // island_transform_matrix places rc0 exactly here
+    return island;
+}
+} // namespace
+
+bool join_chart_placement(const PatchUnwrap &unwrap, const std::vector<TextureIsland> &islands, int child, int parent,
+                          TextureIsland &out_child)
+{
+    if (child < 0 || parent < 0 || child == parent || size_t(child) >= unwrap.chart_centroid.size())
+        return false;
+    const auto edges = build_shared_edges(unwrap);
+    for (const auto &[base_edge, list] : edges) {
+        const ChartEdge *pe = nullptr;
+        const ChartEdge *ce = nullptr;
+        for (const ChartEdge &e : list) {
+            if (e.chart == parent) pe = &e;
+            if (e.chart == child)  ce = &e;
+        }
+        if (pe == nullptr || ce == nullptr)
+            continue;
+        // Parent's *placed* edge; child's *raw* edge, matched endpoint-to-endpoint by base vertex.
+        const Vec2f pp0 = apply_island_transform(unwrap.uvs[size_t(pe->uv_lo)], parent, unwrap, islands);
+        const Vec2f pp1 = apply_island_transform(unwrap.uvs[size_t(pe->uv_hi)], parent, unwrap, islands);
+        out_child = solve_edge_alignment(unwrap.uvs[size_t(ce->uv_lo)], unwrap.uvs[size_t(ce->uv_hi)], pp0, pp1,
+                                          unwrap.chart_centroid[size_t(child)]);
+        return true;
+    }
+    return false;
+}
+
+std::vector<TextureIsland> compute_connected_net(const PatchUnwrap &unwrap)
+{
+    std::vector<TextureIsland> islands(size_t(std::max(unwrap.chart_count, 0)));
+    if (unwrap.chart_count <= 1)
+        return islands;
+
+    // Chart adjacency, with one representative shared edge per adjacent pair.
+    const auto edges = build_shared_edges(unwrap);
+    struct PairEdge { ChartEdge a, b; };
+    std::map<std::pair<int, int>, PairEdge> pair_edge;
+    std::vector<std::vector<int>>            adj(size_t(unwrap.chart_count));
+    for (const auto &[base_edge, list] : edges) {
+        for (size_t i = 0; i < list.size(); ++i)
+            for (size_t j = i + 1; j < list.size(); ++j) {
+                const int c1 = list[i].chart, c2 = list[j].chart;
+                if (c1 == c2 || c1 < 0 || c2 < 0 || c1 >= unwrap.chart_count || c2 >= unwrap.chart_count)
+                    continue;
+                const std::pair<int, int> pk{ std::min(c1, c2), std::max(c1, c2) };
+                if (pair_edge.count(pk))
+                    continue; // keep the first shared edge as the fold line for this pair
+                pair_edge[pk] = (c1 < c2) ? PairEdge{ list[i], list[j] } : PairEdge{ list[j], list[i] };
+                adj[size_t(pk.first)].push_back(pk.second);
+                adj[size_t(pk.second)].push_back(pk.first);
+            }
+    }
+
+    std::vector<bool>  placed(size_t(unwrap.chart_count), false);
+    std::vector<Vec2f> pmin(size_t(unwrap.chart_count)), pmax(size_t(unwrap.chart_count));
+    const auto chart_bbox = [&](int c, Vec2f &lo, Vec2f &hi) {
+        lo = Vec2f(std::numeric_limits<float>::max(), std::numeric_limits<float>::max());
+        hi = Vec2f(std::numeric_limits<float>::lowest(), std::numeric_limits<float>::lowest());
+        for (size_t i = 0; i < unwrap.uvs.size(); ++i)
+            if (unwrap.vertex_chart[i] == c) {
+                const Vec2f p = apply_island_transform(unwrap.uvs[i], c, unwrap, islands);
+                lo = lo.cwiseMin(p);
+                hi = hi.cwiseMax(p);
+            }
+    };
+    const auto overlaps_placed = [&](int c, const Vec2f &lo, const Vec2f &hi) {
+        // A small inset, so charts that merely share an edge (touching bboxes) aren't judged to overlap.
+        const Vec2f eps = 0.02f * (hi - lo).cwiseAbs();
+        for (int o = 0; o < unwrap.chart_count; ++o)
+            if (placed[size_t(o)] && o != c &&
+                lo.x() + eps.x() < pmax[size_t(o)].x() && hi.x() - eps.x() > pmin[size_t(o)].x() &&
+                lo.y() + eps.y() < pmax[size_t(o)].y() && hi.y() - eps.y() > pmin[size_t(o)].y())
+                return true;
+        return false;
+    };
+
+    // BFS from chart 0 (kept at its packed position), unfolding each newly reached chart onto its parent.
+    std::queue<int> q;
+    placed[0] = true;
+    chart_bbox(0, pmin[0], pmax[0]);
+    q.push(0);
+    while (!q.empty()) {
+        const int p = q.front();
+        q.pop();
+        for (const int c : adj[size_t(p)]) {
+            if (placed[size_t(c)])
+                continue;
+            const std::pair<int, int> pk{ std::min(p, c), std::max(p, c) };
+            const auto it = pair_edge.find(pk);
+            if (it == pair_edge.end())
+                continue;
+            const ChartEdge &pe = (p < c) ? it->second.a : it->second.b;
+            const ChartEdge &ce = (p < c) ? it->second.b : it->second.a;
+            const Vec2f pp0 = apply_island_transform(unwrap.uvs[size_t(pe.uv_lo)], p, unwrap, islands);
+            const Vec2f pp1 = apply_island_transform(unwrap.uvs[size_t(pe.uv_hi)], p, unwrap, islands);
+            islands[size_t(c)] = solve_edge_alignment(unwrap.uvs[size_t(ce.uv_lo)], unwrap.uvs[size_t(ce.uv_hi)], pp0,
+                                                       pp1, unwrap.chart_centroid[size_t(c)]);
+
+            Vec2f lo, hi;
+            chart_bbox(c, lo, hi);
+            if (overlaps_placed(c, lo, hi)) {
+                islands[size_t(c)] = TextureIsland{}; // would collide: leave it where the packing put it
+                continue;                             // and don't unfold its subtree off a packed chart
+            }
+            placed[size_t(c)] = true;
+            pmin[size_t(c)]   = lo;
+            pmax[size_t(c)]   = hi;
+            q.push(c);
+        }
+    }
+    return islands;
+}
+
+void average_island_scales(std::vector<TextureIsland> &islands)
+{
+    if (islands.empty())
+        return;
+    float sum = 0.f;
+    for (const TextureIsland &island : islands)
+        sum += island.scale;
+    const float mean = sum / float(islands.size());
+    for (TextureIsland &island : islands)
+        island.scale = mean;
+}
+
+std::vector<Vec2f> compute_lscm_uvs(const indexed_triangle_set &patch, const TextureDisplacementLayer &layer)
+{
+    // Padding disabled (0), matching the UV editor: the packed islands the editor shows and the ones the
+    // bake/preview samples must be laid out identically, or a hand placement made in the editor would
+    // land somewhere else in the baked result.
+    const PatchUnwrap unwrap = compute_patch_unwrap(patch, layer.lscm_seam_angle_deg, 0.f, layer.lscm_seam_edges);
+    if (unwrap.empty())
+        return {};
+
+    // Manual per-vertex UV edits (UV editor Vertex/Edge modes) override the automatic raw unwrap
+    // coordinate for a mesh vertex, before the island transform -- so the edit rides along with any
+    // island move/rotate exactly like the rest of the island. See TextureDisplacementLayer::
+    // lscm_uv_overrides. Small (hand edits), so a plain map is ample.
+    std::map<int, Vec2f> overrides;
+    for (const auto &[mv, uv] : layer.lscm_uv_overrides)
+        overrides[mv] = uv;
+
+    // One UV per patch vertex: a seam vertex has several (one per chart it touches) and has to
+    // settle on one, since it can only be displaced to a single position. See compute_lscm_uvs()'s
+    // header comment -- the surface stays watertight regardless.
+    std::vector<Vec2f> per_vertex(patch.vertices.size(), Vec2f::Zero());
+    std::vector<bool>  assigned(patch.vertices.size(), false);
+    for (size_t i = 0; i < unwrap.uvs.size(); ++i) {
+        const int pv = unwrap.source_vertex[i];
+        if (pv >= 0 && !assigned[size_t(pv)]) {
+            Vec2f      raw = unwrap.uvs[i];
+            const auto it  = overrides.find(pv);
+            if (it != overrides.end())
+                raw = it->second;
+            per_vertex[size_t(pv)] = apply_island_transform(raw, unwrap.vertex_chart[i], unwrap, layer.islands);
+            assigned[size_t(pv)]   = true;
+        }
+    }
+    return per_vertex;
+}
+
+Vec2f apply_uv_transform(const Vec2f &planar, const TextureDisplacementLayer &layer)
+{
     const float scale = (layer.tiling_scale > 1e-6f) ? (1.f / layer.tiling_scale) : 1.f;
-    planar *= scale;
+    const Vec2f scaled = planar * scale;
 
     const float rad = layer.rotation_deg * float(M_PI) / 180.f;
     const float cs  = std::cos(rad);
     const float sn  = std::sin(rad);
-    const Vec2f rotated(planar.x() * cs - planar.y() * sn, planar.x() * sn + planar.y() * cs);
+    const Vec2f rotated(scaled.x() * cs - scaled.y() * sn, scaled.x() * sn + scaled.y() * cs);
 
     return rotated + layer.offset;
 }
 
-// Area-weighted vertex normals computed from the patch's own (pre-displacement) connectivity.
-// Since the patch's vertices have not moved yet at the point this is called, these are identical
-// to the surface normals of the mesh the patch was extracted from.
+float blend_displacement(float accumulated, float value, TextureBlendMode mode)
+{
+    switch (mode) {
+    case TextureBlendMode::Subtract: return accumulated - value;
+    // Multiply/Divide scale rather than offset, so they take `value` as a factor relative to 1 mm
+    // (see TextureBlendMode): a 1 mm-deep layer sampling a white texel is then exactly neutral.
+    case TextureBlendMode::Multiply: return accumulated * value;
+    case TextureBlendMode::Divide: {
+        // Every height map has black regions, and a black texel samples to *exactly* zero -- so this
+        // divisor really does hit zero in ordinary use, not just in some contrived edge case. Floor
+        // its magnitude: an unbounded 1/0 would not merely look wrong, it would fling vertices
+        // thousands of mm away and poison the mesh's bounding box (and with it every plate/print
+        // volume check downstream). The floor doubles as a cap on how far Divide can ever amplify
+        // the relief beneath it -- at most 1/0.05 = 20x.
+        constexpr float min_divisor = 0.05f;
+        const float     divisor     = (std::abs(value) < min_divisor) ? std::copysign(min_divisor, value < 0.f ? -1.f : 1.f) :
+                                                                        value;
+        return accumulated / divisor;
+    }
+    case TextureBlendMode::Add:
+    default: return accumulated + value;
+    }
+}
+
+float sample_layer_height(const DecodedHeightTexture &texture, const TextureDisplacementLayer &layer,
+                          const Vec3f &position, const Vec3f &normal,
+                          const Vec3f &patch_center, const Vec3f &patch_axis, const Vec2f *lscm_uv)
+{
+    if (texture.empty())
+        return 0.f;
+
+    auto sample_at = [&](const Vec2f &planar) {
+        return texture.sample(apply_uv_transform(planar, layer), layer.tile_enabled, layer.tile_method);
+    };
+
+    // Precomputed per-patch LSCM solve wins over the layer's own method (see the header): the
+    // caller only passes it when the patch actually parameterized successfully, so a patch that
+    // failed to unwrap falls through to the analytic methods below as its documented fallback.
+    if (lscm_uv != nullptr)
+        return sample_at(*lscm_uv);
+
+    switch (layer.projection_method) {
+    case TextureProjectionMethod::Cylindrical:
+        return sample_at(project_cylindrical(position, patch_center, patch_axis));
+    case TextureProjectionMethod::Spherical:
+        return sample_at(project_spherical(position, patch_center));
+    case TextureProjectionMethod::ViewProjected:
+        // Flat projection onto the captured projector plane. Single-valued per point, so unlike
+        // blended triplanar it is one sample, and it is what "project from view" places.
+        return sample_at(Vec2f(position.dot(layer.view_project_right), position.dot(layer.view_project_up)));
+    case TextureProjectionMethod::LSCM: // no usable unwrap for this patch -- fall back to Triplanar
+    case TextureProjectionMethod::Triplanar:
+    default: break;
+    }
+
+    // Blended tri-planar: sample all three axis-aligned planes and cross-fade between them by the
+    // normal's own components, instead of hard-switching to whichever single axis dominates. The
+    // hard switch is what produced a visible seam wherever the dominant axis flips (see
+    // TextureProjectionMethod::Triplanar); a weighted blend is continuous across that transition
+    // by construction, since the weight of the axis being left behind falls smoothly to zero.
+    Vec3f w = normal.cwiseAbs();
+    w       = Vec3f(std::pow(w.x(), TRIPLANAR_BLEND_SHARPNESS), std::pow(w.y(), TRIPLANAR_BLEND_SHARPNESS),
+                    std::pow(w.z(), TRIPLANAR_BLEND_SHARPNESS));
+    const float w_sum = w.x() + w.y() + w.z();
+    if (w_sum < 1e-8f)
+        // Degenerate normal: no axis is meaningfully dominant, so no blend is meaningful either.
+        return sample_at(Vec2f(position.x(), position.y()));
+    w /= w_sum;
+
+    // Each plane drops the axis it is named for, matching project_planar()'s own convention (which
+    // the GUI's on-canvas placement gizmo also relies on).
+    return w.x() * sample_at(Vec2f(position.y(), position.z())) +
+           w.y() * sample_at(Vec2f(position.x(), position.z())) +
+           w.z() * sample_at(Vec2f(position.x(), position.y()));
+}
+
+indexed_triangle_set extract_painted_patch(const indexed_triangle_set                    &base_mesh,
+                                            const TriangleSelector::TriangleSplittingData &facet_data)
+{
+    if (facet_data.triangles_to_split.empty())
+        return {};
+
+    const TriangleMesh selector_mesh(base_mesh);
+    TriangleSelector    selector(selector_mesh);
+    selector.deserialize(facet_data, false);
+    return selector.get_facets_strict(EnforcerBlockerType::ENFORCER);
+}
+
+bool compute_layer_paint_anchor(const indexed_triangle_set                    &base_mesh,
+                                 const TriangleSelector::TriangleSplittingData &facet_data,
+                                 Vec3f                                         &anchor_pos,
+                                 Vec3f                                         &anchor_normal)
+{
+    const indexed_triangle_set patch = extract_painted_patch(base_mesh, facet_data);
+    if (patch.indices.empty())
+        return false;
+
+    Vec3f  centroid_sum = Vec3f::Zero();
+    Vec3f  normal_sum   = Vec3f::Zero();
+    for (const stl_triangle_vertex_indices &tri : patch.indices) {
+        const Vec3f &a = patch.vertices[tri[0]];
+        const Vec3f &b = patch.vertices[tri[1]];
+        const Vec3f &c = patch.vertices[tri[2]];
+        // Cross product magnitude is twice the face area, so this area-weights both sums the same
+        // way texture_displacement_vertex_normals() does above.
+        normal_sum   += (b - a).cross(c - a);
+        centroid_sum += (a + b + c) / 3.f;
+    }
+
+    anchor_pos    = centroid_sum / float(patch.indices.size());
+    anchor_normal = (normal_sum.norm() > 1e-8f) ? Vec3f(normal_sum.normalized()) : Vec3f::UnitZ();
+    return true;
+}
+
+// Area-weighted vertex normals of the undisplaced mesh. build_texture_displacement() computes
+// these once, up front, and every layer both projects and displaces along them -- so a vertex
+// covered by several layers is pushed along one single, well-defined direction rather than along
+// whatever direction the surface happened to be pointing partway through the stack.
 static std::vector<Vec3f> texture_displacement_vertex_normals(const indexed_triangle_set &its)
 {
     std::vector<Vec3f> normals(its.vertices.size(), Vec3f::Zero());
@@ -111,16 +1049,67 @@ static std::vector<Vec3f> texture_displacement_vertex_normals(const indexed_tria
     return normals;
 }
 
+namespace {
+// Shortest along-surface distance from every patch vertex to the patch boundary (the pinned vertices
+// shared with the untouched surface), by a multi-source Dijkstra over the patch edges. Used for edge
+// smoothing: the displacement is faded out as this distance goes to zero.
+std::vector<float> patch_boundary_distance(const indexed_triangle_set &patch, const std::vector<bool> &is_boundary)
+{
+    const size_t n = patch.vertices.size();
+    std::vector<std::vector<std::pair<int, float>>> adj(n);
+    for (const stl_triangle_vertex_indices &tri : patch.indices)
+        for (int i = 0; i < 3; ++i) {
+            const int a = tri[i], b = tri[(i + 1) % 3];
+            if (a < 0 || b < 0 || size_t(a) >= n || size_t(b) >= n)
+                continue;
+            const float w = (patch.vertices[size_t(a)] - patch.vertices[size_t(b)]).norm();
+            adj[size_t(a)].push_back({ b, w });
+            adj[size_t(b)].push_back({ a, w });
+        }
+
+    std::vector<float> dist(n, std::numeric_limits<float>::infinity());
+    using QN = std::pair<float, int>;
+    std::priority_queue<QN, std::vector<QN>, std::greater<QN>> pq;
+    for (size_t v = 0; v < n; ++v)
+        if (v < is_boundary.size() && is_boundary[v]) {
+            dist[v] = 0.f;
+            pq.push({ 0.f, int(v) });
+        }
+    while (!pq.empty()) {
+        const auto [d, u] = pq.top();
+        pq.pop();
+        if (d > dist[size_t(u)])
+            continue;
+        for (const auto &[w, ew] : adj[size_t(u)]) {
+            const float nd = d + ew;
+            if (nd < dist[size_t(w)]) {
+                dist[size_t(w)] = nd;
+                pq.push({ nd, w });
+            }
+        }
+    }
+    return dist;
+}
+} // namespace
+
 indexed_triangle_set build_texture_displacement(const indexed_triangle_set                  &base_mesh,
                                                  const std::vector<TextureDisplacementLayer> &layers,
                                                  const TextureDisplacementFacetsData         &facets_data)
 {
-    const indexed_triangle_set original_mesh = base_mesh;
-    indexed_triangle_set       working_mesh   = original_mesh;
-    bool                       mesh_modified  = false;
+    indexed_triangle_set mesh = base_mesh;
+    // TriangleSelector's vertex array starts with the mesh's own vertices (any extra ones, created
+    // where a brush stroke split a triangle, are appended after them), and get_facets_strict()
+    // emits exactly the *referenced* ones, in order. So selector vertex index i is our vertex i --
+    // but only if every vertex of `mesh` is referenced by some triangle, which is precisely what
+    // this call establishes. It is a no-op (indices untouched) for any mesh that already is, which
+    // in practice is all of them; it exists so an input carrying stray unreferenced vertices can't
+    // silently shift the indexing and displace the wrong vertices.
+    its_compactify_vertices(mesh);
+    if (mesh.vertices.empty() || mesh.indices.empty())
+        return mesh;
 
-    // Layers behave like stacked image-editor layers: applied in slot order, each one sculpting
-    // the surface left by the layers before it. This is what makes overlapping layers "blend".
+    // Layers are combined in slot order, like stacked layers in an image editor: each one folds its
+    // own displacement into the running total via its blend mode (see TextureBlendMode).
     std::vector<const TextureDisplacementLayer *> ordered_layers;
     for (const TextureDisplacementLayer &layer : layers)
         if (!layer.empty() && layer.slot >= 0 && size_t(layer.slot) < TEXTURE_DISPLACEMENT_MAX_LAYERS)
@@ -128,90 +1117,138 @@ indexed_triangle_set build_texture_displacement(const indexed_triangle_set      
     std::sort(ordered_layers.begin(), ordered_layers.end(),
                [](const TextureDisplacementLayer *a, const TextureDisplacementLayer *b) { return a->slot < b->slot; });
 
+    // Every layer measures its displacement against the *original* surface -- normals included --
+    // rather than against whatever the previous layer left behind. That is what lets all the layers
+    // be evaluated independently and merged per vertex, instead of having to re-mesh and remap the
+    // paint masks between them (see the header for why that earlier design was dropped).
+    const std::vector<Vec3f> vertex_normals = texture_displacement_vertex_normals(mesh);
+
+    std::vector<float> displacement(mesh.vertices.size(), 0.f);
+    std::vector<bool>  displaced(mesh.vertices.size(), false);
+    bool               any_displacement = false;
+
+    const TriangleMesh selector_mesh(mesh);
     for (const TextureDisplacementLayer *layer : ordered_layers) {
-        const TriangleSelector::TriangleSplittingData &stored_data = facets_data[size_t(layer->slot)];
-        if (stored_data.triangles_to_split.empty())
+        const TriangleSelector::TriangleSplittingData &data = facets_data[size_t(layer->slot)];
+        if (data.triangles_to_split.empty())
             continue;
 
         const DecodedHeightTexture height = decode_height_texture(*layer);
         if (height.empty())
             continue;
 
-        TriangleSelector::TriangleSplittingData data = stored_data;
-        if (mesh_modified) {
-            // The stored paint mask is relative to the volume's original (unbaked) mesh; remap it
-            // onto the working mesh, which earlier layers may have already displaced/subdivided.
-            data = TriangleSelector::remap_painting(original_mesh, data, working_mesh, Transform3d::Identity(),
-                                                     std::optional<std::reference_wrapper<const TriangleSelector::TriangleSplittingData>>{});
-            if (data.bitstream.empty())
-                continue;
-        }
-
-        const TriangleMesh    selector_mesh(working_mesh);
-        TriangleSelector       selector(selector_mesh);
+        TriangleSelector selector(selector_mesh);
         selector.deserialize(data, false);
 
         const indexed_triangle_set patch = selector.get_facets_strict(EnforcerBlockerType::ENFORCER);
         if (patch.indices.empty())
             continue;
-        // get_facets_strict() returns the *entire* mesh's vertex array regardless of which state
-        // was asked for (only the returned triangle indices are filtered by state) -- so `patch`
-        // and `rest` share the exact same vertex indexing. That is what lets the weld below be a
-        // plain index check instead of a position-based lookup.
-        indexed_triangle_set rest = selector.get_facets_strict(EnforcerBlockerType::NONE);
-        assert(rest.vertices.size() == patch.vertices.size());
+        // get_facets_strict() returns the same vertex array whichever state is asked for (only the
+        // triangles are filtered), so `patch` and `rest` share one indexing -- and, per the
+        // compactify above, it is our own.
+        const indexed_triangle_set rest = selector.get_facets_strict(EnforcerBlockerType::NONE);
 
-        // A vertex that is also used by at least one *unpainted* triangle is a boundary vertex:
-        // its final position is ambiguous (it belongs to both the painted and untouched surface),
-        // so it must never be displaced -- otherwise the baked patch would tear away from the
-        // rest of the mesh. Only vertices used exclusively by painted triangles ("interior" to the
-        // patch) are eligible for displacement. This is what keeps the bake seamless without any
-        // remeshing/hole-filling at the boundary.
-        std::vector<bool> is_boundary_vertex(rest.vertices.size(), false);
+        // A vertex used by even one *unpainted* triangle sits on this layer's boundary: it belongs
+        // to both the painted patch and the untouched surface, so displacing it would tear the two
+        // apart. Pinning it is what keeps the result seamless with no remeshing at the seam.
+        std::vector<bool> is_boundary(patch.vertices.size(), false);
         for (const stl_triangle_vertex_indices &tri : rest.indices)
             for (int i = 0; i < 3; ++i)
-                is_boundary_vertex[tri[i]] = true;
+                is_boundary[tri[i]] = true;
 
-        const std::vector<Vec3f> vertex_normals = texture_displacement_vertex_normals(patch);
-
+        // Only the Cylindrical/Spherical methods need these; Triplanar blends each vertex's own
+        // normal and LSCM solves the patch globally.
         Vec3f average_normal = Vec3f::Zero();
+        Vec3f patch_centroid = Vec3f::Zero();
+        int   patch_vertex_count = 0;
         for (const stl_triangle_vertex_indices &tri : patch.indices)
-            for (int i = 0; i < 3; ++i)
-                average_normal += vertex_normals[tri[i]];
-        average_normal = (average_normal.norm() > 1e-8f) ? Vec3f(average_normal.normalized()) : Vec3f::UnitZ();
-
-        const float          sign = layer->invert ? -1.f : 1.f;
-        std::vector<int>     interior_vertex_remap(rest.vertices.size(), -1);
-        indexed_triangle_set working_mesh_next = std::move(rest);
-        for (const stl_triangle_vertex_indices &tri : patch.indices) {
-            stl_triangle_vertex_indices final_tri;
             for (int i = 0; i < 3; ++i) {
-                const int vi = tri[i];
-                if (is_boundary_vertex[vi]) {
-                    // Shared with the untouched surface: reuse the existing, undisplaced vertex.
-                    final_tri[i] = vi;
-                    continue;
-                }
-                if (interior_vertex_remap[vi] < 0) {
-                    const Vec2f uv        = project_texture_displacement_uv(patch.vertices[vi], average_normal, *layer);
-                    const float h         = height.sample(uv);
-                    const Vec3f displaced = patch.vertices[vi] + vertex_normals[vi] * (h * layer->depth_mm * sign);
-                    interior_vertex_remap[vi] = int(working_mesh_next.vertices.size());
-                    working_mesh_next.vertices.push_back(displaced);
-                }
-                final_tri[i] = interior_vertex_remap[vi];
+                average_normal += vertex_normals[tri[i]];
+                patch_centroid += patch.vertices[tri[i]];
+                ++patch_vertex_count;
             }
-            working_mesh_next.indices.push_back(final_tri);
+        average_normal = (average_normal.norm() > 1e-8f) ? Vec3f(average_normal.normalized()) : Vec3f::UnitZ();
+        patch_centroid = (patch_vertex_count > 0) ? Vec3f(patch_centroid / float(patch_vertex_count)) : Vec3f::Zero();
+
+        // Cylinder axis auto-picked as the world axis *least* aligned with the average normal
+        // (perpendicular to the outward radial normal, as a cylinder's own axis would be).
+        Vec3f       patch_axis = Vec3f::UnitZ();
+        const Vec3f an         = average_normal.cwiseAbs();
+        if (an.x() <= an.y() && an.x() <= an.z())
+            patch_axis = Vec3f::UnitX();
+        else if (an.y() <= an.x() && an.y() <= an.z())
+            patch_axis = Vec3f::UnitY();
+
+        // A real unwrap of the whole patch, computed once here rather than per vertex -- it is a
+        // per-chart solve over the whole patch, not a per-point formula. Cached, so repeating this
+        // for every slider tweak costs a hash rather than a re-solve (see compute_patch_unwrap()).
+        const std::vector<Vec2f> lscm_uvs = (layer->projection_method == TextureProjectionMethod::LSCM) ?
+                                                 compute_lscm_uvs(patch, *layer) :
+                                                 std::vector<Vec2f>{};
+
+        // Edge smoothing: a per-vertex weight in [0, 1] that fades the displacement to zero toward the
+        // patch boundary. amount->0 leaves only the very edge softened; amount->1 fades the whole patch
+        // flat. k = (1-a)/a turns the normalized boundary distance into that weight (see the header).
+        std::vector<float> edge_weight;
+        if (layer->edge_smoothing && layer->edge_smoothing_amount > 0.f) {
+            const std::vector<float> bdist = patch_boundary_distance(patch, is_boundary);
+            float max_d = 0.f;
+            for (const float d : bdist)
+                if (std::isfinite(d))
+                    max_d = std::max(max_d, d);
+            edge_weight.assign(patch.vertices.size(), 1.f);
+            if (max_d > 1e-6f) {
+                const float a = std::clamp(layer->edge_smoothing_amount, 0.f, 1.f);
+                const float k = (a < 1.f) ? (1.f - a) / std::max(a, 1e-3f) : 0.f;
+                for (size_t v = 0; v < bdist.size() && v < edge_weight.size(); ++v) {
+                    const float d = std::isfinite(bdist[v]) ? bdist[v] : max_d;
+                    edge_weight[v] = std::clamp((d / max_d) * k, 0.f, 1.f);
+                }
+            }
         }
 
-        working_mesh  = std::move(working_mesh_next);
-        mesh_modified = true;
+        const float sign = layer->invert ? -1.f : 1.f;
+        // A vertex may be reached by several of the patch's triangles; each must fold into the
+        // running total exactly once, or a Multiply/Subtract layer would apply two or three times
+        // over depending on how many painted triangles happen to share the vertex.
+        std::vector<bool> visited(patch.vertices.size(), false);
+        for (const stl_triangle_vertex_indices &tri : patch.indices)
+            for (int i = 0; i < 3; ++i) {
+                const int vi = tri[i];
+                // Split vertices the brush introduced live past the end of our own vertex array;
+                // they carry no displacement of their own and are not part of the output mesh.
+                if (vi >= int(mesh.vertices.size()) || is_boundary[vi] || visited[vi])
+                    continue;
+                visited[vi] = true;
+
+                const Vec2f *lscm_uv = lscm_uvs.empty() ? nullptr : &lscm_uvs[size_t(vi)];
+                const float  h       = sample_layer_height(height, *layer, mesh.vertices[vi], vertex_normals[vi],
+                                                            patch_centroid, patch_axis, lscm_uv);
+
+                // midlevel is the height that means "stay put", so anything below it displaces
+                // *inwards* -- see TextureDisplacementLayer::midlevel. At the default of 0 this is
+                // exactly the old outward-only behaviour.
+                const float edge_w        = edge_weight.empty() ? 1.f : edge_weight[size_t(vi)];
+                const float signed_height = (h - layer->midlevel) * layer->depth_mm * sign * edge_w;
+                displacement[size_t(vi)] = blend_displacement(displacement[size_t(vi)], signed_height,
+                                                               displaced[size_t(vi)] ? layer->blend_mode : TextureBlendMode::Add);
+                // The first layer to reach a vertex has nothing underneath it to blend with, so it
+                // always starts the total off additively -- a Multiply/Divide against an implicit
+                // zero base would otherwise annihilate (or blow up) it, which is never what the
+                // user means by putting a mask on the bottom of the stack.
+                displaced[size_t(vi)] = true;
+                any_displacement      = true;
+            }
     }
 
-    if (mesh_modified)
-        its_compactify_vertices(working_mesh);
+    if (!any_displacement)
+        return mesh;
 
-    return working_mesh;
+    for (size_t vi = 0; vi < mesh.vertices.size(); ++vi)
+        if (displaced[vi])
+            mesh.vertices[vi] += vertex_normals[vi] * displacement[vi];
+
+    return mesh;
 }
 
 indexed_triangle_set build_texture_displacement(const ModelVolume &volume)
@@ -221,6 +1258,63 @@ indexed_triangle_set build_texture_displacement(const ModelVolume &volume)
         facets_data[size_t(i)] = volume.texture_displacement_facet(i).get_data();
 
     return build_texture_displacement(volume.mesh().its, volume.texture_displacement_layers, facets_data);
+}
+
+indexed_triangle_set subdivide_mesh_uniform(const indexed_triangle_set &mesh, float max_edge_length_mm, int max_iterations)
+{
+    indexed_triangle_set current   = mesh;
+    const float          max_edge_sq = max_edge_length_mm * max_edge_length_mm;
+
+    for (int iter = 0; iter < max_iterations; ++iter) {
+        // One vertex-index pair (always stored low-index-first) -> the midpoint vertex already
+        // created for it in this pass, so the two triangles sharing that edge both get the exact
+        // same new vertex instead of two separate, coincident-but-distinct ones (which would leave
+        // the mesh non-manifold even though it looks fine).
+        std::unordered_map<uint64_t, int> midpoint_cache;
+        auto edge_key = [](int a, int b) -> uint64_t {
+            if (a > b)
+                std::swap(a, b);
+            return (uint64_t(uint32_t(a)) << 32) | uint32_t(b);
+        };
+        auto get_midpoint = [&](int a, int b) -> int {
+            const uint64_t key = edge_key(a, b);
+            auto             it  = midpoint_cache.find(key);
+            if (it != midpoint_cache.end())
+                return it->second;
+            const int idx = int(current.vertices.size());
+            current.vertices.push_back((current.vertices[a] + current.vertices[b]) * 0.5f);
+            midpoint_cache.emplace(key, idx);
+            return idx;
+        };
+
+        std::vector<stl_triangle_vertex_indices> new_indices;
+        new_indices.reserve(current.indices.size());
+        bool any_split = false;
+        for (const stl_triangle_vertex_indices &tri : current.indices) {
+            const Vec3f &a = current.vertices[tri[0]];
+            const Vec3f &b = current.vertices[tri[1]];
+            const Vec3f &c = current.vertices[tri[2]];
+            if ((b - a).squaredNorm() <= max_edge_sq && (c - b).squaredNorm() <= max_edge_sq && (a - c).squaredNorm() <= max_edge_sq) {
+                new_indices.push_back(tri);
+                continue;
+            }
+
+            any_split = true;
+            const int m01 = get_midpoint(tri[0], tri[1]);
+            const int m12 = get_midpoint(tri[1], tri[2]);
+            const int m20 = get_midpoint(tri[2], tri[0]);
+            new_indices.push_back(stl_triangle_vertex_indices(tri[0], m01, m20));
+            new_indices.push_back(stl_triangle_vertex_indices(m01, tri[1], m12));
+            new_indices.push_back(stl_triangle_vertex_indices(m20, m12, tri[2]));
+            new_indices.push_back(stl_triangle_vertex_indices(m01, m12, m20));
+        }
+
+        current.indices = std::move(new_indices);
+        if (!any_split)
+            break;
+    }
+
+    return current;
 }
 
 } // namespace Slic3r

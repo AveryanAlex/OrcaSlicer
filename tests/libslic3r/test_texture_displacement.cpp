@@ -88,6 +88,105 @@ TEST_CASE("TextureDisplacement: fully painting a mesh displaces every vertex alo
     }
 }
 
+// Paints every facet of `mesh` into a serialized mask, the way "Select whole model" does.
+static TriangleSelector::TriangleSplittingData paint_whole_mesh(const indexed_triangle_set &mesh)
+{
+    const TriangleMesh tm(mesh);
+    TriangleSelector   selector(tm);
+    for (int f = 0; f < int(mesh.indices.size()); ++f)
+        selector.set_facet(f, EnforcerBlockerType::ENFORCER);
+    return selector.serialize();
+}
+
+// Regression test for the bug this feature shipped with: with two layers painted over the same
+// area, the second one was silently dropped (its paint mask was remapped onto the mesh the first
+// layer had already displaced, which routinely produced an empty bitstream). Every layer is now
+// evaluated against the original mesh instead, so both must show up in the total.
+TEST_CASE("TextureDisplacement: a second layer over the same area is applied too", "[TextureDisplacement]")
+{
+    const indexed_triangle_set cube = its_make_cube(10., 10., 10.);
+
+    TextureDisplacementFacetsData facets{};
+    facets[0] = paint_whole_mesh(cube);
+    facets[1] = facets[0]; // both layers cover the whole cube
+
+    TextureDisplacementLayer base;
+    base.slot         = 0;
+    base.depth_mm     = 1.0f;
+    base.tiling_scale = 5.0f;
+    base.image_data   = make_flat_gray_png(255); // height 1.0 everywhere
+
+    TextureDisplacementLayer second = base;
+    second.slot       = 1;
+    second.depth_mm   = 0.5f;
+    second.blend_mode = TextureBlendMode::Add;
+
+    const indexed_triangle_set result = build_texture_displacement(cube, {base, second}, facets);
+
+    // Topology is preserved exactly, so vertices can be compared 1:1 with the input.
+    REQUIRE(result.vertices.size() == cube.vertices.size());
+    REQUIRE(result.indices.size() == cube.indices.size());
+    for (size_t i = 0; i < cube.vertices.size(); ++i)
+        CHECK_THAT((result.vertices[i] - cube.vertices[i]).norm(), WithinAbs(1.5f, 1e-3f)); // 1.0 + 0.5, not just 1.0
+}
+
+TEST_CASE("TextureDisplacement: blend modes combine a layer with the ones below it", "[TextureDisplacement]")
+{
+    const indexed_triangle_set cube = its_make_cube(10., 10., 10.);
+
+    TextureDisplacementFacetsData facets{};
+    facets[0] = paint_whole_mesh(cube);
+    facets[1] = facets[0];
+
+    TextureDisplacementLayer base;
+    base.slot         = 0;
+    base.depth_mm     = 2.0f;
+    base.tiling_scale = 5.0f;
+    base.image_data   = make_flat_gray_png(255); // -> contributes exactly +2.0 mm
+
+    TextureDisplacementLayer second = base;
+    second.slot     = 1;
+    second.depth_mm = 0.5f; // -> its own value is 0.5 mm
+
+    // Expected total displacement for each mode, given base = 2.0 mm and second = 0.5 mm. Multiply
+    // and Divide treat the layer's value as a factor relative to 1 mm (see TextureBlendMode).
+    const auto expected = GENERATE(table<TextureBlendMode, float>({
+        { TextureBlendMode::Add,      2.5f },  // 2.0 + 0.5
+        { TextureBlendMode::Subtract, 1.5f },  // 2.0 - 0.5
+        { TextureBlendMode::Multiply, 1.0f },  // 2.0 * 0.5
+        { TextureBlendMode::Divide,   4.0f },  // 2.0 / 0.5
+    }));
+    second.blend_mode = std::get<0>(expected);
+
+    const indexed_triangle_set result = build_texture_displacement(cube, {base, second}, facets);
+
+    REQUIRE(result.vertices.size() == cube.vertices.size());
+    for (size_t i = 0; i < cube.vertices.size(); ++i)
+        CHECK_THAT((result.vertices[i] - cube.vertices[i]).norm(), WithinAbs(std::get<1>(expected), 1e-3f));
+}
+
+TEST_CASE("TextureDisplacement: the lowest layer ignores its blend mode", "[TextureDisplacement]")
+{
+    // Multiply against the implicit zero base would annihilate the only layer present; the first
+    // layer to reach a vertex always starts the total off additively instead.
+    const indexed_triangle_set cube = its_make_cube(10., 10., 10.);
+
+    TextureDisplacementFacetsData facets{};
+    facets[0] = paint_whole_mesh(cube);
+
+    TextureDisplacementLayer layer;
+    layer.slot         = 0;
+    layer.depth_mm     = 2.0f;
+    layer.tiling_scale = 5.0f;
+    layer.blend_mode   = TextureBlendMode::Multiply;
+    layer.image_data   = make_flat_gray_png(255);
+
+    const indexed_triangle_set result = build_texture_displacement(cube, {layer}, facets);
+
+    for (size_t i = 0; i < cube.vertices.size(); ++i)
+        CHECK_THAT((result.vertices[i] - cube.vertices[i]).norm(), WithinAbs(2.0f, 1e-3f));
+}
+
 TEST_CASE("TextureDisplacement: boundary vertices shared with unpainted triangles are pinned", "[TextureDisplacement]")
 {
     // A small triangle fan around a central vertex O, with 4 outer points A/B/C/D forming 4

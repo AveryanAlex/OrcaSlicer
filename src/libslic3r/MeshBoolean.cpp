@@ -26,6 +26,12 @@
 #include <CGAL/property_map.h>
 #include <CGAL/boost/graph/copy_face_graph.h>
 #include <CGAL/boost/graph/Face_filtered_graph.h>
+// For parameterize_lscm()
+#include <CGAL/Polygon_mesh_processing/border.h>
+#include <CGAL/Polygon_mesh_processing/connected_components.h>
+#include <CGAL/Surface_mesh_parameterization/Error_code.h>
+#include <CGAL/Surface_mesh_parameterization/LSCM_parameterizer_3.h>
+#include <CGAL/Surface_mesh_parameterization/parameterize.h>
 // BBS: for boolean using mcut
 #include "mcut/include/mcut/mcut.h"
 
@@ -247,6 +253,87 @@ TriangleMesh cgal_to_triangle_mesh(const CGALMesh &cgalmesh)
 indexed_triangle_set cgal_to_indexed_triangle_set(const CGALMesh &cgalmesh)
 {
     return cgal_to_indexed_triangle_set(cgalmesh.m);
+}
+
+// /////////////////////////////////////////////////////////////////////////////
+// Isotropic remeshing
+// /////////////////////////////////////////////////////////////////////////////
+
+indexed_triangle_set remesh_isotropic(const indexed_triangle_set &mesh, double target_edge_length, unsigned n_iterations)
+{
+    if (mesh.indices.empty() || target_edge_length <= 0.0)
+        return mesh;
+
+    _EpicMesh cgal_mesh;
+    triangle_mesh_to_cgal(mesh.vertices, mesh.indices, cgal_mesh);
+    if (cgal_mesh.is_empty() || cgal_mesh.number_of_faces() == 0)
+        return mesh;
+
+    try {
+        CGALProc::isotropic_remeshing(faces(cgal_mesh), target_edge_length, cgal_mesh,
+                                      CGALParams::number_of_iterations(n_iterations));
+    } catch (const std::exception &) {
+        return mesh; // CGAL throws on some non-manifold / degenerate inputs; leave the mesh untouched
+    }
+    if (cgal_mesh.number_of_faces() == 0)
+        return mesh;
+    return cgal_to_indexed_triangle_set(cgal_mesh);
+}
+
+// /////////////////////////////////////////////////////////////////////////////
+// UV parameterization
+// /////////////////////////////////////////////////////////////////////////////
+
+std::optional<std::vector<Vec2f>> parameterize_lscm(const indexed_triangle_set &mesh)
+{
+    namespace SMP = CGAL::Surface_mesh_parameterization;
+
+    if (mesh.indices.empty())
+        return std::nullopt;
+
+    _EpicMesh cgal_mesh;
+    triangle_mesh_to_cgal(mesh.vertices, mesh.indices, cgal_mesh);
+
+    using vertex_descriptor   = boost::graph_traits<_EpicMesh>::vertex_descriptor;
+    using halfedge_descriptor = boost::graph_traits<_EpicMesh>::halfedge_descriptor;
+
+    // LSCM assumes a single topological disk: one connected component, one boundary loop. A patch
+    // with several disconnected painted islands, or with a hole in it, doesn't qualify -- bail out
+    // rather than silently parameterizing just one arbitrary piece of it.
+    {
+        std::vector<std::size_t> component_id(num_faces(cgal_mesh));
+        const std::size_t        num_components = CGAL::Polygon_mesh_processing::connected_components(
+            cgal_mesh, CGAL::make_property_map(component_id));
+        if (num_components != 1)
+            return std::nullopt;
+    }
+
+    const halfedge_descriptor border = CGAL::Polygon_mesh_processing::longest_border(cgal_mesh).first;
+    if (border == halfedge_descriptor())
+        return std::nullopt; // no boundary at all -- a closed patch, which isn't a disk either
+
+    using Point_2 = EpicKernel::Point_2;
+    using UV_pmap = _EpicMesh::Property_map<vertex_descriptor, Point_2>;
+    UV_pmap uv_map = cgal_mesh.add_property_map<vertex_descriptor, Point_2>("h:uv", Point_2(0, 0)).first;
+
+    using Parameterizer = SMP::LSCM_parameterizer_3<_EpicMesh>;
+    const SMP::Error_code err = SMP::parameterize(cgal_mesh, Parameterizer(), border, uv_map);
+    if (err != SMP::OK)
+        return std::nullopt;
+
+    // triangle_mesh_to_cgal() adds vertices in the exact same order as mesh.vertices (see above),
+    // and Surface_mesh assigns indices sequentially on insertion into a fresh mesh, so a
+    // vertex_descriptor's index here is guaranteed to match the original input vertex index --
+    // the same assumption cgal_to_indexed_triangle_set() above already relies on.
+    std::vector<Vec2f> result(mesh.vertices.size(), Vec2f::Zero());
+    for (vertex_descriptor vd : vertices(cgal_mesh)) {
+        const std::size_t idx = std::size_t(vd);
+        if (idx < result.size()) {
+            const Point_2 &uv = uv_map[vd];
+            result[idx]        = Vec2f(float(uv.x()), float(uv.y()));
+        }
+    }
+    return result;
 }
 
 // /////////////////////////////////////////////////////////////////////////////
