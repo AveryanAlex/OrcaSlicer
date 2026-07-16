@@ -9,16 +9,26 @@ uniform vec2 z_range;
 // Clipping plane - general orientation. Used by the SLA gizmo.
 uniform vec4 clipping_plane;
 
-in vec3  v_position;
-// Per-vertex paint weight for the currently active texture-displacement layer, 0..1 (see
-// TriangleSelectorWeighted... note: Phase 1 stores this as a plain enforced/not-enforced mask,
-// so this is 0.0 or 1.0 today; a continuous value is a natural later-phase extension).
-in float v_weight;
+in vec3 v_position;
+// GLModel's P3N3T2 layout (position + normal + texcoord), reused so this mesh builds and renders
+// like any other GLModel rather than needing a bespoke vertex buffer. The two spare channels carry
+// what the bump preview actually needs per vertex:
+//   v_normal.x   -- the active layer's paint weight, 0 (untouched) or 1 (painted).
+//   v_normal.y   -- 1 for a vertex of the island currently being dragged in the UV editor, else 0.
+//                   The fragment shader applies island_delta to those vertices' uv, so a UV drag is a
+//                   single uniform update rather than a whole-mesh rebuild (like Adjust placement).
+//   v_tex_coord  -- the precomputed texture uv for this vertex, valid only when use_vertex_uv is set
+//                   (i.e. the LSCM projection, where uv can't be reconstructed in the shader). The
+//                   triplanar path ignores it and projects in the fragment shader instead.
+in vec3 v_normal;
+in vec2 v_tex_coord;
 
 out vec3  clipping_planes_dots;
 out vec4  model_pos;
 out vec4  world_pos;
 out float weight;
+out float active;
+out vec2  vertex_uv;
 
 void main()
 {
@@ -28,5 +38,7 @@ void main()
     gl_Position = projection_matrix * view_model_matrix * model_pos;
     clipping_planes_dots = vec3(dot(world_pos, clipping_plane), world_pos.z - z_range.x, z_range.y - world_pos.z);
 
-    weight = v_weight;
+    weight    = v_normal.x;
+    active    = v_normal.y;
+    vertex_uv = v_tex_coord;
 }
