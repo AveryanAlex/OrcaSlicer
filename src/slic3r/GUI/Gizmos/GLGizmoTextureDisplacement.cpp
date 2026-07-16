@@ -2093,6 +2093,19 @@ unsigned int GLGizmoTextureDisplacement::tool_icon_id()
     return m_tool_icon.get_id();
 }
 
+unsigned int GLGizmoTextureDisplacement::icon_id(const std::string &filename)
+{
+    auto it = m_icon_cache.find(filename);
+    if (it == m_icon_cache.end()) {
+        // First request for this icon: default-construct the texture in place and load it once (with a
+        // GL context current, since this runs from the panel render). A failed load leaves id 0 and is
+        // not retried.
+        it = m_icon_cache.try_emplace(filename).first;
+        it->second.load_from_svg_file(resources_dir() + "/images/" + filename, false, false, false, 32);
+    }
+    return it->second.get_id();
+}
+
 void GLGizmoTextureDisplacement::add_texture_layer()
 {
     ModelVolume *mv = texture_volume();
@@ -2552,6 +2565,28 @@ void GLGizmoTextureDisplacement::on_render_input_window(float x, float y, float 
         return changed;
     };
 
+    // Icon toggle button shared by the selection-mode and view-mode rows: an SVG button with a teal
+    // backing and full-brightness icon when active, dimmed otherwise. Falls back to a text checkbox if
+    // its icon could not be loaded, so the control is never lost.
+    const float  icon_btn_sz = m_imgui->scaled(1.5f);
+    const ImVec4 icon_active_bg(0.0f, 0.59f, 0.53f, 1.0f);
+    const auto   icon_toggle = [&](int uid, unsigned int ic, bool active, const wxString &label, const wxString &tip) -> bool {
+        bool clicked;
+        ImGui::PushID(uid);
+        if (ic != 0)
+            clicked = m_imgui->image_button((ImTextureID) (intptr_t) ic, ImVec2(icon_btn_sz, icon_btn_sz), ImVec2(0, 0),
+                                            ImVec2(1, 1), -1, active ? icon_active_bg : ImVec4(0, 0, 0, 0),
+                                            active ? ImVec4(1, 1, 1, 1) : ImVec4(0.65f, 0.65f, 0.65f, 1.f));
+        else {
+            bool v  = active;
+            clicked = ImGui::Checkbox(label.ToUTF8().data(), &v);
+        }
+        ImGui::PopID();
+        if (ImGui::IsItemHovered())
+            m_imgui->tooltip(tip, m_imgui->scaled(18.f));
+        return clicked;
+    };
+
     if (m_imgui->button(m_undocked ? _L("Dock panel") : _L("Undock panel")))
         m_undocked = !m_undocked;
     if (ImGui::IsItemHovered())
@@ -2568,17 +2603,22 @@ void GLGizmoTextureDisplacement::on_render_input_window(float x, float y, float 
     const bool is_brush_mode = m_tool_type == ToolType::BRUSH && m_cursor_type != TriangleSelector::CursorType::POINTER;
     const bool is_face_mode  = m_tool_type == ToolType::BRUSH && m_cursor_type == TriangleSelector::CursorType::POINTER;
     const bool is_area_mode  = m_tool_type == ToolType::SMART_FILL;
-    if (ImGui::RadioButton(_u8L("Brush").c_str(), is_brush_mode)) {
+    ImGui::SameLine();
+    if (icon_toggle(801, icon_id("toolbar_big_brush.svg"), is_brush_mode, _L("Brush"),
+                    _L("Brush - paint over the surface by dragging"))) {
         m_tool_type   = ToolType::BRUSH;
         m_cursor_type = TriangleSelector::CursorType::CIRCLE;
     }
     ImGui::SameLine();
-    if (ImGui::RadioButton(_u8L("Face").c_str(), is_face_mode)) {
+    if (icon_toggle(802, icon_id("toolbar_face.svg"), is_face_mode, _L("Face"),
+                    _L("Face - click individual triangles"))) {
         m_tool_type   = ToolType::BRUSH;
         m_cursor_type = TriangleSelector::CursorType::POINTER;
     }
     ImGui::SameLine();
-    if (ImGui::RadioButton(_u8L("Connected area").c_str(), is_area_mode)) {
+    if (icon_toggle(803, icon_id("texture_displacement_connected_area.svg"), is_area_mode, _L("Connected area"),
+                    _L("Connected area - flood-fill the region reachable without crossing an edge sharper than the "
+                       "angle threshold"))) {
         m_tool_type   = ToolType::SMART_FILL;
         m_cursor_type = TriangleSelector::CursorType::POINTER;
     }
@@ -2606,50 +2646,33 @@ void GLGizmoTextureDisplacement::on_render_input_window(float x, float y, float 
         select_whole_model();
 
     // View mode (#: "make View Mode with just icons"): Normal / Fast / Checker / Distortion behave as
-    // one radio group, Wireframe as an independent toggle. All reuse the one tool icon for now, so the
-    // tooltip carries the meaning. The underlying state stays m_use_bump_preview + m_uv_check_mode.
+    // one radio group, Wireframe as an independent toggle. Each has its own icon; the tooltip carries
+    // the meaning. The underlying state stays m_use_bump_preview + m_uv_check_mode.
     {
-        const unsigned int icon = tool_icon_id();
-        const float        vsz  = m_imgui->scaled(1.5f);
-        const ImVec4       teal(0.0f, 0.59f, 0.53f, 1.0f);
-        const int          cur_mode = m_use_bump_preview ? 1 :
-                                       (m_uv_check_mode == UVCheckMode::Checker    ? 2 :
-                                        m_uv_check_mode == UVCheckMode::Distortion ? 3 : 0);
+        const int  cur_mode = m_use_bump_preview ? 1 :
+                              (m_uv_check_mode == UVCheckMode::Checker    ? 2 :
+                               m_uv_check_mode == UVCheckMode::Distortion ? 3 : 0);
         int  new_mode  = cur_mode;
         bool wf_toggle = false;
 
-        // One icon button; active state shown by a teal backing and a full-brightness (vs dimmed) icon.
-        // Falls back to a text toggle if the icon can't load.
-        const auto icon_toggle = [&](int uid, bool active, const wxString &label, const wxString &tip) -> bool {
-            bool clicked;
-            ImGui::PushID(uid);
-            if (icon != 0)
-                clicked = m_imgui->image_button((ImTextureID) (intptr_t) icon, ImVec2(vsz, vsz), ImVec2(0, 0), ImVec2(1, 1),
-                                                -1, active ? teal : ImVec4(0, 0, 0, 0),
-                                                active ? ImVec4(1, 1, 1, 1) : ImVec4(0.65f, 0.65f, 0.65f, 1.f));
-            else {
-                bool v = active;
-                clicked = ImGui::Checkbox(label.ToUTF8().data(), &v);
-            }
-            ImGui::PopID();
-            if (ImGui::IsItemHovered())
-                m_imgui->tooltip(tip, m_imgui->scaled(18.f));
-            return clicked;
-        };
-
         m_imgui->text(_L("View"));
         ImGui::SameLine();
-        if (icon_toggle(701, cur_mode == 0, _L("Normal"), _L("Normal - the true displaced geometry (what Bake produces)"))) new_mode = 0;
+        if (icon_toggle(701, icon_id("texture_displacement_real_preview.svg"), cur_mode == 0, _L("Normal"),
+                        _L("Normal - the true displaced geometry (what Bake produces)"))) new_mode = 0;
         ImGui::SameLine();
-        if (icon_toggle(702, cur_mode == 1, _L("Fast"), _L("Fast - a bump-shaded approximation of the active layer only; quick to update, not exact"))) new_mode = 1;
+        if (icon_toggle(702, icon_id("texture_displacement_fast_preview.svg"), cur_mode == 1, _L("Fast"),
+                        _L("Fast - a bump-shaded approximation of the active layer only; quick to update, not exact"))) new_mode = 1;
         ImGui::SameLine();
-        if (icon_toggle(703, cur_mode == 2, _L("Checker"), _L("Checker - a test grid over the unwrap; squares stay square where it does not stretch"))) new_mode = 2;
+        if (icon_toggle(703, icon_id("texture_displacement_checker.svg"), cur_mode == 2, _L("Checker"),
+                        _L("Checker - a test grid over the unwrap; squares stay square where it does not stretch"))) new_mode = 2;
         ImGui::SameLine();
-        if (icon_toggle(704, cur_mode == 3, _L("Distortion"), _L("Distortion - blue-to-red stretch heatmap over the unwrap (needs the Unwrap/LSCM projection)"))) new_mode = 3;
+        if (icon_toggle(704, icon_id("texture_displacement_distortion.svg"), cur_mode == 3, _L("Distortion"),
+                        _L("Distortion - blue-to-red stretch heatmap over the unwrap (needs the Unwrap/LSCM projection)"))) new_mode = 3;
         ImGui::SameLine();
         ImGui::Dummy(ImVec2(m_imgui->scaled(0.6f), 0.f));
         ImGui::SameLine();
-        if (icon_toggle(705, m_wireframe_overlay, _L("Wireframe"), _L("Wireframe - overlay the mesh edges; independent of the view above"))) wf_toggle = true;
+        if (icon_toggle(705, icon_id("texture_displacement_wireframe.svg"), m_wireframe_overlay, _L("Wireframe"),
+                        _L("Wireframe - overlay the mesh edges; independent of the view above"))) wf_toggle = true;
 
         if (new_mode != cur_mode) {
             m_use_bump_preview = (new_mode == 1);

@@ -449,6 +449,12 @@ private:
     GLTexture    m_tool_icon;
     bool         m_tool_icon_tried = false;
     unsigned int tool_icon_id(); // 0 if the icon could not be loaded
+
+    // The panel's icon-button rows (selection mode, view mode) each need their own small SVG. Loaded and
+    // uploaded once on first use and cached by file name (under resources/images/). Returns 0 if an icon
+    // could not be loaded, in which case the button falls back to a text control.
+    std::map<std::string, GLTexture> m_icon_cache;
+    unsigned int                     icon_id(const std::string &filename);
 };
 
 } // namespace Slic3r::GUI
