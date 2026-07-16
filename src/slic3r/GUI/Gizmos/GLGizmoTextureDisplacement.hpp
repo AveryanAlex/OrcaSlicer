@@ -3,7 +3,15 @@
 
 #include "GLGizmoPainterBase.hpp"
 #include "libslic3r/TextureDisplacement.hpp"
+#include "slic3r/GUI/GLModel.hpp"
+#include "slic3r/GUI/GLTexture.hpp"
 #include "slic3r/GUI/I18N.hpp"
+#include "slic3r/GUI/TextureLibrary.hpp"
+
+#include <array>
+#include <map>
+#include <memory>
+#include <string>
 
 namespace Slic3r::GUI {
 
@@ -21,6 +29,10 @@ public:
     GLGizmoTextureDisplacement(GLCanvas3D& parent, const std::string& icon_filename, unsigned int sprite_id);
 
     void render_painter_gizmo() override;
+
+    // Intercepts mouse input while "Adjust Texture" mode is on (dragging the on-canvas offset/
+    // rotation handles instead of painting); otherwise forwards to the normal painting handling.
+    bool on_mouse(const wxMouseEvent &mouse_event) override;
 
 protected:
     void        on_render_input_window(float x, float y, float bottom_limit) override;
@@ -54,6 +66,173 @@ private:
     void set_active_layer(int slot); // flushes the previous layer's edits, then reloads selectors
     void bake();
 
+    // Marks every facet of every model-part volume as painted for the currently active layer --
+    // "whole model" as an alternative to brushing/clicking every triangle by hand.
+    void select_whole_model();
+
+    // Uniformly subdivides the volume's mesh (see libslic3r::subdivide_mesh_uniform()) so a
+    // low-poly input model has enough vertices to actually show texture-displacement detail.
+    // A real, committed geometry change (like Bake), so it needs its own snapshot; unlike Bake it
+    // has no target region, so any not-yet-baked paint on the volume is dropped rather than
+    // remapped (texture-displacement paint has no remap-across-topology-change support yet).
+    void subdivide_model();
+
+    // Returns a cached GPU thumbnail of layer's texture (decoding + uploading it the first time it
+    // is requested, or whenever its image_data changes), or nullptr if it has no usable texture.
+    GLTexture *get_layer_thumbnail(const TextureDisplacementLayer &layer);
+
+    // A texture from the picker's library (see slic3r/GUI/TextureLibrary.hpp), read and uploaded
+    // once and then kept for the gizmo's lifetime. The decoded bytes are held alongside the GPU
+    // thumbnail so that picking the texture can hand the layer this very same image_data buffer --
+    // which both avoids re-reading the file and lets decode_height_texture()'s own cache (keyed by
+    // exactly this pointer) hit immediately on the first bake/preview.
+    struct LibraryTexture
+    {
+        std::shared_ptr<std::vector<unsigned char>> image_data;
+        std::unique_ptr<GLTexture>                  thumbnail;
+    };
+    const LibraryTexture *get_library_texture(const std::string &path);
+
+    // The layer's texture chooser: a drop-down whose closed state and every one of whose entries
+    // shows a large preview image on the left and the texture's name on the right, plus an adjacent
+    // button that imports an image file from disk into the user texture folder. Shipped and
+    // user-imported textures are listed under separate headings.
+    void render_texture_picker(TextureDisplacementLayer &layer);
+    void set_layer_texture(TextureDisplacementLayer &layer, const TextureLibraryEntry &entry);
+    void import_custom_texture(TextureDisplacementLayer &layer);
+    // Draws a picker row (image left, name right) on top of a full-width Selectable, and leaves the
+    // cursor below it. Shared by the drop-down's closed state and its individual entries so the two
+    // cannot drift apart. Returns true when the row is clicked.
+    bool  texture_row(const char *id, const std::string &name, GLTexture *thumbnail, bool selected, float width);
+    float texture_row_height() const;
+
+    // "Adjust Texture" mode: instead of painting, dragging an on-canvas handle changes the active
+    // layer's offset. The handle is a flat panel lying in the paint patch's own tangent plane
+    // (a "pan" -- drag anywhere on it for free 2D movement), plus two arrows along the patch's
+    // own U/V axes that constrain the drag to just that one axis for precise nudging. Anchored to
+    // the centroid/average-normal of the active layer's current paint patch (see
+    // libslic3r::compute_layer_paint_anchor()), so nothing is drawn if it has nothing painted yet.
+    //
+    // NOTE: the drag direction/sign below is this session's best-effort reasoning about which way
+    // the texture should appear to move as the handle is dragged -- it could not be visually
+    // confirmed while writing it (no way to render/see pixels in this environment), so it may
+    // need a one-line sign flip once actually tested.
+    bool update_adjust_anchor(); // recomputes m_adjust_anchor_pos/normal; false if nothing painted
+    bool on_mouse_adjust_texture(const wxMouseEvent &mouse_event);
+    void render_adjust_texture_gizmo();
+    // Mesh-local tangent-plane basis at m_adjust_anchor_normal, matching project_planar()'s
+    // dominant-axis convention so dragging on-canvas maps consistently onto offset.
+    void adjust_tangent_basis(Vec3f &u_axis, Vec3f &v_axis) const;
+
+    // The plane a drag is measured against: the paint patch's anchor, lifted clear of the surface.
+    // Deliberately *fixed* -- independent of the layer's offset -- so that moving the handle cannot
+    // move the plane the handle's own motion is derived from, which would be a feedback loop.
+    Vec3f adjust_plane_point() const;
+
+    // Where the handle is actually drawn, in mesh-local coordinates. This is NOT just the patch's
+    // centroid: the handle *represents the texture's placement*, so it has to travel as `offset`
+    // changes. Pinning it to the centroid is why dragging it looked broken -- the texture slid but
+    // the handle stayed put. Undoing apply_uv_transform()'s scale and rotation turns the layer's
+    // offset back into a displacement in mm within the patch's tangent plane, which is what gets
+    // added to the anchor here. That is exactly consistent with the drag arithmetic in
+    // on_mouse_adjust_texture(): the handle then tracks the cursor 1:1, and sits back on the anchor
+    // precisely when offset is zero.
+    Vec3f adjust_handle_center(const TextureDisplacementLayer &layer) const;
+
+    // The layer painted by the active slot, or nullptr if that slot has no layer yet.
+    TextureDisplacementLayer       *active_layer();
+    const TextureDisplacementLayer *active_layer() const;
+
+    // Recomputes m_preview_glmodel from the volume's current (unbaked) paint state, using the same
+    // build_texture_displacement() algorithm as Bake. Called whenever the paint mask changes
+    // (stroke end, layer switch, undo/redo reload, post-bake refresh) rather than every frame --
+    // this is real mesh work (PNG sampling, vertex welding), not something to redo per paint stroke
+    // drag sample or idle repaint. With several painted layers this can be slow, so the actual
+    // computation runs in a background TextureDisplacementPreviewJob; this function only queues
+    // it and returns immediately, and m_preview_glmodel is updated later when it completes.
+    void rebuild_preview();
+    void render_preview_mesh();
+
+    // Alternate, GPU-only preview: perturbs shading normals from the active layer's height texture
+    // (a classic bump map) instead of actually moving vertices, using the
+    // resources/shaders/*/texture_displacement_bump.* shader. Faster than the true-displacement
+    // preview (no CPU meshing at all -- just a per-vertex paint-weight buffer built at the same
+    // cadence as rebuild_preview()) but only shows the *active* layer, and any bump is a shading
+    // illusion, not real geometry -- "Bake" always produces the true, exact result either way.
+    void rebuild_bump_preview_mesh();
+    void render_bump_preview_mesh();
+
+    // Feeds the active layer's painted patch + LSCM unwrap (if it's using that projection method)
+    // into Plater's docked UV-editor pane and shows it, or hides the pane if the active layer
+    // isn't using LSCM (or nothing is painted). Called whenever something that could change what
+    // the pane should show happens: paint changes, layer switch, projection method change, bake,
+    // and on shutdown (to hide it).
+    void update_uv_editor();
+
+    // Applies one island edit reported by the UV editor's drag/rotate gestures to the active layer.
+    // Deltas are incremental (see UVEditorCanvas::IslandEditFn); `finished` ends the gesture, which
+    // is when -- and only when -- the 3D preview is rebuilt, since doing that per mouse-move would
+    // queue a mesh recompute for every pixel of a drag.
+    void on_island_edited(int island, const Vec2f &offset_delta, float rotation_delta, float scale_factor, bool finished);
+    // Applies a committed vertex/edge edit from the UV editor's Vertex/Edge modes: each entry is an
+    // unwrapped-vertex index and its new raw-unwrap coordinate. Maps the unwrapped index to a mesh
+    // vertex and stores a per-vertex UV override on the layer (see lscm_uv_overrides), then rebuilds the
+    // preview so the baked geometry follows.
+    void on_uv_vertex_edited(const std::vector<std::pair<int, Vec2f>> &edits);
+    // UV-editor sub-element select mode, mirrored into the canvas: 0 = Island, 1 = Vertex, 2 = Edge.
+    int  m_uv_select_mode = 0;
+    // One affine per island (columns: x basis, y basis, translation), mapping the unwrap's raw mm
+    // coordinates to texture UVs -- the same type as UVEditorCanvas::IslandTransform, spelled out
+    // here so this header needn't drag in wxGLCanvas/glad. Cheap to recompute (it is per *island*,
+    // not per vertex), which is what lets an island drag update the pane without re-uploading a
+    // single vertex.
+    std::vector<Eigen::Matrix<float, 2, 3>> uv_editor_island_transforms(const TextureDisplacementLayer &layer);
+    // Handles a toolbar command forwarded from the UV pane that needs the layer data the canvas
+    // doesn't hold (average island scale, cut island). Takes the command as an int (a cast of
+    // UVEditorCanvas::Command) so this header needn't pull in glad/wxGLCanvas via the canvas header.
+    void on_uv_command(int cmd);
+    // Splits one unwrap chart in two by marking the mesh edges that straddle the plane through its
+    // 3D centroid, perpendicular to its longest axis, as seams (#17). The re-unwrap then separates it.
+    void cut_island(TextureDisplacementLayer &layer, int chart);
+
+    // Captures the current camera's right/up axes into the layer's projector (#6), transformed into
+    // the volume's local space so the projection is stable as the object is later moved/rotated.
+    void capture_view_projection(TextureDisplacementLayer &layer);
+
+    // Manual seam marking (#9): a mode where clicking the model toggles the nearest mesh edge in the
+    // active layer's lscm_seam_edges, so the unwrap can be cut exactly where the user wants -- the
+    // Blender "mark seam" workflow. Painting is suppressed while it is on.
+    bool    m_seam_edit_mode = false;
+    GLModel m_seam_glmodel; // the current seam edges, highlighted on the mesh
+    bool    on_mouse_seam(const wxMouseEvent &mouse_event);
+    void    toggle_seam_at(const Vec2d &mouse_pos);
+    void    rebuild_seam_overlay();
+    void    render_seam_overlay();
+    // The mesh edge nearest the mouse, in the volume's own vertex indices, or {-1,-1} if the ray misses.
+    // Factored out of toggle_seam_at() so the same pick can drive a live hover highlight (below) that
+    // shows which edge a click would toggle -- the "I don't know how it works" feedback the user hit.
+    std::pair<int, int> seam_edge_at(const Vec2d &mouse_pos) const;
+    std::pair<int, int> m_seam_hover_edge{ -1, -1 };
+    // The vertex a click would pick in shortest-path mode, so the target is visible on hover the same
+    // way the edge is in normal mode. -1 when nothing is under the cursor (or not in path mode).
+    int                 m_seam_hover_vertex = -1;
+    GLModel             m_seam_hover_glmodel;
+    void                rebuild_seam_hover_overlay();
+
+    // Shortest-path seam marking, for dense meshes where clicking every single triangle edge is
+    // tedious: in this sub-mode a click picks the nearest vertex, and the next click marks every edge
+    // on the shortest surface path between the two as a seam - so a whole seam line is drawn with two
+    // clicks. The end vertex becomes the next start, so a multi-segment seam chains click by click.
+    bool    m_seam_path_mode   = false;
+    int     m_seam_path_anchor = -1;      // mesh vertex the path starts from, or -1
+    GLModel m_seam_anchor_glmodel;        // the anchor's incident edges, highlighted
+    int     seam_vertex_at(const Vec2d &mouse_pos) const;    // nearest mesh vertex under the cursor
+    void    mark_seam_path(int v_from, int v_to);            // seam every edge on the shortest path
+    void    rebuild_seam_anchor_overlay();
+    // Set while an island gesture is in flight, so the undo snapshot is taken once at the start of
+    // the drag (capturing the state *before* it) rather than on every motion event.
+    bool m_island_drag_active = false;
+
     // Which of the up to TEXTURE_DISPLACEMENT_MAX_LAYERS paint masks the brush currently writes
     // into. Always a valid slot index (0 by default) so the base class's per-volume selector
     // machinery always has something to work with, even before any texture has been added --
@@ -62,7 +241,214 @@ private:
     int  m_active_layer_slot = 0;
     bool m_bake_in_progress  = false;
 
+    // When set, the true-displacement geometry is rebuilt on every parameter change (live), instead of
+    // only once the slider being dragged is released. On by default so painting/added textures show
+    // straight away without needing to nudge a slider first.
+    bool m_auto_update = true;
+
+    // Subdivision is now count-based (split the whole mesh 1..5 times) rather than a target edge
+    // length, and is previewed as a wireframe before it is committed: nothing is written to the model
+    // until "Apply". While previewing, the would-be subdivided mesh is drawn as a wireframe overlay so
+    // the added density is visible; "Done" ends the preview without touching the model. The normal
+    // "Show mesh wireframe" toggle is left alone, so a wireframe the user already had on stays on.
+    int     m_subdivide_count         = 1;
+    bool    m_subdivide_editing       = false;
+    int     m_subdivide_preview_count = -1; // the count m_subdivide_preview_glmodel was built for
+    GLModel m_subdivide_preview_glmodel;
+    void    rebuild_subdivide_preview();
+    void    render_subdivide_preview();
+
+    // Isotropic remeshing (CGAL) to even out wildly varying triangle sizes so displacement has a
+    // consistent density to work with. Target edge length in mm; 0 means "not yet initialised", filled
+    // with the mesh's mean edge length the first time the control is shown. Like subdivide, it replaces
+    // the geometry and drops not-yet-baked paint (no remap across a topology change).
+    float m_remesh_target_edge_mm = 0.f;
+    void  remesh_model();
+
+    // Live, pre-bake preview of the true displaced geometry (built by the same algorithm Bake
+    // uses). Empty/uninitialized whenever nothing is painted yet, in which case the gizmo falls
+    // back to the standard paint-mask overlay like every other painting gizmo.
+    GLModel m_preview_glmodel;
+    // Set while a layer parameter slider has changed since the last rebuild_preview() call but the
+    // mouse button driving the drag hasn't been released yet -- see on_render_input_window().
+    bool m_preview_params_dirty = false;
+
+    // See rebuild_bump_preview_mesh()/render_bump_preview_mesh().
+    bool    m_use_bump_preview = false;
+    // Set from the UV editor's per-move island edits instead of rebuilding the (potentially large) bump
+    // mesh synchronously inside that mouse handler -- doing the rebuild there stalled both the UV pane
+    // and the 3D view. The rebuild is instead coalesced to once per 3D frame (render_painter_gizmo).
+    bool    m_bump_preview_dirty = false;
+    GLModel m_bump_preview_glmodel;
+    // Whether the current bump mesh carries a precomputed per-vertex uv (LSCM) that the shader
+    // should sample at directly, rather than projecting in-shader. Set by rebuild_bump_preview_mesh().
+    bool    m_bump_preview_uses_vertex_uv = false;
+
+    // GPU island drag: while an island is dragged in the UV editor, the bump mesh is baked once (with
+    // the dragged island's vertices flagged, v_normal.y = 1) and then moved purely through the shader's
+    // island_delta uniform -- one uniform update per mouse move, no rebuild -- so it tracks the cursor
+    // as smoothly as Adjust placement. m_bump_active_chart is the dragged island (or -1);
+    // m_bump_active_vertex flags its base vertices; m_bump_baked_active_xf is that island's placement
+    // baked into the current mesh, against which the live delta is measured; m_bump_island_delta is the
+    // resulting final-uv-space affine handed to the shader (identity except mid-drag).
+    int                        m_bump_active_chart = -1;
+    std::vector<uint8_t>       m_bump_active_vertex;
+    Eigen::Matrix<float, 2, 3> m_bump_baked_active_xf = Eigen::Matrix<float, 2, 3>::Identity();
+    Eigen::Matrix<float, 2, 3> m_bump_island_delta    = Eigen::Matrix<float, 2, 3>::Identity();
+    void                       compute_bump_active_vertices(const std::vector<int> &charts);
+
+    // The set of islands the current UV-editor drag moves together: the pane's multi-selection unioned
+    // with each selected island's join group (see build_island_move_set()). Populated at drag start and
+    // cleared when it finishes. A move applies the same offset to every island in it; rotate/scale act
+    // only on the primary. Empty when no move drag is in flight.
+    std::vector<int> m_island_move_set;
+    // All islands that must move with `primary`: the pane's multi-selection plus, for each of those, the
+    // charts sharing its join group in `layer`. Always contains `primary`.
+    std::vector<int> build_island_move_set(const TextureDisplacementLayer &layer, int primary) const;
+    // The join-group id of chart `c`: its explicit entry in `groups`, or `c` itself (its own singleton)
+    // when unset. Two charts move together iff this matches.
+    static int       island_group_of(const std::vector<int> &groups, int c);
+    // Merges chart `b`'s join group into chart `a`'s (materialising `groups` to `chart_count` first).
+    static void      join_island_groups(std::vector<int> &groups, int a, int b, int chart_count);
+    // Final per-vertex texture uv for the projections the shader can't reconstruct itself -- LSCM (an
+    // unwrap) and ViewProjected (a projector plane the shader doesn't know). One entry per patch/base
+    // vertex, already through apply_uv_transform(). Empty for Triplanar/Cylindrical/Spherical, which
+    // the shader projects on its own. Shared by the bump preview and the UV-check overlay.
+    std::vector<Vec2f> compute_layer_vertex_uvs(const indexed_triangle_set &patch,
+                                                const TextureDisplacementLayer &layer) const;
+
+    // UV-check overlay drawn over the painted patch to sanity-check the unwrap (#13/#14). Built by
+    // rebuild_uvcheck_mesh(), drawn by render_uvcheck_mesh() with the "texture_displacement_uvcheck"
+    // shader. Checker works for any projection; Distortion needs the per-vertex LSCM uv.
+    enum class UVCheckMode { None, Checker, Distortion };
+    UVCheckMode m_uv_check_mode = UVCheckMode::None;
+    GLModel     m_uvcheck_glmodel;
+    bool        m_uvcheck_uses_vertex_uv = false;
+    void rebuild_uvcheck_mesh();
+    void render_uvcheck_mesh();
+
+    // The UV editor pane is opened only on the user's explicit request (this toggle in the panel),
+    // never automatically just because a patch exists -- auto-popping it whenever there was "a
+    // selection to process" is exactly what the user asked to stop. update_uv_editor() keeps the pane
+    // hidden unless this is set. Reset on gizmo shutdown so reopening the gizmo doesn't reopen the pane.
+    bool m_show_uv_editor = false;
+    // The unwrap is expensive, so it is recomputed only when the user explicitly asks for it (the
+    // "Unwrap" button), not on every paint stroke or slider nudge. This is set by that button and
+    // consumed by the next update_uv_editor() call, which is the only path that re-solves the unwrap;
+    // every other call merely refreshes the cheap per-island affine transforms over the existing one.
+    bool m_uv_unwrap_pending = false;
+    // Set alongside m_uv_unwrap_pending only by the Unwrap button, so the connected-net auto-layout runs
+    // on a genuine re-unwrap but not on a refresh re-solve (a vertex-edit commit or undo), which must
+    // leave island placements untouched.
+    bool m_uv_apply_connected_net = false;
+    // Signature of the per-vertex UV overrides last reflected in the pane. When it changes without the
+    // user pressing Unwrap -- a vertex/edge edit committing, or an undo/redo reverting one -- the pane
+    // is re-solved so its geometry follows, even though a plain edit otherwise never re-solves (#Feat2).
+    size_t m_uv_overrides_sig = 0;
+    // What the UV pane's background currently holds, so update_uv_editor() only re-uploads it when the
+    // choice actually changes (the height texture is large; re-sending it every stroke would be waste).
+    enum class UVBackground { None, Height, Checker };
+    UVBackground m_uv_editor_bg = UVBackground::None;
+    float        m_uv_editor_bg_smoothing = -1.f; // smoothing the height backdrop was uploaded at
+    // Per-chart distortion heatmap colour for the UV pane (#7/#14), computed once when the unwrap is
+    // re-solved (relative stretch doesn't change when islands are merely moved), fed to the canvas only
+    // while the Distortion check mode is on. Empty otherwise.
+    std::vector<ColorRGBA> m_uv_editor_distortion_colors;
+    void                   compute_uv_editor_distortion_colors(const indexed_triangle_set &patch);
+
+    // Plain triangle-edge overlay on the mesh (#8), toggled independently of the check modes.
+    bool    m_wireframe_overlay = false;
+    GLModel m_wireframe_overlay_glmodel;
+    size_t  m_wireframe_overlay_vcount = 0; // topology signature, so it rebuilds only on a real change
+    void rebuild_wireframe_overlay();       // from the base mesh (bump/paint mode)
+    void build_wireframe_from_its(const indexed_triangle_set &its); // from an explicit mesh, no early-out
+    void refresh_wireframe();               // pick base vs displaced source for the current view
+    void render_wireframe_overlay();
+    // The displaced preview geometry the last preview job produced, kept so the wireframe overlay can be
+    // drawn on the raised surface actually shown in the true-displacement view (#: "wireframe in real mode").
+    indexed_triangle_set m_preview_its;
+    // Bumped on every rebuild_preview() call; a background TextureDisplacementPreviewJob's result
+    // is only applied if this hasn't moved on since the job was queued (see rebuild_preview()),
+    // so a burst of edits can't have an earlier, now-stale job clobber a later one's result.
+    uint64_t m_preview_generation = 0;
+
+    // Per-slot GPU thumbnail cache for the layer list panel, keyed by the image_data pointer that
+    // was current the last time each thumbnail was built (see get_layer_thumbnail()).
+    std::array<std::unique_ptr<GLTexture>, TEXTURE_DISPLACEMENT_MAX_LAYERS> m_thumbnails;
+    std::array<const void *, TEXTURE_DISPLACEMENT_MAX_LAYERS>               m_thumbnail_source{};
+    // The smoothing each cached thumbnail was built at, so a smoothing change re-uploads it (and the
+    // fast/bump preview, which samples this texture, actually shows the blur).
+    std::array<float, TEXTURE_DISPLACEMENT_MAX_LAYERS>                      m_thumbnail_smoothing{};
+
+    // Library textures the picker has shown at least once, keyed by file path (see LibraryTexture).
+    std::map<std::string, LibraryTexture> m_library_textures;
+
+    // Everything the *unwrap* depends on. update_uv_editor() runs from rebuild_preview(), i.e. on
+    // every stroke end and every slider release -- but depth/tiling/rotation/offset/blend change
+    // none of this, so re-extracting the patch and re-solving on those edits would be pure waste.
+    // Held as the real values rather than a hash: TriangleSplittingData has an exact operator==, so
+    // there is no reason to accept a hash's (however unlikely) chance of showing a stale unwrap.
+    struct UVEditorState
+    {
+        int                                     slot       = -1;
+        const void                             *image_data = nullptr;
+        float                                   seam_angle = -1.f;
+        float                                   padding    = -2.f;
+        TriangleSelector::TriangleSplittingData facets;
+        // Manual/auto seam edges also change the unwrap, so a change here must force a re-solve just
+        // like the facets do (marking a seam leaves the paint mask untouched).
+        std::vector<std::pair<int, int>>        seam_edges;
+
+        bool operator==(const UVEditorState &other) const
+        {
+            return slot == other.slot && image_data == other.image_data && seam_angle == other.seam_angle &&
+                   padding == other.padding && facets == other.facets && seam_edges == other.seam_edges;
+        }
+    };
+    UVEditorState m_uv_editor_state;
+    // Bounds of the UVs last handed to the pane, purely so the panel can show where the unwrap
+    // actually landed -- it is packed in mm and then divided by the tile size, so it is easy for it
+    // to end up far outside the texture's first tile without any of that being visible.
+    Vec2f m_uv_editor_bbox_min = Vec2f::Zero();
+    Vec2f m_uv_editor_bbox_max = Vec2f::Zero();
+    // The unwrap m_uv_editor_state produced, kept so that changing tiling/rotation/offset only costs
+    // re-running apply_uv_transform() over it, not another extraction and solve.
+    PatchUnwrap m_uv_editor_unwrap;
+
+    // When set, the panel is a free-floating window the user can drag anywhere (with a title bar to
+    // grab), instead of being pinned to the right of the gizmo toolbar. Persisted across gizmo
+    // open/close within a session, so the choice sticks while working.
+    bool m_undocked = false;
+
+    // See the "Adjust Texture" block of private methods above.
+    bool  m_adjust_texture_mode      = false;
+    bool  m_adjust_anchor_valid      = false;
+    Vec3f m_adjust_anchor_pos        = Vec3f::Zero();  // mesh-local
+    Vec3f m_adjust_anchor_normal     = Vec3f::UnitZ(); // mesh-local
+
+    // Pan: free drag anywhere on the flat panel, moves offset along both axes. AxisU/AxisV: drag
+    // the corresponding arrow, moves offset along only that one axis.
+    enum class AdjustHandle { None, Pan, AxisU, AxisV };
+    AdjustHandle m_adjust_drag_handle       = AdjustHandle::None;
+    Vec2f        m_adjust_drag_start_offset = Vec2f::Zero();
+    // Anchor-relative planar position (see project_planar()) of the point under the mouse at the
+    // moment the current drag started; every subsequent frame's delta is measured against this,
+    // rather than accumulated frame-to-frame, to avoid drift.
+    Vec2f m_adjust_drag_start_planar = Vec2f::Zero();
+
+    // Lazily-built unit quad (the pan panel) and unit line-with-arrowhead (reused, rotated, for
+    // both the U and V axis arrows), transformed into place at render time.
+    GLModel m_adjust_panel_glmodel;
+    GLModel m_adjust_arrow_glmodel;
+
     std::map<std::string, wxString> m_desc;
+
+    // The tool's SVG (toolbar_texture_displacement.svg) uploaded once as a GL texture, so it can be
+    // used as an ImGui image button in the panel (currently the "add layer" affordance next to the
+    // Texture layers heading). Lazily loaded on first use, when a GL context is guaranteed current.
+    GLTexture    m_tool_icon;
+    bool         m_tool_icon_tried = false;
+    unsigned int tool_icon_id(); // 0 if the icon could not be loaded
 };
 
 } // namespace Slic3r::GUI

@@ -217,9 +217,8 @@ bool GLGizmosManager::init()
     m_gizmos.emplace_back(new GLGizmoSeam(m_parent, m_is_dark ? "toolbar_seam_dark.svg" : "toolbar_seam.svg", EType::Seam));
     m_gizmos.emplace_back(new GLGizmoFuzzySkin(m_parent, m_is_dark ? "toolbar_fuzzy_skin_paint_dark.svg" : "toolbar_fuzzy_skin_paint.svg", EType::FuzzySkin));
     m_gizmos.emplace_back(new GLGizmoMmuSegmentation(m_parent, m_is_dark ? "mmu_segmentation_dark.svg" : "mmu_segmentation.svg", EType::MmSegmentation));
-    // TODO: placeholder icon reused from the fuzzy-skin gizmo; swap in a dedicated
-    // toolbar_texture_displacement(_dark).svg once one exists.
-    m_gizmos.emplace_back(new GLGizmoTextureDisplacement(m_parent, m_is_dark ? "toolbar_fuzzy_skin_paint_dark.svg" : "toolbar_fuzzy_skin_paint.svg", EType::TextureDisplacement));
+    // One shared icon (no dedicated dark variant yet); it recolours acceptably in both themes.
+    m_gizmos.emplace_back(new GLGizmoTextureDisplacement(m_parent, "toolbar_texture_displacement.svg", EType::TextureDisplacement));
     m_gizmos.emplace_back(new GLGizmoEmboss(m_parent, m_is_dark ? "toolbar_text_dark.svg" : "toolbar_text.svg", EType::Emboss));
     m_gizmos.emplace_back(new GLGizmoSVG(m_parent));
     m_gizmos.emplace_back(new GLGizmoMeasure(m_parent, m_is_dark ? "toolbar_measure_dark.svg" : "toolbar_measure.svg", EType::Measure));

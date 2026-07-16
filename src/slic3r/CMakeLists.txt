@@ -301,6 +301,8 @@ set(SLIC3R_GUI_SOURCES
     GUI/Jobs/SLAImportJob.hpp
     GUI/Jobs/TextureDisplacementBakeJob.cpp
     GUI/Jobs/TextureDisplacementBakeJob.hpp
+    GUI/Jobs/TextureDisplacementPreviewJob.cpp
+    GUI/Jobs/TextureDisplacementPreviewJob.hpp
     GUI/Jobs/ThreadSafeQueue.hpp
     GUI/Jobs/UpgradeNetworkJob.cpp
     GUI/Jobs/UpgradeNetworkJob.hpp
@@ -470,6 +472,8 @@ set(SLIC3R_GUI_SOURCES
     GUI/TaskManager.hpp
     GUI/TextLines.cpp
     GUI/TextLines.hpp
+    GUI/TextureLibrary.cpp
+    GUI/TextureLibrary.hpp
     GUI/TickCode.cpp
     GUI/TickCode.hpp
     GUI/TroubleshootDialog.cpp
@@ -486,6 +490,8 @@ set(SLIC3R_GUI_SOURCES
     GUI/UserManager.hpp
     GUI/UserNotification.cpp
     GUI/UserNotification.hpp
+    GUI/UVEditorCanvas.cpp
+    GUI/UVEditorCanvas.hpp
     GUI/WebDownPluginDlg.cpp
     GUI/WebDownPluginDlg.hpp
     GUI/WebGuideDialog.cpp

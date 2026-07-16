@@ -1,28 +1,128 @@
 #include "GLGizmoTextureDisplacement.hpp"
 
-#include <fstream>
+#include <boost/log/trivial.hpp>
 
-#include <boost/filesystem.hpp>
-#include <boost/system/error_code.hpp>
-
+#include "libslic3r/MeshBoolean.hpp"
 #include "libslic3r/Model.hpp"
-#include "libslic3r/PNGReadWrite.hpp"
+#include "libslic3r/Utils.hpp"
 
+#include "slic3r/GUI/Camera.hpp"
+#include "slic3r/GUI/CameraUtils.hpp"
 #include "slic3r/GUI/GLCanvas3D.hpp"
 #include "slic3r/GUI/GUI.hpp"
 #include "slic3r/GUI/GUI_App.hpp"
 #include "slic3r/GUI/GUI_ObjectList.hpp"
 #include "slic3r/GUI/ImGuiWrapper.hpp"
 #include "slic3r/GUI/MsgDialog.hpp"
+#include "slic3r/GUI/OpenGLManager.hpp"
 #include "slic3r/GUI/Plater.hpp"
+#include "slic3r/GUI/TextureLibrary.hpp"
+#include "slic3r/GUI/UVEditorCanvas.hpp"
 #include "slic3r/GUI/Jobs/TextureDisplacementBakeJob.hpp"
+#include "slic3r/GUI/Jobs/TextureDisplacementPreviewJob.hpp"
 #include "slic3r/Utils/UndoRedo.hpp"
 #include "GLGizmoUtils.hpp"
 
 #include <glad/gl.h>
 #include <algorithm>
+#include <array>
+#include <cmath>
+#include <limits>
+#include <queue>
+#include <set>
 
 namespace Slic3r::GUI {
+
+namespace {
+// ImGuiWrapper::slider_float()'s trailing `power` parameter is forwarded straight into
+// ImGui::SliderFloat()'s ImGuiSliderFlags argument - this ImGui (1.83) replaced the old float
+// "power" curve API with a flags word but kept the parameter in the same position, and
+// ImGuiWrapper never caught up with the rename. Passing the Logarithmic flag through it is
+// therefore how a log-scaled slider gets requested here.
+//
+// Depth and tile size both want it: they span two to three orders of magnitude, and the values
+// that need the most precision (a few hundredths of a millimetre of relief, a very fine tile) are
+// all bunched into the very bottom of a linear range, where a single pixel of slider travel is a
+// bigger jump than the whole useful region.
+constexpr float ImGuiLogSlider = float(ImGuiSliderFlags_Logarithmic);
+
+// Uploads decoded 8-bit grayscale height data as an RGBA GPU texture for display in the panel.
+// Shared by the per-layer thumbnail and the picker's library entries, which differ only in where
+// their pixels came from.
+//
+// The source is downscaled to THUMBNAIL_MAX_PX first, with a box filter, and uploaded *without*
+// mipmaps. Both halves of that matter, and together they are the fix for thumbnails rendering as
+// garbage:
+//   - GLTexture's mipmap levels are not real downscales (see load_from_raw_data()'s header) - every
+//     level re-uploads the full-resolution buffer reinterpreted at a smaller size. A 512px texture
+//     drawn into a ~48px row is minified ~10x, which is exactly the regime where OpenGL picks those
+//     broken levels, so the thumbnail showed a scrambled crop of the image rather than the image.
+//     Turning mipmaps off makes it sample level 0, which is the real picture.
+//   - But level 0 at 512px sampled down to 48px with plain GL_LINEAR (a 2x2 tap) would alias badly
+//     on exactly the high-frequency patterns these textures are (knurl, hexagons, weave). Box-
+//     filtering down to roughly twice the displayed size first is what actually removes the
+//     frequencies that would alias, and it cuts the VRAM these hold by ~16x as a bonus.
+constexpr int THUMBNAIL_MAX_PX = 128;
+
+std::unique_ptr<GLTexture> upload_height_thumbnail(const DecodedHeightTexture &decoded)
+{
+    if (decoded.empty())
+        return nullptr;
+
+    // Preserve aspect; never upscale a texture that is already small.
+    const int scale = std::max(1, (std::max(decoded.width, decoded.height) + THUMBNAIL_MAX_PX - 1) / THUMBNAIL_MAX_PX);
+    const int w     = std::max(1, decoded.width / scale);
+    const int h     = std::max(1, decoded.height / scale);
+
+    std::vector<unsigned char> rgba(size_t(w) * size_t(h) * 4);
+    for (int y = 0; y < h; ++y)
+        for (int x = 0; x < w; ++x) {
+            // Average the source block this destination pixel covers.
+            const int x0 = x * decoded.width / w, x1 = std::max(x0 + 1, (x + 1) * decoded.width / w);
+            const int y0 = y * decoded.height / h, y1 = std::max(y0 + 1, (y + 1) * decoded.height / h);
+            unsigned int sum = 0, n = 0;
+            for (int sy = y0; sy < y1 && sy < decoded.height; ++sy)
+                for (int sx = x0; sx < x1 && sx < decoded.width; ++sx, ++n)
+                    sum += decoded.pixels[size_t(sy) * size_t(decoded.width) + size_t(sx)];
+
+            const unsigned char gray = (n > 0) ? static_cast<unsigned char>(sum / n) : 0;
+            const size_t        di   = (size_t(y) * size_t(w) + size_t(x)) * 4;
+            rgba[di + 0] = gray;
+            rgba[di + 1] = gray;
+            rgba[di + 2] = gray;
+            rgba[di + 3] = 255;
+        }
+
+    auto texture = std::make_unique<GLTexture>();
+    if (!texture->load_from_raw_data(std::move(rgba), (unsigned int) w, (unsigned int) h, false, /* use_mipmaps */ false))
+        return nullptr;
+    return texture;
+}
+
+// Intersects the camera ray through `mouse_pos` (screen coords) with the plane passing through
+// `plane_point_local`/`plane_normal_local` (mesh-local coords, transformed to world by `trafo`).
+// Returns false if the ray is parallel to the plane or the plane is behind the camera.
+bool ray_plane_hit(const Camera &camera, const Vec2d &mouse_pos, const Transform3d &trafo,
+                    const Vec3f &plane_point_local, const Vec3f &plane_normal_local, Vec3d &out_world_hit)
+{
+    Vec3d ray_origin, ray_dir;
+    CameraUtils::ray_from_screen_pos(camera, mouse_pos, ray_origin, ray_dir);
+
+    const Vec3d plane_point_world  = trafo * plane_point_local.cast<double>();
+    const Vec3d plane_normal_world = (trafo.matrix().block(0, 0, 3, 3).inverse().transpose() * plane_normal_local.cast<double>()).normalized();
+
+    const double denom = ray_dir.dot(plane_normal_world);
+    if (std::abs(denom) < 1e-8)
+        return false;
+
+    const double t = (plane_point_world - ray_origin).dot(plane_normal_world) / denom;
+    if (t < 0.0)
+        return false;
+
+    out_world_hit = ray_origin + ray_dir * t;
+    return true;
+}
+} // namespace
 
 GLGizmoTextureDisplacement::GLGizmoTextureDisplacement(GLCanvas3D& parent, const std::string& icon_filename, unsigned int sprite_id)
     : GLGizmoPainterBase(parent, icon_filename, sprite_id)
@@ -34,7 +134,7 @@ bool GLGizmoTextureDisplacement::on_init()
     m_desc["cursor_size"]   = _L("Brush size");
     m_desc["circle"]        = _L("Circle");
     m_desc["sphere"]        = _L("Sphere");
-    m_desc["add_texture"]   = _L("Add texture...");
+    m_desc["add_texture"]   = _L("Add layer");
     m_desc["remove_layer"]  = _L("Remove");
     m_desc["bake"]          = _L("Bake");
     m_desc["remove_all"]    = _L("Erase all");
@@ -49,6 +149,34 @@ std::string GLGizmoTextureDisplacement::on_get_name() const
 void GLGizmoTextureDisplacement::on_shutdown()
 {
     m_parent.toggle_model_objects_visibility(true);
+    m_preview_glmodel.reset();
+    m_bump_preview_glmodel.reset();
+    m_uvcheck_glmodel.reset();
+    m_wireframe_overlay_glmodel.reset();
+    m_wireframe_overlay_vcount = 0;
+    m_seam_glmodel.reset();
+    m_seam_hover_glmodel.reset();
+    m_seam_hover_edge     = { -1, -1 };
+    m_seam_hover_vertex   = -1;
+    m_seam_anchor_glmodel.reset();
+    m_seam_path_mode      = false;
+    m_seam_path_anchor    = -1;
+    m_subdivide_editing       = false;
+    m_subdivide_preview_count = -1;
+    m_subdivide_preview_glmodel.reset();
+    m_bump_active_chart  = -1;
+    m_bump_active_vertex.clear();
+    m_bump_island_delta  = Eigen::Matrix<float, 2, 3>::Identity();
+    m_island_drag_active = false;
+    m_island_move_set.clear();
+    m_adjust_texture_mode = false;
+    m_seam_edit_mode      = false;
+    m_adjust_drag_handle  = AdjustHandle::None;
+    m_adjust_anchor_valid = false;
+    // The pane is request-only: closing the gizmo drops the request, so reopening it later doesn't
+    // silently reopen the pane too.
+    m_show_uv_editor = false;
+    wxGetApp().plater()->show_uv_editor(false);
 }
 
 PainterGizmoType GLGizmoTextureDisplacement::get_painter_type() const
@@ -68,17 +196,1804 @@ void GLGizmoTextureDisplacement::render_painter_gizmo()
     glsafe(::glEnable(GL_BLEND));
     glsafe(::glEnable(GL_DEPTH_TEST));
 
-    // Phase 1 reuses the standard paint-mask overlay (as every other paint gizmo does) to show
-    // which area of the active layer is painted. A dedicated bump-map preview shader
-    // (resources/shaders/*/texture_displacement_bump.*) is registered and ready to use, but
-    // wiring it into this render path is deferred to a later phase -- see the project plan.
-    // "Bake" already shows the true, real-geometry result, which is the most important preview.
-    render_triangles(selection);
+    // Once anything is painted, m_preview_glmodel holds the true displaced result (same algorithm
+    // Bake uses). The untouched original topology (what render_triangles() draws) coincides
+    // exactly with it everywhere except the painted/displaced area, so both are drawn: the real
+    // preview geometry first, then the usual selection-highlight overlay with a small depth bias
+    // so it wins the depth test on the coincident (unpainted) surface - keeping the familiar
+    // enforcer/blocker highlight for precise brush editing there. Where the surface has actually
+    // been displaced, the raised preview geometry legitimately occludes the flat overlay - that
+    // visible bump is itself the "this is painted" indicator in that area.
+    //
+    // The bump preview is different: it never actually moves geometry (it's a shading trick), so
+    // its depth is identical to the overlay's *everywhere*, not just in the unpainted area - the
+    // depth-biased overlay would win the depth test across the whole surface and hide the bump
+    // shading entirely. So the overlay is skipped for it; the bump shading itself is the only
+    // feedback in that mode (still fine for painting, since render_cursor() below shows the brush).
+    // Coalesced bump rebuild from an in-progress UV island drag (see on_island_edited): done here, at
+    // most once per drawn frame, rather than synchronously in the UV canvas's mouse-move handler.
+    if (m_use_bump_preview && m_bump_preview_dirty) {
+        rebuild_bump_preview_mesh();
+        m_bump_preview_dirty = false;
+    }
+    const bool use_bump = m_use_bump_preview && m_bump_preview_glmodel.is_initialized();
+    if (use_bump) {
+        m_parent.toggle_model_objects_visibility(true);
+        if (ModelVolume *mv = texture_volume())
+            m_parent.toggle_model_objects_visibility(false, m_c->selection_info()->model_object(),
+                                                      m_c->selection_info()->get_active_instance(), mv);
+        render_bump_preview_mesh();
+    } else if (m_preview_glmodel.is_initialized()) {
+        m_parent.toggle_model_objects_visibility(true);
+        if (ModelVolume *mv = texture_volume())
+            m_parent.toggle_model_objects_visibility(false, m_c->selection_info()->model_object(),
+                                                      m_c->selection_info()->get_active_instance(), mv);
+        render_preview_mesh();
+
+        glsafe(::glEnable(GL_POLYGON_OFFSET_FILL));
+        glsafe(::glPolygonOffset(-1.0f, -1.0f));
+        render_triangles(selection);
+        glsafe(::glDisable(GL_POLYGON_OFFSET_FILL));
+    } else {
+        render_triangles(selection);
+    }
+
+    // Diagnostic overlays, drawn on top of whatever preview is active (both pull toward the camera
+    // with a polygon offset so they win the depth test against the coincident surface).
+    if (m_uv_check_mode != UVCheckMode::None)
+        render_uvcheck_mesh();
+    // While previewing a subdivision, its wireframe stands in for the mesh wireframe - it shows the
+    // density the model *would* have. The normal wireframe toggle is left untouched underneath, so it
+    // returns to whatever it was once the preview ends (which is what keeps an already-on wireframe on).
+    if (m_subdivide_editing)
+        render_subdivide_preview();
+    else if (m_wireframe_overlay)
+        render_wireframe_overlay();
+    // Marked seams are always shown for an LSCM layer, so existing cuts are visible before entering
+    // seam-edit mode - but they matter most while marking.
+    render_seam_overlay();
+
     m_c->object_clipper()->render_cut();
     m_c->instances_hider()->render_cut();
-    render_cursor();
+    if (m_adjust_texture_mode)
+        render_adjust_texture_gizmo();
+    else if (!m_seam_edit_mode) // the brush cursor is meaningless while marking seams
+        render_cursor();
 
     glsafe(::glDisable(GL_BLEND));
+}
+
+bool GLGizmoTextureDisplacement::on_mouse(const wxMouseEvent &mouse_event)
+{
+    if (m_seam_edit_mode)
+        return on_mouse_seam(mouse_event);
+    if (m_adjust_texture_mode)
+        return on_mouse_adjust_texture(mouse_event);
+    return GLGizmoPainterBase::on_mouse(mouse_event);
+}
+
+bool GLGizmoTextureDisplacement::on_mouse_seam(const wxMouseEvent &mouse_event)
+{
+    // Hold Ctrl to orbit/pan the camera while in seam mode, exactly as the base painter lets you do
+    // while painting: with Ctrl down we consume nothing, so the canvas gets the drag and moves the
+    // view. Without this, seam mode swallowed every left-drag and the camera couldn't be rotated.
+    if (mouse_event.CmdDown())
+        return false;
+
+    // Left-click marks/unmarks an edge; swallow the rest of the left-button stream so a drag doesn't
+    // paint, but let everything else through so the camera still orbits/pans/zooms normally.
+    if (mouse_event.LeftDown()) {
+        const Vec2d pos(mouse_event.GetX(), mouse_event.GetY());
+        if (m_seam_path_mode) {
+            // Two-click shortest-path seam: first click sets the start vertex, the next seams the whole
+            // path to it and becomes the new start (so a seam line chains click by click).
+            const int v = seam_vertex_at(pos);
+            if (v >= 0) {
+                if (m_seam_path_anchor < 0)
+                    m_seam_path_anchor = v;
+                else {
+                    mark_seam_path(m_seam_path_anchor, v);
+                    m_seam_path_anchor = v;
+                }
+                rebuild_seam_anchor_overlay();
+                m_parent.set_as_dirty();
+            }
+        } else {
+            toggle_seam_at(pos);
+        }
+        return true;
+    }
+    // Live hover: highlight what a click would pick, so the clickable target is obvious (the "I don't
+    // know how it works" the user hit). In normal mode that is an edge; in shortest-path mode it is a
+    // vertex. Don't swallow the motion - the camera still needs it.
+    if (mouse_event.Moving()) {
+        const Vec2d pos(mouse_event.GetX(), mouse_event.GetY());
+        if (m_seam_path_mode) {
+            const int v = seam_vertex_at(pos);
+            if (v != m_seam_hover_vertex) {
+                m_seam_hover_vertex = v;
+                m_seam_hover_edge   = { -1, -1 };
+                rebuild_seam_hover_overlay();
+                m_parent.set_as_dirty();
+            }
+        } else {
+            const std::pair<int, int> edge = seam_edge_at(pos);
+            if (edge != m_seam_hover_edge) {
+                m_seam_hover_edge   = edge;
+                m_seam_hover_vertex = -1;
+                rebuild_seam_hover_overlay();
+                m_parent.set_as_dirty();
+            }
+        }
+    }
+    if (mouse_event.LeftUp() || (mouse_event.Dragging() && mouse_event.LeftIsDown()))
+        return true;
+    return false;
+}
+
+std::pair<int, int> GLGizmoTextureDisplacement::seam_edge_at(const Vec2d &mouse_pos) const
+{
+    const ModelVolume *mv = texture_volume();
+    const ModelObject *mo = m_c->selection_info()->model_object();
+    if (mv == nullptr || mo == nullptr)
+        return { -1, -1 };
+
+    // The mesh raycasters are built one per model-part volume, in that order; find this volume's slot.
+    int idx = -1, count = 0;
+    for (const ModelVolume *v : mo->volumes) {
+        if (!v->is_model_part())
+            continue;
+        if (v == mv) { idx = count; break; }
+        ++count;
+    }
+    const auto &raycasters = m_c->raycaster()->raycasters();
+    if (idx < 0 || idx >= int(raycasters.size()))
+        return { -1, -1 };
+
+    const Selection  &selection = m_parent.get_selection();
+    const Transform3d trafo     = mo->instances[selection.get_instance_idx()]->get_transformation().get_matrix() * mv->get_matrix();
+    const Camera     &camera    = wxGetApp().plater()->get_camera();
+
+    Vec3f  hit = Vec3f::Zero(), normal = Vec3f::Zero();
+    size_t facet = 0;
+    if (!raycasters[size_t(idx)]->unproject_on_mesh(mouse_pos, trafo, camera, hit, normal,
+                                                     m_c->object_clipper()->get_clipping_plane(), &facet))
+        return { -1, -1 };
+
+    const indexed_triangle_set &its = mv->mesh().its;
+    if (facet >= its.indices.size())
+        return { -1, -1 };
+    const stl_triangle_vertex_indices &tri = its.indices[facet];
+
+    // The facet edge nearest the hit point (point-to-segment distance in mesh space).
+    const auto seg_dist = [](const Vec3f &p, const Vec3f &a, const Vec3f &b) {
+        const Vec3f  ab = b - a;
+        const float  l2 = ab.squaredNorm();
+        const float  t  = (l2 > 1e-12f) ? std::clamp((p - a).dot(ab) / l2, 0.f, 1.f) : 0.f;
+        return (p - (a + ab * t)).norm();
+    };
+    int   best_i = 0;
+    float best_d = std::numeric_limits<float>::max();
+    for (int i = 0; i < 3; ++i) {
+        const float d = seg_dist(hit, its.vertices[tri[i]], its.vertices[tri[(i + 1) % 3]]);
+        if (d < best_d) { best_d = d; best_i = i; }
+    }
+    const int a = tri[best_i], b = tri[(best_i + 1) % 3];
+    return { std::min(a, b), std::max(a, b) };
+}
+
+void GLGizmoTextureDisplacement::toggle_seam_at(const Vec2d &mouse_pos)
+{
+    TextureDisplacementLayer *layer = active_layer();
+    if (layer == nullptr)
+        return;
+    const std::pair<int, int> edge = seam_edge_at(mouse_pos);
+    if (edge.first < 0)
+        return;
+
+    Plater::TakeSnapshot snapshot(wxGetApp().plater(), _u8L("Mark texture seam"), UndoRedo::SnapshotType::GizmoAction);
+    auto &seams = layer->lscm_seam_edges;
+    if (const auto it = std::find(seams.begin(), seams.end(), edge); it != seams.end())
+        seams.erase(it);
+    else
+        seams.push_back(edge);
+    rebuild_preview();
+}
+
+int GLGizmoTextureDisplacement::seam_vertex_at(const Vec2d &mouse_pos) const
+{
+    const ModelVolume *mv = texture_volume();
+    const ModelObject *mo = m_c->selection_info()->model_object();
+    if (mv == nullptr || mo == nullptr)
+        return -1;
+    int idx = -1, count = 0;
+    for (const ModelVolume *v : mo->volumes) {
+        if (!v->is_model_part())
+            continue;
+        if (v == mv) { idx = count; break; }
+        ++count;
+    }
+    const auto &raycasters = m_c->raycaster()->raycasters();
+    if (idx < 0 || idx >= int(raycasters.size()))
+        return -1;
+
+    const Selection  &selection = m_parent.get_selection();
+    const Transform3d trafo     = mo->instances[selection.get_instance_idx()]->get_transformation().get_matrix() * mv->get_matrix();
+    const Camera     &camera    = wxGetApp().plater()->get_camera();
+
+    Vec3f  hit = Vec3f::Zero(), normal = Vec3f::Zero();
+    size_t facet = 0;
+    if (!raycasters[size_t(idx)]->unproject_on_mesh(mouse_pos, trafo, camera, hit, normal,
+                                                     m_c->object_clipper()->get_clipping_plane(), &facet))
+        return -1;
+    const indexed_triangle_set &its = mv->mesh().its;
+    if (facet >= its.indices.size())
+        return -1;
+    const stl_triangle_vertex_indices &tri = its.indices[facet];
+    int   best = tri[0];
+    float best_d = std::numeric_limits<float>::max();
+    for (int i = 0; i < 3; ++i) {
+        const float d = (hit - its.vertices[tri[i]]).squaredNorm();
+        if (d < best_d) { best_d = d; best = tri[i]; }
+    }
+    return best;
+}
+
+void GLGizmoTextureDisplacement::mark_seam_path(int v_from, int v_to)
+{
+    TextureDisplacementLayer *layer = active_layer();
+    const ModelVolume        *mv    = texture_volume();
+    if (layer == nullptr || mv == nullptr || v_from < 0 || v_to < 0 || v_from == v_to)
+        return;
+    const indexed_triangle_set &its = mv->mesh().its;
+    const size_t                n   = its.vertices.size();
+    if (size_t(v_from) >= n || size_t(v_to) >= n)
+        return;
+
+    // Shortest path over the mesh's edge graph (Dijkstra, edge weight = length). Built on demand; one
+    // pass per click is fine even on a dense mesh.
+    std::vector<std::vector<std::pair<int, float>>> adj(n);
+    for (const stl_triangle_vertex_indices &tri : its.indices)
+        for (int i = 0; i < 3; ++i) {
+            const int a = tri[i], b = tri[(i + 1) % 3];
+            const float w = (its.vertices[size_t(a)] - its.vertices[size_t(b)]).norm();
+            adj[size_t(a)].push_back({ b, w });
+            adj[size_t(b)].push_back({ a, w });
+        }
+
+    std::vector<float> dist(n, std::numeric_limits<float>::infinity());
+    std::vector<int>   prev(n, -1);
+    using QN = std::pair<float, int>;
+    std::priority_queue<QN, std::vector<QN>, std::greater<QN>> pq;
+    dist[size_t(v_from)] = 0.f;
+    pq.push({ 0.f, v_from });
+    while (!pq.empty()) {
+        const auto [d, u] = pq.top();
+        pq.pop();
+        if (d > dist[size_t(u)])
+            continue;
+        if (u == v_to)
+            break;
+        for (const auto &[w, ew] : adj[size_t(u)]) {
+            const float nd = d + ew;
+            if (nd < dist[size_t(w)]) {
+                dist[size_t(w)] = nd;
+                prev[size_t(w)] = u;
+                pq.push({ nd, w });
+            }
+        }
+    }
+    if (prev[size_t(v_to)] < 0)
+        return; // unreachable (disconnected components)
+
+    Plater::TakeSnapshot snapshot(wxGetApp().plater(), _u8L("Mark texture seam path"), UndoRedo::SnapshotType::GizmoAction);
+    auto &seams = layer->lscm_seam_edges;
+    for (int v = v_to; v != v_from && v >= 0; v = prev[size_t(v)]) {
+        const int p = prev[size_t(v)];
+        if (p < 0)
+            break;
+        const std::pair<int, int> e{ std::min(v, p), std::max(v, p) };
+        if (std::find(seams.begin(), seams.end(), e) == seams.end())
+            seams.push_back(e);
+    }
+    rebuild_preview();
+}
+
+void GLGizmoTextureDisplacement::rebuild_seam_anchor_overlay()
+{
+    m_seam_anchor_glmodel.reset();
+    const ModelVolume *mv = texture_volume();
+    if (!m_seam_edit_mode || !m_seam_path_mode || mv == nullptr || m_seam_path_anchor < 0)
+        return;
+    const indexed_triangle_set &its = mv->mesh().its;
+    if (size_t(m_seam_path_anchor) >= its.vertices.size())
+        return;
+
+    // The anchor's incident edges, so the path's start vertex is visible on the model.
+    GLModel::Geometry init_data;
+    init_data.format = { GLModel::Geometry::EPrimitiveType::Lines, GLModel::Geometry::EVertexLayout::P3 };
+    unsigned nn = 0;
+    for (const stl_triangle_vertex_indices &tri : its.indices)
+        for (int i = 0; i < 3; ++i) {
+            const int a = tri[i], b = tri[(i + 1) % 3];
+            if (a == m_seam_path_anchor || b == m_seam_path_anchor) {
+                init_data.add_vertex(its.vertices[size_t(a)]);
+                init_data.add_vertex(its.vertices[size_t(b)]);
+                init_data.add_line(nn, nn + 1);
+                nn += 2;
+            }
+        }
+    if (!init_data.is_empty())
+        m_seam_anchor_glmodel.init_from(std::move(init_data));
+}
+
+void GLGizmoTextureDisplacement::rebuild_seam_hover_overlay()
+{
+    m_seam_hover_glmodel.reset();
+    const ModelVolume *mv = texture_volume();
+    if (!m_seam_edit_mode || mv == nullptr)
+        return;
+    const indexed_triangle_set &its = mv->mesh().its;
+
+    GLModel::Geometry init_data;
+    init_data.format = { GLModel::Geometry::EPrimitiveType::Lines, GLModel::Geometry::EVertexLayout::P3 };
+
+    if (m_seam_path_mode) {
+        // Highlight the hovered vertex as its ring of incident edges, so the click target is legible on
+        // a dense mesh (matching the green anchor's style, in the hover yellow render_seam_overlay uses).
+        if (m_seam_hover_vertex < 0 || size_t(m_seam_hover_vertex) >= its.vertices.size())
+            return;
+        unsigned nn = 0;
+        for (const stl_triangle_vertex_indices &tri : its.indices)
+            for (int i = 0; i < 3; ++i) {
+                const int a = tri[i], b = tri[(i + 1) % 3];
+                if (a == m_seam_hover_vertex || b == m_seam_hover_vertex) {
+                    init_data.add_vertex(its.vertices[size_t(a)]);
+                    init_data.add_vertex(its.vertices[size_t(b)]);
+                    init_data.add_line(nn, nn + 1);
+                    nn += 2;
+                }
+            }
+        if (!init_data.is_empty())
+            m_seam_hover_glmodel.init_from(std::move(init_data));
+        return;
+    }
+
+    if (m_seam_hover_edge.first < 0 || size_t(m_seam_hover_edge.first) >= its.vertices.size() ||
+        size_t(m_seam_hover_edge.second) >= its.vertices.size())
+        return;
+    init_data.reserve_vertices(2);
+    init_data.reserve_indices(2);
+    init_data.add_vertex(its.vertices[size_t(m_seam_hover_edge.first)]);
+    init_data.add_vertex(its.vertices[size_t(m_seam_hover_edge.second)]);
+    init_data.add_line(0, 1);
+    m_seam_hover_glmodel.init_from(std::move(init_data));
+}
+
+void GLGizmoTextureDisplacement::rebuild_seam_overlay()
+{
+    m_seam_glmodel.reset();
+    const ModelVolume              *mv    = texture_volume();
+    const TextureDisplacementLayer *layer = active_layer();
+    if (mv == nullptr || layer == nullptr || layer->lscm_seam_edges.empty())
+        return;
+    const indexed_triangle_set &its = mv->mesh().its;
+
+    GLModel::Geometry init_data;
+    init_data.format = { GLModel::Geometry::EPrimitiveType::Lines, GLModel::Geometry::EVertexLayout::P3 };
+    init_data.reserve_vertices(layer->lscm_seam_edges.size() * 2);
+    init_data.reserve_indices(layer->lscm_seam_edges.size() * 2);
+    unsigned n = 0;
+    for (const auto &[a, b] : layer->lscm_seam_edges) {
+        if (a < 0 || b < 0 || size_t(a) >= its.vertices.size() || size_t(b) >= its.vertices.size())
+            continue;
+        init_data.add_vertex(its.vertices[size_t(a)]);
+        init_data.add_vertex(its.vertices[size_t(b)]);
+        init_data.add_line(n, n + 1);
+        n += 2;
+    }
+    if (!init_data.is_empty())
+        m_seam_glmodel.init_from(std::move(init_data));
+}
+
+void GLGizmoTextureDisplacement::render_seam_overlay()
+{
+    const ModelObject *mo = m_c->selection_info()->model_object();
+    const ModelVolume *mv = texture_volume();
+    const bool         have_marked = m_seam_glmodel.is_initialized();
+    const bool         have_hover  = m_seam_edit_mode && m_seam_hover_glmodel.is_initialized();
+    const bool         have_anchor = m_seam_edit_mode && m_seam_anchor_glmodel.is_initialized();
+    if (mo == nullptr || mv == nullptr || (!have_marked && !have_hover && !have_anchor))
+        return;
+    GLShaderProgram *shader = wxGetApp().get_shader("flat");
+    if (shader == nullptr)
+        return;
+
+    const Selection  &selection    = m_parent.get_selection();
+    const Transform3d trafo_matrix = mo->instances[selection.get_instance_idx()]->get_transformation().get_matrix() * mv->get_matrix();
+    const Camera     &camera       = wxGetApp().plater()->get_camera();
+
+    shader->start_using();
+    shader->set_uniform("view_model_matrix", camera.get_view_matrix() * trafo_matrix);
+    shader->set_uniform("projection_matrix", camera.get_projection_matrix());
+    glsafe(::glEnable(GL_POLYGON_OFFSET_LINE));
+    glsafe(::glPolygonOffset(-2.0f, -2.0f)); // pull further forward than the wireframe so seams read on top
+    // A seam edge is geometrically the same line as a wireframe edge, so a mere polygon offset is a
+    // fragile way to make the red seam beat the white wireframe -- drivers apply GL_POLYGON_OFFSET_LINE
+    // inconsistently, and the two lines then z-fight and the wireframe wins. When the wireframe is on,
+    // or while actively marking, just draw the seams with depth testing off so they are unconditionally
+    // on top -- being visible is the one thing this overlay has to guarantee.
+    const bool seams_on_top = m_wireframe_overlay || m_seam_edit_mode;
+    if (seams_on_top)
+        glsafe(::glDisable(GL_DEPTH_TEST));
+#if !SLIC3R_OPENGL_ES
+    const bool wide = !OpenGLManager::get_gl_info().is_core_profile();
+    if (wide)
+        glsafe(::glLineWidth(4.0f));
+#endif // !SLIC3R_OPENGL_ES
+    if (have_marked) {
+        m_seam_glmodel.set_color(ColorRGBA(1.0f, 0.15f, 0.15f, 1.0f)); // Blender's seam red
+        m_seam_glmodel.render();
+    }
+    // The edge a click would toggle, in yellow and pulled the furthest forward, so it is unmistakable
+    // which edge is being targeted while marking seams.
+    if (have_hover) {
+        glsafe(::glPolygonOffset(-3.0f, -3.0f));
+        m_seam_hover_glmodel.set_color(ColorRGBA(1.0f, 0.9f, 0.15f, 1.0f));
+        m_seam_hover_glmodel.render();
+    }
+    // The shortest-path start vertex, shown as its ring of incident edges in green.
+    if (have_anchor) {
+        glsafe(::glPolygonOffset(-3.0f, -3.0f));
+        m_seam_anchor_glmodel.set_color(ColorRGBA(0.2f, 1.0f, 0.4f, 1.0f));
+        m_seam_anchor_glmodel.render();
+    }
+#if !SLIC3R_OPENGL_ES
+    if (wide)
+        glsafe(::glLineWidth(1.0f));
+#endif // !SLIC3R_OPENGL_ES
+    glsafe(::glDisable(GL_POLYGON_OFFSET_LINE));
+    if (seams_on_top)
+        glsafe(::glEnable(GL_DEPTH_TEST));
+    shader->stop_using();
+}
+
+void GLGizmoTextureDisplacement::render_preview_mesh()
+{
+    const ModelObject *mo = m_c->selection_info()->model_object();
+    const ModelVolume  *mv = texture_volume();
+    if (mo == nullptr || mv == nullptr)
+        return;
+
+    const Selection  &selection    = m_parent.get_selection();
+    const Transform3d trafo_matrix = mo->instances[selection.get_instance_idx()]->get_transformation().get_matrix() * mv->get_matrix();
+
+    auto *shader = wxGetApp().get_shader("gouraud_light");
+    if (shader == nullptr)
+        return;
+    shader->start_using();
+    const Camera      &camera      = wxGetApp().plater()->get_camera();
+    const Transform3d &view_matrix = camera.get_view_matrix();
+    shader->set_uniform("view_model_matrix", view_matrix * trafo_matrix);
+    shader->set_uniform("projection_matrix", camera.get_projection_matrix());
+    const Matrix3d view_normal_matrix = view_matrix.matrix().block(0, 0, 3, 3) * trafo_matrix.matrix().block(0, 0, 3, 3).inverse().transpose();
+    shader->set_uniform("view_normal_matrix", view_normal_matrix);
+    m_preview_glmodel.render();
+    shader->stop_using();
+}
+
+std::vector<Vec2f> GLGizmoTextureDisplacement::compute_layer_vertex_uvs(const indexed_triangle_set     &patch,
+                                                                       const TextureDisplacementLayer &layer) const
+{
+    if (layer.projection_method == TextureProjectionMethod::LSCM)
+        return compute_lscm_uvs(patch, layer); // one final uv per patch vertex (0 where unassigned)
+    if (layer.projection_method == TextureProjectionMethod::ViewProjected) {
+        std::vector<Vec2f> uv(patch.vertices.size());
+        for (size_t vi = 0; vi < patch.vertices.size(); ++vi) {
+            const Vec2f planar(patch.vertices[vi].dot(layer.view_project_right),
+                               patch.vertices[vi].dot(layer.view_project_up));
+            uv[vi] = apply_uv_transform(planar, layer);
+        }
+        return uv;
+    }
+    return {}; // Triplanar / Cylindrical / Spherical: the shader projects on its own
+}
+
+void GLGizmoTextureDisplacement::rebuild_bump_preview_mesh()
+{
+    m_bump_preview_glmodel.reset();
+
+    const ModelVolume *mv = texture_volume();
+    if (mv == nullptr || m_triangle_selectors.empty())
+        return;
+
+    // Uses the *live* selector (not the flushed model facet data), so this reflects an in-progress
+    // stroke immediately rather than only once it ends - the point of this preview mode is to be
+    // the fast, no-CPU-meshing one.
+    const indexed_triangle_set patch = m_triangle_selectors[0]->get_facets_strict(EnforcerBlockerType::ENFORCER);
+    if (patch.indices.empty())
+        return;
+
+    const indexed_triangle_set &base = mv->mesh().its;
+    if (base.vertices.size() != patch.vertices.size())
+        return; // shouldn't happen: get_facets_strict() always returns the full vertex array
+
+    std::vector<bool> is_painted(patch.vertices.size(), false);
+    for (const stl_triangle_vertex_indices &tri : patch.indices)
+        for (int i = 0; i < 3; ++i)
+            is_painted[tri[i]] = true;
+
+    // For LSCM we hand the shader the finished per-vertex texture uv (island placement + tiling/
+    // rotation/offset already folded in, exactly what the bake samples), because it cannot be
+    // reconstructed in the fragment shader the way a triplanar projection can. This is also what
+    // makes the fast preview follow the UV editor: the uvs move when an island is dragged, so this
+    // mesh rebuilds (on drag end) with them. The other projections keep projecting in-shader.
+    const TextureDisplacementLayer *active = active_layer();
+    std::vector<Vec2f> vertex_uv = active != nullptr ? compute_layer_vertex_uvs(patch, *active) : std::vector<Vec2f>{};
+    m_bump_preview_uses_vertex_uv = vertex_uv.size() == base.vertices.size();
+    if (!m_bump_preview_uses_vertex_uv)
+        vertex_uv.clear();
+
+    GLModel::Geometry init_data;
+    // P3N3T2: normal.x carries the paint weight, tex_coord carries the precomputed uv (see the vertex
+    // shader). Reuses a standard GLModel layout rather than a bespoke vertex buffer.
+    init_data.format = { GLModel::Geometry::EPrimitiveType::Triangles, GLModel::Geometry::EVertexLayout::P3N3T2 };
+    init_data.reserve_vertices(base.vertices.size());
+    init_data.reserve_indices(base.indices.size() * 3);
+    // Every triangle of the whole mesh is included (not just the painted ones) so the surrounding,
+    // un-bumped surface still renders - the per-vertex weight (0 outside the patch) is what fades
+    // the shader's bump effect to nothing there, exactly like the true-displacement preview fades
+    // to the untouched surface at its boundary.
+    // normal.y flags the island currently dragged in the UV editor, so the shader can move just that
+    // island through the island_delta uniform (see the bump shaders / on_island_edited).
+    const bool have_active = m_bump_active_chart >= 0 && !m_bump_active_vertex.empty();
+    for (size_t vi = 0; vi < base.vertices.size(); ++vi) {
+        const float active = (have_active && vi < m_bump_active_vertex.size() && m_bump_active_vertex[vi]) ? 1.f : 0.f;
+        const Vec3f weight_normal(is_painted[vi] ? 1.f : 0.f, active, 0.f);
+        const Vec2f uv = m_bump_preview_uses_vertex_uv ? vertex_uv[vi] : Vec2f::Zero();
+        init_data.add_vertex(base.vertices[vi], weight_normal, uv);
+    }
+    for (const stl_triangle_vertex_indices &tri : base.indices)
+        init_data.add_triangle(unsigned(tri[0]), unsigned(tri[1]), unsigned(tri[2]));
+
+    m_bump_preview_glmodel.init_from(std::move(init_data));
+    // GLModel::render() unconditionally re-sets the shader's "uniform_color" from this internal
+    // color field right before drawing (see GLModel.cpp) - setting the uniform manually in
+    // render_bump_preview_mesh() would just get overwritten by it, so it must be set here instead.
+    // GLModel::Geometry defaults to BLACK, which is exactly what showed up before this was added.
+    m_bump_preview_glmodel.set_color(GLVolume::NEUTRAL_COLOR);
+
+    // The mesh now reflects the islands' current placement, so any live drag delta is measured from
+    // here: reset it to identity and record the dragged island's baked transform.
+    m_bump_island_delta = Eigen::Matrix<float, 2, 3>::Identity();
+    const TextureDisplacementLayer *al = active_layer();
+    if (m_bump_active_chart >= 0 && al != nullptr) {
+        const std::vector<Eigen::Matrix<float, 2, 3>> xf = uv_editor_island_transforms(*al);
+        m_bump_baked_active_xf = (size_t(m_bump_active_chart) < xf.size()) ? xf[size_t(m_bump_active_chart)]
+                                                                           : Eigen::Matrix<float, 2, 3>::Identity();
+    } else {
+        m_bump_baked_active_xf = Eigen::Matrix<float, 2, 3>::Identity();
+    }
+}
+
+void GLGizmoTextureDisplacement::compute_bump_active_vertices(const std::vector<int> &charts)
+{
+    m_bump_active_vertex.clear();
+    const ModelVolume *mv = texture_volume();
+    if (mv == nullptr || charts.empty())
+        return;
+    const PatchUnwrap &u = m_uv_editor_unwrap;
+    m_bump_active_vertex.assign(mv->mesh().its.vertices.size(), 0);
+    // Flag the base vertices of every chart being moved. For a group/multi move that is more than one
+    // chart, but since such a move is a pure translation the shader applies the same delta to them all
+    // (see on_island_edited) -- exactly the "joined islands move together" behaviour.
+    for (size_t i = 0; i < u.uvs.size(); ++i) {
+        if (i >= u.vertex_chart.size() ||
+            std::find(charts.begin(), charts.end(), u.vertex_chart[i]) == charts.end())
+            continue;
+        const int sv = (i < u.source_vertex.size()) ? u.source_vertex[i] : -1;
+        if (sv >= 0 && size_t(sv) < m_bump_active_vertex.size())
+            m_bump_active_vertex[size_t(sv)] = 1;
+    }
+}
+
+int GLGizmoTextureDisplacement::island_group_of(const std::vector<int> &groups, int c)
+{
+    return (c >= 0 && size_t(c) < groups.size() && groups[size_t(c)] >= 0) ? groups[size_t(c)] : c;
+}
+
+void GLGizmoTextureDisplacement::join_island_groups(std::vector<int> &groups, int a, int b, int chart_count)
+{
+    if (a < 0 || b < 0 || chart_count <= 0)
+        return;
+    // Materialise to a full explicit table first, so singletons (which were implicit) get a concrete id
+    // that the relabel loop below can match on.
+    if (int(groups.size()) < chart_count) {
+        const size_t old = groups.size();
+        groups.resize(size_t(chart_count));
+        for (size_t i = old; i < groups.size(); ++i)
+            groups[i] = int(i);
+    }
+    for (size_t i = 0; i < groups.size(); ++i)
+        if (groups[i] < 0)
+            groups[i] = int(i);
+    const int ga = groups[size_t(a)], gb = groups[size_t(b)];
+    if (ga == gb)
+        return;
+    const int g = std::min(ga, gb);
+    for (int &x : groups)
+        if (x == ga || x == gb)
+            x = g;
+}
+
+std::vector<int> GLGizmoTextureDisplacement::build_island_move_set(const TextureDisplacementLayer &layer, int primary) const
+{
+    std::vector<int> set;
+    const int        chart_count = std::max(m_uv_editor_unwrap.chart_count, 0);
+
+    // Seed with the pane's multi-selection (falling back to just the primary if the canvas has none).
+    std::vector<int> seeds;
+    if (const UVEditorCanvas *canvas = wxGetApp().plater()->get_uv_editor_canvas())
+        seeds = canvas->selected_islands();
+    if (seeds.empty() && primary >= 0)
+        seeds.push_back(primary);
+
+    const auto add = [&set](int c) {
+        if (c >= 0 && std::find(set.begin(), set.end(), c) == set.end())
+            set.push_back(c);
+    };
+    for (int s : seeds) {
+        add(s);
+        // Pull in every chart sharing s's join group, so a joined pair moves as one.
+        const int gs = island_group_of(layer.island_groups, s);
+        for (int c = 0; c < chart_count; ++c)
+            if (island_group_of(layer.island_groups, c) == gs)
+                add(c);
+    }
+    add(primary); // never leave the primary out, whatever the selection state
+    return set;
+}
+
+void GLGizmoTextureDisplacement::render_bump_preview_mesh()
+{
+    const ModelObject *mo = m_c->selection_info()->model_object();
+    const ModelVolume  *mv = texture_volume();
+    if (mo == nullptr || mv == nullptr || !m_bump_preview_glmodel.is_initialized())
+        return;
+
+    const TextureDisplacementLayer *layer = active_layer();
+    if (layer == nullptr || layer->empty())
+        return;
+
+    // Reuses the layer-list panel's already-decoded, already-uploaded GPU thumbnail (smoothing-aware),
+    // whose grayscale value lives in the R channel exactly as the shader samples it. Its width/height
+    // are read straight off the texture -- decoding the PNG here every frame would re-run the smoothing
+    // blur on every camera move, which is what tanked the frame rate at high smoothing.
+    GLTexture *tex = get_layer_thumbnail(*layer);
+    if (tex == nullptr || tex->get_width() <= 0 || tex->get_height() <= 0)
+        return;
+
+    GLShaderProgram *shader = wxGetApp().get_shader("texture_displacement_bump");
+    if (shader == nullptr)
+        return;
+
+    const Selection  &selection    = m_parent.get_selection();
+    const Transform3d trafo_matrix = mo->instances[selection.get_instance_idx()]->get_transformation().get_matrix() * mv->get_matrix();
+    const Camera      &camera      = wxGetApp().plater()->get_camera();
+
+    shader->start_using();
+    shader->set_uniform("view_model_matrix", camera.get_view_matrix() * trafo_matrix);
+    shader->set_uniform("projection_matrix", camera.get_projection_matrix());
+    shader->set_uniform("volume_world_matrix", trafo_matrix);
+    const ClippingPlaneDataWrapper clp_data = this->get_clipping_plane_data();
+    shader->set_uniform("clipping_plane", clp_data.clp_dataf);
+    shader->set_uniform("z_range", clp_data.z_range);
+    const Matrix3d view_normal_matrix =
+        camera.get_view_matrix().matrix().block(0, 0, 3, 3) * trafo_matrix.matrix().block(0, 0, 3, 3).inverse().transpose();
+    shader->set_uniform("view_normal_matrix", view_normal_matrix);
+    shader->set_uniform("volume_mirrored", trafo_matrix.matrix().determinant() < 0.0);
+    glsafe(::glActiveTexture(GL_TEXTURE0));
+    glsafe(::glBindTexture(GL_TEXTURE_2D, tex->get_id()));
+    shader->set_uniform("height_tex", 0);
+    shader->set_uniform("height_tex_texel", Vec2f(1.f / float(tex->get_width()), 1.f / float(tex->get_height())));
+    shader->set_uniform("depth_mm", layer->depth_mm);
+    shader->set_uniform("tiling_scale", layer->tiling_scale);
+    shader->set_uniform("rotation_rad", layer->rotation_deg * float(M_PI) / 180.f);
+    shader->set_uniform("uv_offset", layer->offset);
+    shader->set_uniform("invert", layer->invert);
+    // When set, the shader samples at the per-vertex uv baked into the mesh (LSCM) rather than
+    // projecting; see rebuild_bump_preview_mesh().
+    shader->set_uniform("use_vertex_uv", m_bump_preview_uses_vertex_uv);
+    // The live UV-editor island drag rides this 2x3 affine (identity except mid-drag); only the flagged
+    // island's vertices apply it, so a drag is a uniform update rather than a mesh rebuild.
+    const Eigen::Matrix<float, 2, 3> &d = m_bump_island_delta;
+    shader->set_uniform("island_delta_lin", std::array<float, 4>{ d(0, 0), d(0, 1), d(1, 0), d(1, 1) });
+    shader->set_uniform("island_delta_tr", Vec2f(d(0, 2), d(1, 2)));
+    m_bump_preview_glmodel.render();
+    glsafe(::glBindTexture(GL_TEXTURE_2D, 0));
+    shader->stop_using();
+}
+
+void GLGizmoTextureDisplacement::rebuild_uvcheck_mesh()
+{
+    m_uvcheck_glmodel.reset();
+    if (m_uv_check_mode == UVCheckMode::None)
+        return;
+
+    const ModelVolume *mv = texture_volume();
+    if (mv == nullptr || m_triangle_selectors.empty())
+        return;
+    const indexed_triangle_set patch = m_triangle_selectors[0]->get_facets_strict(EnforcerBlockerType::ENFORCER);
+    if (patch.indices.empty())
+        return;
+    const indexed_triangle_set &base = mv->mesh().its;
+    if (base.vertices.size() != patch.vertices.size())
+        return;
+    const TextureDisplacementLayer *layer = active_layer();
+    if (layer == nullptr)
+        return;
+
+    // The checker samples wherever the projection puts it; the projections the shader can't
+    // reconstruct (LSCM, ViewProjected) get a precomputed per-vertex uv, the rest project in-shader.
+    std::vector<Vec2f> uv       = compute_layer_vertex_uvs(patch, *layer);
+    const bool         have_uvs = uv.size() == base.vertices.size();
+    m_uvcheck_uses_vertex_uv    = have_uvs;
+
+    // Per-vertex area distortion in [0,1] (0.5 == ideal), only when both requested and possible.
+    std::vector<float> distortion(base.vertices.size(), 0.5f);
+    if (m_uv_check_mode == UVCheckMode::Distortion && have_uvs) {
+        std::vector<float> tri_log(patch.indices.size(), 0.f);
+        for (size_t f = 0; f < patch.indices.size(); ++f) {
+            const stl_triangle_vertex_indices &t = patch.indices[f];
+            const float a3 = 0.5f * (base.vertices[t[1]] - base.vertices[t[0]]).cross(base.vertices[t[2]] - base.vertices[t[0]]).norm();
+            const Vec2f e0 = uv[t[1]] - uv[t[0]];
+            const Vec2f e1 = uv[t[2]] - uv[t[0]];
+            const float a2 = 0.5f * std::abs(e0.x() * e1.y() - e0.y() * e1.x());
+            tri_log[f] = (a3 > 1e-12f && a2 > 1e-12f) ? std::log2(a2 / a3) : 0.f;
+        }
+        // Centre the heatmap on the patch's own median stretch, so a globally-scaled unwrap reads as
+        // uniformly "ideal" and only *relative* stretching (the thing that matters) shows up as colour.
+        std::vector<float> sorted = tri_log;
+        float              median = 0.f;
+        if (!sorted.empty()) {
+            std::nth_element(sorted.begin(), sorted.begin() + sorted.size() / 2, sorted.end());
+            median = sorted[sorted.size() / 2];
+        }
+        std::vector<float> sum(base.vertices.size(), 0.f);
+        std::vector<int>   cnt(base.vertices.size(), 0);
+        for (size_t f = 0; f < patch.indices.size(); ++f) {
+            // +/- 2 stops (4x stretch either way) spans the full blue->red range.
+            const float d = std::clamp(0.5f + (tri_log[f] - median) / 4.f, 0.f, 1.f);
+            for (int k = 0; k < 3; ++k) {
+                sum[patch.indices[f][k]] += d;
+                ++cnt[patch.indices[f][k]];
+            }
+        }
+        for (size_t v = 0; v < distortion.size(); ++v)
+            if (cnt[v] > 0)
+                distortion[v] = sum[v] / float(cnt[v]);
+    }
+
+    GLModel::Geometry init_data;
+    init_data.format = { GLModel::Geometry::EPrimitiveType::Triangles, GLModel::Geometry::EVertexLayout::P3N3T2 };
+    init_data.reserve_vertices(base.vertices.size());
+    init_data.reserve_indices(patch.indices.size() * 3);
+    for (size_t vi = 0; vi < base.vertices.size(); ++vi)
+        init_data.add_vertex(base.vertices[vi], Vec3f(distortion[vi], 0.f, 0.f),
+                             have_uvs ? uv[vi] : Vec2f::Zero());
+    for (const stl_triangle_vertex_indices &tri : patch.indices)
+        init_data.add_triangle(unsigned(tri[0]), unsigned(tri[1]), unsigned(tri[2]));
+
+    m_uvcheck_glmodel.init_from(std::move(init_data));
+}
+
+void GLGizmoTextureDisplacement::render_uvcheck_mesh()
+{
+    const ModelObject *mo = m_c->selection_info()->model_object();
+    const ModelVolume *mv = texture_volume();
+    if (mo == nullptr || mv == nullptr || !m_uvcheck_glmodel.is_initialized())
+        return;
+    const TextureDisplacementLayer *layer = active_layer();
+    if (layer == nullptr)
+        return;
+    GLShaderProgram *shader = wxGetApp().get_shader("texture_displacement_uvcheck");
+    if (shader == nullptr)
+        return;
+
+    const Selection  &selection    = m_parent.get_selection();
+    const Transform3d trafo_matrix = mo->instances[selection.get_instance_idx()]->get_transformation().get_matrix() * mv->get_matrix();
+    const Camera     &camera       = wxGetApp().plater()->get_camera();
+
+    shader->start_using();
+    shader->set_uniform("view_model_matrix", camera.get_view_matrix() * trafo_matrix);
+    shader->set_uniform("projection_matrix", camera.get_projection_matrix());
+    shader->set_uniform("volume_world_matrix", trafo_matrix);
+    const ClippingPlaneDataWrapper clp_data = this->get_clipping_plane_data();
+    shader->set_uniform("clipping_plane", clp_data.clp_dataf);
+    shader->set_uniform("z_range", clp_data.z_range);
+    const Matrix3d view_normal_matrix =
+        camera.get_view_matrix().matrix().block(0, 0, 3, 3) * trafo_matrix.matrix().block(0, 0, 3, 3).inverse().transpose();
+    shader->set_uniform("view_normal_matrix", view_normal_matrix);
+    shader->set_uniform("volume_mirrored", trafo_matrix.matrix().determinant() < 0.0);
+    shader->set_uniform("mode", m_uv_check_mode == UVCheckMode::Distortion ? 1 : 0);
+    shader->set_uniform("checker_freq", 4.f); // squares per texture tile
+    shader->set_uniform("tiling_scale", layer->tiling_scale);
+    shader->set_uniform("rotation_rad", layer->rotation_deg * float(M_PI) / 180.f);
+    shader->set_uniform("uv_offset", layer->offset);
+    shader->set_uniform("use_vertex_uv", m_uvcheck_uses_vertex_uv);
+
+    // Coincident with the base surface, so pull it toward the camera to win the depth test.
+    glsafe(::glEnable(GL_POLYGON_OFFSET_FILL));
+    glsafe(::glPolygonOffset(-1.0f, -1.0f));
+    m_uvcheck_glmodel.render();
+    glsafe(::glDisable(GL_POLYGON_OFFSET_FILL));
+    shader->stop_using();
+}
+
+void GLGizmoTextureDisplacement::build_wireframe_from_its(const indexed_triangle_set &its)
+{
+    m_wireframe_overlay_glmodel.reset();
+    m_wireframe_overlay_vcount = its.vertices.size();
+    if (its.indices.empty())
+        return;
+
+    GLModel::Geometry init_data;
+    init_data.format = { GLModel::Geometry::EPrimitiveType::Lines, GLModel::Geometry::EVertexLayout::P3 };
+    init_data.reserve_vertices(its.vertices.size());
+    init_data.reserve_indices(its.indices.size() * 6);
+    for (const Vec3f &v : its.vertices)
+        init_data.add_vertex(v);
+    // One segment per triangle edge; shared edges drawn twice, harmless for a wireframe and far
+    // cheaper than deduplicating a million of them.
+    for (const stl_triangle_vertex_indices &tri : its.indices)
+        for (int i = 0; i < 3; ++i)
+            init_data.add_line(unsigned(tri[i]), unsigned(tri[(i + 1) % 3]));
+
+    if (!init_data.is_empty())
+        m_wireframe_overlay_glmodel.init_from(std::move(init_data));
+}
+
+void GLGizmoTextureDisplacement::rebuild_wireframe_overlay()
+{
+    if (!m_wireframe_overlay) {
+        m_wireframe_overlay_glmodel.reset();
+        m_wireframe_overlay_vcount = 0;
+        return;
+    }
+    const ModelVolume *mv = texture_volume();
+    if (mv == nullptr)
+        return;
+    const indexed_triangle_set &its = mv->mesh().its;
+    if (its.indices.empty())
+        return;
+
+    // Building from the base mesh (bump/paint mode); its topology only changes on bake/subdivide, and
+    // this runs on every rebuild_preview(), so rebuild only when the vertex count actually changes.
+    if (m_wireframe_overlay_glmodel.is_initialized() && m_wireframe_overlay_vcount == its.vertices.size())
+        return;
+    build_wireframe_from_its(its);
+}
+
+void GLGizmoTextureDisplacement::refresh_wireframe()
+{
+    if (!m_wireframe_overlay) {
+        m_wireframe_overlay_glmodel.reset();
+        m_wireframe_overlay_vcount = 0;
+        return;
+    }
+    // The wireframe has to sit on whatever mesh is actually on screen. In the true-displacement view
+    // that is the raised preview geometry (m_preview_its) - drawing the flat base mesh's edges there
+    // leaves them buried inside the bumps, which is why the wireframe "didn't show in real mode". In
+    // Fast (bump) mode or with nothing painted, the surface is the undisplaced base mesh.
+    if (!m_use_bump_preview && !m_preview_its.indices.empty())
+        build_wireframe_from_its(m_preview_its);
+    else
+        rebuild_wireframe_overlay();
+}
+
+void GLGizmoTextureDisplacement::render_wireframe_overlay()
+{
+    const ModelObject *mo = m_c->selection_info()->model_object();
+    const ModelVolume *mv = texture_volume();
+    if (mo == nullptr || mv == nullptr || !m_wireframe_overlay_glmodel.is_initialized())
+        return;
+    GLShaderProgram *shader = wxGetApp().get_shader("flat");
+    if (shader == nullptr)
+        return;
+
+    const Selection  &selection    = m_parent.get_selection();
+    const Transform3d trafo_matrix = mo->instances[selection.get_instance_idx()]->get_transformation().get_matrix() * mv->get_matrix();
+    const Camera     &camera       = wxGetApp().plater()->get_camera();
+
+    shader->start_using();
+    shader->set_uniform("view_model_matrix", camera.get_view_matrix() * trafo_matrix);
+    shader->set_uniform("projection_matrix", camera.get_projection_matrix());
+    // Pull the lines toward the camera so they sit on the surface rather than z-fighting into it.
+    glsafe(::glEnable(GL_POLYGON_OFFSET_LINE));
+    glsafe(::glPolygonOffset(-1.0f, -1.0f));
+    m_wireframe_overlay_glmodel.set_color(ColorRGBA(1.0f, 1.0f, 1.0f, 0.6f)); // white, so it reads on any material
+    m_wireframe_overlay_glmodel.render();
+    glsafe(::glDisable(GL_POLYGON_OFFSET_LINE));
+    shader->stop_using();
+}
+
+void GLGizmoTextureDisplacement::rebuild_preview()
+{
+    // Bumped first: any in-flight job's result (captured generation from before this call) will
+    // now compare unequal to m_preview_generation and be discarded when it completes, even if it
+    // finishes after the job queued below.
+    const uint64_t generation = ++m_preview_generation;
+    update_uv_editor();
+    rebuild_bump_preview_mesh();
+    rebuild_uvcheck_mesh();
+    rebuild_seam_overlay();
+
+    const ModelVolume *mv = texture_volume();
+    if (mv == nullptr || !mv->is_texture_displacement_painted()) {
+        m_preview_glmodel.reset();
+        m_preview_its = indexed_triangle_set{}; // no displaced mesh; wireframe falls back to the base
+        refresh_wireframe();
+        return;
+    }
+    // In Fast/paint modes the wireframe follows the base mesh and can be built now; the true-displacement
+    // view's wireframe needs the displaced mesh, which only exists once the job below completes.
+    if (m_use_bump_preview)
+        refresh_wireframe();
+
+    TextureDisplacementPreviewInput input;
+    input.base_mesh = mv->mesh().its;
+    input.layers    = mv->texture_displacement_layers;
+    for (int i = 0; i < int(TEXTURE_DISPLACEMENT_MAX_LAYERS); ++i)
+        input.facets_data[size_t(i)] = mv->texture_displacement_facet(i).get_data();
+
+    auto &worker = wxGetApp().plater()->get_ui_job_worker();
+    queue_job(worker, std::make_unique<TextureDisplacementPreviewJob>(std::move(input), generation,
+        [this](indexed_triangle_set its, uint64_t result_generation) {
+            if (result_generation != m_preview_generation)
+                return; // superseded by a newer edit while this was computing
+            m_preview_glmodel.reset();
+            if (!its.indices.empty()) {
+                m_preview_glmodel.init_from(its);
+                m_preview_glmodel.set_color(GLVolume::NEUTRAL_COLOR);
+            }
+            // Keep the displaced mesh so the wireframe overlay can be drawn on it (the true-displacement
+            // view), then refresh the wireframe from it.
+            m_preview_its = std::move(its);
+            refresh_wireframe();
+            m_parent.set_as_dirty();
+        }));
+}
+
+void GLGizmoTextureDisplacement::update_uv_editor()
+{
+    Plater         *plater    = wxGetApp().plater();
+    UVEditorCanvas *uv_canvas = plater->get_uv_editor_canvas();
+    if (uv_canvas == nullptr)
+        return;
+
+    const ModelVolume        *mv    = texture_volume();
+    TextureDisplacementLayer *layer = active_layer();
+    // The pane is opened only on the user's explicit request (m_show_uv_editor), and only for an LSCM
+    // layer - never automatically just because something is painted. Keep the cached state/unwrap so
+    // that switching the toggle back on re-shows instantly (and re-solves if the paint changed while
+    // it was hidden, via the state comparison below).
+    if (!m_show_uv_editor || mv == nullptr || layer == nullptr ||
+        layer->projection_method != TextureProjectionMethod::LSCM) {
+        plater->show_uv_editor(false);
+        return;
+    }
+
+    // A vertex/edge edit committing (or an undo reverting one) changes the per-vertex UV overrides
+    // without going through the Unwrap button. Detect that and force a re-solve, so the pane's geometry
+    // stays in step with what will bake -- the one exception to "only re-solve on Unwrap".
+    {
+        size_t sig = 1469598103934665603ull; // FNV-1a seed
+        const auto mix = [&sig](uint64_t x) { sig = (sig ^ x) * 1099511628211ull; };
+        mix(layer->lscm_uv_overrides.size());
+        for (const auto &[v, uv] : layer->lscm_uv_overrides) {
+            mix(uint64_t(uint32_t(v)));
+            mix(uint64_t(uint32_t(int32_t(std::llround(uv.x() * 1024.f)))));
+            mix(uint64_t(uint32_t(int32_t(std::llround(uv.y() * 1024.f)))));
+        }
+        if (sig != m_uv_overrides_sig) {
+            m_uv_overrides_sig  = sig;
+            m_uv_unwrap_pending = true;
+        }
+    }
+
+    UVEditorState state;
+    state.slot       = m_active_layer_slot;
+    state.image_data = layer->image_data.get();
+    state.seam_angle = layer->lscm_seam_angle_deg;
+    state.padding    = layer->island_padding_mm;
+    state.facets     = mv->texture_displacement_facet(m_active_layer_slot).get_data();
+    state.seam_edges = layer->lscm_seam_edges;
+
+    // The re-solve happens only when the user pressed "Unwrap" (m_uv_unwrap_pending). Every other call
+    // into here -- a paint stroke ending, a slider release, the check mode changing -- must not pay for
+    // a fresh LSCM solve; it just re-applies the cheap affine transforms over whatever unwrap already
+    // exists. If the paint changed underneath but the user hasn't asked to re-unwrap, the pane keeps
+    // showing the last unwrap on purpose (that is the whole point of making it an explicit action).
+    bool unwrap_changed = false;
+    if (m_uv_unwrap_pending) {
+        m_uv_unwrap_pending = false;
+        const indexed_triangle_set patch = extract_painted_patch(mv->mesh().its, state.facets);
+        if (patch.indices.empty()) {
+            m_uv_editor_state  = UVEditorState{};
+            m_uv_editor_unwrap = PatchUnwrap{};
+            m_uv_editor_distortion_colors.clear();
+            plater->show_uv_editor(false);
+            return;
+        }
+        // Padding disabled (0): the user asked to pack islands with no gap between them.
+        m_uv_editor_unwrap = compute_patch_unwrap(patch, layer->lscm_seam_angle_deg, 0.f, layer->lscm_seam_edges);
+        // Re-apply any stored per-vertex UV edits onto the fresh unwrap, so the pane shows exactly what
+        // compute_lscm_uvs() will bake (which applies the same overrides). Keyed by mesh vertex, so every
+        // unwrapped copy of that vertex gets it -- matching the bake's single-UV-per-vertex settle.
+        if (!layer->lscm_uv_overrides.empty()) {
+            std::map<int, Vec2f> ov;
+            for (const auto &[mv2, uv] : layer->lscm_uv_overrides)
+                ov[mv2] = uv;
+            for (size_t i = 0; i < m_uv_editor_unwrap.uvs.size(); ++i) {
+                const int sv = (i < m_uv_editor_unwrap.source_vertex.size()) ? m_uv_editor_unwrap.source_vertex[i] : -1;
+                const auto it = ov.find(sv);
+                if (it != ov.end())
+                    m_uv_editor_unwrap.uvs[i] = it->second;
+            }
+        }
+        m_uv_editor_state  = std::move(state);
+        unwrap_changed     = true;
+        // Precompute the distortion heatmap now, while the patch is in hand - relative stretch doesn't
+        // change when islands are only moved, so this need not be redone on a drag. It is fed to the
+        // canvas below only while the Distortion check mode is on.
+        compute_uv_editor_distortion_colors(patch);
+    }
+
+    if (m_uv_editor_unwrap.empty()) {
+        // Nothing has been unwrapped yet (or the paint was cleared): keep the pane hidden until the user
+        // presses Unwrap. The panel shows a "Press Unwrap" hint in this state.
+        plater->show_uv_editor(false);
+        return;
+    }
+
+    // The pane background either mirrors the height texture (default) or shows a UV checker (#7), and is
+    // only re-uploaded when that choice, or the unwrap, actually changes - the height image is large.
+    const UVBackground desired_bg = (m_uv_check_mode == UVCheckMode::Checker) ? UVBackground::Checker : UVBackground::Height;
+    const bool bg_smoothing_changed = (desired_bg == UVBackground::Height) && (m_uv_editor_bg_smoothing != layer->smoothing);
+    if (unwrap_changed || desired_bg != m_uv_editor_bg || bg_smoothing_changed) {
+        m_uv_editor_bg_smoothing = layer->smoothing;
+        if (desired_bg == UVBackground::Checker) {
+            // An even squares-per-axis count so the pattern tiles seamlessly across the UV unit
+            // boundary (texcoord == position repeats it once per tile). Softened grays, not pure
+            // black/white, so it doesn't fight the island wires drawn over it.
+            constexpr int              tex = 512, squares = 8, cell = tex / squares;
+            std::vector<unsigned char> checker(size_t(tex) * size_t(tex));
+            for (int y = 0; y < tex; ++y)
+                for (int x = 0; x < tex; ++x)
+                    checker[size_t(y) * tex + x] = ((x / cell + y / cell) & 1) ? 205 : 70;
+            uv_canvas->set_background_texture(checker, tex, tex);
+        } else {
+            const DecodedHeightTexture height = decode_height_texture(*layer);
+            if (!height.empty())
+                uv_canvas->set_background_texture(height.pixels, height.width, height.height);
+            else
+                uv_canvas->set_background_texture({}, 0, 0);
+        }
+        m_uv_editor_bg = desired_bg;
+    }
+
+    // Grow (never shrink) the layer's island list to cover every chart. Shrinking would throw away a
+    // hand placement the moment a stroke temporarily merged two islands, and a stale extra entry is
+    // harmless - island_transform_matrix() only looks up the charts that actually exist.
+    if (layer->islands.size() < size_t(m_uv_editor_unwrap.chart_count))
+        layer->islands.resize(size_t(m_uv_editor_unwrap.chart_count));
+
+    // Connected-net layout (on by default): a *fresh* unwrap is unfolded so adjacent charts sit
+    // edge-to-edge (cube -> a net), rather than as separately packed squares. Only when the user pressed
+    // Unwrap (m_uv_apply_connected_net) -- a re-segmentation renumbers charts anyway, so any hand
+    // placement from before is already meaningless. A *refresh* re-solve (a committed vertex edit, or an
+    // undo) must NOT relayout, or it would throw away every island placement on every vertex edit.
+    if (unwrap_changed && m_uv_apply_connected_net && layer->auto_connect_islands) {
+        std::vector<TextureIsland> net = compute_connected_net(m_uv_editor_unwrap);
+        if (net.size() == size_t(m_uv_editor_unwrap.chart_count)) {
+            if (layer->islands.size() < net.size())
+                layer->islands.resize(net.size());
+            for (size_t i = 0; i < net.size(); ++i)
+                layer->islands[i] = net[i];
+        }
+    }
+    if (unwrap_changed)
+        m_uv_apply_connected_net = false; // consumed; a refresh re-solve leaves placements alone
+
+    // The geometry goes over in the unwrap's *raw* mm coordinates and is only re-uploaded when the
+    // unwrap itself changed. Everything a slider or a drag can touch - island placement, tiling,
+    // rotation, offset - is an affine map on top of that, so it goes over as one 2x3 matrix per
+    // island instead. That is the whole reason dragging an island is now free: a patch of a million
+    // triangles has a million UVs to re-transform and re-upload otherwise, and it was doing exactly
+    // that on every single mouse-move event.
+    if (unwrap_changed) {
+        UVEditorCanvas::Islands view;
+        view.uvs            = m_uv_editor_unwrap.uvs;
+        view.indices        = m_uv_editor_unwrap.indices;
+        view.vertex_island  = m_uv_editor_unwrap.vertex_chart;
+        view.boundary_edges = m_uv_editor_unwrap.boundary_edges;
+        view.island_count   = m_uv_editor_unwrap.chart_count;
+
+        uv_canvas->set_island_edit_callback(
+            [this](int island, const Vec2f &offset_delta, float rotation_delta, float scale_factor, bool finished) {
+                on_island_edited(island, offset_delta, rotation_delta, scale_factor, finished);
+            });
+        uv_canvas->set_vertex_edit_callback(
+            [this](const std::vector<std::pair<int, Vec2f>> &edits) { on_uv_vertex_edited(edits); });
+        uv_canvas->set_command_callback([this](UVEditorCanvas::Command cmd) { on_uv_command(int(cmd)); });
+        uv_canvas->set_islands(std::move(view));
+    }
+
+    uv_canvas->set_select_mode(static_cast<UVEditorCanvas::SelectMode>(m_uv_select_mode));
+
+    uv_canvas->set_uv_transform(layer->tiling_scale, layer->rotation_deg, layer->tile_enabled,
+                                layer->tile_method == TextureTileMethod::MirroredRepeat);
+    uv_canvas->set_island_transforms(uv_editor_island_transforms(*layer));
+    // The distortion heatmap tints the island fills only while its check mode is on; otherwise the
+    // canvas falls back to its default light-green wash.
+    if (m_uv_check_mode == UVCheckMode::Distortion)
+        uv_canvas->set_island_fill_colors(m_uv_editor_distortion_colors);
+    else
+        uv_canvas->set_island_fill_colors({});
+
+    plater->show_uv_editor(true);
+}
+
+void GLGizmoTextureDisplacement::compute_uv_editor_distortion_colors(const indexed_triangle_set &patch)
+{
+    m_uv_editor_distortion_colors.clear();
+    const PatchUnwrap &u = m_uv_editor_unwrap;
+    if (u.empty() || u.chart_count <= 0)
+        return;
+
+    // log2(uv area / 3D area) per unwrap triangle - the same measure the 3D distortion overlay uses.
+    std::vector<float> tri_log(u.indices.size(), 0.f);
+    std::vector<int>   tri_chart(u.indices.size(), -1);
+    for (size_t f = 0; f < u.indices.size(); ++f) {
+        const stl_triangle_vertex_indices &t = u.indices[f];
+        if (t[0] < 0 || size_t(t[0]) >= u.vertex_chart.size())
+            continue;
+        tri_chart[f] = u.vertex_chart[size_t(t[0])];
+        const auto p3 = [&](int uv_idx) -> Vec3f {
+            const int sv = (size_t(uv_idx) < u.source_vertex.size()) ? u.source_vertex[size_t(uv_idx)] : -1;
+            return (sv >= 0 && size_t(sv) < patch.vertices.size()) ? patch.vertices[size_t(sv)] : Vec3f::Zero();
+        };
+        const float a3 = 0.5f * (p3(t[1]) - p3(t[0])).cross(p3(t[2]) - p3(t[0])).norm();
+        const Vec2f e0 = u.uvs[size_t(t[1])] - u.uvs[size_t(t[0])];
+        const Vec2f e1 = u.uvs[size_t(t[2])] - u.uvs[size_t(t[0])];
+        const float a2 = 0.5f * std::abs(e0.x() * e1.y() - e0.y() * e1.x());
+        tri_log[f] = (a3 > 1e-12f && a2 > 1e-12f) ? std::log2(a2 / a3) : 0.f;
+    }
+
+    // Centre on the median stretch, so a globally scaled unwrap reads as uniform and only *relative*
+    // stretching shows up - matching the 3D overlay's convention.
+    std::vector<float> sorted = tri_log;
+    float              median = 0.f;
+    if (!sorted.empty()) {
+        std::nth_element(sorted.begin(), sorted.begin() + sorted.size() / 2, sorted.end());
+        median = sorted[sorted.size() / 2];
+    }
+
+    std::vector<double> chart_sum(size_t(u.chart_count), 0.0);
+    std::vector<int>    chart_cnt(size_t(u.chart_count), 0);
+    for (size_t f = 0; f < tri_log.size(); ++f) {
+        const int c = tri_chart[f];
+        if (c >= 0 && c < u.chart_count) {
+            chart_sum[size_t(c)] += tri_log[f];
+            ++chart_cnt[size_t(c)];
+        }
+    }
+
+    // Blue (compressed) -> green (ideal) -> red (stretched), +/- 2 stops spanning the full range.
+    const auto heat = [](float t) -> ColorRGBA {
+        t = std::clamp(t, 0.f, 1.f);
+        const ColorRGBA blue{ 0.15f, 0.35f, 1.0f, 0.5f }, green{ 0.2f, 0.9f, 0.3f, 0.5f }, red{ 1.0f, 0.2f, 0.15f, 0.5f };
+        if (t < 0.5f) { const float s = t * 2.f;         return blue * (1.f - s) + green * s; }
+        const float s = (t - 0.5f) * 2.f;                return green * (1.f - s) + red * s;
+    };
+
+    m_uv_editor_distortion_colors.resize(size_t(u.chart_count), heat(0.5f));
+    for (int c = 0; c < u.chart_count; ++c)
+        if (chart_cnt[size_t(c)] > 0) {
+            const float avg = float(chart_sum[size_t(c)] / chart_cnt[size_t(c)]);
+            m_uv_editor_distortion_colors[size_t(c)] = heat(std::clamp(0.5f + (avg - median) / 4.f, 0.f, 1.f));
+        }
+}
+
+void GLGizmoTextureDisplacement::on_uv_command(int cmd)
+{
+    TextureDisplacementLayer *layer = active_layer();
+    if (layer == nullptr)
+        return;
+
+    if (cmd == int(UVEditorCanvas::Command::AverageScale)) {
+        Plater::TakeSnapshot snapshot(wxGetApp().plater(), _u8L("Average island scale"), UndoRedo::SnapshotType::GizmoAction);
+        average_island_scales(layer->islands);
+        rebuild_preview();
+    } else if (cmd == int(UVEditorCanvas::Command::CutSelectedIsland)) {
+        UVEditorCanvas *canvas = wxGetApp().plater()->get_uv_editor_canvas();
+        const int       chart  = canvas != nullptr ? canvas->selected_island() : -1;
+        if (chart < 0) {
+            show_error(nullptr, _u8L("Select an island in the UV editor first."));
+            return;
+        }
+        Plater::TakeSnapshot snapshot(wxGetApp().plater(), _u8L("Cut texture island"), UndoRedo::SnapshotType::GizmoAction);
+        cut_island(*layer, chart);
+        rebuild_preview();
+    } else if (cmd == int(UVEditorCanvas::Command::JoinSelected)) {
+        UVEditorCanvas *canvas = wxGetApp().plater()->get_uv_editor_canvas();
+        const int       chart  = canvas != nullptr ? canvas->selected_island() : -1;
+        if (chart < 0) {
+            show_error(nullptr, _u8L("Select an island in the UV editor first."));
+            return;
+        }
+        // Join to whichever neighbouring island (one it shares an edge with) is currently placed
+        // nearest -- i.e. the one it was dragged up against.
+        const Eigen::Matrix<float, 2, 3> sel_m = island_transform_matrix(chart, m_uv_editor_unwrap, layer->islands);
+        const Vec2f sel_c = sel_m.block<2, 2>(0, 0) * m_uv_editor_unwrap.chart_centroid[size_t(chart)] + sel_m.col(2);
+        int   best_parent = -1;
+        float best_d2     = std::numeric_limits<float>::max();
+        TextureIsland best_place, cand;
+        for (int p = 0; p < m_uv_editor_unwrap.chart_count; ++p) {
+            if (p == chart)
+                continue;
+            if (!join_chart_placement(m_uv_editor_unwrap, layer->islands, chart, p, cand))
+                continue; // not a neighbour
+            const Eigen::Matrix<float, 2, 3> pm = island_transform_matrix(p, m_uv_editor_unwrap, layer->islands);
+            const Vec2f pc = pm.block<2, 2>(0, 0) * m_uv_editor_unwrap.chart_centroid[size_t(p)] + pm.col(2);
+            const float d2 = (pc - sel_c).squaredNorm();
+            if (d2 < best_d2) { best_d2 = d2; best_parent = p; best_place = cand; }
+        }
+        if (best_parent < 0) {
+            show_error(nullptr, _u8L("This island has no neighbour it shares an edge with."));
+            return;
+        }
+        Plater::TakeSnapshot snapshot(wxGetApp().plater(), _u8L("Join texture island"), UndoRedo::SnapshotType::GizmoAction);
+        if (layer->islands.size() <= size_t(chart))
+            layer->islands.resize(size_t(chart) + 1);
+        layer->islands[size_t(chart)] = best_place;
+        // Record the join so the two (and anything already grouped with either) move together from now
+        // on, not just visually snap once.
+        join_island_groups(layer->island_groups, chart, best_parent, m_uv_editor_unwrap.chart_count);
+        rebuild_preview();
+    } else if (cmd == int(UVEditorCanvas::Command::UnjoinSelected)) {
+        UVEditorCanvas *canvas = wxGetApp().plater()->get_uv_editor_canvas();
+        const int       chart  = canvas != nullptr ? canvas->selected_island() : -1;
+        if (chart < 0 || size_t(chart) >= layer->islands.size()) {
+            show_error(nullptr, _u8L("Select an island in the UV editor first."));
+            return;
+        }
+        Plater::TakeSnapshot snapshot(wxGetApp().plater(), _u8L("Unjoin texture island"), UndoRedo::SnapshotType::GizmoAction);
+        layer->islands[size_t(chart)] = TextureIsland{}; // back to its own packed position
+        // Break its join link too, so it stops moving with the others (the rest stay grouped).
+        if (size_t(chart) < layer->island_groups.size())
+            layer->island_groups[size_t(chart)] = chart;
+        rebuild_preview();
+    }
+    // FrameAll/ToggleSnap are handled inside the canvas; ProjectFromView is not wired yet.
+}
+
+void GLGizmoTextureDisplacement::capture_view_projection(TextureDisplacementLayer &layer)
+{
+    const ModelVolume *mv = texture_volume();
+    const ModelObject *mo = m_c->selection_info()->model_object();
+    if (mv == nullptr || mo == nullptr)
+        return;
+
+    const Camera     &camera    = wxGetApp().plater()->get_camera();
+    const Selection  &selection = m_parent.get_selection();
+    const Transform3d trafo     = mo->instances[selection.get_instance_idx()]->get_transformation().get_matrix() * mv->get_matrix();
+
+    // The view matrix's rotation rows are the camera axes in world space; bring them into the
+    // volume's local frame (where the mesh vertices live) so the projector rides along with the part.
+    const Matrix3d view_rot   = camera.get_view_matrix().matrix().block<3, 3>(0, 0);
+    const Matrix3d trafo_rot  = trafo.matrix().block<3, 3>(0, 0);
+    const Matrix3d world_to_local = trafo_rot.inverse();
+    const Vec3d    local_right = world_to_local * Vec3d(view_rot.row(0).transpose());
+    const Vec3d    local_up    = world_to_local * Vec3d(view_rot.row(1).transpose());
+
+    // Unit axes: the projected planar coordinate must stay in mm so tiling_scale keeps meaning mm.
+    layer.view_project_right = local_right.norm() > 1e-9 ? Vec3f(local_right.normalized().cast<float>()) : Vec3f::UnitX();
+    layer.view_project_up    = local_up.norm() > 1e-9 ? Vec3f(local_up.normalized().cast<float>()) : Vec3f::UnitY();
+}
+
+void GLGizmoTextureDisplacement::cut_island(TextureDisplacementLayer &layer, int chart)
+{
+    const ModelVolume *mv = texture_volume();
+    if (mv == nullptr)
+        return;
+    const std::vector<Vec3f> &verts = mv->mesh().its.vertices;
+    const PatchUnwrap        &u     = m_uv_editor_unwrap;
+
+    // Collect the chart's triangles back in mesh-vertex space, and its 3D bounding box.
+    std::vector<std::array<int, 3>> tris;
+    Vec3f lo(std::numeric_limits<float>::max(), std::numeric_limits<float>::max(), std::numeric_limits<float>::max());
+    Vec3f hi(std::numeric_limits<float>::lowest(), std::numeric_limits<float>::lowest(), std::numeric_limits<float>::lowest());
+    for (const stl_triangle_vertex_indices &t : u.indices) {
+        if (t[0] < 0 || size_t(t[0]) >= u.vertex_chart.size() || u.vertex_chart[size_t(t[0])] != chart)
+            continue;
+        std::array<int, 3> bt{};
+        bool               ok = true;
+        for (int k = 0; k < 3; ++k) {
+            const int uvv = t[k];
+            if (uvv < 0 || size_t(uvv) >= u.source_vertex.size()) { ok = false; break; }
+            const int base = u.source_vertex[size_t(uvv)];
+            if (base < 0 || size_t(base) >= verts.size()) { ok = false; break; }
+            bt[k] = base;
+            lo    = lo.cwiseMin(verts[size_t(base)]);
+            hi    = hi.cwiseMax(verts[size_t(base)]);
+        }
+        if (ok)
+            tris.push_back(bt);
+    }
+    if (tris.empty())
+        return;
+
+    // Cut perpendicular to the longest axis, through the centroid - a long thin island is split
+    // across its narrow middle, which is exactly the "islands might be very long" case.
+    const Vec3f  ext  = hi - lo;
+    const int    axis = (ext.x() >= ext.y() && ext.x() >= ext.z()) ? 0 : (ext.y() >= ext.z() ? 1 : 2);
+    const float  mid  = 0.5f * (lo[axis] + hi[axis]);
+
+    std::set<std::pair<int, int>> seams(layer.lscm_seam_edges.begin(), layer.lscm_seam_edges.end());
+    for (const std::array<int, 3> &bt : tris)
+        for (int i = 0; i < 3; ++i) {
+            const int a = bt[i], b = bt[(i + 1) % 3];
+            // Endpoints on opposite sides of the plane -> this edge crosses it -> make it a seam.
+            if ((verts[size_t(a)][axis] < mid) != (verts[size_t(b)][axis] < mid))
+                seams.insert({ std::min(a, b), std::max(a, b) });
+        }
+    layer.lscm_seam_edges.assign(seams.begin(), seams.end());
+}
+
+// unwrap mm -> texture uv, per island: the island's own hand placement, then the layer's
+// tiling/rotation/offset. Both are affine, so they compose into one matrix the canvas can hand
+// straight to a shader.
+std::vector<Eigen::Matrix<float, 2, 3>>
+GLGizmoTextureDisplacement::uv_editor_island_transforms(const TextureDisplacementLayer &layer)
+{
+    const float uv_scale = (layer.tiling_scale > 1e-6f) ? (1.f / layer.tiling_scale) : 1.f;
+    const float rad      = layer.rotation_deg * float(M_PI) / 180.f;
+    const float cs       = std::cos(rad) * uv_scale;
+    const float sn       = std::sin(rad) * uv_scale;
+
+    Eigen::Matrix2f uv_linear;
+    uv_linear << cs, -sn,
+                 sn,  cs;
+
+    m_uv_editor_bbox_min = Vec2f(std::numeric_limits<float>::max(), std::numeric_limits<float>::max());
+    m_uv_editor_bbox_max = Vec2f(std::numeric_limits<float>::lowest(), std::numeric_limits<float>::lowest());
+
+    std::vector<Eigen::Matrix<float, 2, 3>> transforms(size_t(std::max(m_uv_editor_unwrap.chart_count, 0)));
+    for (int c = 0; c < m_uv_editor_unwrap.chart_count; ++c) {
+        const Eigen::Matrix<float, 2, 3> island = island_transform_matrix(c, m_uv_editor_unwrap, layer.islands);
+        Eigen::Matrix<float, 2, 3>      &m      = transforms[size_t(c)];
+        m.block<2, 2>(0, 0) = uv_linear * island.block<2, 2>(0, 0);
+        m.col(2)            = uv_linear * island.col(2) + layer.offset;
+    }
+
+    // Only for the panel's readout; the canvas computes its own bounds.
+    for (size_t i = 0; i < m_uv_editor_unwrap.uvs.size(); ++i) {
+        const int c = m_uv_editor_unwrap.vertex_chart[i];
+        if (c < 0 || size_t(c) >= transforms.size())
+            continue;
+        const Vec2f uv = transforms[size_t(c)].block<2, 2>(0, 0) * m_uv_editor_unwrap.uvs[i] + transforms[size_t(c)].col(2);
+        m_uv_editor_bbox_min = m_uv_editor_bbox_min.cwiseMin(uv);
+        m_uv_editor_bbox_max = m_uv_editor_bbox_max.cwiseMax(uv);
+    }
+    return transforms;
+}
+
+void GLGizmoTextureDisplacement::on_island_edited(int island, const Vec2f &offset_delta, float rotation_delta,
+                                                  float scale_factor, bool finished)
+{
+    TextureDisplacementLayer *layer = active_layer();
+    if (layer == nullptr || island < 0)
+        return;
+    if (size_t(island) >= layer->islands.size())
+        layer->islands.resize(size_t(island) + 1);
+
+    // A pure translation (no rotation, no scale) is the only gesture that moves a whole group/selection
+    // together; rotate and scale stay on the primary island alone. This split is what makes flagging a
+    // group's worth of vertices on the GPU safe: the shared shader delta is a pure translation, so the
+    // same offset is correct for every flagged island.
+    const bool is_move = rotation_delta == 0.f && scale_factor == 1.f;
+
+    if (!m_island_drag_active) {
+        // Taken before the first delta lands, so one undo reverts the whole drag rather than just
+        // its final mouse-move.
+        Plater::TakeSnapshot snapshot(wxGetApp().plater(), _u8L("Move texture island"), UndoRedo::SnapshotType::GizmoAction);
+        m_island_drag_active = true;
+        // Decide the moved set once, at drag start: the whole selection + join groups for a move, or
+        // just the primary for a rotate/scale.
+        m_island_move_set = is_move ? build_island_move_set(*layer, island) : std::vector<int>{ island };
+        // Set up the GPU drag: flag the moved islands' vertices and bake the mesh once (via the dirty
+        // flag). From then on the drag is a uniform update, no rebuild -- see render_bump_preview_mesh().
+        m_bump_active_chart = island;
+        compute_bump_active_vertices(m_island_move_set);
+        m_bump_island_delta  = Eigen::Matrix<float, 2, 3>::Identity();
+        m_bump_preview_dirty = true;
+    }
+
+    // Apply the edit. A move goes to every island in the moved set (same offset -> they translate as
+    // one); a rotate/scale goes only to the primary, about its own centroid.
+    const std::vector<int>  single{ island };
+    const std::vector<int> &targets = (is_move && !m_island_move_set.empty()) ? m_island_move_set : single;
+    for (int c : targets) {
+        if (c < 0)
+            continue;
+        if (size_t(c) >= layer->islands.size())
+            layer->islands.resize(size_t(c) + 1);
+        TextureIsland &target = layer->islands[size_t(c)];
+        target.offset += offset_delta;
+        if (c == island) {
+            target.rotation_deg += rotation_delta;
+            // Guarded: a scale that reaches zero is unrecoverable (every subsequent factor multiplies it)
+            // and would collapse the island to a point -- exactly the failure this feature hit once already.
+            target.scale = std::clamp(target.scale * scale_factor, 0.001f, 1000.f);
+        }
+    }
+
+    if (finished) {
+        m_island_drag_active = false;
+        m_bump_active_chart  = -1;
+        m_bump_active_vertex.clear();
+        m_island_move_set.clear();
+        m_bump_island_delta  = Eigen::Matrix<float, 2, 3>::Identity();
+        rebuild_preview(); // the real displaced geometry moved: recompute it once, at the end
+    } else {
+        const std::vector<Eigen::Matrix<float, 2, 3>> xf = uv_editor_island_transforms(*layer);
+        if (UVEditorCanvas *uv_canvas = wxGetApp().plater()->get_uv_editor_canvas()) {
+            // Live feedback in the pane, and deliberately *just* the transforms: nothing about the
+            // unwrap changed, so none of the vertex buffers need touching. This is what makes a drag
+            // interactive on a patch with a million triangles.
+            uv_canvas->set_island_transforms(xf);
+        }
+        // Move the island on the model live through the shader's island_delta uniform -- no mesh
+        // rebuild. delta = F_current * F_baked^-1 in final-uv space (the bump mesh bakes F_baked; the
+        // shader applies delta to the flagged island's uv). The one rebuild that bakes the flags is
+        // scheduled at drag start above and consumed once per frame by render_painter_gizmo().
+        if (m_use_bump_preview && m_bump_active_chart == island && size_t(island) < xf.size()) {
+            Eigen::Matrix3f cur = Eigen::Matrix3f::Identity();
+            cur.topRows<2>()    = xf[size_t(island)];
+            Eigen::Matrix3f bak = Eigen::Matrix3f::Identity();
+            bak.topRows<2>()    = m_bump_baked_active_xf;
+            m_bump_island_delta = (cur * bak.inverse()).topRows<2>();
+            m_parent.set_as_dirty();
+        }
+    }
+}
+
+void GLGizmoTextureDisplacement::on_uv_vertex_edited(const std::vector<std::pair<int, Vec2f>> &edits)
+{
+    TextureDisplacementLayer *layer = active_layer();
+    if (layer == nullptr || edits.empty() || m_uv_editor_unwrap.empty())
+        return;
+
+    Plater::TakeSnapshot snapshot(wxGetApp().plater(), _u8L("Edit texture UV"), UndoRedo::SnapshotType::GizmoAction);
+
+    for (const auto &[unwrapped, raw_uv] : edits) {
+        if (unwrapped < 0 || size_t(unwrapped) >= m_uv_editor_unwrap.source_vertex.size())
+            continue;
+        // Keep the gizmo's own unwrap copy in step, so the pane and the bake agree without a re-solve.
+        if (size_t(unwrapped) < m_uv_editor_unwrap.uvs.size())
+            m_uv_editor_unwrap.uvs[size_t(unwrapped)] = raw_uv;
+
+        const int mesh_v = m_uv_editor_unwrap.source_vertex[size_t(unwrapped)];
+        if (mesh_v < 0)
+            continue;
+        // Store (or update) the override for this mesh vertex. Small list, linear scan is fine.
+        auto it = std::find_if(layer->lscm_uv_overrides.begin(), layer->lscm_uv_overrides.end(),
+                               [mesh_v](const std::pair<int, Vec2f> &p) { return p.first == mesh_v; });
+        if (it != layer->lscm_uv_overrides.end())
+            it->second = raw_uv;
+        else
+            layer->lscm_uv_overrides.emplace_back(mesh_v, raw_uv);
+    }
+
+    rebuild_preview(); // the baked displacement samples the moved uv now
+}
+
+bool GLGizmoTextureDisplacement::update_adjust_anchor()
+{
+    const ModelVolume *mv = texture_volume();
+    m_adjust_anchor_valid = mv != nullptr &&
+        compute_layer_paint_anchor(mv->mesh().its, mv->texture_displacement_facet(m_active_layer_slot).get_data(),
+                                    m_adjust_anchor_pos, m_adjust_anchor_normal);
+    return m_adjust_anchor_valid;
+}
+
+TextureDisplacementLayer *GLGizmoTextureDisplacement::active_layer()
+{
+    ModelVolume *mv = texture_volume();
+    if (mv == nullptr)
+        return nullptr;
+    for (TextureDisplacementLayer &l : mv->texture_displacement_layers)
+        if (l.slot == m_active_layer_slot)
+            return &l;
+    return nullptr;
+}
+
+const TextureDisplacementLayer *GLGizmoTextureDisplacement::active_layer() const
+{
+    return const_cast<GLGizmoTextureDisplacement *>(this)->active_layer();
+}
+
+Vec3f GLGizmoTextureDisplacement::adjust_plane_point() const
+{
+    const ModelVolume *mv        = texture_volume();
+    const float        bbox_size = (mv != nullptr) ? float(mv->mesh().bounding_box().size().norm()) : 1.f;
+    const float        lift      = bbox_size * 0.01f + 0.2f; // clear of the surface, to avoid z-fighting
+    return m_adjust_anchor_pos + m_adjust_anchor_normal * lift;
+}
+
+Vec3f GLGizmoTextureDisplacement::adjust_handle_center(const TextureDisplacementLayer &layer) const
+{
+    // apply_uv_transform() maps a planar mm coordinate p to uv = R(p / tiling_scale) + offset, and
+    // on_mouse_adjust_texture() drives offset by  offset = offset_start - R(delta / tiling_scale).
+    // Inverting that, the handle's displacement from the anchor is  - R^-1(offset) * tiling_scale --
+    // which, substituted into the drag equation, moves the handle by exactly `delta`. So the handle
+    // follows the cursor precisely, and is back on the anchor exactly when offset is zero.
+    const float rad = layer.rotation_deg * float(M_PI) / 180.f;
+    const float cs = std::cos(rad), sn = std::sin(rad);
+    const Vec2f unrotated(layer.offset.x() * cs + layer.offset.y() * sn, -layer.offset.x() * sn + layer.offset.y() * cs);
+    const Vec2f planar = -unrotated * layer.tiling_scale;
+
+    Vec3f u_axis, v_axis;
+    adjust_tangent_basis(u_axis, v_axis);
+    return adjust_plane_point() + u_axis * planar.x() + v_axis * planar.y();
+}
+
+void GLGizmoTextureDisplacement::adjust_tangent_basis(Vec3f &u_axis, Vec3f &v_axis) const
+{
+    // Mirrors project_planar()'s own dominant-axis choice exactly, so the ring's "0 degrees" and
+    // the offset handle's plane always agree with what project_texture_displacement_uv() does.
+    const Vec3f n = m_adjust_anchor_normal.cwiseAbs();
+    if (n.x() >= n.y() && n.x() >= n.z()) {
+        u_axis = Vec3f::UnitY();
+        v_axis = Vec3f::UnitZ();
+    } else if (n.y() >= n.x() && n.y() >= n.z()) {
+        u_axis = Vec3f::UnitX();
+        v_axis = Vec3f::UnitZ();
+    } else {
+        u_axis = Vec3f::UnitX();
+        v_axis = Vec3f::UnitY();
+    }
+}
+
+void GLGizmoTextureDisplacement::render_adjust_texture_gizmo()
+{
+    if (!m_adjust_anchor_valid)
+        return;
+
+    const ModelObject              *mo    = m_c->selection_info()->model_object();
+    const ModelVolume              *mv    = texture_volume();
+    const TextureDisplacementLayer *layer = active_layer();
+    if (mo == nullptr || mv == nullptr || layer == nullptr)
+        return;
+
+    const Selection  &selection    = m_parent.get_selection();
+    const Transform3d trafo_matrix = mo->instances[selection.get_instance_idx()]->get_transformation().get_matrix() * mv->get_matrix();
+
+    // Handle sizes scale with the volume so they stay usable on both tiny and huge models.
+    const float bbox_size    = float(mv->mesh().bounding_box().size().norm());
+    const float panel_half   = bbox_size * 0.04f + 1.f;
+    const float arrow_length = panel_half * 2.2f;
+
+    // Tracks the layer's offset, so the handle actually travels with the texture as it is dragged.
+    const Vec3f handle_center_local = adjust_handle_center(*layer);
+
+    GLShaderProgram *shader = wxGetApp().get_shader("flat");
+    if (shader == nullptr)
+        return;
+
+    glsafe(::glDisable(GL_DEPTH_TEST));
+    glsafe(::glEnable(GL_BLEND));
+    shader->start_using();
+
+    const Camera &camera = wxGetApp().plater()->get_camera();
+
+    Vec3f u_axis, v_axis;
+    adjust_tangent_basis(u_axis, v_axis);
+    Transform3d plane_transform     = Transform3d::Identity();
+    plane_transform.linear().col(0) = u_axis.cast<double>();
+    plane_transform.linear().col(1) = v_axis.cast<double>();
+    plane_transform.linear().col(2) = m_adjust_anchor_normal.cast<double>();
+    plane_transform.translation()   = handle_center_local.cast<double>();
+
+    // Pan panel: a flat square lying in the patch's own tangent plane. Dragging anywhere on it
+    // moves the texture freely along both axes at once.
+    if (!m_adjust_panel_glmodel.is_initialized()) {
+        GLModel::Geometry init_data;
+        init_data.format = { GLModel::Geometry::EPrimitiveType::Triangles, GLModel::Geometry::EVertexLayout::P3 };
+        init_data.reserve_vertices(4);
+        init_data.reserve_indices(6);
+        init_data.add_vertex(Vec3f(-1.f, -1.f, 0.f));
+        init_data.add_vertex(Vec3f(1.f, -1.f, 0.f));
+        init_data.add_vertex(Vec3f(1.f, 1.f, 0.f));
+        init_data.add_vertex(Vec3f(-1.f, 1.f, 0.f));
+        init_data.add_triangle(0, 1, 2);
+        init_data.add_triangle(0, 2, 3);
+        m_adjust_panel_glmodel.init_from(std::move(init_data));
+    }
+    Transform3d view_model_matrix = camera.get_view_matrix() * trafo_matrix * plane_transform *
+        Geometry::assemble_transform(Vec3d::Zero(), Vec3d::Zero(), Vec3d(panel_half, panel_half, panel_half));
+    shader->set_uniform("view_model_matrix", view_model_matrix);
+    shader->set_uniform("projection_matrix", camera.get_projection_matrix());
+    ColorRGBA panel_color = m_adjust_drag_handle == AdjustHandle::Pan ? ColorRGBA::YELLOW() : ColorRGBA::ORANGE();
+    panel_color.a(0.45f);
+    m_adjust_panel_glmodel.set_color(panel_color);
+    m_adjust_panel_glmodel.render();
+
+    // Axis arrows: a shaft plus a small V-shaped arrowhead, both along local +X. Reused for both
+    // the U and V axes below by swapping which world direction local +X is transformed to.
+    if (!m_adjust_arrow_glmodel.is_initialized()) {
+        GLModel::Geometry init_data;
+        init_data.format = { GLModel::Geometry::EPrimitiveType::Lines, GLModel::Geometry::EVertexLayout::P3 };
+        init_data.reserve_vertices(4);
+        init_data.reserve_indices(6);
+        init_data.add_vertex(Vec3f(0.f, 0.f, 0.f));
+        init_data.add_vertex(Vec3f(1.f, 0.f, 0.f));
+        init_data.add_vertex(Vec3f(0.82f, 0.08f, 0.f));
+        init_data.add_vertex(Vec3f(0.82f, -0.08f, 0.f));
+        init_data.add_line(0, 1);
+        init_data.add_line(1, 2);
+        init_data.add_line(1, 3);
+        m_adjust_arrow_glmodel.init_from(std::move(init_data));
+    }
+#if !SLIC3R_OPENGL_ES
+    if (!OpenGLManager::get_gl_info().is_core_profile())
+        glsafe(::glLineWidth(2.0f));
+#endif // !SLIC3R_OPENGL_ES
+
+    auto render_arrow = [&](const Vec3f &axis, const Vec3f &other_axis, bool is_active) {
+        Transform3d arrow_transform     = Transform3d::Identity();
+        arrow_transform.linear().col(0) = axis.cast<double>();
+        arrow_transform.linear().col(1) = other_axis.cast<double>();
+        arrow_transform.linear().col(2) = m_adjust_anchor_normal.cast<double>();
+        arrow_transform.translation()   = handle_center_local.cast<double>();
+
+        const Transform3d vmm = camera.get_view_matrix() * trafo_matrix * arrow_transform *
+            Geometry::assemble_transform(Vec3d::Zero(), Vec3d::Zero(), Vec3d(arrow_length, arrow_length, arrow_length));
+        shader->set_uniform("view_model_matrix", vmm);
+        shader->set_uniform("projection_matrix", camera.get_projection_matrix());
+        m_adjust_arrow_glmodel.set_color(is_active ? ColorRGBA::YELLOW() : ColorRGBA::ORANGE());
+        m_adjust_arrow_glmodel.render();
+    };
+    render_arrow(u_axis, v_axis, m_adjust_drag_handle == AdjustHandle::AxisU);
+    render_arrow(v_axis, u_axis, m_adjust_drag_handle == AdjustHandle::AxisV);
+
+    shader->stop_using();
+    glsafe(::glDisable(GL_BLEND));
+    glsafe(::glEnable(GL_DEPTH_TEST));
+}
+
+bool GLGizmoTextureDisplacement::on_mouse_adjust_texture(const wxMouseEvent &mouse_event)
+{
+    if (!m_adjust_anchor_valid)
+        return false;
+
+    ModelVolume              *mv    = texture_volume();
+    ModelObject              *mo    = m_c->selection_info()->model_object();
+    TextureDisplacementLayer *layer = active_layer();
+    if (mv == nullptr || mo == nullptr || layer == nullptr)
+        return false;
+
+    const Selection   &selection    = m_parent.get_selection();
+    const Transform3d  trafo_matrix = mo->instances[selection.get_instance_idx()]->get_transformation().get_matrix() * mv->get_matrix();
+    const Camera      &camera       = wxGetApp().plater()->get_camera();
+
+    const float bbox_size    = float(mv->mesh().bounding_box().size().norm());
+    const float panel_half   = bbox_size * 0.04f + 1.f;
+    const float arrow_length = panel_half * 2.2f;
+    // Where the handle is drawn (moves with the layer's offset) vs. the plane the drag is measured
+    // against (fixed at the anchor). Keeping them apart is what stops the handle's own motion from
+    // feeding back into the delta that produced it.
+    const Vec3f handle_center_local = adjust_handle_center(*layer);
+    const Vec3f drag_plane_local    = adjust_plane_point();
+    const Vec3d handle_center_world = trafo_matrix * handle_center_local.cast<double>();
+    const Vec2d mouse_pos(mouse_event.GetX(), mouse_event.GetY());
+
+    Vec3f u_axis, v_axis;
+    adjust_tangent_basis(u_axis, v_axis);
+
+    const Point handle_screen = CameraUtils::project(camera, handle_center_world);
+    const Vec2d handle_screen_d(double(handle_screen.x()), double(handle_screen.y()));
+
+    // Point-to-segment distance in screen space, for the arrow shafts.
+    auto dist_to_segment_px = [](const Vec2d &p, const Vec2d &a, const Vec2d &b) {
+        const Vec2d ab = b - a;
+        const double len2 = ab.squaredNorm();
+        const double t = (len2 > 1e-9) ? std::clamp((p - a).dot(ab) / len2, 0.0, 1.0) : 0.0;
+        return (p - (a + ab * t)).norm();
+    };
+
+    if (mouse_event.LeftDown()) {
+        const Vec3d u_tip_world = trafo_matrix * (handle_center_local + u_axis * arrow_length).cast<double>();
+        const Vec3d v_tip_world = trafo_matrix * (handle_center_local + v_axis * arrow_length).cast<double>();
+        const Point u_tip_screen = CameraUtils::project(camera, u_tip_world);
+        const Point v_tip_screen = CameraUtils::project(camera, v_tip_world);
+        const Vec2d u_tip_screen_d(double(u_tip_screen.x()), double(u_tip_screen.y()));
+        const Vec2d v_tip_screen_d(double(v_tip_screen.x()), double(v_tip_screen.y()));
+
+        // Panel screen-space "radius", approximated from one corner (a loose circle around the
+        // square is close enough for hit-testing purposes).
+        const Vec3d panel_corner_world = trafo_matrix * (handle_center_local + (u_axis + v_axis) * panel_half).cast<double>();
+        const Point panel_corner_screen = CameraUtils::project(camera, panel_corner_world);
+        const double panel_screen_radius = (Vec2d(double(panel_corner_screen.x()), double(panel_corner_screen.y())) - handle_screen_d).norm();
+
+        constexpr double pick_tolerance_px = 8.0;
+        const double dist_to_u = dist_to_segment_px(mouse_pos, handle_screen_d, u_tip_screen_d);
+        const double dist_to_v = dist_to_segment_px(mouse_pos, handle_screen_d, v_tip_screen_d);
+        const double dist_to_panel = (handle_screen_d - mouse_pos).norm();
+
+        // Arrows take priority over the panel (their tips extend past it), then the panel covers
+        // the broader central area.
+        if (dist_to_u <= pick_tolerance_px && dist_to_u <= dist_to_v)
+            m_adjust_drag_handle = AdjustHandle::AxisU;
+        else if (dist_to_v <= pick_tolerance_px)
+            m_adjust_drag_handle = AdjustHandle::AxisV;
+        else if (dist_to_panel <= panel_screen_radius)
+            m_adjust_drag_handle = AdjustHandle::Pan;
+        else {
+            m_adjust_drag_handle = AdjustHandle::None;
+            return false;
+        }
+
+        m_adjust_drag_start_offset = layer->offset;
+
+        Vec3d world_hit;
+        if (ray_plane_hit(camera, mouse_pos, trafo_matrix, drag_plane_local, m_adjust_anchor_normal, world_hit)) {
+            const Vec3f local_hit = (trafo_matrix.inverse() * world_hit).cast<float>();
+            m_adjust_drag_start_planar = project_planar(local_hit, m_adjust_anchor_normal);
+        }
+        return true;
+    }
+
+    if (mouse_event.Dragging() && m_adjust_drag_handle != AdjustHandle::None) {
+        Vec3d world_hit;
+        if (!ray_plane_hit(camera, mouse_pos, trafo_matrix, drag_plane_local, m_adjust_anchor_normal, world_hit))
+            return true;
+        const Vec3f local_hit      = (trafo_matrix.inverse() * world_hit).cast<float>();
+        const Vec2f current_planar = project_planar(local_hit, m_adjust_anchor_normal);
+
+        Vec2f delta_planar = current_planar - m_adjust_drag_start_planar;
+        // project_planar()'s (x, y) axes are exactly u_axis/v_axis (see adjust_tangent_basis()),
+        // so zeroing one component constrains the drag to only the other axis.
+        if (m_adjust_drag_handle == AdjustHandle::AxisU)
+            delta_planar.y() = 0.f;
+        else if (m_adjust_drag_handle == AdjustHandle::AxisV)
+            delta_planar.x() = 0.f;
+
+        const float scale        = (layer->tiling_scale > 1e-6f) ? (1.f / layer->tiling_scale) : 1.f;
+        const Vec2f delta_scaled = delta_planar * scale;
+        const float rad          = layer->rotation_deg * float(M_PI) / 180.f;
+        const float cs = std::cos(rad), sn = std::sin(rad);
+        const Vec2f delta_rotated(delta_scaled.x() * cs - delta_scaled.y() * sn, delta_scaled.x() * sn + delta_scaled.y() * cs);
+        // Increasing `offset` shifts which texel is sampled at a fixed world position, which
+        // visually slides the pattern the *opposite* way - subtracting is this session's
+        // best-effort reasoning about the direction that feels like "dragging the texture",
+        // unverified against an actual render (see header comment).
+        layer->offset = m_adjust_drag_start_offset - delta_rotated;
+
+        m_preview_params_dirty = true;
+        m_parent.set_as_dirty();
+        return true;
+    }
+
+    if (mouse_event.LeftUp() && m_adjust_drag_handle != AdjustHandle::None) {
+        m_adjust_drag_handle = AdjustHandle::None;
+        rebuild_preview();
+        m_preview_params_dirty = false;
+        return true;
+    }
+
+    return false;
 }
 
 ModelVolume* GLGizmoTextureDisplacement::texture_volume()
@@ -113,6 +2028,7 @@ void GLGizmoTextureDisplacement::update_model_object()
         const ModelObjectPtrs &mos = wxGetApp().model().objects;
         wxGetApp().obj_list()->update_info_items(std::find(mos.begin(), mos.end(), mo) - mos.begin());
         m_parent.post_event(SimpleEvent(EVT_GLCANVAS_SCHEDULE_BACKGROUND_PROCESS));
+        rebuild_preview();
     }
 }
 
@@ -136,6 +2052,18 @@ void GLGizmoTextureDisplacement::update_from_model_object(bool first_update)
         m_triangle_selectors.back()->deserialize(mv->texture_displacement_facet(m_active_layer_slot).get_data(), false);
         m_triangle_selectors.back()->request_update_render_data();
     }
+
+    // Start a freshly opened, never-textured volume with one layer already in place, so the panel is
+    // ready to paint straight away rather than showing an empty layer list. Only on first open, and
+    // only when there are none - never during an undo/redo or layer-switch reload (which also come
+    // through here), where silently adding a layer would be wrong.
+    if (first_update)
+        if (ModelVolume *tv = texture_volume(); tv != nullptr && tv->texture_displacement_layers.empty()) {
+            add_texture_layer(); // takes its own snapshot and rebuilds the preview
+            return;
+        }
+
+    rebuild_preview();
 }
 
 void GLGizmoTextureDisplacement::set_active_layer(int slot)
@@ -143,10 +2071,26 @@ void GLGizmoTextureDisplacement::set_active_layer(int slot)
     if (slot == m_active_layer_slot)
         return;
     // Flush edits made while the previous layer was active before switching what the selectors
-    // reflect -- otherwise they would be silently lost.
+    // reflect - otherwise they would be silently lost.
     update_model_object();
     m_active_layer_slot = slot;
     update_from_model_object(false);
+    // The on-canvas gizmo (if on) is anchored to whichever layer is active - keep it in sync
+    // instead of leaving it pointing at the previous layer's (now stale) paint patch.
+    if (m_adjust_texture_mode)
+        update_adjust_anchor();
+    // Refresh every preview/overlay (bump, UV editor, seams, ...) for the newly active layer.
+    rebuild_preview();
+}
+
+unsigned int GLGizmoTextureDisplacement::tool_icon_id()
+{
+    if (!m_tool_icon_tried) {
+        m_tool_icon_tried = true;
+        // Runs from the panel render, i.e. with a GL context current, so the upload is safe here.
+        m_tool_icon.load_from_svg_file(resources_dir() + "/images/toolbar_texture_displacement.svg", false, false, false, 32);
+    }
+    return m_tool_icon.get_id();
 }
 
 void GLGizmoTextureDisplacement::add_texture_layer()
@@ -167,65 +2111,176 @@ void GLGizmoTextureDisplacement::add_texture_layer()
         return;
     }
 
+    Plater::TakeSnapshot snapshot(wxGetApp().plater(), _u8L("Add texture displacement layer"), UndoRedo::SnapshotType::GizmoAction);
+
+    TextureDisplacementLayer layer;
+    layer.slot = free_slot;
+    // Start the layer off on the first library texture rather than on nothing at all: a textureless
+    // layer looks broken (painting on it appears to do nothing, because there is no height map to
+    // displace by). The user swaps it for another from the layer's own picker.
+    const std::vector<TextureLibraryEntry> &library = texture_library();
+    if (!library.empty())
+        if (const LibraryTexture *tex = get_library_texture(library.front().path)) {
+            layer.name       = library.front().name;
+            layer.path       = library.front().path;
+            layer.image_data = tex->image_data;
+        }
+    mv->texture_displacement_layers.push_back(std::move(layer));
+
+    set_active_layer(free_slot);
+    // set_active_layer() is a no-op when the new slot happens to be the one already active (slot 0,
+    // for the very first layer added), so the preview would not pick the new texture up on its own.
+    rebuild_preview();
+    m_parent.set_as_dirty();
+}
+
+const GLGizmoTextureDisplacement::LibraryTexture *GLGizmoTextureDisplacement::get_library_texture(const std::string &path)
+{
+    if (auto it = m_library_textures.find(path); it != m_library_textures.end())
+        return it->second.image_data ? &it->second : nullptr;
+
+    LibraryTexture entry;
+    std::string    error;
+    entry.image_data = load_texture_image_data(path, error);
+    if (entry.image_data) {
+        TextureDisplacementLayer probe;
+        probe.image_data = entry.image_data;
+        entry.thumbnail  = upload_height_thumbnail(decode_height_texture(probe));
+        if (!entry.thumbnail)
+            entry.image_data.reset(); // decoded to nothing usable - treat it as a failed load
+    } else {
+        BOOST_LOG_TRIVIAL(error) << "Texture displacement: could not load texture " << path << ": " << error;
+    }
+
+    // Cached whether it loaded or not: a file that failed is remembered as unusable, so the picker
+    // does not retry (and re-log) it on every frame it is on screen.
+    const auto [pos, inserted] = m_library_textures.emplace(path, std::move(entry));
+    return pos->second.image_data ? &pos->second : nullptr;
+}
+
+void GLGizmoTextureDisplacement::set_layer_texture(TextureDisplacementLayer &layer, const TextureLibraryEntry &entry)
+{
+    const LibraryTexture *tex = get_library_texture(entry.path);
+    if (tex == nullptr) {
+        show_error(nullptr, _u8L("Could not load the selected texture."));
+        return;
+    }
+
+    Plater::TakeSnapshot snapshot(wxGetApp().plater(), _u8L("Change texture displacement texture"), UndoRedo::SnapshotType::GizmoAction);
+    layer.name = entry.name;
+    layer.path = entry.path;
+    // Handing over the library's own buffer (rather than a copy) is what lets decode_height_texture()
+    // - whose cache is keyed by exactly this pointer - hit straight away instead of re-decoding
+    // the PNG the first time the layer is previewed or baked.
+    layer.image_data = tex->image_data;
+
+    rebuild_preview();
+    m_parent.set_as_dirty();
+}
+
+void GLGizmoTextureDisplacement::import_custom_texture(TextureDisplacementLayer &layer)
+{
     const wxString wildcard = "Images (*.png;*.jpg;*.jpeg;*.bmp)|*.png;*.jpg;*.jpeg;*.bmp";
     wxFileDialog   dialog(nullptr, _L("Choose a texture image (height map)"), wxEmptyString, wxEmptyString, wildcard,
                          wxFD_OPEN | wxFD_FILE_MUST_EXIST);
     if (dialog.ShowModal() != wxID_OK)
         return;
 
-    const std::string path = into_u8(dialog.GetPath());
-
-    wxImage image;
-    if (!image.LoadFile(dialog.GetPath()) || !image.IsOk()) {
-        show_error(nullptr, _u8L("Could not load the selected image."));
+    // Converts to the 8-bit grayscale PNG the bake code understands and copies it into the user's
+    // own texture folder, so it stays available for later models (and survives an app update, which
+    // rewrites the shipped folder wholesale).
+    std::string                              error;
+    const std::optional<TextureLibraryEntry> entry = import_texture_to_library(into_u8(dialog.GetPath()), error);
+    if (!entry) {
+        show_error(nullptr, error);
         return;
     }
+    set_layer_texture(layer, *entry);
+}
 
-    // libslic3r's PNG decoder (used by the baking code, which has no wxWidgets dependency) only
-    // understands true 8-bit grayscale PNG. Convert and re-encode through Slic3r's own PNG writer
-    // here rather than relying on wxImage's PNG encoder to pick a compatible color type.
-    const wxImage gray = image.ConvertToGreyscale();
-    const int     w    = gray.GetWidth();
-    const int     h    = gray.GetHeight();
-    if (w <= 0 || h <= 0) {
-        show_error(nullptr, _u8L("The selected image is empty."));
-        return;
+float GLGizmoTextureDisplacement::texture_row_height() const
+{
+    return m_imgui->scaled(3.f);
+}
+
+bool GLGizmoTextureDisplacement::texture_row(const char *id, const std::string &name, GLTexture *thumbnail, bool selected, float width)
+{
+    const float  row_h   = texture_row_height();
+    const ImVec2 start   = ImGui::GetCursorPos();
+    const bool   clicked = ImGui::Selectable(id, selected, 0, ImVec2(width, row_h));
+    const ImVec2 after   = ImGui::GetCursorPos();
+
+    // Lay the image and the name back over the Selectable that was just emitted, so the whole row
+    // - preview included - is the clickable target rather than just a strip of text next to it.
+    ImGui::SetCursorPos(ImVec2(start.x + ImGui::GetStyle().FramePadding.x, start.y));
+    if (thumbnail != nullptr) {
+        // Fit inside a row_h square without distorting a non-square source image.
+        const float  aspect = (thumbnail->get_height() > 0) ? float(thumbnail->get_width()) / float(thumbnail->get_height()) : 1.f;
+        const ImVec2 dim    = (aspect >= 1.f) ? ImVec2(row_h, row_h / aspect) : ImVec2(row_h * aspect, row_h);
+        ImGui::Image((ImTextureID) (intptr_t) thumbnail->get_id(), dim);
+        ImGui::SameLine();
     }
-    std::vector<uint8_t> gray_pixels(size_t(w) * size_t(h));
-    const unsigned char *rgb = gray.GetData();
-    for (size_t i = 0; i < gray_pixels.size(); ++i)
-        gray_pixels[i] = rgb[i * 3];
+    ImGui::SetCursorPosY(start.y + (row_h - ImGui::GetTextLineHeight()) * 0.5f); // centre the name on the image
+    ImGui::TextUnformatted(name.c_str());
 
-    const boost::filesystem::path tmp_path = boost::filesystem::temp_directory_path()
-        / boost::filesystem::unique_path("orca_texdisp_%%%%%%%%.png");
-    if (!Slic3r::png::write_gray_to_file(tmp_path.string(), size_t(w), size_t(h), gray_pixels)) {
-        show_error(nullptr, _u8L("Failed to prepare the texture for use."));
-        return;
+    ImGui::SetCursorPos(after);
+    return clicked;
+}
+
+void GLGizmoTextureDisplacement::render_texture_picker(TextureDisplacementLayer &layer)
+{
+    const float row_h        = texture_row_height();
+    const float import_btn_w = m_imgui->scaled(1.6f);
+    const float spacing      = ImGui::GetStyle().ItemSpacing.x;
+    const float picker_w     = std::max(m_imgui->scaled(10.f), ImGui::GetContentRegionAvail().x - import_btn_w - spacing);
+
+    const ImVec2 start = ImGui::GetCursorPos();
+    if (texture_row("##texture_picker", layer.name.empty() ? _u8L("Choose a texture...") : layer.name,
+                    get_layer_thumbnail(layer), false, picker_w))
+        ImGui::OpenPopup("##texture_library");
+    const ImVec2 after = ImGui::GetCursorPos();
+
+    // Positioned explicitly rather than with SameLine(): texture_row() draws several widgets and
+    // then rewinds the cursor, so ImGui's notion of "the previous line" is not the row's own.
+    ImGui::SetCursorPos(ImVec2(start.x + picker_w + spacing, start.y));
+    if (ImGui::Button("+", ImVec2(import_btn_w, row_h)))
+        import_custom_texture(layer);
+    if (ImGui::IsItemHovered())
+        m_imgui->tooltip(_u8L("Import your own image as a height map. It is converted to the format the slicer "
+                              "bakes from and saved to your personal texture folder, kept separate from the "
+                              "textures shipped with OrcaSlicer."),
+                          m_imgui->scaled(20.f));
+    ImGui::SetCursorPos(after);
+
+    if (ImGui::BeginPopup("##texture_library")) {
+        const std::vector<TextureLibraryEntry> &library = texture_library();
+        if (library.empty())
+            m_imgui->text(_L("No textures found."));
+
+        bool shipped_heading = false;
+        bool user_heading    = false;
+        for (const TextureLibraryEntry &entry : library) {
+            if (!entry.is_user && !shipped_heading) {
+                ImGui::TextDisabled("%s", _u8L("Built-in").c_str());
+                shipped_heading = true;
+            } else if (entry.is_user && !user_heading) {
+                if (shipped_heading)
+                    ImGui::Separator();
+                ImGui::TextDisabled("%s", _u8L("My textures").c_str());
+                user_heading = true;
+            }
+
+            ImGui::PushID(entry.path.c_str());
+            const LibraryTexture *tex = get_library_texture(entry.path);
+            if (texture_row("##entry", entry.name, tex != nullptr ? tex->thumbnail.get() : nullptr,
+                            entry.path == layer.path, m_imgui->scaled(14.f))) {
+                set_layer_texture(layer, entry);
+                ImGui::CloseCurrentPopup();
+            }
+            ImGui::PopID();
+        }
+        ImGui::EndPopup();
     }
-    std::vector<unsigned char> bytes;
-    {
-        std::ifstream ifs(tmp_path.string(), std::ios::binary);
-        bytes.assign(std::istreambuf_iterator<char>(ifs), std::istreambuf_iterator<char>());
-    }
-    boost::system::error_code ec;
-    boost::filesystem::remove(tmp_path, ec);
-
-    if (bytes.empty()) {
-        show_error(nullptr, _u8L("Failed to prepare the texture for use."));
-        return;
-    }
-
-    Plater::TakeSnapshot snapshot(wxGetApp().plater(), _u8L("Add texture displacement layer"), UndoRedo::SnapshotType::GizmoAction);
-
-    TextureDisplacementLayer layer;
-    layer.slot       = free_slot;
-    layer.name       = boost::filesystem::path(path).filename().string();
-    layer.path       = path;
-    layer.image_data = std::make_shared<std::vector<unsigned char>>(std::move(bytes));
-    mv->texture_displacement_layers.push_back(std::move(layer));
-
-    set_active_layer(free_slot);
-    m_parent.set_as_dirty();
 }
 
 void GLGizmoTextureDisplacement::remove_texture_layer(int slot)
@@ -240,13 +2295,195 @@ void GLGizmoTextureDisplacement::remove_texture_layer(int slot)
     layers.erase(std::remove_if(layers.begin(), layers.end(),
                                  [slot](const TextureDisplacementLayer &l) { return l.slot == slot; }),
                  layers.end());
-    if (slot >= 0 && slot < int(TEXTURE_DISPLACEMENT_MAX_LAYERS))
+    if (slot >= 0 && slot < int(TEXTURE_DISPLACEMENT_MAX_LAYERS)) {
         mv->texture_displacement_facet(slot).reset();
+        m_thumbnails[size_t(slot)].reset();
+        m_thumbnail_source[size_t(slot)] = nullptr;
+    }
 
     if (m_active_layer_slot == slot)
-        update_from_model_object(false);
+        update_from_model_object(false); // also rebuilds the preview
+    else
+        rebuild_preview(); // a non-active layer's contribution to the combined preview changed
 
     m_parent.set_as_dirty();
+}
+
+void GLGizmoTextureDisplacement::select_whole_model()
+{
+    ModelObject *mo = m_c->selection_info()->model_object();
+    if (!mo)
+        return;
+
+    Plater::TakeSnapshot snapshot(wxGetApp().plater(), _u8L("Select whole model for texture displacement"), UndoRedo::SnapshotType::GizmoAction);
+
+    int idx = -1;
+    for (const ModelVolume *v : mo->volumes) {
+        if (!v->is_model_part())
+            continue;
+        ++idx;
+        const size_t facet_count = v->mesh().its.indices.size();
+        for (size_t i = 0; i < facet_count; ++i)
+            m_triangle_selectors[idx]->set_facet(int(i), EnforcerBlockerType::ENFORCER);
+        m_triangle_selectors[idx]->request_update_render_data();
+    }
+    update_model_object();
+    m_parent.set_as_dirty();
+}
+
+void GLGizmoTextureDisplacement::subdivide_model()
+{
+    ModelVolume *mv = texture_volume();
+    ModelObject *mo = m_c->selection_info()->model_object();
+    if (mv == nullptr || mo == nullptr)
+        return;
+
+    Plater *plater = wxGetApp().plater();
+    Plater::TakeSnapshot snapshot(plater, _u8L("Subdivide model for texture displacement"), UndoRedo::SnapshotType::GizmoAction);
+
+    // Same save/replace/restore-painting dance GLGizmoSimplify uses when it re-tessellates a
+    // volume's mesh: supported/seam/mmu/fuzzy-skin masks get remapped onto the new triangles,
+    // texture-displacement doesn't (no remap support for it yet) and is dropped instead of being
+    // left referring to triangle indices that no longer mean the same thing.
+    std::optional<TriangleSelector::SavedPainting> saved_painting = mv->save_painting();
+
+    // max_edge_length 0 means "no triangle is ever small enough", so every non-degenerate edge is
+    // split on each of the m_subdivide_count passes - i.e. a plain "subdivide the whole mesh N times".
+    TriangleMesh new_mesh(subdivide_mesh_uniform(mv->mesh().its, 0.f, m_subdivide_count));
+    mv->set_mesh(std::move(new_mesh));
+    mv->set_new_unique_id();
+    mv->calculate_convex_hull();
+    mv->restore_painting(saved_painting);
+
+    if (ObjectList *obj_list = wxGetApp().obj_list()) {
+        const ModelObjectPtrs &objs = plater->model().objects;
+        auto it = std::find(objs.begin(), objs.end(), mo);
+        if (it != objs.end())
+            obj_list->update_info_items(size_t(it - objs.begin()));
+    }
+
+    plater->changed_object(*mo);
+    update_from_model_object(false); // reload selectors/preview against the new mesh + cleared paint
+    m_parent.set_as_dirty();
+}
+
+void GLGizmoTextureDisplacement::remesh_model()
+{
+    ModelVolume *mv = texture_volume();
+    ModelObject *mo = m_c->selection_info()->model_object();
+    if (mv == nullptr || mo == nullptr || m_remesh_target_edge_mm <= 0.f)
+        return;
+
+    Plater *plater = wxGetApp().plater();
+
+    // CGAL isotropic remeshing can be slow on a big mesh; do it before taking the snapshot so a failure
+    // (it returns the input unchanged) doesn't leave an empty undo step.
+    indexed_triangle_set remeshed;
+    {
+        wxBusyCursor wait;
+        remeshed = MeshBoolean::cgal::remesh_isotropic(mv->mesh().its, double(m_remesh_target_edge_mm), 3);
+    }
+    if (remeshed.indices.empty() || remeshed.vertices.size() == mv->mesh().its.vertices.size()) {
+        show_error(nullptr, _u8L("Remeshing did not change the model (it may be non-manifold or the target size "
+                                 "is already met)."));
+        return;
+    }
+
+    Plater::TakeSnapshot snapshot(plater, _u8L("Remesh model for texture displacement"), UndoRedo::SnapshotType::GizmoAction);
+    // Same save/replace/restore-painting dance as subdivide: texture-displacement paint has no remap
+    // across a topology change, so it is dropped rather than left pointing at triangles that moved.
+    std::optional<TriangleSelector::SavedPainting> saved_painting = mv->save_painting();
+    mv->set_mesh(TriangleMesh(std::move(remeshed)));
+    mv->set_new_unique_id();
+    mv->calculate_convex_hull();
+    mv->restore_painting(saved_painting);
+
+    if (ObjectList *obj_list = wxGetApp().obj_list()) {
+        const ModelObjectPtrs &objs = plater->model().objects;
+        auto it = std::find(objs.begin(), objs.end(), mo);
+        if (it != objs.end())
+            obj_list->update_info_items(size_t(it - objs.begin()));
+    }
+    plater->changed_object(*mo);
+    update_from_model_object(false);
+    m_parent.set_as_dirty();
+}
+
+void GLGizmoTextureDisplacement::rebuild_subdivide_preview()
+{
+    m_subdivide_preview_glmodel.reset();
+    m_subdivide_preview_count = -1;
+    const ModelVolume *mv = texture_volume();
+    if (mv == nullptr || m_subdivide_count < 1)
+        return;
+
+    // The same subdivision Apply would commit, but kept in a throwaway mesh and shown only as a
+    // wireframe - the model itself is not touched until Apply.
+    const indexed_triangle_set its = subdivide_mesh_uniform(mv->mesh().its, 0.f, m_subdivide_count);
+    if (its.indices.empty())
+        return;
+    m_subdivide_preview_count = m_subdivide_count;
+
+    GLModel::Geometry init_data;
+    init_data.format = { GLModel::Geometry::EPrimitiveType::Lines, GLModel::Geometry::EVertexLayout::P3 };
+    init_data.reserve_vertices(its.vertices.size());
+    init_data.reserve_indices(its.indices.size() * 6);
+    for (const Vec3f &v : its.vertices)
+        init_data.add_vertex(v);
+    for (const stl_triangle_vertex_indices &tri : its.indices)
+        for (int i = 0; i < 3; ++i)
+            init_data.add_line(unsigned(tri[i]), unsigned(tri[(i + 1) % 3]));
+    if (!init_data.is_empty())
+        m_subdivide_preview_glmodel.init_from(std::move(init_data));
+}
+
+void GLGizmoTextureDisplacement::render_subdivide_preview()
+{
+    const ModelObject *mo = m_c->selection_info()->model_object();
+    const ModelVolume *mv = texture_volume();
+    if (mo == nullptr || mv == nullptr || !m_subdivide_preview_glmodel.is_initialized())
+        return;
+    GLShaderProgram *shader = wxGetApp().get_shader("flat");
+    if (shader == nullptr)
+        return;
+
+    const Selection  &selection    = m_parent.get_selection();
+    const Transform3d trafo_matrix = mo->instances[selection.get_instance_idx()]->get_transformation().get_matrix() * mv->get_matrix();
+    const Camera     &camera       = wxGetApp().plater()->get_camera();
+
+    shader->start_using();
+    shader->set_uniform("view_model_matrix", camera.get_view_matrix() * trafo_matrix);
+    shader->set_uniform("projection_matrix", camera.get_projection_matrix());
+    glsafe(::glEnable(GL_POLYGON_OFFSET_LINE));
+    glsafe(::glPolygonOffset(-1.0f, -1.0f));
+    m_subdivide_preview_glmodel.set_color(ColorRGBA(0.2f, 0.9f, 1.0f, 0.7f)); // cyan, reads as "preview"
+    m_subdivide_preview_glmodel.render();
+    glsafe(::glDisable(GL_POLYGON_OFFSET_LINE));
+    shader->stop_using();
+}
+
+GLTexture *GLGizmoTextureDisplacement::get_layer_thumbnail(const TextureDisplacementLayer &layer)
+{
+    if (layer.empty() || layer.slot < 0 || size_t(layer.slot) >= TEXTURE_DISPLACEMENT_MAX_LAYERS)
+        return nullptr;
+
+    const size_t slot = size_t(layer.slot);
+    if (m_thumbnails[slot] && m_thumbnail_source[slot] == layer.image_data.get() &&
+        m_thumbnail_smoothing[slot] == layer.smoothing)
+        return m_thumbnails[slot].get();
+
+    // Reuses the already-decoded, already-cached grayscale pixels (see decode_height_texture()'s
+    // own cache in TextureDisplacement.cpp) - only the gray-to-RGBA expansion and GPU upload below are
+    // new work. Rebuilt when the texture *or the smoothing* changes, so the fast/bump preview - which
+    // samples this GPU texture directly - reflects the current smoothing rather than the raw image.
+    std::unique_ptr<GLTexture> texture = upload_height_thumbnail(decode_height_texture(layer));
+    if (!texture)
+        return nullptr;
+
+    m_thumbnails[slot]          = std::move(texture);
+    m_thumbnail_source[slot]    = layer.image_data.get();
+    m_thumbnail_smoothing[slot] = layer.smoothing;
+    return m_thumbnails[slot].get();
 }
 
 void GLGizmoTextureDisplacement::bake()
@@ -265,7 +2502,17 @@ void GLGizmoTextureDisplacement::bake()
     }
 
     m_bake_in_progress = true;
-    queue_texture_displacement_bake(*mv, [this]() { m_bake_in_progress = false; });
+    queue_texture_displacement_bake(*mv, [this]() {
+        m_bake_in_progress = false;
+        // Baking replaces the volume's mesh (new id, new topology) without changing the object's
+        // id or volume count, so GLGizmoPainterBase::data_changed()'s usual change-detection never
+        // notices it needs to reload - do it explicitly here, otherwise the gizmo keeps painting
+        // and rendering against the stale, pre-bake TriangleSelectorPatch until the object is
+        // deselected and reselected.
+        if (m_state == On && m_c->selection_info() && m_c->selection_info()->model_object())
+            update_from_model_object(false);
+        m_parent.set_as_dirty();
+    });
 }
 
 void GLGizmoTextureDisplacement::on_render_input_window(float x, float y, float bottom_limit)
@@ -277,25 +2524,177 @@ void GLGizmoTextureDisplacement::on_render_input_window(float x, float y, float 
 
     const float approx_height = m_imgui->scaled(24.f);
     y = std::min(y, bottom_limit - approx_height);
-    GizmoImguiSetNextWIndowPos(x, y, ImGuiCond_Always, 1.0f, 0.0f);
+
+    // Docked (the default) the panel is pinned next to the gizmo toolbar and cannot be moved, like
+    // every other gizmo's. Undocked it becomes an ordinary floating window: a title bar to drag it
+    // by, and no forced position - this panel is tall enough (layer stack, per-layer controls) that
+    // it can cover the very part of the model being painted, and being able to shove it aside is the
+    // point. The position is deliberately *not* seeded on undock, so the window stays exactly where
+    // it already was and the user just gains the ability to move it from there.
+    ImGuiWindowFlags flags = ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse;
+    if (!m_undocked) {
+        flags |= ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar;
+        GizmoImguiSetNextWIndowPos(x, y, ImGuiCond_Always, 1.0f, 0.0f);
+    }
 
     ImGuiWrapper::push_toolbar_style(m_parent.get_scale());
-    GizmoImguiBegin(get_name(), ImGuiWindowFlags_NoMove | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar);
+    GizmoImguiBegin(get_name(), flags);
 
-    m_imgui->text(m_desc.at("cursor_size"));
-    ImGui::SameLine();
-    ImGui::PushItemWidth(m_imgui->scaled(7.f));
-    m_imgui->slider_float("##cursor_radius", &m_cursor_radius, CursorRadiusMin, CursorRadiusMax, "%.2f");
+    // Combo drop-downs otherwise inherit ImGui's near-black default popup background; under the light
+    // theme that leaves the dark item text unreadable ("the dropbox is black"). Pushed only around each
+    // Combo below (never around a tooltip, whose own near-black default is what makes it readable).
+    const ImVec4 combo_popup_bg = wxGetApp().dark_mode() ? ImVec4(0.18f, 0.18f, 0.19f, 1.f)
+                                                         : ImVec4(0.93f, 0.93f, 0.93f, 1.f);
+    const auto scoped_combo = [&](const char *id, int *v, const char *const items[], int n) {
+        ImGui::PushStyleColor(ImGuiCol_PopupBg, combo_popup_bg);
+        const bool changed = ImGui::Combo(id, v, items, n);
+        ImGui::PopStyleColor();
+        return changed;
+    };
 
-    bool is_circle = m_cursor_type == TriangleSelector::CursorType::CIRCLE;
-    if (ImGui::RadioButton(m_desc.at("circle").ToUTF8().data(), is_circle))
+    if (m_imgui->button(m_undocked ? _L("Dock panel") : _L("Undock panel")))
+        m_undocked = !m_undocked;
+    if (ImGui::IsItemHovered())
+        m_imgui->tooltip(_u8L("Detach this panel so it can be dragged anywhere over the 3D view, or dock it "
+                              "back beside the toolbar."),
+                          m_imgui->scaled(20.f));
+    ImGui::Separator();
+
+    // Selection mode: which of TriangleSelector's existing click/brush mechanisms drives painting.
+    // "Face" and "Connected area" reuse the exact same underlying selection machinery every other
+    // paint gizmo already has (single-facet click, and angle-limited flood fill respectively) --
+    // just exposed here as an alternative to brushing, one triangle/region at a time.
+    m_imgui->text(_L("Selection mode"));
+    const bool is_brush_mode = m_tool_type == ToolType::BRUSH && m_cursor_type != TriangleSelector::CursorType::POINTER;
+    const bool is_face_mode  = m_tool_type == ToolType::BRUSH && m_cursor_type == TriangleSelector::CursorType::POINTER;
+    const bool is_area_mode  = m_tool_type == ToolType::SMART_FILL;
+    if (ImGui::RadioButton(_u8L("Brush").c_str(), is_brush_mode)) {
+        m_tool_type   = ToolType::BRUSH;
         m_cursor_type = TriangleSelector::CursorType::CIRCLE;
+    }
     ImGui::SameLine();
-    if (ImGui::RadioButton(m_desc.at("sphere").ToUTF8().data(), !is_circle))
-        m_cursor_type = TriangleSelector::CursorType::SPHERE;
+    if (ImGui::RadioButton(_u8L("Face").c_str(), is_face_mode)) {
+        m_tool_type   = ToolType::BRUSH;
+        m_cursor_type = TriangleSelector::CursorType::POINTER;
+    }
+    ImGui::SameLine();
+    if (ImGui::RadioButton(_u8L("Connected area").c_str(), is_area_mode)) {
+        m_tool_type   = ToolType::SMART_FILL;
+        m_cursor_type = TriangleSelector::CursorType::POINTER;
+    }
+
+    if (is_brush_mode) {
+        m_imgui->text(m_desc.at("cursor_size"));
+        ImGui::SameLine();
+        ImGui::PushItemWidth(m_imgui->scaled(8.4f));
+        m_imgui->slider_float("##cursor_radius", &m_cursor_radius, CursorRadiusMin, CursorRadiusMax, "%.2f");
+        ImGui::PopItemWidth();
+
+        bool is_circle = m_cursor_type == TriangleSelector::CursorType::CIRCLE;
+        if (ImGui::RadioButton(m_desc.at("circle").ToUTF8().data(), is_circle))
+            m_cursor_type = TriangleSelector::CursorType::CIRCLE;
+        ImGui::SameLine();
+        if (ImGui::RadioButton(m_desc.at("sphere").ToUTF8().data(), !is_circle))
+            m_cursor_type = TriangleSelector::CursorType::SPHERE;
+    } else if (is_area_mode) {
+        ImGui::PushItemWidth(m_imgui->scaled(8.4f));
+        m_imgui->slider_float(_u8L("Angle threshold"), &m_smart_fill_angle, SmartFillAngleMin, SmartFillAngleMax, "%.0f");
+        ImGui::PopItemWidth();
+    }
+
+    if (m_imgui->button(_u8L("Select whole model")))
+        select_whole_model();
+
+    // View mode (#: "make View Mode with just icons"): Normal / Fast / Checker / Distortion behave as
+    // one radio group, Wireframe as an independent toggle. All reuse the one tool icon for now, so the
+    // tooltip carries the meaning. The underlying state stays m_use_bump_preview + m_uv_check_mode.
+    {
+        const unsigned int icon = tool_icon_id();
+        const float        vsz  = m_imgui->scaled(1.5f);
+        const ImVec4       teal(0.0f, 0.59f, 0.53f, 1.0f);
+        const int          cur_mode = m_use_bump_preview ? 1 :
+                                       (m_uv_check_mode == UVCheckMode::Checker    ? 2 :
+                                        m_uv_check_mode == UVCheckMode::Distortion ? 3 : 0);
+        int  new_mode  = cur_mode;
+        bool wf_toggle = false;
+
+        // One icon button; active state shown by a teal backing and a full-brightness (vs dimmed) icon.
+        // Falls back to a text toggle if the icon can't load.
+        const auto icon_toggle = [&](int uid, bool active, const wxString &label, const wxString &tip) -> bool {
+            bool clicked;
+            ImGui::PushID(uid);
+            if (icon != 0)
+                clicked = m_imgui->image_button((ImTextureID) (intptr_t) icon, ImVec2(vsz, vsz), ImVec2(0, 0), ImVec2(1, 1),
+                                                -1, active ? teal : ImVec4(0, 0, 0, 0),
+                                                active ? ImVec4(1, 1, 1, 1) : ImVec4(0.65f, 0.65f, 0.65f, 1.f));
+            else {
+                bool v = active;
+                clicked = ImGui::Checkbox(label.ToUTF8().data(), &v);
+            }
+            ImGui::PopID();
+            if (ImGui::IsItemHovered())
+                m_imgui->tooltip(tip, m_imgui->scaled(18.f));
+            return clicked;
+        };
+
+        m_imgui->text(_L("View"));
+        ImGui::SameLine();
+        if (icon_toggle(701, cur_mode == 0, _L("Normal"), _L("Normal - the true displaced geometry (what Bake produces)"))) new_mode = 0;
+        ImGui::SameLine();
+        if (icon_toggle(702, cur_mode == 1, _L("Fast"), _L("Fast - a bump-shaded approximation of the active layer only; quick to update, not exact"))) new_mode = 1;
+        ImGui::SameLine();
+        if (icon_toggle(703, cur_mode == 2, _L("Checker"), _L("Checker - a test grid over the unwrap; squares stay square where it does not stretch"))) new_mode = 2;
+        ImGui::SameLine();
+        if (icon_toggle(704, cur_mode == 3, _L("Distortion"), _L("Distortion - blue-to-red stretch heatmap over the unwrap (needs the Unwrap/LSCM projection)"))) new_mode = 3;
+        ImGui::SameLine();
+        ImGui::Dummy(ImVec2(m_imgui->scaled(0.6f), 0.f));
+        ImGui::SameLine();
+        if (icon_toggle(705, m_wireframe_overlay, _L("Wireframe"), _L("Wireframe - overlay the mesh edges; independent of the view above"))) wf_toggle = true;
+
+        if (new_mode != cur_mode) {
+            m_use_bump_preview = (new_mode == 1);
+            m_uv_check_mode    = (new_mode == 2) ? UVCheckMode::Checker :
+                                 (new_mode == 3) ? UVCheckMode::Distortion : UVCheckMode::None;
+            rebuild_uvcheck_mesh();
+            if (m_use_bump_preview)
+                rebuild_bump_preview_mesh();
+            refresh_wireframe(); // Normal<->Fast swaps the wireframe between displaced and base mesh
+            update_uv_editor(); // mirror the checker / distortion heatmap into the UV pane too (#7)
+            m_parent.set_as_dirty();
+        }
+        if (wf_toggle) {
+            m_wireframe_overlay = !m_wireframe_overlay;
+            refresh_wireframe();
+            m_parent.set_as_dirty();
+        }
+    }
+
+    if (ImGui::Checkbox(_u8L("Auto update").c_str(), &m_auto_update))
+        if (m_auto_update)
+            rebuild_preview(); // catch up anything that changed while it was off
+    if (ImGui::IsItemHovered())
+        m_imgui->tooltip(_u8L("Rebuild the displaced geometry as soon as anything changes (painting, textures, "
+                              "sliders). Turn off to only rebuild when you release a slider, on very heavy models."),
+                          m_imgui->scaled(20.f));
 
     ImGui::Separator();
     m_imgui->text(_L("Texture layers"));
+    if (mv != nullptr) {
+        // Add-layer affordance as an icon beside the heading. It is deliberately *not* right-aligned
+        // against the window edge: this panel uses ImGuiWindowFlags_AlwaysAutoResize, and positioning
+        // an item at GetWindowContentRegionMax().x - w feeds the window's own width back into its
+        // auto-fit, growing it by one item-spacing every frame -- which, with the panel docked and
+        // anchored by its right edge, walked it left off-screen on hover. A plain SameLine can't do that.
+        const unsigned int add_icon = tool_icon_id();
+        const float        sz       = m_imgui->scaled(1.3f);
+        ImGui::SameLine();
+        const bool add_clicked = (add_icon != 0) ? m_imgui->image_button((ImTextureID) (intptr_t) add_icon, ImVec2(sz, sz))
+                                                  : m_imgui->button(m_desc.at("add_texture"));
+        if (ImGui::IsItemHovered())
+            m_imgui->tooltip(_u8L("Add a texture layer"), m_imgui->scaled(20.f));
+        if (add_clicked)
+            add_texture_layer();
+    }
 
     if (mv != nullptr) {
         std::vector<TextureDisplacementLayer *> ordered;
@@ -303,30 +2702,470 @@ void GLGizmoTextureDisplacement::on_render_input_window(float x, float y, float 
             ordered.push_back(&l);
         std::sort(ordered.begin(), ordered.end(), [](const auto *a, const auto *b) { return a->slot < b->slot; });
 
-        for (TextureDisplacementLayer *layer : ordered) {
+        // Removing a layer erases it from mv->texture_displacement_layers, which shifts every later
+        // element down and leaves `ordered` - and `layer` itself - pointing at the wrong element
+        // (or past the end). Removing mid-loop would therefore keep rendering this row's remaining
+        // widgets against freed/shifted memory. Defer it to after the loop instead.
+        int slot_to_remove = -1;
+
+        // The layer stack lives in its own scrolling, tinted region (#10, #12): with eight layers'
+        // worth of controls the panel otherwise runs off the bottom of the screen, and there was
+        // nothing to tell "settings that belong to this layer" apart from "settings that belong to
+        // the tool".
+        ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(1.f, 1.f, 1.f, 0.04f));
+        ImGui::BeginChild("##texture_layers", ImVec2(0.f, m_imgui->scaled(20.f)), true);
+
+        for (size_t li = 0; li < ordered.size(); ++li) {
+            TextureDisplacementLayer *layer = ordered[li];
             ImGui::PushID(layer->slot);
             const bool is_active = layer->slot == m_active_layer_slot;
-            if (ImGui::RadioButton("##active", is_active))
+
+            // Tint the whole active layer's block, not just its header (#: "background color for the
+            // selected layer ... whole plate"). The block's height isn't known until it is laid out, so
+            // draw the block into a foreground channel and the backing rectangle into a background one,
+            // then merge - the standard ImGui "rect behind a group" trick.
+            ImDrawList  *dl        = ImGui::GetWindowDrawList();
+            const ImVec2 block_min = ImGui::GetCursorScreenPos();
+            const float  block_rx  = ImGui::GetWindowPos().x + ImGui::GetWindowContentRegionMax().x;
+            if (is_active) {
+                dl->ChannelsSplit(2);
+                dl->ChannelsSetCurrent(1);
+            }
+
+            // Clicking the header - or anywhere in the layer's block, see the group below - makes
+            // it the active layer (#11, #12). A radio button was doing this before, which worked but
+            // gave no sense of which block of controls belonged to which layer.
+            ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.f, 0.68f, 0.58f, 0.55f));
+            ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(0.f, 0.68f, 0.58f, 0.35f));
+            const std::string header = layer->name.empty() ? Slic3r::format(_u8L("Layer %1%"), li + 1) : layer->name;
+            if (ImGui::Selectable(header.c_str(), is_active, 0, ImVec2(ImGui::GetContentRegionAvail().x - m_imgui->scaled(3.f), 0.f)))
                 set_active_layer(layer->slot);
-            ImGui::SameLine();
-            ImGui::Text("%s", layer->name.empty() ? "texture" : layer->name.c_str());
+            ImGui::PopStyleColor(2);
             ImGui::SameLine();
             if (m_imgui->button(m_desc.at("remove_layer")))
-                remove_texture_layer(layer->slot);
+                slot_to_remove = layer->slot;
 
-            ImGui::PushItemWidth(m_imgui->scaled(7.f));
-            m_imgui->slider_float(_u8L("Depth (mm)"), &layer->depth_mm, 0.02f, 5.f, "%.2f");
-            m_imgui->slider_float(_u8L("Tile size (mm)"), &layer->tiling_scale, 0.5f, 100.f, "%.1f");
-            m_imgui->slider_float(_u8L("Rotation"), &layer->rotation_deg, 0.f, 360.f, "%.0f");
+            // Everything below is this layer's own; the group lets a click anywhere inside it select
+            // the layer, which is what makes the block feel like one object rather than loose widgets.
+            ImGui::BeginGroup();
+            render_texture_picker(*layer);
+
+            ImGui::PushItemWidth(m_imgui->scaled(8.4f));
+            // Depth and tile size are logarithmic: see ImGuiLogSlider.
+            m_preview_params_dirty |= m_imgui->slider_float(_u8L("Depth (mm)"), &layer->depth_mm, 0.01f, 10.f, "%.3f", ImGuiLogSlider);
+            m_preview_params_dirty |= m_imgui->slider_float(_u8L("Tile size (mm)"), &layer->tiling_scale, 0.2f, 200.f, "%.2f", ImGuiLogSlider);
+            m_preview_params_dirty |= m_imgui->slider_float(_u8L("Rotation"), &layer->rotation_deg, 0.f, 360.f, "%.0f");
+            // Midlevel (#19): the height that means "don't move". At 0 the surface only ever bulges
+            // outwards; at 0.5 mid-grey is neutral and darker texels cut inwards.
+            m_preview_params_dirty |= m_imgui->slider_float(_u8L("Midlevel"), &layer->midlevel, 0.f, 10.f, "%.2f");
             ImGui::PopItemWidth();
-            ImGui::Checkbox(_u8L("Invert").c_str(), &layer->invert);
+            if (ImGui::IsItemHovered())
+                m_imgui->tooltip(_u8L("The grey level that stays put. At 0 the texture can only push the surface "
+                                      "outwards. Raise it and anything darker cuts inwards instead, so one height "
+                                      "map both embosses and engraves -0.5 makes mid-grey neutral.\n\n"
+                                      "Cutting inwards can fold the surface through itself where normals converge: "
+                                      "inside a sharp concave corner, or through a thin wall. Keep Depth small "
+                                      "relative to the feature you are cutting into."),
+                                  m_imgui->scaled(20.f));
+            if (layer->midlevel > 0.f && layer->depth_mm > 1.f)
+                m_imgui->warning_text(_L("Deep inward displacement may self-intersect."));
+
+            ImGui::PushItemWidth(m_imgui->scaled(8.4f));
+            m_preview_params_dirty |= m_imgui->slider_float(_u8L("Smoothing"), &layer->smoothing, 0.f, 1.f, "%.2f");
+            ImGui::PopItemWidth();
+            if (ImGui::IsItemHovered())
+                m_imgui->tooltip(_u8L("Blurs the height texture before it displaces the surface, rounding hard edges "
+                                      "and removing speckle without needing a softer source image. Affects the preview "
+                                      "and the bake alike."),
+                                  m_imgui->scaled(20.f));
+
+            // Edge smoothing: fade the displacement to flat toward the boundary of the painted area.
+            m_preview_params_dirty |= ImGui::Checkbox(_u8L("Edge smoothing").c_str(), &layer->edge_smoothing);
+            if (ImGui::IsItemHovered())
+                m_imgui->tooltip(_u8L("Fade the relief to flat toward the edge of the painted area, so it blends into "
+                                      "the surrounding surface. A small amount only softens a thin band at the very "
+                                      "edge; the maximum flattens the whole painted face."),
+                                  m_imgui->scaled(20.f));
+            if (layer->edge_smoothing) {
+                ImGui::PushItemWidth(m_imgui->scaled(8.4f));
+                m_preview_params_dirty |= m_imgui->slider_float(_u8L("Edge amount"), &layer->edge_smoothing_amount,
+                                                                 0.02f, 1.f, "%.2f");
+                ImGui::PopItemWidth();
+            }
+
+            m_preview_params_dirty |= ImGui::Checkbox(_u8L("Invert").c_str(), &layer->invert);
+
+            // The lowest painted layer has nothing underneath it to combine with - it *is* the
+            // base - so a blend mode would be meaningless (and Multiply/Divide against an implicit
+            // zero would annihilate it). build_texture_displacement() forces the first layer to
+            // reach a given vertex to behave additively regardless; say so rather than offering a
+            // control that silently does nothing.
+            if (li == 0) {
+                ImGui::TextDisabled("%s", _u8L("Base layer").c_str());
+            } else {
+                m_imgui->text(_u8L("Blend"));
+                ImGui::SameLine();
+                const std::string  blend_add      = _u8L("Add");
+                const std::string  blend_subtract = _u8L("Subtract");
+                const std::string  blend_multiply = _u8L("Multiply");
+                const std::string  blend_divide   = _u8L("Divide");
+                const char        *blend_items[]  = { blend_add.c_str(), blend_subtract.c_str(), blend_multiply.c_str(),
+                                                       blend_divide.c_str() };
+                int                blend_mode     = static_cast<int>(layer->blend_mode);
+                ImGui::PushItemWidth(m_imgui->scaled(8.4f));
+                if (scoped_combo("##blend_mode", &blend_mode, blend_items, IM_ARRAYSIZE(blend_items))) {
+                    layer->blend_mode      = static_cast<TextureBlendMode>(blend_mode);
+                    m_preview_params_dirty = true;
+                }
+                ImGui::PopItemWidth();
+                if (ImGui::IsItemHovered())
+                    m_imgui->tooltip(_u8L("How this layer combines with the layers below it, wherever they overlap. "
+                                          "Add and Subtract pile relief on or carve it away. Multiply and Divide "
+                                          "scale the relief underneath, which makes this layer act as a mask over "
+                                          "it - for those two, Depth is a gain, and a depth of 1 mm on a white "
+                                          "part of the texture leaves the layers below unchanged."),
+                                      m_imgui->scaled(20.f));
+            }
+
+            m_preview_params_dirty |= ImGui::Checkbox(_u8L("Tile").c_str(), &layer->tile_enabled);
+            if (layer->tile_enabled) {
+                ImGui::SameLine();
+                const std::string  tile_method_repeat   = _u8L("Repeat");
+                const std::string  tile_method_mirrored  = _u8L("Mirrored repeat");
+                const char        *tile_method_items[]   = { tile_method_repeat.c_str(), tile_method_mirrored.c_str() };
+                int                tile_method           = static_cast<int>(layer->tile_method);
+                ImGui::PushItemWidth(m_imgui->scaled(8.4f));
+                if (scoped_combo("##tile_method", &tile_method, tile_method_items, IM_ARRAYSIZE(tile_method_items))) {
+                    layer->tile_method      = static_cast<TextureTileMethod>(tile_method);
+                    m_preview_params_dirty = true;
+                }
+                ImGui::PopItemWidth();
+            }
+
+            {
+                m_imgui->text(_u8L("Projection"));
+                ImGui::SameLine();
+                const std::string  projection_triplanar   = _u8L("Triplanar (blended)");
+                const std::string  projection_cylindrical = _u8L("Cylindrical");
+                const std::string  projection_spherical   = _u8L("Spherical");
+                const std::string  projection_lscm        = _u8L("Unwrap (LSCM)");
+                const std::string  projection_view        = _u8L("From view");
+                const char        *projection_items[]     = { projection_triplanar.c_str(), projection_cylindrical.c_str(),
+                                                                projection_spherical.c_str(), projection_lscm.c_str(),
+                                                                projection_view.c_str() };
+                int                projection_method      = static_cast<int>(layer->projection_method);
+                ImGui::PushItemWidth(m_imgui->scaled(8.4f));
+                if (scoped_combo("##projection_method", &projection_method, projection_items, IM_ARRAYSIZE(projection_items))) {
+                    const auto new_method = static_cast<TextureProjectionMethod>(projection_method);
+                    // Capture the current view the moment "From view" is chosen, so it does something
+                    // sensible immediately rather than projecting from a stale/default direction.
+                    if (new_method == TextureProjectionMethod::ViewProjected &&
+                        layer->projection_method != TextureProjectionMethod::ViewProjected)
+                        capture_view_projection(*layer);
+                    layer->projection_method = new_method;
+                    m_preview_params_dirty   = true;
+                }
+                ImGui::PopItemWidth();
+                if (ImGui::IsItemHovered())
+                    m_imgui->tooltip(layer->projection_method == TextureProjectionMethod::LSCM ?
+                                          _u8L("Flattens the painted area and maps the texture onto it with as little "
+                                               "stretching as possible. The area is cut into pieces at its sharp edges "
+                                               "first (see Seam angle), so each piece can lie flat on its own.") :
+                                          _u8L("Triplanar projects the texture from all three axes at once and blends "
+                                               "between them, so a patch wrapping around a sharp edge has no seam. "
+                                               "Cylindrical and Spherical wrap the texture around the painted area's "
+                                               "own centre, for round shapes."),
+                                      m_imgui->scaled(20.f));
+
+                if (layer->projection_method == TextureProjectionMethod::LSCM) {
+                    ImGui::PushItemWidth(m_imgui->scaled(8.4f));
+                    m_preview_params_dirty |= m_imgui->slider_float(_u8L("Seam angle"), &layer->lscm_seam_angle_deg,
+                                                                     5.f, 90.f, "%.0f");
+                    ImGui::PopItemWidth();
+                    if (ImGui::IsItemHovered())
+                        m_imgui->tooltip(_u8L("Edges sharper than this are cut, and the pieces either side of them are "
+                                              "flattened separately. Lower it to cut more: each piece then lies flat "
+                                              "with less stretching, at the cost of the texture not running continuously "
+                                              "across the cut. Raise it to keep more of the area in one piece. Corners "
+                                              "of a box are 90 degrees, so the default cuts them apart; a smoothly "
+                                              "rounded surface stays whole."),
+                                          m_imgui->scaled(20.f));
+
+                    if (ImGui::Checkbox(_u8L("Connect islands").c_str(), &layer->auto_connect_islands)) {
+                        // Apply (or, when turned off, just stop re-applying) right away rather than
+                        // waiting for the next re-unwrap.
+                        if (layer->auto_connect_islands && !m_uv_editor_unwrap.empty()) {
+                            std::vector<TextureIsland> net = compute_connected_net(m_uv_editor_unwrap);
+                            if (net.size() == size_t(m_uv_editor_unwrap.chart_count)) {
+                                if (layer->islands.size() < net.size())
+                                    layer->islands.resize(net.size());
+                                for (size_t i = 0; i < net.size(); ++i)
+                                    layer->islands[i] = net[i];
+                            }
+                        }
+                        m_preview_params_dirty = true;
+                    }
+                    if (ImGui::IsItemHovered())
+                        m_imgui->tooltip(_u8L("Lay the unwrap out as a connected net: pieces that share an edge are "
+                                              "unfolded next to each other (a cube becomes a joined net rather than six "
+                                              "loose squares). They stay separate islands, so you can still move any of "
+                                              "them by hand afterwards."),
+                                          m_imgui->scaled(20.f));
+
+                    if (is_active) {
+                        // Explicit unwrap (#: "Add unwrap button so it does not recompute on every
+                        // change"). The LSCM solve runs only when this is pressed -- painting, the seam
+                        // angle slider and seam marking no longer trigger it -- and the pane opens right
+                        // afterwards. Re-press it to fold in any edits made since.
+                        if (m_imgui->button(_u8L("Unwrap"))) {
+                            m_uv_unwrap_pending      = true;
+                            m_uv_apply_connected_net = true; // a genuine re-unwrap may relayout the islands
+                            m_show_uv_editor         = true;
+                            update_uv_editor();
+                        }
+                        if (ImGui::IsItemHovered())
+                            m_imgui->tooltip(_u8L("Flatten the painted area into UV islands and open the UV editor. The "
+                                                  "unwrap is computed only when you press this, not on every edit -- so "
+                                                  "paint, change the seam angle or mark seams first, then press Unwrap to "
+                                                  "see the result. Islands can then be moved, rotated and scaled."),
+                                              m_imgui->scaled(20.f));
+
+                        // Select mode for the UV pane: whole islands, single vertices, or single edges.
+                        // Vertex/Edge are free-form UV editing and feed the per-vertex overrides that the
+                        // bake honours; Island is the move/rotate/scale-with-grouping behaviour.
+                        if (!m_uv_editor_unwrap.empty()) {
+                            m_imgui->text(_u8L("Select:"));
+                            ImGui::SameLine();
+                            int mode = m_uv_select_mode;
+                            ImGui::RadioButton(_u8L("Island").c_str(), &mode, 0);
+                            ImGui::SameLine();
+                            ImGui::RadioButton(_u8L("Vertex").c_str(), &mode, 1);
+                            ImGui::SameLine();
+                            ImGui::RadioButton(_u8L("Edge").c_str(), &mode, 2);
+                            if (mode != m_uv_select_mode) {
+                                m_uv_select_mode = mode;
+                                if (UVEditorCanvas *c = wxGetApp().plater()->get_uv_editor_canvas())
+                                    c->set_select_mode(static_cast<UVEditorCanvas::SelectMode>(mode));
+                            }
+                            if (!layer->lscm_uv_overrides.empty()) {
+                                ImGui::SameLine();
+                                if (m_imgui->button(_u8L("Clear UV edits"))) {
+                                    Plater::TakeSnapshot snapshot(wxGetApp().plater(), _u8L("Clear texture UV edits"),
+                                                                   UndoRedo::SnapshotType::GizmoAction);
+                                    layer->lscm_uv_overrides.clear();
+                                    m_uv_unwrap_pending = true; // re-solve so the pane drops the edited coords
+                                    update_uv_editor();
+                                    rebuild_preview();
+                                }
+                                if (ImGui::IsItemHovered())
+                                    m_imgui->tooltip(_u8L("Discard all manual vertex/edge moves and return the unwrap to its "
+                                                          "automatic shape."),
+                                                      m_imgui->scaled(20.f));
+                            }
+                        }
+
+                        // Manual seam marking (#9): a click mode that toggles mesh edges as seams.
+                        bool seam_mode = m_seam_edit_mode;
+                        if (ImGui::Checkbox(_u8L("Mark seams").c_str(), &seam_mode)) {
+                            m_seam_edit_mode = seam_mode;
+                            if (seam_mode)
+                                m_adjust_texture_mode = false; // the two click modes are mutually exclusive
+                            else {
+                                m_seam_hover_edge = { -1, -1 }; // drop the hover highlight when leaving the mode
+                                m_seam_hover_vertex = -1;
+                                m_seam_hover_glmodel.reset();
+                                m_seam_path_anchor = -1;
+                                m_seam_anchor_glmodel.reset();
+                            }
+                            m_parent.set_as_dirty();
+                        }
+                        if (ImGui::IsItemHovered())
+                            m_imgui->tooltip(_u8L("Click edges on the model to cut the unwrap along them, like marking a "
+                                                  "seam in Blender. The edge under the cursor is highlighted yellow; click "
+                                                  "to mark it red. Click a marked (red) edge again to unmark it. Hold Ctrl "
+                                                  "and drag to rotate the view. Painting is paused while this is on."),
+                                              m_imgui->scaled(20.f));
+                        if (m_seam_edit_mode) {
+                            // Shortest-path mode, for dense meshes: click two points, seam the whole path.
+                            ImGui::SameLine();
+                            bool path_mode = m_seam_path_mode;
+                            if (ImGui::Checkbox(_u8L("Path").c_str(), &path_mode)) {
+                                m_seam_path_mode    = path_mode;
+                                m_seam_path_anchor  = -1;
+                                m_seam_hover_edge   = { -1, -1 }; // hover target type changes with the mode
+                                m_seam_hover_vertex = -1;
+                                m_seam_hover_glmodel.reset();
+                                m_seam_anchor_glmodel.reset();
+                                m_parent.set_as_dirty();
+                            }
+                            if (ImGui::IsItemHovered())
+                                m_imgui->tooltip(_u8L("Instead of clicking every edge, click a start point and then an end "
+                                                      "point: the whole shortest path between them is seamed at once (green "
+                                                      "marks the start). Each click extends the seam from the last point. "
+                                                      "Best for dense meshes."),
+                                                  m_imgui->scaled(20.f));
+                        }
+                        if (!layer->lscm_seam_edges.empty()) {
+                            ImGui::SameLine();
+                            if (m_imgui->button(_u8L("Clear seams"))) {
+                                Plater::TakeSnapshot snapshot(wxGetApp().plater(), _u8L("Clear texture seams"),
+                                                               UndoRedo::SnapshotType::GizmoAction);
+                                layer->lscm_seam_edges.clear();
+                                rebuild_preview();
+                            }
+                        }
+
+                        // What the UV editor is actually showing. Cheap, and the only way to tell an
+                        // unwrap that produced nothing apart from one merely framed off-screen. The
+                        // island tools (snap, average scale, cut) and the gesture hints now live in the
+                        // UV pane itself - its toolbar and status line - rather than here (#18).
+                        if (m_uv_editor_unwrap.empty())
+                            m_imgui->text(_u8L("Press Unwrap to flatten the painted area."));
+                        else
+                            m_imgui->text(Slic3r::format(_u8L("Unwrap: %1% islands, %2% faces, %3% verts."),
+                                                         m_uv_editor_unwrap.chart_count, m_uv_editor_unwrap.indices.size(),
+                                                         m_uv_editor_unwrap.uvs.size()));
+                    }
+                }
+
+                if (layer->projection_method == TextureProjectionMethod::ViewProjected) {
+                    // Re-capture the projector from wherever the camera is now (#6): orbit the model,
+                    // press this, and the texture is re-laid from the new angle.
+                    if (m_imgui->button(_u8L("Capture current view"))) {
+                        capture_view_projection(*layer);
+                        m_preview_params_dirty = true;
+                    }
+                    if (ImGui::IsItemHovered())
+                        m_imgui->tooltip(_u8L("Projects the texture straight onto the painted area from the direction "
+                                              "you are currently looking, like a slide projector. Faces angled away from "
+                                              "that direction will stretch - turn the model to where you want the "
+                                              "texture crisp, then capture."),
+                                          m_imgui->scaled(20.f));
+                }
+            }
+
+            if (is_active) {
+                bool adjust_on = m_adjust_texture_mode;
+                if (ImGui::Checkbox(_u8L("Adjust placement").c_str(), &adjust_on)) {
+                    if (adjust_on) {
+                        update_model_object(); // flush any pending strokes before anchoring
+                        if (update_adjust_anchor())
+                            m_adjust_texture_mode = true;
+                        else
+                            show_error(nullptr, _u8L("Paint something with this layer first."));
+                    } else {
+                        m_adjust_texture_mode = false;
+                        m_adjust_drag_handle  = AdjustHandle::None;
+                    }
+                }
+            }
+            ImGui::EndGroup();
+            // A click that lands on the layer's body (not on a widget, which consumes its own click)
+            // selects it too, so the whole block reads as one clickable object (#12).
+            if (!is_active && ImGui::IsItemClicked())
+                set_active_layer(layer->slot);
+
+            if (is_active) {
+                const float  pad = m_imgui->scaled(0.25f);
+                const ImVec2 rmin(block_min.x - pad, block_min.y - pad);
+                const ImVec2 rmax(block_rx, ImGui::GetCursorScreenPos().y);
+                dl->ChannelsSetCurrent(0);
+                dl->AddRectFilled(rmin, rmax, ImGui::GetColorU32(ImVec4(0.0f, 0.59f, 0.53f, 0.22f)), m_imgui->scaled(0.2f));
+                dl->ChannelsMerge();
+            }
+
             ImGui::PopID();
             ImGui::Separator();
         }
+
+        ImGui::EndChild();
+        ImGui::PopStyleColor();
+
+        if (slot_to_remove >= 0)
+            remove_texture_layer(slot_to_remove); // deferred: see slot_to_remove's declaration
     }
 
-    if (m_imgui->button(m_desc.at("add_texture")))
-        add_texture_layer();
+    // ImGui sliders report "changed" continuously on every frame while being dragged, not just
+    // once on release - rebuilding the preview (a real CPU mesh recompute) on every one of those
+    // frames is what made dragging these sliders feel slow. Only rebuild once the mouse button
+    // that's driving the drag is released, i.e. once per edit instead of dozens of times per drag.
+    if (m_preview_params_dirty && (m_auto_update || !ImGui::IsMouseDown(ImGuiMouseButton_Left))) {
+        rebuild_preview();
+        m_preview_params_dirty = false;
+    }
+    // (The "Add layer" button now lives next to the "Texture layers" heading, as an icon.)
+
+    ImGui::Separator();
+    m_imgui->text(_u8L("Not enough vertices for fine detail?"));
+    ImGui::PushItemWidth(m_imgui->scaled(8.4f));
+    if (ImGui::SliderInt(_u8L("Subdivide steps").c_str(), &m_subdivide_count, 1, 5)) {
+        m_subdivide_count = std::clamp(m_subdivide_count, 1, 5);
+        if (m_subdivide_editing)
+            rebuild_subdivide_preview();
+        m_parent.set_as_dirty();
+    }
+    ImGui::PopItemWidth();
+    if (ImGui::IsItemHovered())
+        m_imgui->tooltip(_u8L("How many times to split every triangle into four. Each step roughly quadruples the "
+                              "triangle count, so there are enough vertices for the height texture to displace."),
+                          m_imgui->scaled(20.f));
+
+    if (!m_subdivide_editing) {
+        if (m_imgui->button(_u8L("Preview subdivision"))) {
+            m_subdivide_editing = true;
+            rebuild_subdivide_preview();
+            m_parent.set_as_dirty();
+        }
+        if (ImGui::IsItemHovered())
+            m_imgui->tooltip(_u8L("Shows the subdivided mesh as a wireframe without changing the model. Press Apply to "
+                                  "commit it, or Done to leave the model as it is."),
+                              m_imgui->scaled(20.f));
+    } else {
+        if (m_imgui->button(_u8L("Apply"))) {
+            subdivide_model();           // commits m_subdivide_count passes (takes its own snapshot)
+            rebuild_subdivide_preview(); // re-preview against the now-denser mesh
+            m_parent.set_as_dirty();
+        }
+        if (ImGui::IsItemHovered())
+            m_imgui->tooltip(_u8L("Replaces the model's geometry with the subdivided mesh and clears any not-yet-baked "
+                                  "paint on it (already-baked bumps are unaffected)."),
+                              m_imgui->scaled(20.f));
+        ImGui::SameLine();
+        if (m_imgui->button(_u8L("Done"))) {
+            m_subdivide_editing       = false;
+            m_subdivide_preview_count = -1;
+            m_subdivide_preview_glmodel.reset();
+            m_parent.set_as_dirty();
+        }
+    }
+
+    // Remesh: even out uneven triangle sizes (CGAL isotropic remeshing). GPU Delaunay isn't practical
+    // here, but this delivers the same goal - a consistent triangle size across the whole model.
+    m_imgui->text(_u8L("Uneven triangle sizes?"));
+    if (m_remesh_target_edge_mm <= 0.f && mv != nullptr) {
+        // Seed the target with the model's current mean edge length, so the default is a sensible
+        // "make everything about the size it already averages".
+        const indexed_triangle_set &its = mv->mesh().its;
+        double sum = 0.0; size_t cnt = 0;
+        for (const stl_triangle_vertex_indices &tri : its.indices)
+            for (int i = 0; i < 3; ++i) {
+                sum += (its.vertices[tri[i]] - its.vertices[tri[(i + 1) % 3]]).norm();
+                ++cnt;
+            }
+        m_remesh_target_edge_mm = cnt > 0 ? std::clamp(float(sum / double(cnt)), 0.1f, 20.f) : 1.f;
+    }
+    ImGui::PushItemWidth(m_imgui->scaled(8.4f));
+    m_imgui->slider_float(_u8L("Target edge (mm)"), &m_remesh_target_edge_mm, 0.1f, 20.f, "%.2f", ImGuiLogSlider);
+    ImGui::PopItemWidth();
+    m_imgui->disabled_begin(mv == nullptr);
+    if (m_imgui->button(_u8L("Remesh")))
+        remesh_model();
+    m_imgui->disabled_end();
+    if (ImGui::IsItemHovered())
+        m_imgui->tooltip(_u8L("Rebuilds the whole model with triangles close to this edge length - splitting the big "
+                              "ones and merging the small ones - so displacement has an even density to work with. "
+                              "Replaces the geometry and clears any not-yet-baked paint (already-baked bumps are kept)."),
+                          m_imgui->scaled(20.f));
 
     ImGui::Separator();
 
@@ -352,7 +3191,7 @@ void GLGizmoTextureDisplacement::on_render_input_window(float x, float y, float 
     m_imgui->disabled_end();
 
     ImGui::Separator();
-    if (m_imgui->button(_L("Done")))
+    if (m_imgui->button(_L("Close")))
         m_parent.reset_all_gizmos();
 
     GizmoImguiEnd();
