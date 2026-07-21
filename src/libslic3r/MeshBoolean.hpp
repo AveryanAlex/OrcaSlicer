@@ -86,9 +86,11 @@ std::optional<std::vector<Vec2f>> parameterize_lscm(const indexed_triangle_set &
 // Isotropic remeshing (CGAL): rebuilds the mesh so its triangles are close to a uniform target edge
 // length, splitting oversized triangles and collapsing undersized ones. Used to even out a model with
 // wildly varying triangle sizes so texture displacement has a consistent vertex density to work with.
+// Edges whose dihedral angle exceeds `sharp_angle_deg`, and any open border, are held fixed so hard
+// features survive instead of being eroded by the relaxation pass; pass 0 to remesh everything.
 // Returns the input unchanged if remeshing fails (e.g. a non-manifold or self-intersecting input).
 indexed_triangle_set remesh_isotropic(const indexed_triangle_set &mesh, double target_edge_length,
-                                      unsigned n_iterations = 3);
+                                      unsigned n_iterations = 3, double sharp_angle_deg = 40.0);
 }
 
 namespace mcut {

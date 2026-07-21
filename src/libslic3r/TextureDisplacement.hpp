@@ -7,6 +7,7 @@
 #include <vector>
 
 #include <cereal/cereal.hpp>
+#include <cereal/types/array.hpp> // view_project_matrix is a std::array<float, 12>
 #include <cereal/types/string.hpp>
 #include <cereal/types/vector.hpp>
 
@@ -218,6 +219,24 @@ struct TextureDisplacementLayer
     // projects to Vec2f(dot(pos, right), dot(pos, up)) before the usual tiling/rotation/offset.
     Vec3f view_project_right = Vec3f::UnitX();
     Vec3f view_project_up    = Vec3f::UnitY();
+
+    // Also ViewProjected, and takes precedence over the two axes above when set: an exact *projective*
+    // map from a local-space position straight to a texture uv, written by the projection-frame overlay
+    // (the semi-transparent window dragged over the 3D view -- its border becomes the uv unit square).
+    //
+    // Row-major 3x4, applied to the homogeneous point p~ = (x, y, z, 1):
+    //     uv = ( row0.p~ / row2.p~ , row1.p~ / row2.p~ )
+    // The perspective divide is the whole point. view_project_right/up can only express an *affine*
+    // projection, which matches an orthographic camera exactly but not a perspective one -- under
+    // perspective the near end of a part projects larger than the far end, and no pair of axes
+    // reproduces that. Folding the camera's full projection*view*model product into one matrix does.
+    // Because a point behind the projector has row2.p~ <= 0 and no meaningful uv, sampling must check
+    // the sign rather than divide blindly; see project_uv_projective().
+    //
+    // Note this map already includes placement, so the usual tiling/rotation/offset transform is NOT
+    // applied on top of it -- the window's own position and size are the placement.
+    bool                  view_project_projective = false;
+    std::array<float, 12> view_project_matrix{};
     // Only used by TextureProjectionMethod::LSCM: hand placement of the unwrap's islands, indexed by
     // chart id (see TextureIsland). Shorter than the chart count simply means the missing ones are
     // still where the automatic packing put them.
@@ -255,7 +274,7 @@ struct TextureDisplacementLayer
            static_cast<int>(tile_method), static_cast<int>(projection_method), lscm_seam_angle_deg, islands,
            static_cast<int>(blend_mode), midlevel, island_padding_mm, lscm_seam_edges, view_project_right,
            view_project_up, smoothing, edge_smoothing, edge_smoothing_amount, auto_connect_islands, island_groups,
-           lscm_uv_overrides);
+           lscm_uv_overrides, view_project_projective, view_project_matrix);
     }
     template<class Archive> void load(Archive &ar)
     {
@@ -266,7 +285,8 @@ struct TextureDisplacementLayer
         ar(slot, name, path, path_in_3mf, blob, depth_mm, tiling_scale, rotation_deg, offset, invert, tile_enabled,
            tile_method_int, projection_method_int, lscm_seam_angle_deg, islands, blend_mode_int, midlevel,
            island_padding_mm, lscm_seam_edges, view_project_right, view_project_up, smoothing, edge_smoothing,
-           edge_smoothing_amount, auto_connect_islands, island_groups, lscm_uv_overrides);
+           edge_smoothing_amount, auto_connect_islands, island_groups, lscm_uv_overrides, view_project_projective,
+           view_project_matrix);
         image_data        = blob.empty() ? nullptr : std::make_shared<std::vector<unsigned char>>(blob.begin(), blob.end());
         tile_method       = static_cast<TextureTileMethod>(tile_method_int);
         projection_method = static_cast<TextureProjectionMethod>(projection_method_int);
@@ -283,8 +303,11 @@ struct DecodedHeightTexture
     int height = 0;
 
     bool empty() const { return width <= 0 || height <= 0 || pixels.empty(); }
-    // Bilinearly sampled height in [0, 1] at a normalized uv coordinate. When tile_enabled is
-    // false, uv is clamped to the texture's edge instead of being wrapped/repeated.
+    // Bilinearly sampled height in [0, 1] at a normalized uv coordinate. When tile_enabled is false,
+    // a uv outside [0, 1) samples as 0 -- the texture simply is not there, rather than its border
+    // row/column being smeared outward forever (which is what clamping the coordinate would do, and
+    // was a real reported bug). Callers rely on this to get a hard edge: it is how the projection
+    // frame's border becomes the edge of the displacement.
     float sample(const Vec2f &uv, bool tile_enabled = true, TextureTileMethod tile_method = TextureTileMethod::Repeat) const;
 };
 
@@ -306,6 +329,12 @@ Vec2f project_planar(const Vec3f &position, const Vec3f &normal);
 // projection method, without going through project_texture_displacement_uv()'s own dispatch
 // (which only knows how to compute the *analytic* methods from a single vertex + normal).
 Vec2f apply_uv_transform(const Vec2f &planar, const TextureDisplacementLayer &layer);
+
+// Applies a row-major 3x4 projective matrix (see TextureDisplacementLayer::view_project_matrix) to a
+// local-space point, writing the resulting texture uv. Returns false -- and leaves `uv` untouched --
+// when the point lies behind the projector or on its plane (w <= 0), where there is no meaningful uv
+// and dividing would produce a mirrored or infinite coordinate. Callers treat that as "no height".
+bool project_uv_projective(const std::array<float, 12> &m, const Vec3f &position, Vec2f &uv);
 
 // Sample a layer's height texture at a mesh-local position, honouring the layer's projection
 // method, tiling scale, rotation, offset and tiling mode. Returns a height in [0, 1].

@@ -164,6 +164,21 @@ texture samples per vertex and so has no single UV that represents it.
   (`compute_layer_vertex_uvs()`) and drive the shader's `use_vertex_uv` path. Faces angled away from
   the projector smear; that is inherent to view projection, not a bug.
 
+  Two companions to this mode:
+  - **Projection frame overlay** (`TextureProjectorFrame`, see below) — a semi-transparent window
+    dragged over the 3D view whose border becomes the projection's edge. Applying it stores an exact
+    **projective** map in `view_project_matrix`, which supersedes the affine `right`/`up` axes above
+    for that layer (`view_project_projective`).
+  - **"Project only on visible"** (`select_visible_faces()`) — repaints the layer with exactly the
+    facets the camera can see, so the projected area matches the viewpoint the projector was captured
+    from. Two tests: a facing test (normal vs. view direction, per triangle — under perspective the
+    view direction varies across the model, so it is taken from the eye to each centroid), then
+    `MeshRaycaster::get_unobscured_idxs()` on the survivors to drop facets hidden behind other
+    geometry, so a concave part's far inner wall is correctly excluded. One ray query per front-facing
+    facet, hence click-driven (on the checkbox and on each "Capture current view"), never per frame.
+    It **replaces** the layer's paint rather than adding to it — "project onto what I can see" would
+    otherwise accumulate every angle the user had ever looked from.
+
 ### Manual seams and island cutting
 
 `TextureDisplacementLayer::lscm_seam_edges` — undirected mesh-vertex-index edge pairs the unwrap is
@@ -217,7 +232,10 @@ Algorithm: recursive 1-to-4 triangle split via edge midpoints, with a shared per
 (keyed by sorted vertex-index pair) so triangles sharing an edge get the *same* new vertex — capped
 at `max_iterations` (default 6) passes to bound worst-case triangle-count explosion.
 
-Wired as a "Subdivide model" button in the gizmo panel — a real, committed geometry change (like
+Wired as a "Subdivide steps" slider (**0–5**, where 0 means no subdivision and previews nothing) plus
+Preview/Apply/Done in the gizmo panel. **Apply snaps the slider back to 0** — see bug #22: leaving it
+at the count just committed made the panel immediately re-preview N more passes on top of a mesh 4^N
+times denser, which is what the "subdivide lags" report was. A real, committed geometry change (like
 Bake), using the same `save_painting()`/`set_mesh()`/`restore_painting()` dance `GLGizmoSimplify`
 uses: supported/seam/mmu/fuzzy-skin masks get remapped onto the new triangles, texture-displacement
 paint does not (no remap support yet) and is dropped rather than left pointing at now-meaningless
@@ -313,6 +331,53 @@ shifts which texel is sampled at a fixed world position, which visually slides t
 render pixels. May need a one-line sign flip once actually tested. The rotation-arrow-implied
 direction should be reliable (it follows directly from a self-consistent 2D basis, no such
 ambiguity).
+
+### Projection frame overlay (ViewProjected)
+
+`src/slic3r/GUI/TextureProjectorFrame.hpp/.cpp` — a semi-transparent, resizable `wxFrame` the user
+drags **over the 3D view**, like a slide projector's gate. Whatever the model shows through it is what
+the texture is projected onto, and the window's border becomes the hard edge of the displacement.
+Press **Apply projection frame** and the gizmo reads the window's rectangle and commits it.
+
+The window is deliberately **dumb**: it owns no placement state and reports nothing continuously. Its
+position and size *are* the placement, read on demand at Apply — which is also when the expensive
+visible-facet raycast runs. So dragging it is free and nothing recomputes until asked.
+
+Plain 2D (`wxPaintDC`), not a `wxGLCanvas`: a second GL canvas would have to share the app's one real
+`wxGLContext`, the cause of bugs #10 and #14 below. It only ever draws a bitmap and a border.
+
+**The projective mapping (`apply_projection_frame()`)** is the substantive part. The frame defines a
+**screen-space** rectangle, but the bake samples from a **local-space** position, so the two have to be
+reconciled. `view_project_right/up` can only express an *affine* projection — exact under an
+orthographic camera, but wrong under perspective, where the near end of a part projects larger than the
+far end and no pair of axes reproduces that. So the layer instead stores a full projective map
+(`view_project_matrix`, row-major 3×4, `uv = (row0·p̃/row2·p̃, row1·p̃/row2·p̃)`), built like this:
+
+- `K = projection · view · (instance · volume)`, i.e. local → clip, the same product the renderer uses.
+  Note `Camera::get_projection_matrix()` is typed `Transform3d` (nominally affine) but its perspective
+  form explicitly writes a `(0, 0, −1, 0)` bottom row into the underlying 4×4, so `clip.w = −z_eye` is
+  genuinely carried. The build therefore multiplies **`.matrix()` products** (plain `Matrix4d`), never
+  `Transform3d` products, which would not compose that row correctly.
+- Window coordinates follow `igl::project`'s convention (as `CameraUtils::project` does), with y
+  measured downward. Writing `uv = (win − rect_origin) / rect_size` makes u and v affine in
+  `ndc = clip.xyz / clip.w`; multiplying through by `clip.w` leaves a plain linear combination of `K`'s
+  rows, which is exactly the 3×4 matrix — the perspective divide survives intact.
+- `w > 0` is checked rather than divided blindly. A point behind the projector has `w < 0` and divides
+  to a plausible-looking but **mirrored** uv — the classic way a projected decal reappears on the back
+  of a model. `project_uv_projective()` returns false there and the caller treats it as no height.
+
+The map already includes placement, so `apply_uv_transform()` is **not** applied on top of it — the
+window's own position and size are the placement, and the tiling/rotation/offset sliders would shove
+the result off the frame the user just aligned. A "Clear" button drops back to the affine path where
+those controls mean something again.
+
+Apply also sets `tile_enabled = false`, so `DecodedHeightTexture::sample()` returns 0 outside `[0,1)`
+and the border is a hard edge rather than the first seam of an endless repeat, and repaints the layer
+via `select_visible_faces(&matrix)` — the frame's uv square clips the selection, which both matches the
+paint to the border and keeps the ray queries proportional to the framed area instead of the model.
+
+Owned by the gizmo and **destroyed** (not just hidden) in `on_shutdown()`. Closing it only hides it, so
+reopening keeps it where it was left.
 
 ### UV Editor pane
 
@@ -487,6 +552,37 @@ These were all real, confirmed root causes (found by reading the actual code pat
     actual island bbox into the panel — three rounds of reasoning from screenshots had each guessed
     wrong, because a collapsed-to-a-point unwrap and an off-screen-framed one look identical.
 
+19. **Isotropic remeshing produced scrambled geometry with dropped triangles** — the "remeshing kinda
+    does not work properly" report, and a genuine one-line root cause. `isotropic_remeshing()` edits
+    the `Surface_mesh` **in place**, and its edge collapses only *mark* vertices and faces as removed;
+    the underlying arrays keep the holes until `collect_garbage()` is called. That matters because the
+    shared `cgal_to_indexed_triangle_set()` numbers its output vertices by **iteration order** (which
+    skips removed slots) while reading each face's corner as the **raw integer value of the vertex
+    descriptor** (which does not). The two agree only up to the first collapse; past that every
+    triangle indexes the wrong vertices, and any descriptor beyond the live vertex count hits the
+    converter's `iv >= vsize` guard and is silently dropped *together with its triangle*. Fixed by
+    compacting (`cgal_mesh.collect_garbage()`) before converting. Note the pre-existing callers were
+    unaffected: the boolean ops build their result into a fresh mesh, so only the in-place remesher
+    ever handed the converter a mesh with garbage in it.
+20. **Remeshing rounded off every sharp edge** — the second half of the same report. CGAL's
+    `isotropic_remeshing` relaxes vertices tangentially along the surface, which erodes hard features
+    unless they are constrained: a cube came back with wobbly, eroded edges. Fixed by detecting sharp
+    edges (`PMP::detect_sharp_edges()` at a user-settable dihedral angle, default 40°) plus every open
+    border, constraining them, and passing `protect_constraints(true)`. That option additionally
+    requires each constrained edge to already be shorter than 4/3 · target, hence the
+    `PMP::split_long_edges()` pre-pass (given the same map, so the halves inherit the constraint) —
+    this mirrors CGAL's own isotropic_remeshing example. Also added a guard for the case where
+    `Surface_mesh::add_face()` refused faces on a non-manifold input: remeshing a mesh that silently
+    lost faces yields a **punctured** model, so it now bails out and reports instead.
+21. **Remesh falsely reporting "did not change the model"** — the GUI decided success by comparing
+    *vertex counts*. A remesh that redistributes triangles at roughly the current density legitimately
+    lands on the same count, so a perfectly good result was discarded with an error. Now compared
+    structurally against the input (which is what `remesh_isotropic()` hands back on failure).
+22. **Subdivide re-previewing at the same count after Apply** — Apply committed N passes and then
+    immediately rebuilt the *preview* at N passes again, now on top of a mesh up to 4^N times denser.
+    That is the single most expensive thing the panel can do, and it ran on every Apply. The slider
+    now starts at 0 (a real "no subdivision" value that previews nothing), and Apply snaps back to it.
+
 ## Known limitations / deferred work
 
 - **No `.3mf` serialization** for texture-displacement paint data or texture assets. A background
@@ -539,7 +635,8 @@ Remaining cosmetic / known gaps:
 **libslic3r (core, no GUI dependency):**
 - `src/libslic3r/TextureDisplacement.hpp/.cpp` — data model, bake algorithm, projection methods,
   tiling, subdivision. See doc comments throughout, they're kept accurate and up to date.
-- `src/libslic3r/MeshBoolean.hpp/.cpp` — added `parameterize_lscm()` in the `cgal` sub-namespace,
+- `src/libslic3r/MeshBoolean.hpp/.cpp` — added `parameterize_lscm()` and `remesh_isotropic()`
+  (sharp-feature-preserving isotropic remeshing, see bugs #19–#21) in the `cgal` sub-namespace,
   reusing the existing `CGALMesh`/`_EpicMesh`/conversion-helper infrastructure already there for
   mesh boolean ops. New CGAL includes: `Polygon_mesh_processing/border.h`,
   `Polygon_mesh_processing/connected_components.h`, `Surface_mesh_parameterization/{Error_code,
@@ -567,6 +664,8 @@ Remaining cosmetic / known gaps:
 - `src/slic3r/GUI/Jobs/TextureDisplacementBakeJob.hpp/.cpp` — background bake commit.
 - `src/slic3r/GUI/Jobs/TextureDisplacementPreviewJob.hpp/.cpp` — background preview compute
   (mirrors the bake job's shape but commits nothing to the Model).
+- `src/slic3r/GUI/TextureProjectorFrame.hpp/.cpp` — the semi-transparent projection-frame overlay for
+  ViewProjected layers (plain 2D `wxPaintDC`, no GL context — see its section above).
 - `src/slic3r/GUI/UVEditorCanvas.hpp/.cpp` — the 2D UV unwrap viewer widget.
 - `src/slic3r/GUI/Plater.hpp/.cpp` — `uv_editor_canvas` member, AUI pane registration,
   `get_uv_editor_canvas()`/`show_uv_editor()`.

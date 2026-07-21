@@ -145,6 +145,7 @@ UVEditorCanvas::UVEditorCanvas(wxWindow *parent)
     Bind(wxEVT_MIDDLE_UP, &UVEditorCanvas::on_mouse, this);
     Bind(wxEVT_MOTION, &UVEditorCanvas::on_mouse, this);
     Bind(wxEVT_MOUSEWHEEL, &UVEditorCanvas::on_mouse, this);
+    Bind(wxEVT_LEAVE_WINDOW, &UVEditorCanvas::on_leave, this);
     Bind(wxEVT_KEY_DOWN, &UVEditorCanvas::on_key, this);
     Bind(wxEVT_ERASE_BACKGROUND, &UVEditorCanvas::on_erase_background, this);
 }
@@ -177,6 +178,8 @@ void UVEditorCanvas::set_islands(Islands islands)
         // Vertex/edge picks index into the old unwrap; drop them too.
         m_active_vertex = -1;
         m_active_edge   = { -1, -1 };
+        m_sel_vertices.clear();
+        m_sel_edges.clear();
     }
 
     // Boundary vertices, bucketed per island, for snapping.
@@ -283,9 +286,15 @@ void UVEditorCanvas::update_status()
     case Gesture::None:
     default:
         if (m_select_mode == SelectMode::Vertex)
-            msg = _L("Vertex mode: drag a vertex to reshape the unwrap  |  wheel = zoom, middle-drag = pan, Home = frame");
+            msg = m_sel_vertices.size() > 1 ?
+                      wxString::Format(_L("%d vertices selected  |  drag = move together, Shift/Ctrl click = add/remove"),
+                                       int(m_sel_vertices.size())) :
+                      _L("Vertex mode: drag a vertex to reshape  |  Shift/Ctrl click = multi-select, wheel = zoom, Home = frame");
         else if (m_select_mode == SelectMode::Edge)
-            msg = _L("Edge mode: drag an island edge to reshape the unwrap  |  wheel = zoom, middle-drag = pan, Home = frame");
+            msg = m_sel_edges.size() > 1 ?
+                      wxString::Format(_L("%d edges selected  |  drag = move together, Shift/Ctrl click = add/remove"),
+                                       int(m_sel_edges.size())) :
+                      _L("Edge mode: drag an island edge to reshape  |  Shift/Ctrl click = multi-select, wheel = zoom, Home = frame");
         else if (m_selection.size() > 1)
             msg = wxString::Format(_L("%d islands selected  |  drag = move together, Shift/Ctrl click = add/remove, R/S = rotate/scale primary"),
                                     int(m_selection.size()));
@@ -391,6 +400,8 @@ void UVEditorCanvas::set_select_mode(SelectMode mode)
     m_select_mode   = mode;
     m_active_vertex = -1;
     m_active_edge   = { -1, -1 };
+    m_sel_vertices.clear();
+    m_sel_edges.clear();
     m_gesture       = Gesture::None;
     update_status();
     Refresh();
@@ -520,6 +531,16 @@ Vec2f UVEditorCanvas::snap_correction(int island) const
     return best;
 }
 
+std::vector<int> UVEditorCanvas::selected_edge_endpoints() const
+{
+    std::vector<int> verts;
+    for (const auto &[a, b] : m_sel_edges)
+        for (const int v : { a, b })
+            if (v >= 0 && std::find(verts.begin(), verts.end(), v) == verts.end())
+                verts.push_back(v);
+    return verts;
+}
+
 void UVEditorCanvas::end_gesture()
 {
     const bool was_editing = m_gesture == Gesture::MoveIsland || m_gesture == Gesture::RotateIsland ||
@@ -545,11 +566,22 @@ void UVEditorCanvas::end_gesture()
             if (v >= 0 && size_t(v) < m_islands.uvs.size())
                 edits.emplace_back(v, m_islands.uvs[size_t(v)]);
         };
-        if (m_gesture == Gesture::MoveVertex)
-            add(m_active_vertex);
-        else {
-            add(m_active_edge.first);
-            add(m_active_edge.second);
+        // Commit every element of the multi-selection, not just the primary, so a group drag stores all
+        // the moved vertices' overrides. Falls back to the primary if the selection is somehow empty.
+        if (m_gesture == Gesture::MoveVertex) {
+            if (m_sel_vertices.empty())
+                add(m_active_vertex);
+            else
+                for (const int v : m_sel_vertices)
+                    add(v);
+        } else {
+            const std::vector<int> endpoints = selected_edge_endpoints();
+            if (endpoints.empty()) {
+                add(m_active_edge.first);
+                add(m_active_edge.second);
+            } else
+                for (const int v : endpoints)
+                    add(v);
         }
         if (!edits.empty())
             m_on_vertex_edit(edits);
@@ -638,6 +670,12 @@ void UVEditorCanvas::on_mouse(wxMouseEvent &evt)
     const wxEventType type = evt.GetEventType();
     const wxPoint     pos  = evt.GetPosition();
 
+    // Track the pointer so the +/- add-remove hint can be drawn next to it in Vertex/Edge mode.
+    m_cursor_px     = pos;
+    m_cursor_inside = true;
+    if (type == wxEVT_MOTION && m_select_mode != SelectMode::Island && m_gesture == Gesture::None)
+        Refresh(); // animate the hint (and its +/- flip) as the pointer/modifiers move
+
     // Key events (R/S/Home) only arrive if this canvas has focus, and clicking it is the natural way
     // to ask for it - the pane is not in the tab order.
     if (type == wxEVT_LEFT_DOWN || type == wxEVT_RIGHT_DOWN || type == wxEVT_MIDDLE_DOWN)
@@ -656,15 +694,50 @@ void UVEditorCanvas::on_mouse(wxMouseEvent &evt)
         m_drag_last_px    = pos;
         m_gesture_last_uv = uv;
         if (m_select_mode == SelectMode::Vertex) {
-            m_active_vertex     = vertex_at(uv);
+            const int hit       = vertex_at(uv);
             m_active_edge       = { -1, -1 };
             m_vertex_edit_moved = false;
-            m_gesture           = (m_active_vertex >= 0) ? Gesture::MoveVertex : Gesture::Pan;
+            // Same Shift-adds / Ctrl-toggles / plain-replaces rules as island selection, so a group of
+            // vertices can be picked and dragged together.
+            if (hit >= 0) {
+                if (evt.ShiftDown()) {
+                    if (!is_vertex_selected(hit))
+                        m_sel_vertices.push_back(hit);
+                } else if (evt.ControlDown()) {
+                    if (auto it = std::find(m_sel_vertices.begin(), m_sel_vertices.end(), hit); it != m_sel_vertices.end())
+                        m_sel_vertices.erase(it);
+                    else
+                        m_sel_vertices.push_back(hit);
+                } else if (!is_vertex_selected(hit)) {
+                    m_sel_vertices.assign(1, hit);
+                }
+            } else if (!evt.ShiftDown() && !evt.ControlDown()) {
+                m_sel_vertices.clear();
+            }
+            // Primary = the clicked vertex only if it is (still) selected; a Ctrl-deselect just toggles.
+            m_active_vertex = (hit >= 0 && is_vertex_selected(hit)) ? hit : -1;
+            m_gesture       = (m_active_vertex >= 0) ? Gesture::MoveVertex : Gesture::Pan;
         } else if (m_select_mode == SelectMode::Edge) {
-            m_active_edge       = edge_at(uv);
+            const std::pair<int, int> hit = edge_at(uv);
             m_active_vertex     = -1;
             m_vertex_edit_moved = false;
-            m_gesture           = (m_active_edge.first >= 0) ? Gesture::MoveEdge : Gesture::Pan;
+            if (hit.first >= 0) {
+                if (evt.ShiftDown()) {
+                    if (!is_edge_selected(hit))
+                        m_sel_edges.push_back(hit);
+                } else if (evt.ControlDown()) {
+                    if (auto it = std::find(m_sel_edges.begin(), m_sel_edges.end(), hit); it != m_sel_edges.end())
+                        m_sel_edges.erase(it);
+                    else
+                        m_sel_edges.push_back(hit);
+                } else if (!is_edge_selected(hit)) {
+                    m_sel_edges.assign(1, hit);
+                }
+            } else if (!evt.ShiftDown() && !evt.ControlDown()) {
+                m_sel_edges.clear();
+            }
+            m_active_edge = (hit.first >= 0 && is_edge_selected(hit)) ? hit : std::pair<int, int>{ -1, -1 };
+            m_gesture     = (m_active_edge.first >= 0) ? Gesture::MoveEdge : Gesture::Pan;
         } else {
             const int hit = island_at(uv);
             if (hit >= 0) {
@@ -739,8 +812,15 @@ void UVEditorCanvas::on_mouse(wxMouseEvent &evt)
             break;
         }
         case Gesture::MoveVertex: {
-            const Vec2f uv = screen_to_uv(pos);
-            move_vertex_raw(m_active_vertex, uv - m_gesture_last_uv);
+            const Vec2f uv    = screen_to_uv(pos);
+            const Vec2f delta = uv - m_gesture_last_uv;
+            // Move the whole selection by the same uv-space delta (each vertex converts it through its
+            // own island transform in move_vertex_raw). Falls back to the primary if none is selected.
+            if (m_sel_vertices.empty())
+                move_vertex_raw(m_active_vertex, delta);
+            else
+                for (const int v : m_sel_vertices)
+                    move_vertex_raw(v, delta);
             m_gesture_last_uv   = uv;
             m_vertex_edit_moved = true;
             Refresh();
@@ -749,8 +829,14 @@ void UVEditorCanvas::on_mouse(wxMouseEvent &evt)
         case Gesture::MoveEdge: {
             const Vec2f uv    = screen_to_uv(pos);
             const Vec2f delta = uv - m_gesture_last_uv;
-            move_vertex_raw(m_active_edge.first, delta);
-            move_vertex_raw(m_active_edge.second, delta);
+            // Move every unique endpoint of every selected edge once. Falls back to the primary edge.
+            const std::vector<int> endpoints = selected_edge_endpoints();
+            if (endpoints.empty()) {
+                move_vertex_raw(m_active_edge.first, delta);
+                move_vertex_raw(m_active_edge.second, delta);
+            } else
+                for (const int v : endpoints)
+                    move_vertex_raw(v, delta);
             m_gesture_last_uv   = uv;
             m_vertex_edit_moved = true;
             Refresh();
@@ -1046,6 +1132,16 @@ void UVEditorCanvas::on_size(wxSizeEvent &evt)
     Update();
 }
 
+void UVEditorCanvas::on_leave(wxMouseEvent &evt)
+{
+    evt.Skip();
+    if (m_cursor_inside) {
+        m_cursor_inside = false;
+        if (m_select_mode != SelectMode::Island)
+            Refresh(); // the +/- hint was following the cursor; drop it now the pointer is gone
+    }
+}
+
 void UVEditorCanvas::render()
 {
     if (m_context == nullptr || !IsShownOnScreen())
@@ -1190,7 +1286,8 @@ void UVEditorCanvas::render()
     // Vertex/Edge mode handles: a small square drawn over the picked vertex (or each endpoint of the
     // picked edge), so it is obvious which sub-element a drag will move. The already-drawn boundary
     // sits between an edge's two markers, so the pair reads as "this edge".
-    if (m_select_mode != SelectMode::Island && (m_active_vertex >= 0 || m_active_edge.first >= 0)) {
+    if (m_select_mode != SelectMode::Island &&
+        (!m_sel_vertices.empty() || !m_sel_edges.empty() || m_active_vertex >= 0 || m_active_edge.first >= 0)) {
         if (!m_vertex_marker_glmodel.is_initialized()) {
             GLModel::Geometry q;
             q.format = { GLModel::Geometry::EPrimitiveType::Triangles, GLModel::Geometry::EVertexLayout::P3 };
@@ -1215,12 +1312,55 @@ void UVEditorCanvas::render()
             m.scale(double(marker));
             draw(m_vertex_marker_glmodel, UV_COLOR_SEL_BOUNDARY, m);
         };
-        if (m_active_vertex >= 0)
-            draw_marker(m_active_vertex);
-        if (m_active_edge.first >= 0) {
-            draw_marker(m_active_edge.first);
-            draw_marker(m_active_edge.second);
+        // Mark every element of the multi-selection (falling back to the primary when nothing is in the
+        // set yet), so a Shift/Ctrl group is all visibly highlighted.
+        if (m_select_mode == SelectMode::Vertex) {
+            if (m_sel_vertices.empty())
+                draw_marker(m_active_vertex);
+            else
+                for (const int v : m_sel_vertices)
+                    draw_marker(v);
+        } else {
+            if (m_sel_edges.empty()) {
+                draw_marker(m_active_edge.first);
+                draw_marker(m_active_edge.second);
+            } else
+                for (const auto &[a, b] : m_sel_edges) {
+                    draw_marker(a);
+                    draw_marker(b);
+                }
         }
+    }
+
+    // Add/remove hint next to the cursor in Vertex/Edge mode: a green '+' when a click will add to the
+    // selection (plain or Shift), a red '-' when Ctrl is held and a click will remove one -- the UV-side
+    // twin of the 3D paint cursor's own sign. Rebuilt each frame at the pointer, sized in pixels.
+    if (m_select_mode != SelectMode::Island && m_cursor_inside) {
+        const float uv_per_px = 2.f * m_zoom / float(std::max(1, std::min(size.GetWidth(), size.GetHeight())));
+        const Vec2f centre    = screen_to_uv(m_cursor_px) + Vec2f(14.f, -14.f) * uv_per_px; // up-right of the pointer
+        const float r         = 6.f * uv_per_px;
+        const bool  removing  = wxGetKeyState(WXK_CONTROL);
+
+        GLModel::Geometry sign;
+        sign.format = { GLModel::Geometry::EPrimitiveType::Lines, GLModel::Geometry::EVertexLayout::P3 };
+        unsigned   idx = 0;
+        const auto seg = [&](const Vec2f &a, const Vec2f &b) {
+            sign.add_vertex(Vec3f(a.x(), a.y(), 0.f));
+            sign.add_vertex(Vec3f(b.x(), b.y(), 0.f));
+            sign.add_line(idx, idx + 1);
+            idx += 2;
+        };
+        seg(centre - Vec2f(r, 0.f), centre + Vec2f(r, 0.f)); // the '-' bar, shared by both signs
+        if (!removing)
+            seg(centre - Vec2f(0.f, r), centre + Vec2f(0.f, r)); // the extra stroke that makes it a '+'
+
+        m_cursor_sign_glmodel.reset();
+        if (!sign.is_empty())
+            m_cursor_sign_glmodel.init_from(std::move(sign));
+        set_line_width(3.f);
+        draw(m_cursor_sign_glmodel, removing ? ColorRGBA(1.f, 0.30f, 0.25f, 0.95f) : ColorRGBA(0.35f, 0.90f, 0.45f, 0.95f),
+             identity);
+        set_line_width(1.f);
     }
 
     // The GL context is shared with the 3D view; leave the bits we touched as we found them.
@@ -1253,29 +1393,33 @@ enum : int {
 
 UVEditorPanel::UVEditorPanel(wxWindow *parent) : wxPanel(parent, wxID_ANY)
 {
-    // Icon + label buttons: the tool icon (toolbar_texture_displacement.svg) is reused on all four as a
-    // placeholder until dedicated per-tool art exists, and the label is kept alongside it so the
-    // buttons stay tellable apart while they share one picture.
-    const wxBitmap icon = create_scaled_bitmap("toolbar_texture_displacement", this, 16);
+    // Icon + label buttons: each has its own dedicated SVG (see the map below), with the label kept
+    // alongside it. A missing SVG simply leaves the button showing only its label -- never bitmap-less
+    // garbage -- so the bar stays usable before the art lands.
     auto *bar = new wxBoxSizer(wxHORIZONTAL);
-    const auto add_button = [&](int id, const wxString &label, const wxString &tip) {
+    const auto set_icon = [this](wxAnyButton *b, const std::string &iconname) {
+        const wxBitmap bmp = create_scaled_bitmap(iconname, this, 16);
+        if (bmp.IsOk())
+            b->SetBitmap(bmp);
+    };
+    const auto add_button = [&](int id, const std::string &iconname, const wxString &label, const wxString &tip) {
         auto *b = new wxButton(this, id, label, wxDefaultPosition, wxDefaultSize, wxBU_EXACTFIT);
-        b->SetBitmap(icon);
+        set_icon(b, iconname);
         b->SetToolTip(tip);
         bar->Add(b, 0, wxALL, 2);
         b->Bind(wxEVT_BUTTON, &UVEditorPanel::on_tool, this);
         return b;
     };
-    add_button(ID_UV_FRAME, _L("Frame"), _L("Frame all islands (Home)"));
+    add_button(ID_UV_FRAME, "texture_displacement_frame", _L("Frame"), _L("Frame all islands (Home)"));
     m_snap_button = new wxToggleButton(this, ID_UV_SNAP, _L("Snap"), wxDefaultPosition, wxDefaultSize, wxBU_EXACTFIT);
-    m_snap_button->SetBitmap(icon);
+    set_icon(m_snap_button, "texture_displacement_snap");
     m_snap_button->SetToolTip(_L("Snap islands together when dragging"));
     bar->Add(m_snap_button, 0, wxALL, 2);
     m_snap_button->Bind(wxEVT_TOGGLEBUTTON, &UVEditorPanel::on_tool, this);
-    add_button(ID_UV_AVG_SCALE, _L("Avg scale"), _L("Give every island the same texel density"));
-    add_button(ID_UV_CUT, _L("Cut"), _L("Split the selected island across its long axis"));
-    add_button(ID_UV_JOIN, _L("Join"), _L("Unfold the selected island onto its nearest neighbour along their shared edge"));
-    add_button(ID_UV_UNJOIN, _L("Unjoin"), _L("Send the selected island back to its own packed position"));
+    add_button(ID_UV_AVG_SCALE, "texture_displacement_avg_scale", _L("Avg scale"), _L("Give every island the same texel density"));
+    add_button(ID_UV_CUT, "texture_displacement_cut", _L("Cut"), _L("Split the selected island across its long axis"));
+    add_button(ID_UV_JOIN, "texture_displacement_join", _L("Join"), _L("Unfold the selected island onto its nearest neighbour along their shared edge"));
+    add_button(ID_UV_UNJOIN, "texture_displacement_join", _L("Unjoin"), _L("Send the selected island back to its own packed position"));
 
     m_canvas = new UVEditorCanvas(this);
     m_canvas->set_status_callback([this](const wxString &text) {

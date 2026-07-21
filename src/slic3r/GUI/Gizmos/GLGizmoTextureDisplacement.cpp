@@ -5,18 +5,22 @@
 #include "libslic3r/MeshBoolean.hpp"
 #include "libslic3r/Model.hpp"
 #include "libslic3r/Utils.hpp"
+#include "libslic3r/format.hpp"
 
 #include "slic3r/GUI/Camera.hpp"
 #include "slic3r/GUI/CameraUtils.hpp"
 #include "slic3r/GUI/GLCanvas3D.hpp"
+#include "slic3r/GUI/GLToolbar.hpp" // GLToolbar::Default_Icons_Size, to match the toolbar's icon size
 #include "slic3r/GUI/GUI.hpp"
 #include "slic3r/GUI/GUI_App.hpp"
 #include "slic3r/GUI/GUI_ObjectList.hpp"
 #include "slic3r/GUI/ImGuiWrapper.hpp"
+#include "slic3r/GUI/MainFrame.hpp" // wxGetApp().mainframe, as the projector window's parent
 #include "slic3r/GUI/MsgDialog.hpp"
 #include "slic3r/GUI/OpenGLManager.hpp"
 #include "slic3r/GUI/Plater.hpp"
 #include "slic3r/GUI/TextureLibrary.hpp"
+#include "slic3r/GUI/TextureProjectorFrame.hpp"
 #include "slic3r/GUI/UVEditorCanvas.hpp"
 #include "slic3r/GUI/Jobs/TextureDisplacementBakeJob.hpp"
 #include "slic3r/GUI/Jobs/TextureDisplacementPreviewJob.hpp"
@@ -177,6 +181,16 @@ void GLGizmoTextureDisplacement::on_shutdown()
     // silently reopen the pane too.
     m_show_uv_editor = false;
     wxGetApp().plater()->show_uv_editor(false);
+
+    // Destroyed, not just hidden: unlike the UV pane (owned by Plater), this frame is owned here, and
+    // it holds a callback capturing `this`. Leaving it alive past the gizmo would leave that callback
+    // pointing at a gizmo that is no longer driving anything.
+    if (m_projector_frame != nullptr) {
+        m_projector_frame->Destroy();
+        m_projector_frame = nullptr;
+    }
+    m_projector_tex_source    = nullptr; // a rebuilt frame starts with no texture in it
+    m_projector_tex_smoothing = -1.f;
 }
 
 PainterGizmoType GLGizmoTextureDisplacement::get_painter_type() const
@@ -331,14 +345,13 @@ bool GLGizmoTextureDisplacement::on_mouse_seam(const wxMouseEvent &mouse_event)
     return false;
 }
 
-std::pair<int, int> GLGizmoTextureDisplacement::seam_edge_at(const Vec2d &mouse_pos) const
+int GLGizmoTextureDisplacement::texture_volume_raycaster_index() const
 {
     const ModelVolume *mv = texture_volume();
     const ModelObject *mo = m_c->selection_info()->model_object();
     if (mv == nullptr || mo == nullptr)
-        return { -1, -1 };
+        return -1;
 
-    // The mesh raycasters are built one per model-part volume, in that order; find this volume's slot.
     int idx = -1, count = 0;
     for (const ModelVolume *v : mo->volumes) {
         if (!v->is_model_part())
@@ -346,9 +359,20 @@ std::pair<int, int> GLGizmoTextureDisplacement::seam_edge_at(const Vec2d &mouse_
         if (v == mv) { idx = count; break; }
         ++count;
     }
-    const auto &raycasters = m_c->raycaster()->raycasters();
-    if (idx < 0 || idx >= int(raycasters.size()))
+    return (idx >= 0 && idx < int(m_c->raycaster()->raycasters().size())) ? idx : -1;
+}
+
+std::pair<int, int> GLGizmoTextureDisplacement::seam_edge_at(const Vec2d &mouse_pos) const
+{
+    const ModelVolume *mv = texture_volume();
+    const ModelObject *mo = m_c->selection_info()->model_object();
+    if (mv == nullptr || mo == nullptr)
         return { -1, -1 };
+
+    const int idx = texture_volume_raycaster_index();
+    if (idx < 0)
+        return { -1, -1 };
+    const auto &raycasters = m_c->raycaster()->raycasters();
 
     const Selection  &selection = m_parent.get_selection();
     const Transform3d trafo     = mo->instances[selection.get_instance_idx()]->get_transformation().get_matrix() * mv->get_matrix();
@@ -406,16 +430,10 @@ int GLGizmoTextureDisplacement::seam_vertex_at(const Vec2d &mouse_pos) const
     const ModelObject *mo = m_c->selection_info()->model_object();
     if (mv == nullptr || mo == nullptr)
         return -1;
-    int idx = -1, count = 0;
-    for (const ModelVolume *v : mo->volumes) {
-        if (!v->is_model_part())
-            continue;
-        if (v == mv) { idx = count; break; }
-        ++count;
-    }
-    const auto &raycasters = m_c->raycaster()->raycasters();
-    if (idx < 0 || idx >= int(raycasters.size()))
+    const int idx = texture_volume_raycaster_index();
+    if (idx < 0)
         return -1;
+    const auto &raycasters = m_c->raycaster()->raycasters();
 
     const Selection  &selection = m_parent.get_selection();
     const Transform3d trafo     = mo->instances[selection.get_instance_idx()]->get_transformation().get_matrix() * mv->get_matrix();
@@ -690,6 +708,14 @@ std::vector<Vec2f> GLGizmoTextureDisplacement::compute_layer_vertex_uvs(const in
     if (layer.projection_method == TextureProjectionMethod::ViewProjected) {
         std::vector<Vec2f> uv(patch.vertices.size());
         for (size_t vi = 0; vi < patch.vertices.size(); ++vi) {
+            if (layer.view_project_projective) {
+                // Matches sample_layer_height()'s projective branch, including skipping
+                // apply_uv_transform(). A vertex behind the projector gets a uv far outside [0,1] so
+                // it samples as nothing, rather than the mirrored coordinate a blind divide gives.
+                if (!project_uv_projective(layer.view_project_matrix, patch.vertices[vi], uv[vi]))
+                    uv[vi] = Vec2f(-1e6f, -1e6f);
+                continue;
+            }
             const Vec2f planar(patch.vertices[vi].dot(layer.view_project_right),
                                patch.vertices[vi].dot(layer.view_project_up));
             uv[vi] = apply_uv_transform(planar, layer);
@@ -1502,6 +1528,137 @@ void GLGizmoTextureDisplacement::capture_view_projection(TextureDisplacementLaye
     layer.view_project_up    = local_up.norm() > 1e-9 ? Vec3f(local_up.normalized().cast<float>()) : Vec3f::UnitY();
 }
 
+void GLGizmoTextureDisplacement::show_projector(bool show)
+{
+    if (!show) {
+        if (m_projector_frame != nullptr)
+            m_projector_frame->Hide();
+        return;
+    }
+
+    if (m_projector_frame == nullptr) {
+        // Parented to the main frame, not to Plater: Plater is a wxPanel, and wxFRAME_FLOAT_ON_PARENT
+        // wants a real top-level window to float above.
+        m_projector_frame         = new TextureProjectorFrame(wxGetApp().mainframe);
+        m_projector_tex_source    = nullptr; // fresh window, nothing uploaded into it yet
+        m_projector_tex_smoothing = -1.f;
+        m_projector_frame->set_opacity(m_projector_opacity);
+
+        // Opened centred over the 3D canvas, at about half its size: the frame is meant to be
+        // dragged onto part of the model, so starting somewhere on top of it beats the OS's default
+        // cascade position, which is often off over the sidebar.
+        if (const wxGLCanvas *cnv = m_parent.get_wxglcanvas(); cnv != nullptr) {
+            const wxRect  area = cnv->GetScreenRect();
+            const wxSize  size(std::max(160, area.width / 2), std::max(160, area.height / 2));
+            m_projector_frame->SetSize(wxRect(area.GetTopLeft() + wxPoint((area.width - size.x) / 2,
+                                                                         (area.height - size.y) / 2),
+                                              size));
+        }
+    }
+
+    m_projector_frame->Show();
+    m_projector_frame->Raise();
+    update_projector();
+}
+
+void GLGizmoTextureDisplacement::update_projector()
+{
+    if (m_projector_frame == nullptr || !m_projector_frame->IsShown())
+        return;
+
+    const TextureDisplacementLayer *layer = active_layer();
+    if (layer == nullptr || layer->projection_method != TextureProjectionMethod::ViewProjected) {
+        m_projector_frame->set_texture({}, 0, 0);
+        m_projector_tex_source    = nullptr;
+        m_projector_tex_smoothing = -1.f;
+        return;
+    }
+
+    // Only re-upload when the pixels actually changed - this is reached from the panel's per-edit
+    // flush, and rebuilding the bitmap from identical bytes every time would be pure waste.
+    if (m_projector_tex_source != layer->image_data.get() || m_projector_tex_smoothing != layer->smoothing) {
+        const DecodedHeightTexture height = decode_height_texture(*layer);
+        if (height.empty())
+            m_projector_frame->set_texture({}, 0, 0);
+        else
+            m_projector_frame->set_texture(height.pixels, height.width, height.height);
+        m_projector_tex_source    = layer->image_data.get();
+        m_projector_tex_smoothing = layer->smoothing;
+    }
+}
+
+int GLGizmoTextureDisplacement::apply_projection_frame()
+{
+    TextureDisplacementLayer *layer = active_layer();
+    const ModelVolume        *mv    = texture_volume();
+    const ModelObject        *mo    = m_c->selection_info()->model_object();
+    wxGLCanvas               *cnv   = m_parent.get_wxglcanvas();
+    if (layer == nullptr || mv == nullptr || mo == nullptr || cnv == nullptr || m_projector_frame == nullptr ||
+        !m_projector_frame->IsShown())
+        return -1;
+
+    // The frame's gate, brought from screen coordinates into the GL viewport's pixel space. Two
+    // conversions, both necessary: ScreenToClient() because the viewport's origin is the canvas's
+    // top-left, not the desktop's, and the retina scale because the viewport is sized in physical
+    // pixels (see GLCanvas3D::get_canvas_size()) while wx hands out logical ones.
+    const wxRect  gate   = m_projector_frame->client_rect_on_screen();
+    const wxPoint tl     = cnv->ScreenToClient(gate.GetTopLeft());
+    const double  scale  = double(m_parent.get_scale());
+    const double  rx = double(tl.x) * scale, ry = double(tl.y) * scale;
+    const double  rw = double(gate.width) * scale, rh = double(gate.height) * scale;
+    if (rw < 1.0 || rh < 1.0)
+        return -1;
+
+    const Camera             &camera = wxGetApp().plater()->get_camera();
+    const std::array<int, 4> &vp     = camera.get_viewport();
+    const Selection          &sel    = m_parent.get_selection();
+    const Transform3d trafo = mo->instances[sel.get_instance_idx()]->get_transformation().get_matrix() * mv->get_matrix();
+
+    // Local space -> clip space, the same product the renderer uses, so the mapping agrees with what
+    // is actually on screen rather than with an idealisation of it.
+    const Eigen::Matrix4d K = camera.get_projection_matrix().matrix() * camera.get_view_matrix().matrix() * trafo.matrix();
+
+    // Window coordinates follow igl::project's convention (as CameraUtils::project does):
+    //     win_x = vp.x + vp.w * (ndc.x + 1) / 2,  and y measured downward as vp.h - win_y_gl.
+    // Turning those into uv = (win - rect_origin) / rect_size gives u and v as affine functions of
+    // ndc.x and ndc.y, and since ndc = clip.xyz / clip.w, multiplying through by clip.w leaves a
+    // plain linear combination of K's rows - i.e. one 3x4 matrix carrying the perspective divide.
+    const double A = double(vp[2]) / (2.0 * rw);
+    const double B = (double(vp[0]) + double(vp[2]) * 0.5 - rx) / rw;
+    const double C = -double(vp[3]) / (2.0 * rh);
+    const double D = (double(vp[3]) * 0.5 - double(vp[1]) - ry) / rh;
+
+    const Eigen::Vector4d row_u = A * K.row(0).transpose() + B * K.row(3).transpose();
+    const Eigen::Vector4d row_v = C * K.row(1).transpose() + D * K.row(3).transpose();
+    const Eigen::Vector4d row_w = K.row(3).transpose();
+
+    std::array<float, 12> m{};
+    for (int i = 0; i < 4; ++i) {
+        m[size_t(i)]     = float(row_u[i]);
+        m[size_t(4 + i)] = float(row_v[i]);
+        m[size_t(8 + i)] = float(row_w[i]);
+    }
+
+    Plater::TakeSnapshot snapshot(wxGetApp().plater(), _u8L("Apply texture projection frame"),
+                                  UndoRedo::SnapshotType::GizmoAction);
+
+    layer->projection_method       = TextureProjectionMethod::ViewProjected;
+    layer->view_project_projective = true;
+    layer->view_project_matrix     = m;
+    // Off, so the height sampler returns 0 outside [0,1) and the frame's border becomes a hard edge
+    // of the displacement rather than the first seam of an endless repeat.
+    layer->tile_enabled = false;
+    // The affine axes are kept up to date too, so turning the projective mapping off later leaves a
+    // sane flat projection from this same viewpoint instead of whatever was captured long ago.
+    capture_view_projection(*layer);
+
+    const int painted = select_visible_faces(&m);
+    m_preview_params_dirty = true;
+    rebuild_preview();
+    m_parent.set_as_dirty();
+    return painted;
+}
+
 void GLGizmoTextureDisplacement::cut_island(TextureDisplacementLayer &layer, int chart)
 {
     const ModelVolume *mv = texture_volume();
@@ -2088,22 +2245,45 @@ unsigned int GLGizmoTextureDisplacement::tool_icon_id()
     if (!m_tool_icon_tried) {
         m_tool_icon_tried = true;
         // Runs from the panel render, i.e. with a GL context current, so the upload is safe here.
-        m_tool_icon.load_from_svg_file(resources_dir() + "/images/toolbar_texture_displacement.svg", false, false, false, 32);
+        m_tool_icon.load_from_svg_file(resources_dir() + "/images/texture_displacement_add.svg", false, false, false, 32);
     }
     return m_tool_icon.get_id();
 }
 
-unsigned int GLGizmoTextureDisplacement::icon_id(const std::string &filename)
+void GLGizmoTextureDisplacement::ensure_panel_icons()
 {
-    auto it = m_icon_cache.find(filename);
-    if (it == m_icon_cache.end()) {
-        // First request for this icon: default-construct the texture in place and load it once (with a
-        // GL context current, since this runs from the panel render). A failed load leaves id 0 and is
-        // not retried.
-        it = m_icon_cache.try_emplace(filename).first;
-        it->second.load_from_svg_file(resources_dir() + "/images/" + filename, false, false, false, 32);
-    }
-    return it->second.get_id();
+    if (m_panel_icons_tried)
+        return;
+    m_panel_icons_tried = true;
+
+    // Order is irrelevant; the map keys by file name. Loaded with color_wite_gray so each icon has both
+    // a monochrome ("normal", grey in the current theme) and an original-colour variant.
+    static const std::vector<std::string> names = {
+        "toolbar_big_brush.svg", "toolbar_face.svg", "texture_displacement_connected_area.svg",
+        "texture_displacement_real_preview.svg", "texture_displacement_fast_preview.svg",
+        "texture_displacement_checker.svg", "texture_displacement_distortion.svg",
+        "texture_displacement_wireframe.svg", "texture_displacement_cross.svg",
+        "texture_displacement_uv_select_island.svg", "texture_displacement_uv_select_edge.svg",
+        "texture_displacement_uv_select_vertex.svg",
+    };
+    std::vector<std::string> paths;
+    paths.reserve(names.size());
+    for (const std::string &n : names)
+        paths.push_back(resources_dir() + "/images/" + n);
+
+    // Runs from the panel render, i.e. with a GL context current, so the upload is safe here.
+    //
+    // Rasterized at twice GLToolbar::Default_Icons_Size rather than at it: these are drawn at the
+    // toolbar's icon size, which is that constant scaled by DPI (toolbar_icon_scale() folds in
+    // em_unit), so on a 200% display the draw size reaches 80 px. Rasterizing at 40 would upscale a
+    // 40 px bitmap there, which is what actually reads as blurry - downscaling does not. The icon set
+    // is rasterized once for the gizmo's lifetime, so it cannot re-raster on a DPI change; sizing for
+    // the larger case and letting ImGui shrink it is the version that looks right on both.
+    const std::vector<IconManager::Icons> icons =
+        m_panel_icons.init(paths, ImVec2(2 * GLToolbar::Default_Icons_Size, 2 * GLToolbar::Default_Icons_Size),
+                           IconManager::RasterType::color_wite_gray);
+    for (size_t i = 0; i < names.size() && i < icons.size(); ++i)
+        m_panel_icon_map[names[i]] = icons[i];
 }
 
 void GLGizmoTextureDisplacement::add_texture_layer()
@@ -2322,6 +2502,101 @@ void GLGizmoTextureDisplacement::remove_texture_layer(int slot)
     m_parent.set_as_dirty();
 }
 
+int GLGizmoTextureDisplacement::select_visible_faces(const std::array<float, 12> *uv_clip)
+{
+    ModelVolume *mv = texture_volume();
+    ModelObject *mo = m_c->selection_info()->model_object();
+    const int    idx = texture_volume_raycaster_index();
+    if (mv == nullptr || mo == nullptr || idx < 0 || idx >= int(m_triangle_selectors.size()))
+        return 0;
+
+    const indexed_triangle_set &its = mv->mesh().its;
+    if (its.indices.empty())
+        return 0;
+
+    const Selection             &selection = m_parent.get_selection();
+    const Geometry::Transformation trafo(mo->instances[selection.get_instance_idx()]->get_transformation().get_matrix() *
+                                         mv->get_matrix());
+    const Transform3d            &to_world = trafo.get_matrix();
+    const Camera                 &camera   = wxGetApp().plater()->get_camera();
+
+    // Normals transform by the inverse transpose, not by the matrix itself - with a non-uniform
+    // scale the two differ, and using the wrong one flips the facing test on the scaled axes.
+    const Matrix3d normal_matrix = to_world.matrix().block<3, 3>(0, 0).inverse().transpose();
+
+    // Pass 1 (cheap): drop back-facing triangles. Under perspective the view direction varies across
+    // the model, so it is taken per triangle from the eye to the centroid; under an orthographic
+    // camera get_position() is still a point on the view axis, so the same expression stays correct
+    // in direction terms for everything actually on screen.
+    const Vec3d eye = camera.get_position();
+    const bool  ortho = camera.get_type() == Camera::EType::Ortho;
+    const Vec3d fwd   = camera.get_dir_forward();
+
+    std::vector<Vec3f>    centroids;   // world coords, what get_unobscured_idxs() expects
+    std::vector<unsigned> front_facing; // parallel: which facet each centroid came from
+    centroids.reserve(its.indices.size() / 2);
+    front_facing.reserve(its.indices.size() / 2);
+
+    for (size_t f = 0; f < its.indices.size(); ++f) {
+        const stl_triangle_vertex_indices &tri = its.indices[f];
+        const Vec3d a = its.vertices[tri[0]].cast<double>();
+        const Vec3d b = its.vertices[tri[1]].cast<double>();
+        const Vec3d c = its.vertices[tri[2]].cast<double>();
+        const Vec3d n_world = normal_matrix * (b - a).cross(c - a);
+        if (n_world.squaredNorm() < 1e-20)
+            continue; // degenerate triangle: no meaningful normal, so no meaningful facing test
+        const Vec3d centroid_local = (a + b + c) / 3.0;
+        const Vec3d centroid_world = to_world * centroid_local;
+        const Vec3d view_dir       = ortho ? fwd : Vec3d(centroid_world - eye);
+        if (n_world.dot(view_dir) >= 0.0)
+            continue; // facing away from the camera
+
+        // Clip to the projection frame before the raycast, not after: outside the frame the texture
+        // samples to nothing anyway, so those facets would only be painted to no effect - and this
+        // is also what keeps the ray queries proportional to the framed area instead of the model.
+        if (uv_clip != nullptr) {
+            Vec2f uv;
+            if (!project_uv_projective(*uv_clip, centroid_local.cast<float>(), uv))
+                continue; // behind the projector
+            if (uv.x() < 0.f || uv.x() > 1.f || uv.y() < 0.f || uv.y() > 1.f)
+                continue;
+        }
+        centroids.emplace_back(centroid_world.cast<float>());
+        front_facing.push_back(unsigned(f));
+    }
+    if (centroids.empty())
+        return 0;
+
+    // Pass 2 (the expensive one): a real ray query per surviving centroid, so geometry in front of a
+    // front-facing triangle correctly hides it - the far inner wall of a cup is front-facing but not
+    // visible. This is why the whole thing is click-driven rather than live.
+    std::vector<unsigned> unobscured;
+    {
+        wxBusyCursor wait;
+        unobscured = m_c->raycaster()->raycasters()[size_t(idx)]->get_unobscured_idxs(
+            trafo, camera, centroids, m_c->object_clipper()->get_clipping_plane());
+    }
+    if (unobscured.empty())
+        return 0;
+
+    Plater::TakeSnapshot snapshot(wxGetApp().plater(), _u8L("Select visible faces for texture displacement"),
+                                  UndoRedo::SnapshotType::GizmoAction);
+
+    // Replaces the layer's paint rather than adding to it: the checkbox means "project onto what I
+    // can see", so a second capture from a new angle should not leave the previous angle painted.
+    // TriangleSelectorGUI, not the TriangleSelector base: request_update_render_data() is declared on
+    // the GUI subclass, so binding to the base here would drop it.
+    TriangleSelectorGUI &selector = *m_triangle_selectors[size_t(idx)];
+    selector.reset();
+    for (unsigned i : unobscured)
+        selector.set_facet(int(front_facing[i]), EnforcerBlockerType::ENFORCER);
+    selector.request_update_render_data();
+
+    update_model_object();
+    m_parent.set_as_dirty();
+    return int(unobscured.size());
+}
+
 void GLGizmoTextureDisplacement::select_whole_model()
 {
     ModelObject *mo = m_c->selection_info()->model_object();
@@ -2348,8 +2623,8 @@ void GLGizmoTextureDisplacement::subdivide_model()
 {
     ModelVolume *mv = texture_volume();
     ModelObject *mo = m_c->selection_info()->model_object();
-    if (mv == nullptr || mo == nullptr)
-        return;
+    if (mv == nullptr || mo == nullptr || m_subdivide_count < 1)
+        return; // 0 passes means "no subdivision" - don't take a snapshot for a no-op
 
     Plater *plater = wxGetApp().plater();
     Plater::TakeSnapshot snapshot(plater, _u8L("Subdivide model for texture displacement"), UndoRedo::SnapshotType::GizmoAction);
@@ -2391,14 +2666,24 @@ void GLGizmoTextureDisplacement::remesh_model()
 
     // CGAL isotropic remeshing can be slow on a big mesh; do it before taking the snapshot so a failure
     // (it returns the input unchanged) doesn't leave an empty undo step.
-    indexed_triangle_set remeshed;
+    const indexed_triangle_set &src = mv->mesh().its;
+    indexed_triangle_set        remeshed;
     {
         wxBusyCursor wait;
-        remeshed = MeshBoolean::cgal::remesh_isotropic(mv->mesh().its, double(m_remesh_target_edge_mm), 3);
+        remeshed = MeshBoolean::cgal::remesh_isotropic(mv->mesh().its, double(m_remesh_target_edge_mm), 3,
+                                                       m_remesh_keep_sharp_edges ? double(m_remesh_sharp_angle_deg) : 0.0);
     }
-    if (remeshed.indices.empty() || remeshed.vertices.size() == mv->mesh().its.vertices.size()) {
-        show_error(nullptr, _u8L("Remeshing did not change the model (it may be non-manifold or the target size "
-                                 "is already met)."));
+    // remesh_isotropic() signals failure by handing the input straight back, so compare against it
+    // structurally. Vertex count alone is not enough: a remesh that only redistributes triangles at
+    // roughly the current density legitimately lands on the same count, and treating that as failure
+    // meant a perfectly good result got thrown away with an error message.
+    const bool unchanged = remeshed.indices.empty() ||
+                           (remeshed.vertices.size() == src.vertices.size() && remeshed.indices.size() == src.indices.size() &&
+                            remeshed.indices == src.indices);
+    if (unchanged) {
+        show_error(nullptr, _u8L("Remeshing did not change the model. It may be non-manifold (open edges or "
+                                 "edges shared by more than two triangles), or the target edge length may "
+                                 "already be met."));
         return;
     }
 
@@ -2528,6 +2813,30 @@ void GLGizmoTextureDisplacement::bake()
     });
 }
 
+void GLGizmoTextureDisplacement::render_paint_cursor_hint()
+{
+    // Only in the plain paint/select modes; seam and adjust modes have their own click semantics where
+    // an add/remove sign would just be noise.
+    if (m_seam_edit_mode || m_adjust_texture_mode)
+        return;
+    const ImGuiIO &io = ImGui::GetIO();
+    // The pointer must be over the 3D view, not over this panel (or any other ImGui window).
+    if (io.WantCaptureMouse || !ImGui::IsMousePosValid())
+        return;
+
+    // Shift erases (see handle_snapshot_action_name()); a plain stroke adds.
+    const bool  removing = io.KeyShift;
+    const ImU32 color    = removing ? IM_COL32(235, 70, 60, 255) : IM_COL32(90, 210, 110, 255);
+    const char *glyph    = removing ? "-" : "+";
+
+    ImDrawList  *dl = ImGui::GetForegroundDrawList();
+    const float  fs = ImGui::GetFontSize() * 1.5f;
+    const ImVec2 at(io.MousePos.x + 15.f, io.MousePos.y - fs - 6.f);
+    // A translucent dark disc behind the glyph so it reads on any material colour.
+    dl->AddCircleFilled(ImVec2(at.x + fs * 0.28f, at.y + fs * 0.5f), fs * 0.62f, IM_COL32(0, 0, 0, 150));
+    dl->AddText(ImGui::GetFont(), fs, at, color, glyph);
+}
+
 void GLGizmoTextureDisplacement::on_render_input_window(float x, float y, float bottom_limit)
 {
     ModelObject *mo = m_c->selection_info()->model_object();
@@ -2565,24 +2874,68 @@ void GLGizmoTextureDisplacement::on_render_input_window(float x, float y, float 
         return changed;
     };
 
-    // Icon toggle button shared by the selection-mode and view-mode rows: an SVG button with a teal
-    // backing and full-brightness icon when active, dimmed otherwise. Falls back to a text checkbox if
-    // its icon could not be loaded, so the control is never lost.
-    const float  icon_btn_sz = m_imgui->scaled(1.5f);
-    const ImVec4 icon_active_bg(0.0f, 0.59f, 0.53f, 1.0f);
-    const auto   icon_toggle = [&](int uid, unsigned int ic, bool active, const wxString &label, const wxString &tip) -> bool {
-        bool clicked;
+    // Icon toggle button shared by the selection-mode and view-mode rows, styled like the main toolbar:
+    // an inactive button shows the icon in the theme's normal (grey) monochrome, an active one shows it
+    // in its original colours. All icons are the same square size. Falls back to a text checkbox if the
+    // icon set could not be loaded, so the control is never lost.
+    ensure_panel_icons();
+    // Sized to match the 3D toolbar's icons exactly, rather than to the panel's font. It is the same
+    // expression GLCanvas3D::_update_toolbar_icons_scale() uses, and it is valid here because ImGui's
+    // DisplaySize is set from the canvas's pixel size (GLCanvas3D::_resize()) - so one ImGui unit is
+    // one canvas pixel, the very units the toolbar is drawn in. Deriving it rather than hard-coding a
+    // font multiple also keeps the two in step when the toolbar auto-fit shrinks its icons to make
+    // them fit a narrow window, which it does by lowering the same toolbar_icon_scale() read here.
+    const float icon_btn_sz = GLToolbar::Default_Icons_Size * wxGetApp().toolbar_icon_scale() * m_parent.get_scale();
+    // The icon SVGs carry their own border, so the ImGui button's own frame border and idle fill are
+    // suppressed here (FrameBorderSize 0 + transparent ImGuiCol_Button) to avoid a doubled border -- the
+    // hover/active fill is left in place for feedback. Applied only around these gizmo icon buttons.
+    const auto push_borderless_icon_style = []() {
+        ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0.f);
+        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.f, 0.f, 0.f, 0.f));
+    };
+    const auto pop_borderless_icon_style = []() {
+        ImGui::PopStyleColor();
+        ImGui::PopStyleVar();
+    };
+    const auto  icon_toggle = [&](int uid, const std::string &iconfile, bool active, const wxString &label,
+                                 const wxString &tip) -> bool {
+        bool       clicked = false;
+        const auto it      = m_panel_icon_map.find(iconfile);
         ImGui::PushID(uid);
-        if (ic != 0)
-            clicked = m_imgui->image_button((ImTextureID) (intptr_t) ic, ImVec2(icon_btn_sz, icon_btn_sz), ImVec2(0, 0),
-                                            ImVec2(1, 1), -1, active ? icon_active_bg : ImVec4(0, 0, 0, 0),
-                                            active ? ImVec4(1, 1, 1, 1) : ImVec4(0.65f, 0.65f, 0.65f, 1.f));
-        else {
+        // color_wite_gray variants: [0] normal/grey, [1] original colour, [2] disabled.
+        if (it != m_panel_icon_map.end() && it->second.size() >= 2 && it->second[active ? 1 : 0]->is_valid()) {
+            const IconManager::Icon &ic = *it->second[active ? 1 : 0];
+            push_borderless_icon_style();
+            clicked = m_imgui->image_button((ImTextureID) (intptr_t) ic.tex_id, ImVec2(icon_btn_sz, icon_btn_sz),
+                                            ic.tl, ic.br, -1, ImVec4(0, 0, 0, 0), ImVec4(1, 1, 1, 1));
+            pop_borderless_icon_style();
+        } else {
             bool v  = active;
             clicked = ImGui::Checkbox(label.ToUTF8().data(), &v);
         }
         ImGui::PopID();
         if (ImGui::IsItemHovered())
+            m_imgui->tooltip(tip, m_imgui->scaled(18.f));
+        return clicked;
+    };
+    // Borderless icon button (non-toggle): always the grey monochrome variant. Falls back to a plain
+    // text button when the icon file is absent, so the control is never lost before the art lands.
+    const auto icon_button = [&](int uid, const std::string &iconfile, float sz, const wxString &label,
+                                 const wxString &tip) -> bool {
+        bool       clicked = false;
+        const auto it      = m_panel_icon_map.find(iconfile);
+        ImGui::PushID(uid);
+        if (it != m_panel_icon_map.end() && !it->second.empty() && it->second[0]->is_valid()) {
+            const IconManager::Icon &ic = *it->second[0];
+            push_borderless_icon_style();
+            clicked = m_imgui->image_button((ImTextureID) (intptr_t) ic.tex_id, ImVec2(sz, sz), ic.tl, ic.br, -1,
+                                            ImVec4(0, 0, 0, 0), ImVec4(1, 1, 1, 1));
+            pop_borderless_icon_style();
+        } else {
+            clicked = m_imgui->button(label);
+        }
+        ImGui::PopID();
+        if (!tip.empty() && ImGui::IsItemHovered())
             m_imgui->tooltip(tip, m_imgui->scaled(18.f));
         return clicked;
     };
@@ -2604,19 +2957,19 @@ void GLGizmoTextureDisplacement::on_render_input_window(float x, float y, float 
     const bool is_face_mode  = m_tool_type == ToolType::BRUSH && m_cursor_type == TriangleSelector::CursorType::POINTER;
     const bool is_area_mode  = m_tool_type == ToolType::SMART_FILL;
     ImGui::SameLine();
-    if (icon_toggle(801, icon_id("toolbar_big_brush.svg"), is_brush_mode, _L("Brush"),
+    if (icon_toggle(801, "toolbar_big_brush.svg", is_brush_mode, _L("Brush"),
                     _L("Brush - paint over the surface by dragging"))) {
         m_tool_type   = ToolType::BRUSH;
         m_cursor_type = TriangleSelector::CursorType::CIRCLE;
     }
     ImGui::SameLine();
-    if (icon_toggle(802, icon_id("toolbar_face.svg"), is_face_mode, _L("Face"),
+    if (icon_toggle(802, "toolbar_face.svg", is_face_mode, _L("Face"),
                     _L("Face - click individual triangles"))) {
         m_tool_type   = ToolType::BRUSH;
         m_cursor_type = TriangleSelector::CursorType::POINTER;
     }
     ImGui::SameLine();
-    if (icon_toggle(803, icon_id("texture_displacement_connected_area.svg"), is_area_mode, _L("Connected area"),
+    if (icon_toggle(803, "texture_displacement_connected_area.svg", is_area_mode, _L("Connected area"),
                     _L("Connected area - flood-fill the region reachable without crossing an edge sharper than the "
                        "angle threshold"))) {
         m_tool_type   = ToolType::SMART_FILL;
@@ -2657,21 +3010,21 @@ void GLGizmoTextureDisplacement::on_render_input_window(float x, float y, float 
 
         m_imgui->text(_L("View"));
         ImGui::SameLine();
-        if (icon_toggle(701, icon_id("texture_displacement_real_preview.svg"), cur_mode == 0, _L("Normal"),
+        if (icon_toggle(701, "texture_displacement_real_preview.svg", cur_mode == 0, _L("Normal"),
                         _L("Normal - the true displaced geometry (what Bake produces)"))) new_mode = 0;
         ImGui::SameLine();
-        if (icon_toggle(702, icon_id("texture_displacement_fast_preview.svg"), cur_mode == 1, _L("Fast"),
+        if (icon_toggle(702, "texture_displacement_fast_preview.svg", cur_mode == 1, _L("Fast"),
                         _L("Fast - a bump-shaded approximation of the active layer only; quick to update, not exact"))) new_mode = 1;
         ImGui::SameLine();
-        if (icon_toggle(703, icon_id("texture_displacement_checker.svg"), cur_mode == 2, _L("Checker"),
+        if (icon_toggle(703, "texture_displacement_checker.svg", cur_mode == 2, _L("Checker"),
                         _L("Checker - a test grid over the unwrap; squares stay square where it does not stretch"))) new_mode = 2;
         ImGui::SameLine();
-        if (icon_toggle(704, icon_id("texture_displacement_distortion.svg"), cur_mode == 3, _L("Distortion"),
+        if (icon_toggle(704, "texture_displacement_distortion.svg", cur_mode == 3, _L("Distortion"),
                         _L("Distortion - blue-to-red stretch heatmap over the unwrap (needs the Unwrap/LSCM projection)"))) new_mode = 3;
         ImGui::SameLine();
         ImGui::Dummy(ImVec2(m_imgui->scaled(0.6f), 0.f));
         ImGui::SameLine();
-        if (icon_toggle(705, icon_id("texture_displacement_wireframe.svg"), m_wireframe_overlay, _L("Wireframe"),
+        if (icon_toggle(705, "texture_displacement_wireframe.svg", m_wireframe_overlay, _L("Wireframe"),
                         _L("Wireframe - overlay the mesh edges; independent of the view above"))) wf_toggle = true;
 
         if (new_mode != cur_mode) {
@@ -2711,8 +3064,15 @@ void GLGizmoTextureDisplacement::on_render_input_window(float x, float y, float 
         const unsigned int add_icon = tool_icon_id();
         const float        sz       = m_imgui->scaled(1.3f);
         ImGui::SameLine();
-        const bool add_clicked = (add_icon != 0) ? m_imgui->image_button((ImTextureID) (intptr_t) add_icon, ImVec2(sz, sz))
-                                                  : m_imgui->button(m_desc.at("add_texture"));
+        bool add_clicked;
+        if (add_icon != 0) {
+            // The add icon SVG carries its own border; suppress the ImGui frame border/idle fill.
+            push_borderless_icon_style();
+            add_clicked = m_imgui->image_button((ImTextureID) (intptr_t) add_icon, ImVec2(sz, sz));
+            pop_borderless_icon_style();
+        } else {
+            add_clicked = m_imgui->button(m_desc.at("add_texture"));
+        }
         if (ImGui::IsItemHovered())
             m_imgui->tooltip(_u8L("Add a texture layer"), m_imgui->scaled(20.f));
         if (add_clicked)
@@ -2765,7 +3125,8 @@ void GLGizmoTextureDisplacement::on_render_input_window(float x, float y, float 
                 set_active_layer(layer->slot);
             ImGui::PopStyleColor(2);
             ImGui::SameLine();
-            if (m_imgui->button(m_desc.at("remove_layer")))
+            if (icon_button(600 + layer->slot, "texture_displacement_cross.svg", m_imgui->scaled(1.3f),
+                            m_desc.at("remove_layer"), _u8L("Remove this layer")))
                 slot_to_remove = layer->slot;
 
             // Everything below is this layer's own; the group lets a click anywhere inside it select
@@ -2958,18 +3319,25 @@ void GLGizmoTextureDisplacement::on_render_input_window(float x, float y, float 
                         // bake honours; Island is the move/rotate/scale-with-grouping behaviour.
                         if (!m_uv_editor_unwrap.empty()) {
                             m_imgui->text(_u8L("Select:"));
+                            const auto set_uv_mode = [&](int mode) {
+                                if (mode != m_uv_select_mode) {
+                                    m_uv_select_mode = mode;
+                                    if (UVEditorCanvas *c = wxGetApp().plater()->get_uv_editor_canvas())
+                                        c->set_select_mode(static_cast<UVEditorCanvas::SelectMode>(mode));
+                                }
+                            };
                             ImGui::SameLine();
-                            int mode = m_uv_select_mode;
-                            ImGui::RadioButton(_u8L("Island").c_str(), &mode, 0);
+                            if (icon_toggle(810, "texture_displacement_uv_select_island.svg", m_uv_select_mode == 0,
+                                            _L("Island"), _L("Island - move, rotate and scale whole islands")))
+                                set_uv_mode(0);
                             ImGui::SameLine();
-                            ImGui::RadioButton(_u8L("Vertex").c_str(), &mode, 1);
+                            if (icon_toggle(811, "texture_displacement_uv_select_vertex.svg", m_uv_select_mode == 1,
+                                            _L("Vertex"), _L("Vertex - drag vertices to reshape; Shift/Ctrl to multi-select")))
+                                set_uv_mode(1);
                             ImGui::SameLine();
-                            ImGui::RadioButton(_u8L("Edge").c_str(), &mode, 2);
-                            if (mode != m_uv_select_mode) {
-                                m_uv_select_mode = mode;
-                                if (UVEditorCanvas *c = wxGetApp().plater()->get_uv_editor_canvas())
-                                    c->set_select_mode(static_cast<UVEditorCanvas::SelectMode>(mode));
-                            }
+                            if (icon_toggle(812, "texture_displacement_uv_select_edge.svg", m_uv_select_mode == 2,
+                                            _L("Edge"), _L("Edge - drag edges to reshape; Shift/Ctrl to multi-select")))
+                                set_uv_mode(2);
                             if (!layer->lscm_uv_overrides.empty()) {
                                 ImGui::SameLine();
                                 if (m_imgui->button(_u8L("Clear UV edits"))) {
@@ -3056,7 +3424,14 @@ void GLGizmoTextureDisplacement::on_render_input_window(float x, float y, float 
                     // press this, and the texture is re-laid from the new angle.
                     if (m_imgui->button(_u8L("Capture current view"))) {
                         capture_view_projection(*layer);
+                        // Selecting the visible faces *after* capturing means the projector axes are
+                        // already the ones the selection was made against - the two describe the
+                        // same viewpoint, which is the whole point of the option.
+                        if (m_project_only_visible && select_visible_faces() == 0)
+                            show_error(nullptr, _u8L("Nothing is visible from this angle - turn the model to face the "
+                                                     "part you want to project onto."));
                         m_preview_params_dirty = true;
+                        update_projector();
                     }
                     if (ImGui::IsItemHovered())
                         m_imgui->tooltip(_u8L("Projects the texture straight onto the painted area from the direction "
@@ -3064,6 +3439,66 @@ void GLGizmoTextureDisplacement::on_render_input_window(float x, float y, float 
                                               "that direction will stretch - turn the model to where you want the "
                                               "texture crisp, then capture."),
                                           m_imgui->scaled(20.f));
+
+                    if (ImGui::Checkbox(_u8L("Project only on visible").c_str(), &m_project_only_visible)) {
+                        if (m_project_only_visible && select_visible_faces() == 0)
+                            show_error(nullptr, _u8L("Nothing is visible from this angle - turn the model to face the "
+                                                     "part you want to project onto."));
+                        m_preview_params_dirty = true;
+                        update_projector();
+                    }
+                    if (ImGui::IsItemHovered())
+                        m_imgui->tooltip(_u8L("Paints exactly the faces you can currently see - facing the camera and "
+                                              "not hidden behind anything else - and projects onto those. This replaces "
+                                              "the layer's painted area, and is re-applied each time you capture the "
+                                              "view."),
+                                          m_imgui->scaled(20.f));
+
+                    ImGui::Separator();
+                    bool projector_open = m_projector_frame != nullptr && m_projector_frame->IsShown();
+                    if (ImGui::Checkbox(_u8L("Projection frame").c_str(), &projector_open))
+                        show_projector(projector_open);
+                    if (ImGui::IsItemHovered())
+                        m_imgui->tooltip(_u8L("Opens a see-through window you drag over the model. Whatever shows "
+                                              "through it is what the texture is projected onto, and the window's "
+                                              "border becomes the edge of the projection. Move and resize it to frame "
+                                              "the area you want, then press Apply."),
+                                          m_imgui->scaled(20.f));
+
+                    if (projector_open) {
+                        ImGui::PushItemWidth(m_imgui->scaled(6.f));
+                        if (ImGui::SliderInt(_u8L("Opacity").c_str(), &m_projector_opacity, 20, 255))
+                            m_projector_frame->set_opacity(m_projector_opacity);
+                        ImGui::PopItemWidth();
+
+                        if (m_imgui->button(_u8L("Apply projection frame"))) {
+                            const int painted = apply_projection_frame();
+                            if (painted == 0)
+                                show_error(nullptr, _u8L("Nothing of the model is inside the frame - move it over the "
+                                                         "part you want to project onto."));
+                            else if (painted < 0)
+                                show_error(nullptr, _u8L("The frame could not be applied. Make sure it overlaps the "
+                                                         "3D view."));
+                        }
+                        if (ImGui::IsItemHovered())
+                            m_imgui->tooltip(_u8L("Projects the texture through the frame from the direction you are "
+                                                  "looking now, and paints the visible faces inside it. This replaces "
+                                                  "the layer's painted area. The result is fixed to the model, so you "
+                                                  "can orbit freely afterwards."),
+                                              m_imgui->scaled(20.f));
+                    }
+
+                    if (layer->view_project_projective) {
+                        m_imgui->text(_u8L("Placed by projection frame."));
+                        ImGui::SameLine();
+                        if (m_imgui->button(_u8L("Clear"))) {
+                            // Back to the plain axis projection, where tiling/rotation/offset mean
+                            // something again - the matrix path deliberately ignores them.
+                            layer->view_project_projective = false;
+                            layer->tile_enabled            = true;
+                            m_preview_params_dirty         = true;
+                        }
+                    }
                 }
             }
 
@@ -3114,6 +3549,9 @@ void GLGizmoTextureDisplacement::on_render_input_window(float x, float y, float 
     // that's driving the drag is released, i.e. once per edit instead of dozens of times per drag.
     if (m_preview_params_dirty && (m_auto_update || !ImGui::IsMouseDown(ImGuiMouseButton_Left))) {
         rebuild_preview();
+        // Same edits (tile size, rotation, offset, a new texture) are what the projector window
+        // draws, so it refreshes on the same one-per-edit cadence. No-op while it is closed.
+        update_projector();
         m_preview_params_dirty = false;
     }
     // (The "Add layer" button now lives next to the "Texture layers" heading, as an icon.)
@@ -3121,16 +3559,17 @@ void GLGizmoTextureDisplacement::on_render_input_window(float x, float y, float 
     ImGui::Separator();
     m_imgui->text(_u8L("Not enough vertices for fine detail?"));
     ImGui::PushItemWidth(m_imgui->scaled(8.4f));
-    if (ImGui::SliderInt(_u8L("Subdivide steps").c_str(), &m_subdivide_count, 1, 5)) {
-        m_subdivide_count = std::clamp(m_subdivide_count, 1, 5);
+    if (ImGui::SliderInt(_u8L("Subdivide steps").c_str(), &m_subdivide_count, 0, 5)) {
+        m_subdivide_count = std::clamp(m_subdivide_count, 0, 5);
         if (m_subdivide_editing)
-            rebuild_subdivide_preview();
+            rebuild_subdivide_preview(); // a count of 0 clears the preview, it doesn't compute one
         m_parent.set_as_dirty();
     }
     ImGui::PopItemWidth();
     if (ImGui::IsItemHovered())
         m_imgui->tooltip(_u8L("How many times to split every triangle into four. Each step roughly quadruples the "
-                              "triangle count, so there are enough vertices for the height texture to displace."),
+                              "triangle count, so there are enough vertices for the height texture to displace. "
+                              "0 means no subdivision."),
                           m_imgui->scaled(20.f));
 
     if (!m_subdivide_editing) {
@@ -3144,11 +3583,18 @@ void GLGizmoTextureDisplacement::on_render_input_window(float x, float y, float 
                                   "commit it, or Done to leave the model as it is."),
                               m_imgui->scaled(20.f));
     } else {
+        m_imgui->disabled_begin(m_subdivide_count < 1);
         if (m_imgui->button(_u8L("Apply"))) {
-            subdivide_model();           // commits m_subdivide_count passes (takes its own snapshot)
-            rebuild_subdivide_preview(); // re-preview against the now-denser mesh
+            subdivide_model(); // commits m_subdivide_count passes (takes its own snapshot)
+            // Back to 0 rather than staying at the count just applied: the mesh is now up to 4^N
+            // times denser, so re-previewing the same N passes on top of it is both pointless (the
+            // density asked for is already committed) and by far the slowest thing this panel does.
+            // rebuild_subdivide_preview() at 0 just drops the wireframe.
+            m_subdivide_count = 0;
+            rebuild_subdivide_preview();
             m_parent.set_as_dirty();
         }
+        m_imgui->disabled_end();
         if (ImGui::IsItemHovered())
             m_imgui->tooltip(_u8L("Replaces the model's geometry with the subdivided mesh and clears any not-yet-baked "
                                   "paint on it (already-baked bumps are unaffected)."),
@@ -3180,6 +3626,23 @@ void GLGizmoTextureDisplacement::on_render_input_window(float x, float y, float 
     ImGui::PushItemWidth(m_imgui->scaled(8.4f));
     m_imgui->slider_float(_u8L("Target edge (mm)"), &m_remesh_target_edge_mm, 0.1f, 20.f, "%.2f", ImGuiLogSlider);
     ImGui::PopItemWidth();
+
+    ImGui::Checkbox(_u8L("Keep sharp edges").c_str(), &m_remesh_keep_sharp_edges);
+    if (ImGui::IsItemHovered())
+        m_imgui->tooltip(_u8L("Holds hard edges and open borders in place while the rest is remeshed. Without it "
+                              "the remesher slides vertices along the surface and rounds every crisp edge off - "
+                              "a cube comes back with wobbly edges."),
+                          m_imgui->scaled(20.f));
+    if (m_remesh_keep_sharp_edges) {
+        ImGui::PushItemWidth(m_imgui->scaled(8.4f));
+        m_imgui->slider_float(_u8L("Sharp edge angle"), &m_remesh_sharp_angle_deg, 5.f, 90.f, "%.0f deg");
+        ImGui::PopItemWidth();
+        if (ImGui::IsItemHovered())
+            m_imgui->tooltip(_u8L("Edges bent by more than this count as hard features and are kept. Lower keeps "
+                                  "more detail but leaves more of the mesh untouched; higher remeshes more freely."),
+                              m_imgui->scaled(20.f));
+    }
+
     m_imgui->disabled_begin(mv == nullptr);
     if (m_imgui->button(_u8L("Remesh")))
         remesh_model();
@@ -3219,6 +3682,10 @@ void GLGizmoTextureDisplacement::on_render_input_window(float x, float y, float 
 
     GizmoImguiEnd();
     ImGuiWrapper::pop_toolbar_style();
+
+    // Drawn last, over everything, via the foreground draw list: the +/- add-remove sign next to the
+    // 3D cursor. Still inside the gizmo's ImGui frame here, which is what render_paint_cursor_hint() needs.
+    render_paint_cursor_hint();
 }
 
 } // namespace Slic3r::GUI

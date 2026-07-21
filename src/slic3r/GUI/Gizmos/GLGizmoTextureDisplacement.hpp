@@ -6,6 +6,7 @@
 #include "slic3r/GUI/GLModel.hpp"
 #include "slic3r/GUI/GLTexture.hpp"
 #include "slic3r/GUI/I18N.hpp"
+#include "slic3r/GUI/IconManager.hpp"
 #include "slic3r/GUI/TextureLibrary.hpp"
 
 #include <array>
@@ -14,6 +15,8 @@
 #include <string>
 
 namespace Slic3r::GUI {
+
+class TextureProjectorFrame;
 
 // Paint-style gizmo that assigns one or more texture-displacement "layers" (see
 // libslic3r/TextureDisplacement.hpp) to painted areas of a model, and can bake the result into
@@ -70,6 +73,44 @@ private:
     // "whole model" as an alternative to brushing/clicking every triangle by hand.
     void select_whole_model();
 
+    // The mesh raycasters are built one per model-part volume, in that order; this is the texture
+    // volume's slot among them, or -1 if it has none (no selection, or the lists disagree).
+    int texture_volume_raycaster_index() const;
+
+    // Paints exactly the facets currently visible from the camera onto the active layer, replacing
+    // whatever that layer had painted. "Visible" is two tests: the facet faces the camera, and its
+    // centroid is not hidden behind other geometry (a real raycast, so a concave part's far inner
+    // wall is correctly excluded). When `uv_clip` is given (the projection frame's matrix), facets
+    // whose centroid falls outside the frame's uv unit square are skipped first - which both clips
+    // the selection to the frame and spares the raycast for everything outside it. Costs one ray
+    // query per surviving facet, so it is a one-shot action, never a per-frame one. Returns the
+    // number of facets selected.
+    int select_visible_faces(const std::array<float, 12> *uv_clip = nullptr);
+
+    // When set, "Capture current view" also re-selects the visible faces, so the viewpoint the
+    // projector was captured from and the area it projects onto stay the same. Independent of the
+    // projection frame below: this takes every visible facet, the frame clips to its rectangle.
+    // Off by default, because turning it on replaces whatever the layer had painted.
+    bool m_project_only_visible = false;
+
+    // The projection-frame overlay for a ViewProjected layer: a semi-transparent window dragged over
+    // the 3D view whose border becomes the projection's edge. Created lazily and owned here; hidden
+    // rather than destroyed when closed, so reopening keeps it where the user left it.
+    TextureProjectorFrame *m_projector_frame   = nullptr;
+    int                    m_projector_opacity = 140;
+    // What the overlay's texture was last built from, so repeated updates don't rebuild the bitmap
+    // from unchanged pixels. Same shape as the m_thumbnail_source/m_thumbnail_smoothing pair above.
+    const void *m_projector_tex_source    = nullptr;
+    float       m_projector_tex_smoothing = -1.f;
+    void show_projector(bool show);
+    // Pushes the active layer's texture into the overlay. Cheap, and a no-op while it is hidden.
+    void update_projector();
+    // Reads the overlay's rectangle and commits it as the layer's projection: builds the exact
+    // projective local->uv matrix from the camera and that rectangle, turns tiling off so the border
+    // is a hard edge, and repaints the layer with the visible facets inside the frame. Returns the
+    // number of facets selected, or -1 if the frame could not be used at all.
+    int apply_projection_frame();
+
     // Uniformly subdivides the volume's mesh (see libslic3r::subdivide_mesh_uniform()) so a
     // low-poly input model has enough vertices to actually show texture-displacement detail.
     // A real, committed geometry change (like Bake), so it needs its own snapshot; unlike Bake it
@@ -120,6 +161,10 @@ private:
     bool update_adjust_anchor(); // recomputes m_adjust_anchor_pos/normal; false if nothing painted
     bool on_mouse_adjust_texture(const wxMouseEvent &mouse_event);
     void render_adjust_texture_gizmo();
+    // Draws a small '+'/'-' next to the mouse over the 3D view while painting/selecting, so it is
+    // obvious whether the next stroke adds paint (default) or erases it (Shift). Uses ImGui's
+    // foreground draw list, so it must be called from inside the gizmo's ImGui frame.
+    void render_paint_cursor_hint();
     // Mesh-local tangent-plane basis at m_adjust_anchor_normal, matching project_planar()'s
     // dominant-axis convention so dragging on-canvas maps consistently onto offset.
     void adjust_tangent_basis(Vec3f &u_axis, Vec3f &v_axis) const;
@@ -251,6 +296,10 @@ private:
     // until "Apply". While previewing, the would-be subdivided mesh is drawn as a wireframe overlay so
     // the added density is visible; "Done" ends the preview without touching the model. The normal
     // "Show mesh wireframe" toggle is left alone, so a wireframe the user already had on stays on.
+    // 0 is a real value meaning "no subdivision": it previews nothing and Apply is a no-op. Apply
+    // snaps the slider back to it, because each pass quadruples the triangle count - leaving the
+    // count where it was would immediately re-preview N more passes on top of the mesh that was just
+    // committed, i.e. the most expensive thing the panel can do, on every Apply.
     int     m_subdivide_count         = 1;
     bool    m_subdivide_editing       = false;
     int     m_subdivide_preview_count = -1; // the count m_subdivide_preview_glmodel was built for
@@ -263,6 +312,10 @@ private:
     // with the mesh's mean edge length the first time the control is shown. Like subdivide, it replaces
     // the geometry and drops not-yet-baked paint (no remap across a topology change).
     float m_remesh_target_edge_mm = 0.f;
+    // Dihedral angle above which an edge counts as a hard feature and is held fixed by the remesher.
+    // Off by default would round every sharp edge off, so this is on; 0 disables the protection.
+    float m_remesh_sharp_angle_deg   = 40.f;
+    bool  m_remesh_keep_sharp_edges  = true;
     void  remesh_model();
 
     // Live, pre-bake preview of the true displaced geometry (built by the same algorithm Bake
@@ -450,11 +503,14 @@ private:
     bool         m_tool_icon_tried = false;
     unsigned int tool_icon_id(); // 0 if the icon could not be loaded
 
-    // The panel's icon-button rows (selection mode, view mode) each need their own small SVG. Loaded and
-    // uploaded once on first use and cached by file name (under resources/images/). Returns 0 if an icon
-    // could not be loaded, in which case the button falls back to a text control.
-    std::map<std::string, GLTexture> m_icon_cache;
-    unsigned int                     icon_id(const std::string &filename);
+    // Icons for the panel's selection-mode and view-mode button rows. Loaded through IconManager with
+    // the same colour/monochrome variants the main toolbar uses, so an inactive button shows the icon in
+    // the theme's normal (grey) foreground colour and an active one shows it in its original colours --
+    // matching the toolbar's selected/unselected look. Uploaded once on first panel render.
+    IconManager                                m_panel_icons;
+    std::map<std::string, IconManager::Icons>  m_panel_icon_map; // file name -> [normal, colour, disabled]
+    bool                                       m_panel_icons_tried = false;
+    void                                       ensure_panel_icons();
 };
 
 } // namespace Slic3r::GUI

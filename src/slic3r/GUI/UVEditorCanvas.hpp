@@ -144,6 +144,7 @@ private:
     void on_size(wxSizeEvent &evt);
     void on_mouse(wxMouseEvent &evt);
     void on_key(wxKeyEvent &evt);
+    void on_leave(wxMouseEvent &evt); // drops the +/- cursor hint when the pointer leaves the canvas
     void on_erase_background(wxEraseEvent &evt) {} // required to avoid flicker on MSW, deliberately a no-op
 
     void render();
@@ -244,14 +245,37 @@ private:
     Gesture m_gesture         = Gesture::None;
 
     SelectMode          m_select_mode  = SelectMode::Island;
-    // The sub-element being edited in Vertex/Edge mode (unwrapped-vertex indices), or -1/{-1,-1}.
+    // The sub-element being edited in Vertex/Edge mode (unwrapped-vertex indices), or -1/{-1,-1}. This
+    // is the *primary* (last-picked) element of the multi-selection below.
     int                 m_active_vertex = -1;
     std::pair<int, int> m_active_edge{ -1, -1 };
+    // Multi-selection for Vertex/Edge modes, mirroring the island selection: plain click replaces, Shift
+    // adds, Ctrl toggles, and a drag moves the whole set together. m_active_vertex/m_active_edge stay the
+    // primary. Kept as small vectors (tiny, and order doesn't matter here).
+    std::vector<int>                 m_sel_vertices;
+    std::vector<std::pair<int, int>> m_sel_edges;
+    bool is_vertex_selected(int v) const
+    {
+        return std::find(m_sel_vertices.begin(), m_sel_vertices.end(), v) != m_sel_vertices.end();
+    }
+    bool is_edge_selected(const std::pair<int, int> &e) const
+    {
+        return std::find(m_sel_edges.begin(), m_sel_edges.end(), e) != m_sel_edges.end();
+    }
+    // Unique unwrapped-vertex endpoints of every selected edge (an endpoint shared by two selected edges
+    // is returned once, so a drag doesn't move it twice).
+    std::vector<int> selected_edge_endpoints() const;
+    // Last known mouse position over the canvas, and whether the pointer is currently inside it. Used to
+    // draw the +/- add/remove sign next to the cursor in Vertex/Edge mode.
+    wxPoint m_cursor_px{ 0, 0 };
+    bool    m_cursor_inside = false;
     // Set once a Vertex/Edge drag actually moves, so a bare click (select without drag) doesn't commit a
     // no-op edit and take an undo snapshot for nothing.
     bool                m_vertex_edit_moved = false;
     // Lazily-built small filled square, drawn at an edited/hovered vertex as a handle.
     GLModel m_vertex_marker_glmodel;
+    // Rebuilt each frame at the cursor while a +/- add-remove hint is shown (Vertex/Edge mode).
+    GLModel m_cursor_sign_glmodel;
     int     m_selected_island = -1;
     // The full multi-selection; m_selected_island is its primary (last-clicked) member. Kept as a small
     // vector rather than a set because it is tiny and iteration order (primary last) is convenient.

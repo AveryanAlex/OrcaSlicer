@@ -934,6 +934,19 @@ float blend_displacement(float accumulated, float value, TextureBlendMode mode)
     }
 }
 
+bool project_uv_projective(const std::array<float, 12> &m, const Vec3f &position, Vec2f &uv)
+{
+    const float x = position.x(), y = position.y(), z = position.z();
+    const float w = m[8] * x + m[9] * y + m[10] * z + m[11];
+    // Strictly greater than zero: at w == 0 the point sits on the projector's plane and maps to
+    // infinity, and at w < 0 it is behind the projector, where dividing yields a plausible-looking
+    // but mirrored uv - the classic way a projected decal reappears on the back of a model.
+    if (!(w > 1e-6f))
+        return false;
+    uv = Vec2f((m[0] * x + m[1] * y + m[2] * z + m[3]) / w, (m[4] * x + m[5] * y + m[6] * z + m[7]) / w);
+    return true;
+}
+
 float sample_layer_height(const DecodedHeightTexture &texture, const TextureDisplacementLayer &layer,
                           const Vec3f &position, const Vec3f &normal,
                           const Vec3f &patch_center, const Vec3f &patch_axis, const Vec2f *lscm_uv)
@@ -957,6 +970,16 @@ float sample_layer_height(const DecodedHeightTexture &texture, const TextureDisp
     case TextureProjectionMethod::Spherical:
         return sample_at(project_spherical(position, patch_center));
     case TextureProjectionMethod::ViewProjected:
+        if (layer.view_project_projective) {
+            // Exact projective placement written by the projection-frame overlay. Sampled directly,
+            // *without* apply_uv_transform(): the matrix already maps the window's border to the uv
+            // unit square, so the tiling/rotation/offset controls would displace it off the frame
+            // the user just aligned. A point behind the projector has no uv at all -> no height.
+            Vec2f uv;
+            if (!project_uv_projective(layer.view_project_matrix, position, uv))
+                return 0.f;
+            return texture.sample(uv, layer.tile_enabled, layer.tile_method);
+        }
         // Flat projection onto the captured projector plane. Single-valued per point, so unlike
         // blended triplanar it is one sample, and it is what "project from view" places.
         return sample_at(Vec2f(position.dot(layer.view_project_right), position.dot(layer.view_project_up)));
@@ -1163,9 +1186,15 @@ indexed_triangle_set build_texture_displacement(const indexed_triangle_set      
         int   patch_vertex_count = 0;
         for (const stl_triangle_vertex_indices &tri : patch.indices)
             for (int i = 0; i < 3; ++i) {
-                average_normal += vertex_normals[tri[i]];
-                patch_centroid += patch.vertices[tri[i]];
+                const int vi = tri[i];
+                patch_centroid += patch.vertices[size_t(vi)];
                 ++patch_vertex_count;
+                // A brush stroke that split a triangle appends new vertices past the base mesh's own
+                // (see the get_facets_strict() note above); vertex_normals is sized to the base mesh,
+                // so those split indices must be skipped here or this reads out of bounds. The main
+                // displacement loop below guards the same way.
+                if (vi < int(vertex_normals.size()))
+                    average_normal += vertex_normals[size_t(vi)];
             }
         average_normal = (average_normal.norm() > 1e-8f) ? Vec3f(average_normal.normalized()) : Vec3f::UnitZ();
         patch_centroid = (patch_vertex_count > 0) ? Vec3f(patch_centroid / float(patch_vertex_count)) : Vec3f::Zero();
