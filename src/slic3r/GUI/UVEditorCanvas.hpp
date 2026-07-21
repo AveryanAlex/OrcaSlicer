@@ -23,26 +23,26 @@
 
 namespace Slic3r::GUI {
 
-// Standalone 2D viewer/editor for a flattened (UV-unwrapped) mesh patch -- shows the result of
+// Standalone 2D viewer/editor for a flattened (UV-unwrapped) mesh patch - shows the result of
 // GLGizmoTextureDisplacement's LSCM projection method as its own resizable pane (see Plater's
 // "uv_editor" AUI pane) rather than folding 2D UV-space rendering into the main 3D viewport.
 //
 // Islands can be laid out by hand, roughly the way Blender's UV editor works: click one to select
 // it, drag to move it, right-drag or press R to rotate it, S to scale it, both about its own centre.
-// Islands are free to overlap -- nothing re-packs them behind the user's back. The texture underneath
+// Islands are free to overlap - nothing re-packs them behind the user's back. The texture underneath
 // is always drawn upright and axis-aligned, and it is the islands that move over it, which is what
 // makes "rotate this island" a meaningful gesture rather than just spinning the whole texture.
 //
 // **Geometry is uploaded in the unwrap's own (raw, mm) coordinates, once**, and each island is drawn
 // through its own affine matrix passed as a shader uniform. That matters: a patch can easily run to
-// a million triangles, and the earlier design -- which pre-transformed every UV on the CPU and
-// re-uploaded the whole wireframe on every mouse-move event -- made a drag cost a couple of hundred
+// a million triangles, and the earlier design - which pre-transformed every UV on the CPU and
+// re-uploaded the whole wireframe on every mouse-move event - made a drag cost a couple of hundred
 // milliseconds per frame. Moving an island now touches a 2x3 matrix and nothing else.
 //
 // Uses the app's single shared wxGLContext (via wxGetApp().init_glcontext(), the same call
 // View3D/Preview/AssembleView each make in GUI_Preview.cpp) rather than an independent context of
 // its own, specifically so it can reuse the app's already-registered "flat"/"flat_texture"
-// shaders and GLModel as-is -- GLModel::render() looks up its shader via a GUI_App-wide "current
+// shaders and GLModel as-is - GLModel::render() looks up its shader via a GUI_App-wide "current
 // shader", which only means anything for canvases sharing the app's one real GL context.
 class UVEditorCanvas : public wxGLCanvas
 {
@@ -54,7 +54,7 @@ public:
     // y basis, translation).
     using IslandTransform = Eigen::Matrix<float, 2, 3>;
 
-    // The unwrap to display, in the unwrap's own mm coordinates -- *not* texture UVs. Changing this
+    // The unwrap to display, in the unwrap's own mm coordinates - *not* texture UVs. Changing this
     // is the expensive path (it rebuilds every vertex buffer), so it must only be called when the
     // unwrap itself changes, never merely because an island moved. Pass an empty `indices` to show
     // nothing.
@@ -71,13 +71,13 @@ public:
     // The cheap path: one transform per island. Safe to call on every mouse-move of a drag.
     void set_island_transforms(std::vector<IslandTransform> transforms);
 
-    // One fill colour per island, overriding the default light-green wash -- used to paint the UV
+    // One fill colour per island, overriding the default light-green wash - used to paint the UV
     // distortion heatmap over the islands when the gizmo's "Distortion" check mode is on (#7/#14).
     // Pass empty to go back to the default wash. Cheap: it never touches a vertex buffer.
     void set_island_fill_colors(std::vector<ColorRGBA> colors);
 
     // The layer's own tiling scale and rotation. Needed to map a gesture, which happens in texture-UV
-    // space, back into the unwrap's mm space -- which is where a TextureIsland's offset actually
+    // space, back into the unwrap's mm space - which is where a TextureIsland's offset actually
     // lives (see apply_uv_transform()). The tile settings come along because the background has to
     // repeat exactly the way the height sampler does, or the pane would stop showing what gets baked.
     void set_uv_transform(float tiling_scale, float rotation_deg, bool tile_enabled, bool tile_mirrored);
@@ -94,7 +94,7 @@ public:
 
     // High-level actions the pane toolbar triggers. The canvas handles the view-only ones (framing,
     // the snap toggle) itself and forwards the rest to whoever owns the island data (the gizmo), via
-    // the command callback -- the canvas has the selection and the view, the gizmo has the layer.
+    // the command callback - the canvas has the selection and the view, the gizmo has the layer.
     enum class Command { FrameAll, ToggleSnap, AverageScale, CutSelectedIsland, ProjectFromView, JoinSelected, UnjoinSelected };
     void run_command(Command cmd);
     using CommandFn = std::function<void(Command)>;
@@ -106,7 +106,7 @@ public:
     void set_status_callback(StatusFn fn) { m_on_status = std::move(fn); }
 
     // Reports an island edit as it happens. The deltas are *incremental* (one mouse event's worth)
-    // and already converted into the units a TextureIsland stores -- unwrap mm, degrees, and a scale
+    // and already converted into the units a TextureIsland stores - unwrap mm, degrees, and a scale
     // *factor* to multiply the island's existing scale by. They are incremental on purpose: the owner
     // applies them and hands back fresh transforms, and if the gesture tracked geometry rather than
     // raw mouse motion that round trip would feed back into itself. `finished` marks the end of a
@@ -116,7 +116,7 @@ public:
     void set_island_edit_callback(IslandEditFn fn) { m_on_island_edit = std::move(fn); }
 
     // What a click grabs: a whole island (move/rotate/scale, groups move together), a single vertex, or
-    // a single edge (both its endpoints). Vertex/Edge are free-form UV editing -- they move the actual
+    // a single edge (both its endpoints). Vertex/Edge are free-form UV editing - they move the actual
     // unwrap coordinates, which the owner then folds into the layer's per-vertex UV overrides so the
     // change is baked, not just shown (see set_vertex_edit_callback).
     enum class SelectMode { Island, Vertex, Edge };
@@ -177,7 +177,7 @@ private:
     void  move_vertex_raw(int unwrapped_vertex, const Vec2f &delta_uv);
     Vec2f island_centroid(int island) const;
     // Converts a delta in texture-UV space into the unwrap's mm space, undoing the layer's scale and
-    // rotation -- the inverse of what apply_uv_transform() did on the way in.
+    // rotation - the inverse of what apply_uv_transform() did on the way in.
     Vec2f uv_delta_to_unwrap(const Vec2f &delta_uv) const;
     // The correction that would bring the selected island's nearest boundary vertex onto a boundary
     // vertex of some *other* island, in texture-UV space. Zero if nothing is within reach (#2).
@@ -192,7 +192,7 @@ private:
     std::vector<IslandTransform> m_transforms;
     // Per-island fill colour override (distortion heatmap); empty means use the default wash (#7).
     std::vector<ColorRGBA>       m_island_fill_colors;
-    // Boundary vertices per island, for snapping -- a patch's boundary is a tiny fraction of it, and
+    // Boundary vertices per island, for snapping - a patch's boundary is a tiny fraction of it, and
     // rescanning the whole uv array on every snap test would not be.
     std::vector<std::vector<int>> m_island_boundary_verts;
 
@@ -203,7 +203,7 @@ private:
     std::vector<GLModel> m_island_boundary;  // outline
     std::vector<GLModel> m_island_fill;      // filled, for the selected island's wash
 
-    GLModel m_tile_outline_glmodel; // the texture's first tile, [0,1]^2 -- the "you are here"
+    GLModel m_tile_outline_glmodel; // the texture's first tile, [0,1]^2 - the "you are here"
     GLModel m_grid_glmodel;
     float   m_grid_step = 0.f; // the UV step m_grid_glmodel was built for; 0 = not built
 
@@ -290,7 +290,7 @@ private:
     float   m_gesture_last_dist  = 0.f;
     // Rotation is tracked as two running totals over the gesture: the raw mouse rotation, and how much
     // has actually been applied. With Shift held the applied total is quantised to 15-degree steps
-    // (Blender-style angle snapping), so the two diverge -- and driving the applied total off the raw
+    // (Blender-style angle snapping), so the two diverge - and driving the applied total off the raw
     // one, rather than snapping each incremental delta, is what makes the snap stable instead of
     // juddering. The raw/applied split also survives crossing +/-180 degrees, which a single wrapped
     // angle would not. m_rot_applied doubles as the modal-rotate undo amount for Esc.

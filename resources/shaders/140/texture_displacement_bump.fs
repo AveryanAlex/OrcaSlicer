@@ -62,7 +62,7 @@ uniform bool       use_vertex_uv; // true: sample at vertex_uv with a derived ta
 // A 2x3 affine (columns packed as lin = (m00, m01, m10, m11), tr = (m02, m12)) applied to the uv of
 // the island currently being dragged in the UV editor (active > 0.5). Identity when nothing is
 // dragged, so this whole path is a no-op then. Lets a UV island drag move the bump on the model with
-// only a uniform update -- no mesh rebuild -- exactly the way Adjust placement moves the whole texture.
+// only a uniform update 
 uniform vec4       island_delta_lin;
 uniform vec2       island_delta_tr;
 
@@ -76,7 +76,7 @@ in vec2  vertex_uv;
 out vec4 out_color;
 
 // The two model-space axes the triplanar planar coordinate is read off, per dominant normal
-// component -- same choice libslic3r's project_planar() makes, so planar.x runs along t, planar.y
+// component - same choice libslic3r's project_planar() makes, so planar.x runs along t, planar.y
 // along b.
 void projection_axes(vec3 n, out vec3 t, out vec3 b)
 {
@@ -113,10 +113,10 @@ void main()
         triangle_normal = -triangle_normal;
 
     if (use_vertex_uv) {
-        // Precomputed-uv (LSCM) path -- Mikkelsen's surface-gradient bump ("Bump Mapping
+        // Precomputed-uv (LSCM) path - Mikkelsen's surface-gradient bump ("Bump Mapping
         // Unparametrized Surfaces on the GPU"). The perturbed normal is derived straight from the
         // screen-space derivatives of the *sampled height* and the position, so it is scale-exact
-        // with no uv->mm assumption at all -- which is the whole point here: an LSCM map is conformal,
+        // with no uv->mm assumption at all - which is the whole point here: an LSCM map is conformal,
         // not isometric, so the local mm-per-uv varies across the chart and the earlier "one global
         // 1/tiling factor" got the depth visibly wrong. dFdx(h) captures the true on-screen rate of
         // change however the chart is stretched or however fine the tiling is.

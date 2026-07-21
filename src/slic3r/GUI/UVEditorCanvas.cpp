@@ -851,7 +851,7 @@ void UVEditorCanvas::on_mouse(wxMouseEvent &evt)
             m_gesture_last_angle = angle;
 
             // With Shift, quantise to *global* 15-degree marks (0/15/30...), i.e. snap the island's
-            // absolute on-screen orientation, not 15 degrees relative to wherever it started (#10) --
+            // absolute on-screen orientation, not 15 degrees relative to wherever it started (#10) -
             // snapping the target rather than each delta is what keeps it from juddering on a step.
             constexpr float STEP       = 15.f;
             const float     absolute   = m_rot_base_deg + m_rot_raw_deg;
@@ -1333,7 +1333,7 @@ void UVEditorCanvas::render()
     }
 
     // Add/remove hint next to the cursor in Vertex/Edge mode: a green '+' when a click will add to the
-    // selection (plain or Shift), a red '-' when Ctrl is held and a click will remove one -- the UV-side
+    // selection (plain or Shift), a red '-' when Ctrl is held and a click will remove one - the UV-side
     // twin of the 3D paint cursor's own sign. Rebuilt each frame at the pointer, sized in pixels.
     if (m_select_mode != SelectMode::Island && m_cursor_inside) {
         const float uv_per_px = 2.f * m_zoom / float(std::max(1, std::min(size.GetWidth(), size.GetHeight())));
@@ -1375,9 +1375,9 @@ void UVEditorCanvas::render()
     update_status();
 }
 
-// ----------------------------------------------------------------------------------------------
+// -----------------------------------------------
 // UVEditorPanel
-// ----------------------------------------------------------------------------------------------
+// -----------------------------------------------
 
 namespace {
 enum : int {
@@ -1394,8 +1394,8 @@ enum : int {
 UVEditorPanel::UVEditorPanel(wxWindow *parent) : wxPanel(parent, wxID_ANY)
 {
     // Icon + label buttons: each has its own dedicated SVG (see the map below), with the label kept
-    // alongside it. A missing SVG simply leaves the button showing only its label -- never bitmap-less
-    // garbage -- so the bar stays usable before the art lands.
+    // alongside it. A missing SVG simply leaves the button showing only its label - never bitmap-less
+    // garbage - so the bar stays usable before the art lands.
     auto *bar = new wxBoxSizer(wxHORIZONTAL);
     const auto set_icon = [this](wxAnyButton *b, const std::string &iconname) {
         const wxBitmap bmp = create_scaled_bitmap(iconname, this, 16);

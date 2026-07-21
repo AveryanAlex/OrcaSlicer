@@ -38,7 +38,7 @@ float DecodedHeightTexture::sample(const Vec2f &uv, bool tile_enabled, TextureTi
 
     if (!tile_enabled && (uv.x() < 0.f || uv.x() >= 1.f || uv.y() < 0.f || uv.y() >= 1.f))
         // Outside the single, non-repeating placement entirely: no texture there, not "smeared
-        // edge pixel" -- clamping the *coordinate* to [0, 1] would otherwise keep returning the
+        // edge pixel" - clamping the *coordinate* to [0, 1] would otherwise keep returning the
         // border row/column's height forever in every direction, stretching it out to infinity.
         return 0.f;
 
@@ -136,7 +136,7 @@ DecodedHeightTexture decode_height_texture(const TextureDisplacementLayer &layer
     if (layer.empty())
         return result;
 
-    // The raw (unsmoothed) decode is what gets cached, keyed by the image_data allocation -- decoding
+    // The raw (unsmoothed) decode is what gets cached, keyed by the image_data allocation - decoding
     // a PNG is the expensive part and never changes for a given image. Smoothing is applied afterwards
     // to a throwaway copy, so moving the smoothing slider never invalidates the decode cache.
     const void *key = layer.image_data.get();
@@ -192,7 +192,7 @@ Vec2f project_planar(const Vec3f &position, const Vec3f &normal)
     // tri-planar/cube projection; a patch spanning several differently-oriented faces gets each
     // face projected along its own best-fit axis instead of all faces sharing one axis picked
     // from a single averaged normal (which looks correct on one face but visibly distorts on any
-    // other face in the same patch -- exactly the bug an earlier version of this feature had).
+    // other face in the same patch - exactly the bug an earlier version of this feature had).
     const Vec3f n = normal.cwiseAbs();
     if (n.x() >= n.y() && n.x() >= n.z())
         return Vec2f(position.y(), position.z());
@@ -203,7 +203,7 @@ Vec2f project_planar(const Vec3f &position, const Vec3f &normal)
 
 namespace {
 // Wrapped around patch_axis, centered at patch_center. u is the arc length (mm) around the axis at
-// this point's own radius, v is the signed distance along the axis -- a reasonable approximation
+// this point's own radius, v is the signed distance along the axis - a reasonable approximation
 // for roughly cylindrical selections, not an exact fit for arbitrary geometry.
 Vec2f project_cylindrical(const Vec3f &position, const Vec3f &patch_center, const Vec3f &patch_axis)
 {
@@ -225,7 +225,7 @@ Vec2f project_cylindrical(const Vec3f &position, const Vec3f &patch_center, cons
 
 // Longitude/latitude around patch_center. u/v are scaled by this point's own distance from the
 // center so the result is in roughly the same mm-ish units tiling_scale expects, rather than bare
-// radians -- again an approximation, not an exact geodesic parametrization.
+// radians - again an approximation, not an exact geodesic parametrization.
 Vec2f project_spherical(const Vec3f &position, const Vec3f &patch_center)
 {
     const Vec3f rel    = position - patch_center;
@@ -239,7 +239,7 @@ Vec2f project_spherical(const Vec3f &position, const Vec3f &patch_center)
     return Vec2f(longitude, latitude) * radius;
 }
 
-// CGAL's LSCM parameterizer expects a clean mesh with no isolated (unreferenced) vertices -- but
+// CGAL's LSCM parameterizer expects a clean mesh with no isolated (unreferenced) vertices - but
 // `patch` here (from TriangleSelector::get_facets_strict()) carries the *entire* mesh's vertex
 // array, only its `indices` filtered to the painted triangles. Build a compacted copy referencing
 // only the vertices `patch.indices` actually uses, plus a map back to the original vertex index so
@@ -328,8 +328,8 @@ std::vector<int> segment_into_charts(const indexed_triangle_set &mesh, const std
         }
     }
 
-    // The chart-join test compares a *neighbourhood-averaged* normal per face -- the face plus its
-    // edge-adjacent neighbours (~5 samples) -- rather than the single face normal. On a finely
+    // The chart-join test compares a *neighbourhood-averaged* normal per face - the face plus its
+    // edge-adjacent neighbours (~5 samples) - rather than the single face normal. On a finely
     // tessellated curved surface this stops one noisy triangle from spuriously cutting (or a lone
     // near-flat sliver from wrongly merging) a chart, while a genuine sharp crease, where the whole
     // neighbourhood on each side agrees, still cuts. This is the "use 5 points, not one" refinement.
@@ -352,7 +352,7 @@ std::vector<int> segment_into_charts(const indexed_triangle_set &mesh, const std
     for (const auto &[key, fp] : edge_faces) {
         if (fp.second < 0)
             continue; // a boundary edge of the patch, nothing on the far side to join
-        // A manually/auto marked seam always cuts, whatever the dihedral angle -- that is exactly
+        // A manually/auto marked seam always cuts, whatever the dihedral angle - that is exactly
         // what lets "mark seam" / "cut island" split a chart that is otherwise flat enough to merge.
         if (!seam_keys.empty() && seam_keys.count(key))
             continue;
@@ -373,7 +373,7 @@ std::vector<int> segment_into_charts(const indexed_triangle_set &mesh, const std
 }
 
 // Projects a chart onto an orthonormal basis of its own average normal. This is *isometric* for a
-// flat chart -- lengths and angles come out exactly right -- which is why a flat chart never needs a
+// flat chart - lengths and angles come out exactly right - which is why a flat chart never needs a
 // solve at all, and why this also serves as the fallback for a chart LSCM cannot handle.
 std::vector<Vec2f> project_to_tangent_plane(const indexed_triangle_set &chart, const Vec3f &normal)
 {
@@ -407,7 +407,7 @@ float area_2d(const std::vector<Vec2f> &uvs, const std::vector<stl_triangle_vert
 }
 
 // FNV-1a over the patch's geometry plus the seam angle. The unwrap depends on nothing else about a
-// layer -- not depth, tiling, rotation, offset or even which texture is on it -- so keying the cache
+// layer - not depth, tiling, rotation, offset or even which texture is on it - so keying the cache
 // on just this is what lets every one of those sliders be dragged without paying for a re-solve.
 uint64_t unwrap_cache_key(const indexed_triangle_set &patch, float seam_angle_deg, float padding_mm,
                           const std::vector<std::pair<int, int>> &seam_edges)
@@ -532,7 +532,7 @@ PatchUnwrap compute_patch_unwrap(const indexed_triangle_set &patch, float seam_a
         const Vec3f chart_normal = (normal_sum.norm() > 1e-12f) ? Vec3f(normal_sum.normalized()) : Vec3f::UnitZ();
 
         // Is the chart flat? Charts are grown by a *pairwise* angle threshold, so a chart can still
-        // curve gradually across many triangles -- being merged is not the same as being planar. But
+        // curve gradually across many triangles - being merged is not the same as being planar. But
         // when it is planar (a cube face, and after seam-cutting that is the common case), the
         // tangent-plane projection is already the exact answer, and skipping the solve is the single
         // biggest speed-up here.
@@ -541,14 +541,14 @@ PatchUnwrap compute_patch_unwrap(const indexed_triangle_set &patch, float seam_a
             if (chart_of[f] == c)
                 planar = normals[f].dot(chart_normal) >= 0.9998f; // ~1 degree
 
-        // Measured before chart_mesh.indices is moved out from under it, below -- area_3d() iterates
+        // Measured before chart_mesh.indices is moved out from under it, below - area_3d() iterates
         // those indices, so taking it afterwards silently measures an empty mesh and returns 0.
         const float mesh_area_3d = area_3d(chart_mesh);
 
         std::optional<std::vector<Vec2f>> uvs;
         if (!planar)
             uvs = MeshBoolean::cgal::parameterize_lscm(chart_mesh);
-        // Flat chart, or one LSCM refused (not a topological disk -- closed, or holed).
+        // Flat chart, or one LSCM refused (not a topological disk - closed, or holed).
         chart.uvs = uvs ? std::move(*uvs) : project_to_tangent_plane(chart_mesh, chart_normal);
         chart.indices = std::move(chart_mesh.indices);
 
@@ -871,7 +871,7 @@ std::vector<Vec2f> compute_lscm_uvs(const indexed_triangle_set &patch, const Tex
         return {};
 
     // Manual per-vertex UV edits (UV editor Vertex/Edge modes) override the automatic raw unwrap
-    // coordinate for a mesh vertex, before the island transform -- so the edit rides along with any
+    // coordinate for a mesh vertex, before the island transform - so the edit rides along with any
     // island move/rotate exactly like the rest of the island. See TextureDisplacementLayer::
     // lscm_uv_overrides. Small (hand edits), so a plain map is ample.
     std::map<int, Vec2f> overrides;
@@ -880,7 +880,7 @@ std::vector<Vec2f> compute_lscm_uvs(const indexed_triangle_set &patch, const Tex
 
     // One UV per patch vertex: a seam vertex has several (one per chart it touches) and has to
     // settle on one, since it can only be displaced to a single position. See compute_lscm_uvs()'s
-    // header comment -- the surface stays watertight regardless.
+    // header comment - the surface stays watertight regardless.
     std::vector<Vec2f> per_vertex(patch.vertices.size(), Vec2f::Zero());
     std::vector<bool>  assigned(patch.vertices.size(), false);
     for (size_t i = 0; i < unwrap.uvs.size(); ++i) {
@@ -918,12 +918,12 @@ float blend_displacement(float accumulated, float value, TextureBlendMode mode)
     // (see TextureBlendMode): a 1 mm-deep layer sampling a white texel is then exactly neutral.
     case TextureBlendMode::Multiply: return accumulated * value;
     case TextureBlendMode::Divide: {
-        // Every height map has black regions, and a black texel samples to *exactly* zero -- so this
+        // Every height map has black regions, and a black texel samples to *exactly* zero - so this
         // divisor really does hit zero in ordinary use, not just in some contrived edge case. Floor
         // its magnitude: an unbounded 1/0 would not merely look wrong, it would fling vertices
         // thousands of mm away and poison the mesh's bounding box (and with it every plate/print
         // volume check downstream). The floor doubles as a cap on how far Divide can ever amplify
-        // the relief beneath it -- at most 1/0.05 = 20x.
+        // the relief beneath it - at most 1/0.05 = 20x.
         constexpr float min_divisor = 0.05f;
         const float     divisor     = (std::abs(value) < min_divisor) ? std::copysign(min_divisor, value < 0.f ? -1.f : 1.f) :
                                                                         value;
@@ -983,7 +983,7 @@ float sample_layer_height(const DecodedHeightTexture &texture, const TextureDisp
         // Flat projection onto the captured projector plane. Single-valued per point, so unlike
         // blended triplanar it is one sample, and it is what "project from view" places.
         return sample_at(Vec2f(position.dot(layer.view_project_right), position.dot(layer.view_project_up)));
-    case TextureProjectionMethod::LSCM: // no usable unwrap for this patch -- fall back to Triplanar
+    case TextureProjectionMethod::LSCM: // no usable unwrap for this patch - fall back to Triplanar
     case TextureProjectionMethod::Triplanar:
     default: break;
     }
@@ -1048,7 +1048,7 @@ bool compute_layer_paint_anchor(const indexed_triangle_set                    &b
 }
 
 // Area-weighted vertex normals of the undisplaced mesh. build_texture_displacement() computes
-// these once, up front, and every layer both projects and displaces along them -- so a vertex
+// these once, up front, and every layer both projects and displaces along them - so a vertex
 // covered by several layers is pushed along one single, well-defined direction rather than along
 // whatever direction the surface happened to be pointing partway through the stack.
 static std::vector<Vec3f> texture_displacement_vertex_normals(const indexed_triangle_set &its)
@@ -1122,7 +1122,7 @@ indexed_triangle_set build_texture_displacement(const indexed_triangle_set      
     indexed_triangle_set mesh = base_mesh;
     // TriangleSelector's vertex array starts with the mesh's own vertices (any extra ones, created
     // where a brush stroke split a triangle, are appended after them), and get_facets_strict()
-    // emits exactly the *referenced* ones, in order. So selector vertex index i is our vertex i --
+    // emits exactly the *referenced* ones, in order. So selector vertex index i is our vertex i -
     // but only if every vertex of `mesh` is referenced by some triangle, which is precisely what
     // this call establishes. It is a no-op (indices untouched) for any mesh that already is, which
     // in practice is all of them; it exists so an input carrying stray unreferenced vertices can't
@@ -1140,7 +1140,7 @@ indexed_triangle_set build_texture_displacement(const indexed_triangle_set      
     std::sort(ordered_layers.begin(), ordered_layers.end(),
                [](const TextureDisplacementLayer *a, const TextureDisplacementLayer *b) { return a->slot < b->slot; });
 
-    // Every layer measures its displacement against the *original* surface -- normals included --
+    // Every layer measures its displacement against the *original* surface - normals included -
     // rather than against whatever the previous layer left behind. That is what lets all the layers
     // be evaluated independently and merged per vertex, instead of having to re-mesh and remap the
     // paint masks between them (see the header for why that earlier design was dropped).
@@ -1167,7 +1167,7 @@ indexed_triangle_set build_texture_displacement(const indexed_triangle_set      
         if (patch.indices.empty())
             continue;
         // get_facets_strict() returns the same vertex array whichever state is asked for (only the
-        // triangles are filtered), so `patch` and `rest` share one indexing -- and, per the
+        // triangles are filtered), so `patch` and `rest` share one indexing - and, per the
         // compactify above, it is our own.
         const indexed_triangle_set rest = selector.get_facets_strict(EnforcerBlockerType::NONE);
 
@@ -1208,7 +1208,7 @@ indexed_triangle_set build_texture_displacement(const indexed_triangle_set      
         else if (an.y() <= an.x() && an.y() <= an.z())
             patch_axis = Vec3f::UnitY();
 
-        // A real unwrap of the whole patch, computed once here rather than per vertex -- it is a
+        // A real unwrap of the whole patch, computed once here rather than per vertex - it is a
         // per-chart solve over the whole patch, not a per-point formula. Cached, so repeating this
         // for every slider tweak costs a hash rather than a re-solve (see compute_patch_unwrap()).
         const std::vector<Vec2f> lscm_uvs = (layer->projection_method == TextureProjectionMethod::LSCM) ?
@@ -1255,14 +1255,14 @@ indexed_triangle_set build_texture_displacement(const indexed_triangle_set      
                                                             patch_centroid, patch_axis, lscm_uv);
 
                 // midlevel is the height that means "stay put", so anything below it displaces
-                // *inwards* -- see TextureDisplacementLayer::midlevel. At the default of 0 this is
+                // *inwards* - see TextureDisplacementLayer::midlevel. At the default of 0 this is
                 // exactly the old outward-only behaviour.
                 const float edge_w        = edge_weight.empty() ? 1.f : edge_weight[size_t(vi)];
                 const float signed_height = (h - layer->midlevel) * layer->depth_mm * sign * edge_w;
                 displacement[size_t(vi)] = blend_displacement(displacement[size_t(vi)], signed_height,
                                                                displaced[size_t(vi)] ? layer->blend_mode : TextureBlendMode::Add);
                 // The first layer to reach a vertex has nothing underneath it to blend with, so it
-                // always starts the total off additively -- a Multiply/Divide against an implicit
+                // always starts the total off additively - a Multiply/Divide against an implicit
                 // zero base would otherwise annihilate (or blow up) it, which is never what the
                 // user means by putting a mask on the bottom of the stack.
                 displaced[size_t(vi)] = true;

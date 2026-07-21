@@ -2,9 +2,9 @@
 
 // Vertex stage for the UV-check overlay (checker / distortion heatmap) drawn over the painted patch
 // by GLGizmoTextureDisplacement. Reuses GLModel's P3N3T2 layout so it needs no bespoke buffer:
-//   v_normal.x  -- per-vertex UV distortion (uv-area / surface-area ratio, remapped so 0.5 = ideal);
+//   v_normal.x  - per-vertex UV distortion (uv-area / surface-area ratio, remapped so 0.5 = ideal);
 //                  only the distortion mode reads it.
-//   v_tex_coord -- precomputed texture uv, valid only when use_vertex_uv is set (LSCM); the checker
+//   v_tex_coord - precomputed texture uv, valid only when use_vertex_uv is set (LSCM); the checker
 //                  mode reconstructs uv in the fragment shader otherwise.
 
 uniform mat4 view_model_matrix;

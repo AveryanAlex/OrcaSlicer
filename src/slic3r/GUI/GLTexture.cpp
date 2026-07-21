@@ -201,7 +201,7 @@ bool GLTexture::load_from_raw_data(std::vector<unsigned char> data, unsigned int
         // codebase has historically considered unreliable on some graphics cards.
         //
         // Each level is a 2x2 box filter of the level above it. Note this used to re-upload the
-        // *level-0* buffer at every level instead, which does not downscale anything -- it just
+        // *level-0* buffer at every level instead, which does not downscale anything - it just
         // reinterprets the image's first lod_w * lod_h texels as the whole smaller level, i.e. every
         // level below 0 held a crop of the top-left corner. It went unnoticed for as long as every
         // caller drew these textures at roughly their native size (where only level 0 is ever
@@ -660,8 +660,8 @@ bool GLTexture::generate_texture_from_text(const std::string& text_str, wxFont& 
 
     found = false;
     src -= 3;
-    for (int h = m_height; h > 0; --h) {
-        for (int w = m_width; w > 0; --w) {
+    for (int h = m_height; h > 0; -h) {
+        for (int w = m_width; w > 0; -w) {
             if ((*src) != background.Red() && !found) {
                 found = true;
                 if (h < font.GetPointSize())
@@ -742,7 +742,7 @@ void GLTexture::render_sub_texture(unsigned int tex_id, float left, float right,
 static bool to_squared_power_of_two(const std::string& filename, int max_size_px, int& w, int& h)
 {
     auto is_power_of_two = [](int v) { return v != 0 && (v & (v - 1)) == 0; };
-    auto upper_power_of_two = [](int v) { v--; v |= v >> 1; v |= v >> 2; v |= v >> 4; v |= v >> 8; v |= v >> 16; v++; return v; };
+    auto upper_power_of_two = [](int v) { v-; v |= v >> 1; v |= v >> 2; v |= v >> 4; v |= v >> 8; v |= v >> 16; v++; return v; };
 
     int new_w = std::max(w, h);
     if (!is_power_of_two(new_w))

@@ -2,11 +2,11 @@
 
 // UV-check overlay for the texture-displacement gizmo, drawn over the painted patch so the LSCM
 // unwrap can be sanity-checked on the real 3D surface (mode set by the `mode` uniform):
-//   mode 0 -- Checker: a procedural checkerboard sampled at the layer's uv. Even squares that stay
+//   mode 0 - Checker: a procedural checkerboard sampled at the layer's uv. Even squares that stay
 //             square everywhere on the model mean the unwrap is low-distortion; squares that smear or
 //             shear reveal exactly where it stretches. Same uv the bake samples, so what you see is
 //             where the texture actually lands.
-//   mode 1 -- Distortion heatmap: the per-vertex area-distortion carried in `distortion`, blue
+//   mode 1 - Distortion heatmap: the per-vertex area-distortion carried in `distortion`, blue
 //             (compressed) -> green (ideal) -> red (stretched).
 // Both are lit with the same cheap two-light diffuse the bump preview uses, so the surface still
 // reads as 3D.

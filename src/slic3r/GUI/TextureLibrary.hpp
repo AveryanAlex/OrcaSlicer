@@ -40,8 +40,8 @@ std::optional<TextureLibraryEntry> import_texture_to_library(const std::string &
 
 // Encoded bytes of `path`, ready to hand to TextureDisplacementLayer::image_data. Files already in
 // the supported 8-bit grayscale PNG form (everything in the two library folders, by construction)
-// are passed through verbatim; anything else -- e.g. a colour PNG the user copied into the folder
-// by hand -- is converted on the fly, so a valid image never silently produces a blank layer.
+// are passed through verbatim; anything else - e.g. a colour PNG the user copied into the folder
+// by hand - is converted on the fly, so a valid image never silently produces a blank layer.
 // Returns nullptr with `error` set if the file cannot be read or decoded at all.
 std::shared_ptr<std::vector<unsigned char>> load_texture_image_data(const std::string &path, std::string &error);
 

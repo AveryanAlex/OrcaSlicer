@@ -637,10 +637,10 @@ void GLGizmoTextureDisplacement::render_seam_overlay()
     glsafe(::glEnable(GL_POLYGON_OFFSET_LINE));
     glsafe(::glPolygonOffset(-2.0f, -2.0f)); // pull further forward than the wireframe so seams read on top
     // A seam edge is geometrically the same line as a wireframe edge, so a mere polygon offset is a
-    // fragile way to make the red seam beat the white wireframe -- drivers apply GL_POLYGON_OFFSET_LINE
+    // fragile way to make the red seam beat the white wireframe - drivers apply GL_POLYGON_OFFSET_LINE
     // inconsistently, and the two lines then z-fight and the wireframe wins. When the wireframe is on,
     // or while actively marking, just draw the seams with depth testing off so they are unconditionally
-    // on top -- being visible is the one thing this overlay has to guarantee.
+    // on top - being visible is the one thing this overlay has to guarantee.
     const bool seams_on_top = m_wireframe_overlay || m_seam_edit_mode;
     if (seams_on_top)
         glsafe(::glDisable(GL_DEPTH_TEST));
@@ -812,7 +812,7 @@ void GLGizmoTextureDisplacement::compute_bump_active_vertices(const std::vector<
     m_bump_active_vertex.assign(mv->mesh().its.vertices.size(), 0);
     // Flag the base vertices of every chart being moved. For a group/multi move that is more than one
     // chart, but since such a move is a pure translation the shader applies the same delta to them all
-    // (see on_island_edited) -- exactly the "joined islands move together" behaviour.
+    // (see on_island_edited) - exactly the "joined islands move together" behaviour.
     for (size_t i = 0; i < u.uvs.size(); ++i) {
         if (i >= u.vertex_chart.size() ||
             std::find(charts.begin(), charts.end(), u.vertex_chart[i]) == charts.end())
@@ -893,7 +893,7 @@ void GLGizmoTextureDisplacement::render_bump_preview_mesh()
 
     // Reuses the layer-list panel's already-decoded, already-uploaded GPU thumbnail (smoothing-aware),
     // whose grayscale value lives in the R channel exactly as the shader samples it. Its width/height
-    // are read straight off the texture -- decoding the PNG here every frame would re-run the smoothing
+    // are read straight off the texture - decoding the PNG here every frame would re-run the smoothing
     // blur on every camera move, which is what tanked the frame rate at high smoothing.
     GLTexture *tex = get_layer_thumbnail(*layer);
     if (tex == nullptr || tex->get_width() <= 0 || tex->get_height() <= 0)
@@ -1211,7 +1211,7 @@ void GLGizmoTextureDisplacement::update_uv_editor()
 
     // A vertex/edge edit committing (or an undo reverting one) changes the per-vertex UV overrides
     // without going through the Unwrap button. Detect that and force a re-solve, so the pane's geometry
-    // stays in step with what will bake -- the one exception to "only re-solve on Unwrap".
+    // stays in step with what will bake - the one exception to "only re-solve on Unwrap".
     {
         size_t sig = 1469598103934665603ull; // FNV-1a seed
         const auto mix = [&sig](uint64_t x) { sig = (sig ^ x) * 1099511628211ull; };
@@ -1236,7 +1236,7 @@ void GLGizmoTextureDisplacement::update_uv_editor()
     state.seam_edges = layer->lscm_seam_edges;
 
     // The re-solve happens only when the user pressed "Unwrap" (m_uv_unwrap_pending). Every other call
-    // into here -- a paint stroke ending, a slider release, the check mode changing -- must not pay for
+    // into here - a paint stroke ending, a slider release, the check mode changing - must not pay for
     // a fresh LSCM solve; it just re-applies the cheap affine transforms over whatever unwrap already
     // exists. If the paint changed underneath but the user hasn't asked to re-unwrap, the pane keeps
     // showing the last unwrap on purpose (that is the whole point of making it an explicit action).
@@ -1255,7 +1255,7 @@ void GLGizmoTextureDisplacement::update_uv_editor()
         m_uv_editor_unwrap = compute_patch_unwrap(patch, layer->lscm_seam_angle_deg, 0.f, layer->lscm_seam_edges);
         // Re-apply any stored per-vertex UV edits onto the fresh unwrap, so the pane shows exactly what
         // compute_lscm_uvs() will bake (which applies the same overrides). Keyed by mesh vertex, so every
-        // unwrapped copy of that vertex gets it -- matching the bake's single-UV-per-vertex settle.
+        // unwrapped copy of that vertex gets it - matching the bake's single-UV-per-vertex settle.
         if (!layer->lscm_uv_overrides.empty()) {
             std::map<int, Vec2f> ov;
             for (const auto &[mv2, uv] : layer->lscm_uv_overrides)
@@ -1316,7 +1316,7 @@ void GLGizmoTextureDisplacement::update_uv_editor()
 
     // Connected-net layout (on by default): a *fresh* unwrap is unfolded so adjacent charts sit
     // edge-to-edge (cube -> a net), rather than as separately packed squares. Only when the user pressed
-    // Unwrap (m_uv_apply_connected_net) -- a re-segmentation renumbers charts anyway, so any hand
+    // Unwrap (m_uv_apply_connected_net) - a re-segmentation renumbers charts anyway, so any hand
     // placement from before is already meaningless. A *refresh* re-solve (a committed vertex edit, or an
     // undo) must NOT relayout, or it would throw away every island placement on every vertex edit.
     if (unwrap_changed && m_uv_apply_connected_net && layer->auto_connect_islands) {
@@ -1459,7 +1459,7 @@ void GLGizmoTextureDisplacement::on_uv_command(int cmd)
             return;
         }
         // Join to whichever neighbouring island (one it shares an edge with) is currently placed
-        // nearest -- i.e. the one it was dragged up against.
+        // nearest - i.e. the one it was dragged up against.
         const Eigen::Matrix<float, 2, 3> sel_m = island_transform_matrix(chart, m_uv_editor_unwrap, layer->islands);
         const Vec2f sel_c = sel_m.block<2, 2>(0, 0) * m_uv_editor_unwrap.chart_centroid[size_t(chart)] + sel_m.col(2);
         int   best_parent = -1;
@@ -1770,7 +1770,7 @@ void GLGizmoTextureDisplacement::on_island_edited(int island, const Vec2f &offse
         // just the primary for a rotate/scale.
         m_island_move_set = is_move ? build_island_move_set(*layer, island) : std::vector<int>{ island };
         // Set up the GPU drag: flag the moved islands' vertices and bake the mesh once (via the dirty
-        // flag). From then on the drag is a uniform update, no rebuild -- see render_bump_preview_mesh().
+        // flag). From then on the drag is a uniform update, no rebuild - see render_bump_preview_mesh().
         m_bump_active_chart = island;
         compute_bump_active_vertices(m_island_move_set);
         m_bump_island_delta  = Eigen::Matrix<float, 2, 3>::Identity();
@@ -1791,7 +1791,7 @@ void GLGizmoTextureDisplacement::on_island_edited(int island, const Vec2f &offse
         if (c == island) {
             target.rotation_deg += rotation_delta;
             // Guarded: a scale that reaches zero is unrecoverable (every subsequent factor multiplies it)
-            // and would collapse the island to a point -- exactly the failure this feature hit once already.
+            // and would collapse the island to a point - exactly the failure this feature hit once already.
             target.scale = std::clamp(target.scale * scale_factor, 0.001f, 1000.f);
         }
     }
@@ -1811,7 +1811,7 @@ void GLGizmoTextureDisplacement::on_island_edited(int island, const Vec2f &offse
             // interactive on a patch with a million triangles.
             uv_canvas->set_island_transforms(xf);
         }
-        // Move the island on the model live through the shader's island_delta uniform -- no mesh
+        // Move the island on the model live through the shader's island_delta uniform - no mesh
         // rebuild. delta = F_current * F_baked^-1 in final-uv space (the bump mesh bakes F_baked; the
         // shader applies delta to the flagged island's uv). The one rebuild that bakes the flags is
         // scheduled at drag start above and consumed once per frame by render_painter_gizmo().
@@ -1893,7 +1893,7 @@ Vec3f GLGizmoTextureDisplacement::adjust_handle_center(const TextureDisplacement
 {
     // apply_uv_transform() maps a planar mm coordinate p to uv = R(p / tiling_scale) + offset, and
     // on_mouse_adjust_texture() drives offset by  offset = offset_start - R(delta / tiling_scale).
-    // Inverting that, the handle's displacement from the anchor is  - R^-1(offset) * tiling_scale --
+    // Inverting that, the handle's displacement from the anchor is  - R^-1(offset) * tiling_scale -
     // which, substituted into the drag equation, moves the handle by exactly `delta`. So the handle
     // follows the cursor precisely, and is back on the anchor exactly when offset is zero.
     const float rad = layer.rotation_deg * float(M_PI) / 180.f;
@@ -2887,7 +2887,7 @@ void GLGizmoTextureDisplacement::on_render_input_window(float x, float y, float 
     // them fit a narrow window, which it does by lowering the same toolbar_icon_scale() read here.
     const float icon_btn_sz = GLToolbar::Default_Icons_Size * wxGetApp().toolbar_icon_scale() * m_parent.get_scale();
     // The icon SVGs carry their own border, so the ImGui button's own frame border and idle fill are
-    // suppressed here (FrameBorderSize 0 + transparent ImGuiCol_Button) to avoid a doubled border -- the
+    // suppressed here (FrameBorderSize 0 + transparent ImGuiCol_Button) to avoid a doubled border - the
     // hover/active fill is left in place for feedback. Applied only around these gizmo icon buttons.
     const auto push_borderless_icon_style = []() {
         ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0.f);
@@ -2950,7 +2950,7 @@ void GLGizmoTextureDisplacement::on_render_input_window(float x, float y, float 
 
     // Selection mode: which of TriangleSelector's existing click/brush mechanisms drives painting.
     // "Face" and "Connected area" reuse the exact same underlying selection machinery every other
-    // paint gizmo already has (single-facet click, and angle-limited flood fill respectively) --
+    // paint gizmo already has (single-facet click, and angle-limited flood fill respectively) -
     // just exposed here as an alternative to brushing, one triangle/region at a time.
     m_imgui->text(_L("Selection mode"));
     const bool is_brush_mode = m_tool_type == ToolType::BRUSH && m_cursor_type != TriangleSelector::CursorType::POINTER;
@@ -3059,7 +3059,7 @@ void GLGizmoTextureDisplacement::on_render_input_window(float x, float y, float 
         // Add-layer affordance as an icon beside the heading. It is deliberately *not* right-aligned
         // against the window edge: this panel uses ImGuiWindowFlags_AlwaysAutoResize, and positioning
         // an item at GetWindowContentRegionMax().x - w feeds the window's own width back into its
-        // auto-fit, growing it by one item-spacing every frame -- which, with the panel docked and
+        // auto-fit, growing it by one item-spacing every frame - which, with the panel docked and
         // anchored by its right edge, walked it left off-screen on hover. A plain SameLine can't do that.
         const unsigned int add_icon = tool_icon_id();
         const float        sz       = m_imgui->scaled(1.3f);
@@ -3298,8 +3298,8 @@ void GLGizmoTextureDisplacement::on_render_input_window(float x, float y, float 
 
                     if (is_active) {
                         // Explicit unwrap (#: "Add unwrap button so it does not recompute on every
-                        // change"). The LSCM solve runs only when this is pressed -- painting, the seam
-                        // angle slider and seam marking no longer trigger it -- and the pane opens right
+                        // change"). The LSCM solve runs only when this is pressed - painting, the seam
+                        // angle slider and seam marking no longer trigger it - and the pane opens right
                         // afterwards. Re-press it to fold in any edits made since.
                         if (m_imgui->button(_u8L("Unwrap"))) {
                             m_uv_unwrap_pending      = true;
@@ -3309,7 +3309,7 @@ void GLGizmoTextureDisplacement::on_render_input_window(float x, float y, float 
                         }
                         if (ImGui::IsItemHovered())
                             m_imgui->tooltip(_u8L("Flatten the painted area into UV islands and open the UV editor. The "
-                                                  "unwrap is computed only when you press this, not on every edit -- so "
+                                                  "unwrap is computed only when you press this, not on every edit - so "
                                                   "paint, change the seam angle or mark seams first, then press Unwrap to "
                                                   "see the result. Islands can then be moved, rotated and scaled."),
                                               m_imgui->scaled(20.f));

@@ -24,7 +24,7 @@ struct TextureDisplacementBakeInput
 };
 
 // Bakes a volume's painted texture-displacement layers into real mesh geometry in the background,
-// then commits the result on the main thread -- mirrors EmbossJob's UpdateJob/update_volume()
+// then commits the result on the main thread - mirrors EmbossJob's UpdateJob/update_volume()
 // bake-and-commit pattern (see EmbossJob.cpp).
 class TextureDisplacementBakeJob : public Job
 {

@@ -157,7 +157,7 @@ std::optional<TextureLibraryEntry> import_texture_to_library(const std::string &
         return std::nullopt;
 
     // Never overwrite an existing texture (the user's or, if they picked the same name twice, their
-    // own earlier import) -- uniquify instead.
+    // own earlier import) - uniquify instead.
     const std::string       stem = boost::filesystem::path(source_path).stem().string();
     boost::filesystem::path dest = boost::filesystem::path(user_dir) / (stem + ".png");
     for (int i = 2; boost::filesystem::exists(dest); ++i)

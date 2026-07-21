@@ -1902,7 +1902,7 @@ void ImGuiWrapper::search_list(const ImVec2& size_, bool (*items_getter)(int, co
             scroll_up();
         else {
             if (hovered_id > 0)
-                --hovered_id;
+                -hovered_id;
             scroll_y(hovered_id);
         }
     });
@@ -2293,7 +2293,7 @@ std::string ImGuiWrapper::trunc(const std::string &text,
     } else {
         // decrease letter count
         while (count_letter > 1) {
-            --count_letter;
+            -count_letter;
             result_text = text_.substr(0, count_letter);
             text_width  = calc_text_size(result_text).x;
             if (text_width < allowed_width) break;            
@@ -2555,7 +2555,7 @@ void ImGuiWrapper::push_toolbar_style(const float scale)
         ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(238 / 255.0f, 238 / 255.0f, 238 / 255.0f, 0.00f));        // 11
         ImGui::PushStyleColor(ImGuiCol_TextSelectedBg, COL_GREEN_LIGHT);                                     // 12
         // The checkbox/radio frame behind this is drawn fully transparent (see FrameBg above,
-        // alpha 0), showing the light window background through it -- a white check mark there is
+        // alpha 0), showing the light window background through it - a white check mark there is
         // invisible. Dark mode doesn't have this problem (its window background is dark), so only
         // this branch needs a check mark color with real contrast against a light background.
         ImGui::PushStyleColor(ImGuiCol_CheckMark, ImVec4(0.f, 156 / 255.f, 136 / 255.f, 1.00f));//13

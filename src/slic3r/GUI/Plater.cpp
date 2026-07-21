@@ -695,7 +695,7 @@ void Sidebar::priv::flush_printer_sync(bool restart)
     }
     //btn_sync_printer->SetBackgroundColorNormal((*counter_sync_printer & 1) ? "#F8F8F8" :"#009688");
     m_printer_bbl_sync->SetBitmap_((*counter_sync_printer & 1) ? "printer_sync_not" : "printer_sync_ok");
-    if (--*counter_sync_printer <= 0)
+    if (-*counter_sync_printer <= 0)
         timer_sync_printer->Stop();
 }
 
@@ -1124,7 +1124,7 @@ ExtruderGroup::ExtruderGroup(wxWindow * parent, int index, wxString const &title
     btn_up->SetBackgroundColour(*wxWHITE);
     btn_up->Bind(wxEVT_COMMAND_BUTTON_CLICKED, [this, index](auto &evt) {
         if (page_cur > 0)
-            --page_cur;
+            -page_cur;
         update_ams();
     });
     btn_up->Hide();
@@ -1189,7 +1189,7 @@ void ExtruderGroup::update_ams()
         ams[index]->Refresh();
         ams[index]->Open();
     }
-    for (size_t i = i1; i < ams_n1 && left > 0; ++i, ++index, --left) {
+    for (size_t i = i1; i < ams_n1 && left > 0; ++i, ++index, -left) {
         ams[index]->Update(i < ams_1.size() ? ams_1[i] : info1);
         ams[index]->Refresh();
         ams[index]->Open();
@@ -3781,7 +3781,7 @@ void Sidebar::sync_ams_list(bool is_from_big_sync_btn)
 
         for (size_t i = 0; i < merge_info.merges.size(); i++) {
             auto& cur = merge_info.merges[i];
-            for (int j = cur.size() -1; j >= 1 ; j--) {
+            for (int j = cur.size() -1; j >= 1 ; j-) {
                 auto last_index = cur[j];
                 change_filament(last_index, cur[0]);
                 cur.erase(cur.begin() + j);
@@ -4471,7 +4471,7 @@ struct Plater::priv
     AssembleView* assemble_view { nullptr };
     // Docked/resizable 2D pane showing GLGizmoTextureDisplacement's LSCM unwrap of a painted
     // patch; a sibling AUI pane alongside "sidebar"/"main", not part of the view3D/preview/
-    // assemble_view sizer -- see its registration below and Plater::get_uv_editor_canvas(). The
+    // assemble_view sizer - see its registration below and Plater::get_uv_editor_canvas(). The
     // pane hosts the panel (toolbar + canvas + status line); uv_editor_canvas is its inner canvas,
     // cached so the gizmo can reach it directly.
     UVEditorPanel*  uv_editor_panel { nullptr };
@@ -4697,7 +4697,7 @@ struct Plater::priv
     bool up_to_date(bool saved, bool backup);
 
     void suppress_snapshots()   { m_prevent_snapshots++; }
-    void allow_snapshots()      { m_prevent_snapshots--; }
+    void allow_snapshots()      { m_prevent_snapshots-; }
     // BBS: single snapshot
     void single_snapshots_enter(SingleSnapshot *single)
     {
@@ -5141,7 +5141,7 @@ Plater::priv::priv(Plater *q, MainFrame *main_frame)
                                    .BottomDockable(false)
                                    .BestSize(wxSize(39 * wxGetApp().em_unit(), 90 * wxGetApp().em_unit())));
 
-    // UV editor pane for GLGizmoTextureDisplacement's LSCM unwrap preview -- a resizable/dockable
+    // UV editor pane for GLGizmoTextureDisplacement's LSCM unwrap preview - a resizable/dockable
     // sibling of "sidebar"/"main" like everything else registered on this same AUI manager, not a
     // change to the view3D/preview/assemble_view sizer above. Hidden by default: only relevant
     // while that gizmo is active with a layer using the "Unwrap (LSCM)" projection method (see
@@ -11808,7 +11808,7 @@ void Plater::priv::undo()
     const std::vector<UndoRedo::Snapshot> &snapshots = this->undo_redo_stack().snapshots();
     auto it_current = std::lower_bound(snapshots.begin(), snapshots.end(), UndoRedo::Snapshot(this->undo_redo_stack().active_snapshot_time()));
     // BBS: undo-redo until modify record
-    while (--it_current != snapshots.begin() && !snapshot_modifies_project(*it_current));
+    while (-it_current != snapshots.begin() && !snapshot_modifies_project(*it_current));
     if (it_current == snapshots.begin()) return;
     if (get_current_canvas3D()->get_canvas_type() == GLCanvas3D::CanvasAssembleView) {
         if (it_current->snapshot_data.snapshot_type != UndoRedo::SnapshotType::GizmoAction &&
@@ -11828,7 +11828,7 @@ void Plater::priv::redo()
     while (it_current != snapshots.end() && !snapshot_modifies_project(*it_current++));
     if (it_current != snapshots.end()) {
         while (it_current != snapshots.end() && !snapshot_modifies_project(*it_current++));
-        this->undo_redo_to(--it_current);
+        this->undo_redo_to(-it_current);
     }
 }
 
@@ -13085,7 +13085,7 @@ void adjust_settings_for_flowrate_calib(ModelObjectPtrs& objects, bool linear, i
     auto printer_config  = &wxGetApp().preset_bundle->printers.get_edited_preset().config;
     auto filament_config = &wxGetApp().preset_bundle->filaments.get_edited_preset().config;
 
-    /// --- scale ---
+    /// -- scale --
     // model is created for a 0.4 nozzle, scale z with nozzle size.
     const ConfigOptionFloats* nozzle_diameter_config = printer_config->option<ConfigOptionFloats>("nozzle_diameter");
     std::vector<int> extruder_types         = printer_config->option<ConfigOptionEnumsGeneric>("extruder_type")->values;
@@ -16706,7 +16706,7 @@ void Plater::on_filaments_delete(size_t num_filaments, size_t filament_id, int r
 
         for (auto& item : item->second.gcodes) {
             if (item.type == CustomGCode::Type::ToolChange && item.extruder > filament_id)
-                item.extruder--;
+                item.extruder-;
         }
     }
 }
@@ -17191,7 +17191,7 @@ void Plater::show_uv_editor(bool show)
     if (!pane.IsOk() || pane.IsShown() == show)
         return;
 
-    // Deferred, because GLGizmoTextureDisplacement calls this from its ImGui panel -- that is, from
+    // Deferred, because GLGizmoTextureDisplacement calls this from its ImGui panel - that is, from
     // the middle of the 3D canvas's GL frame. Showing an AUI pane re-lays out the window and
     // delivers the resulting size/paint events synchronously, and the UV canvas painting itself
     // makes its own surface current in the app's *shared* GL context, which mid-frame is the one

@@ -51,13 +51,13 @@ enum class TextureProjectionMethod : int
     Triplanar   = 0,
     // Wrapped around an axis running through the patch's centroid. The axis itself is picked
     // automatically as the world axis *least* aligned with the patch's average normal (since a
-    // cylinder's own axis is perpendicular to its outward radial normal) -- a reasonable default
+    // cylinder's own axis is perpendicular to its outward radial normal) - a reasonable default
     // for roughly cylindrical selections, not a precise fit for arbitrary geometry.
     Cylindrical = 1,
-    // Wrapped around the patch's centroid using longitude/latitude -- reasonable for roughly
+    // Wrapped around the patch's centroid using longitude/latitude - reasonable for roughly
     // spherical/rounded selections, again an approximation rather than an exact geodesic map.
     Spherical   = 2,
-    // Real UV unwrap of the painted patch -- a proper low-distortion flattening rather than a
+    // Real UV unwrap of the painted patch - a proper low-distortion flattening rather than a
     // planar/cylindrical/spherical approximation. The patch is first cut into charts along its
     // sharp edges and each chart is flattened on its own (see compute_patch_unwrap()), so a patch
     // that is not a single developable surface still unwraps sensibly. Falls back to Triplanar for
@@ -65,20 +65,20 @@ enum class TextureProjectionMethod : int
     LSCM        = 3,
     // Flat projection along a fixed direction captured from the 3D camera ("project from view"): the
     // texture is laid onto the painted area as seen from that angle, like a decal projector. Single
-    // planar map (no per-face axis switch), so it can smear on faces turned away from the projector --
+    // planar map (no per-face axis switch), so it can smear on faces turned away from the projector -
     // that is inherent to view projection and is the user's call, not a bug. The projector's two
     // in-plane axes live in TextureDisplacementLayer::view_project_right/up.
     ViewProjected = 4,
 };
 
 // Dihedral angle (degrees) above which an edge between two painted triangles becomes a chart seam
-// -- i.e. the unwrap is cut there rather than being forced to flatten across it.
+// - i.e. the unwrap is cut there rather than being forced to flatten across it.
 //
 // The whole point of this being a threshold rather than "flatten everything as one piece": three
 // faces meeting at a cube corner are not developable, so a single-chart solve has to distort them
 // badly to lie flat (they splay out into a fan, which is what "it merges all the edges into a
 // triangle" describes). Cutting at the 90-degree edges instead lets each face flatten exactly.
-// Meanwhile a smoothly curved surface -- a subdivided sphere, say -- has only small angles between
+// Meanwhile a smoothly curved surface - a subdivided sphere, say - has only small angles between
 // neighbouring triangles, stays a single chart, and unwraps as one piece the way it should.
 static constexpr float LSCM_DEFAULT_SEAM_ANGLE_DEG = 30.f;
 
@@ -95,8 +95,8 @@ static constexpr float TRIPLANAR_BLEND_SHARPNESS = 4.f;
 //
 // Add/Subtract are in mm and need no further explanation. Multiply/Divide are *scaling* operations
 // and therefore need a unit convention: they treat the layer's own value as a unitless factor
-// relative to 1 mm. That makes `depth_mm` act as a gain -- a layer with depth 1 mm and a white
-// (1.0) texel multiplies the accumulated relief by exactly 1, i.e. leaves it unchanged -- which is
+// relative to 1 mm. That makes `depth_mm` act as a gain - a layer with depth 1 mm and a white
+// (1.0) texel multiplies the accumulated relief by exactly 1, i.e. leaves it unchanged - which is
 // the behaviour that makes a Multiply layer usable as a mask over the layers beneath it.
 enum class TextureBlendMode : int
 {
@@ -112,20 +112,20 @@ float blend_displacement(float accumulated, float value, TextureBlendMode mode);
 
 // Where one unwrap island (chart) sits in UV space, on top of wherever compute_patch_unwrap() first
 // packed it. This is what the UV editor's drag/rotate gestures write to, so a user can lay the
-// islands out by hand -- move them, rotate them, overlap them -- rather than being stuck with the
+// islands out by hand - move them, rotate them, overlap them - rather than being stuck with the
 // automatic packing.
 //
 // Indexed by chart id, which compute_patch_unwrap() assigns in first-encountered-triangle order. That
 // is stable for a given patch and seam angle, but *not* across a change to either: repainting the
 // patch, or moving the seam-angle slider, can renumber the charts and so leave a hand-placed island
-// applied to a different one. Accepted deliberately -- the alternative is a persistent chart identity
+// applied to a different one. Accepted deliberately - the alternative is a persistent chart identity
 // that survives arbitrary re-segmentation, which is a much larger problem than this feature warrants.
 struct TextureIsland
 {
     Vec2f offset       = Vec2f::Zero(); // in the unwrap's own mm space
     float rotation_deg = 0.f;           // about the island's own centroid
     // About the island's own centroid too. 1 = the size compute_patch_unwrap() gave it, which is
-    // already its true surface area in mm -- so scaling an island away from 1 deliberately makes its
+    // already its true surface area in mm - so scaling an island away from 1 deliberately makes its
     // texel density differ from its neighbours'. See average_island_scales().
     float scale = 1.f;
 
@@ -168,7 +168,7 @@ struct TextureDisplacementLayer
     // The height value that means "don't move this vertex". The sampled height (0..1) has this
     // subtracted before being scaled by depth_mm, so with the default of 0 the surface only ever
     // moves *outwards* (the classic height-map convention), while 0.5 makes mid-grey neutral and
-    // lets darker texels cut *into* the surface -- an engraved-and-embossed result from one map.
+    // lets darker texels cut *into* the surface - an engraved-and-embossed result from one map.
     //
     // Cutting inward is not free: vertices move along their own normals, which converge inside a
     // concave corner and inside a thin wall, so a large depth_mm against a small feature really can
@@ -197,7 +197,7 @@ struct TextureDisplacementLayer
     bool  auto_connect_islands  = true;
 
     // When false, the texture is sampled once (clamped to its edge pixels outside [0, 1)) instead
-    // of being repeated -- useful for a single decal-like placement rather than a repeating tile.
+    // of being repeated - useful for a single decal-like placement rather than a repeating tile.
     bool              tile_enabled = true;
     TextureTileMethod tile_method  = TextureTileMethod::Repeat;
 
@@ -222,19 +222,19 @@ struct TextureDisplacementLayer
 
     // Also ViewProjected, and takes precedence over the two axes above when set: an exact *projective*
     // map from a local-space position straight to a texture uv, written by the projection-frame overlay
-    // (the semi-transparent window dragged over the 3D view -- its border becomes the uv unit square).
+    // (the semi-transparent window dragged over the 3D view - its border becomes the uv unit square).
     //
     // Row-major 3x4, applied to the homogeneous point p~ = (x, y, z, 1):
     //     uv = ( row0.p~ / row2.p~ , row1.p~ / row2.p~ )
     // The perspective divide is the whole point. view_project_right/up can only express an *affine*
-    // projection, which matches an orthographic camera exactly but not a perspective one -- under
+    // projection, which matches an orthographic camera exactly but not a perspective one - under
     // perspective the near end of a part projects larger than the far end, and no pair of axes
     // reproduces that. Folding the camera's full projection*view*model product into one matrix does.
     // Because a point behind the projector has row2.p~ <= 0 and no meaningful uv, sampling must check
     // the sign rather than divide blindly; see project_uv_projective().
     //
     // Note this map already includes placement, so the usual tiling/rotation/offset transform is NOT
-    // applied on top of it -- the window's own position and size are the placement.
+    // applied on top of it - the window's own position and size are the placement.
     bool                  view_project_projective = false;
     std::array<float, 12> view_project_matrix{};
     // Only used by TextureProjectionMethod::LSCM: hand placement of the unwrap's islands, indexed by
@@ -243,7 +243,7 @@ struct TextureDisplacementLayer
     std::vector<TextureIsland> islands;
 
     // Only used by TextureProjectionMethod::LSCM: persistent "join" groups, indexed by chart id. Charts
-    // that share a group id move together as one in the UV editor -- this is what the explicit "Join"
+    // that share a group id move together as one in the UV editor - this is what the explicit "Join"
     // command records (over and above placing the child next to its parent). An entry of -1, or an index
     // past the end of the vector, means the chart is its own singleton group (moves alone). Empty means
     // every chart is a singleton. Same chart-renumbering caveat as `islands`: a re-unwrap can reshuffle
@@ -252,7 +252,7 @@ struct TextureDisplacementLayer
 
     // Only used by TextureProjectionMethod::LSCM: manual per-vertex UV edits made in the UV editor's
     // Vertex/Edge select modes. Each pair is (mesh vertex index, its overriding raw-unwrap coordinate in
-    // mm) -- the *raw* unwrap position, i.e. before the island transform, so the edited vertex still
+    // mm) - the *raw* unwrap position, i.e. before the island transform, so the edited vertex still
     // moves and rotates with its island. In compute_lscm_uvs() this replaces the automatic unwrap
     // coordinate for that vertex; in the editor it edits the displayed geometry directly. Keyed in mesh-
     // vertex space like lscm_seam_edges (dropped on a topology change). The raw coordinate is only
@@ -304,7 +304,7 @@ struct DecodedHeightTexture
 
     bool empty() const { return width <= 0 || height <= 0 || pixels.empty(); }
     // Bilinearly sampled height in [0, 1] at a normalized uv coordinate. When tile_enabled is false,
-    // a uv outside [0, 1) samples as 0 -- the texture simply is not there, rather than its border
+    // a uv outside [0, 1) samples as 0 - the texture simply is not there, rather than its border
     // row/column being smeared outward forever (which is what clamping the coordinate would do, and
     // was a real reported bug). Callers rely on this to get a hard edge: it is how the projection
     // frame's border becomes the edge of the displacement.
@@ -317,13 +317,13 @@ DecodedHeightTexture decode_height_texture(const TextureDisplacementLayer &layer
 
 // Raw dominant-axis planar projection of `position` (in mm, not yet scaled/rotated/offset by any
 // layer), dropping the axis position that best aligns with `normal`. Exposed on its own (rather
-// than only inline inside project_texture_displacement_uv()) so GUI code -- the on-canvas
-// "adjust texture placement" gizmo -- can map a dragged 3D point into the exact same 2D space
+// than only inline inside project_texture_displacement_uv()) so GUI code - the on-canvas
+// "adjust texture placement" gizmo - can map a dragged 3D point into the exact same 2D space
 // tiling_scale/rotation_deg/offset operate in, without duplicating the axis-selection logic.
 Vec2f project_planar(const Vec3f &position, const Vec3f &normal);
 
 // Applies a layer's tiling_scale/rotation_deg/offset to an already-projected planar coordinate
-// (in mm, dominant-axis planar, cylindrical, spherical, or CGAL LSCM output -- any of them, all
+// (in mm, dominant-axis planar, cylindrical, spherical, or CGAL LSCM output - any of them, all
 // share this same final step). Exposed separately so build_texture_displacement() can route CGAL
 // LSCM's per-patch UV solve through the same scale/rotate/offset controls as every other
 // projection method, without going through project_texture_displacement_uv()'s own dispatch
@@ -331,7 +331,7 @@ Vec2f project_planar(const Vec3f &position, const Vec3f &normal);
 Vec2f apply_uv_transform(const Vec2f &planar, const TextureDisplacementLayer &layer);
 
 // Applies a row-major 3x4 projective matrix (see TextureDisplacementLayer::view_project_matrix) to a
-// local-space point, writing the resulting texture uv. Returns false -- and leaves `uv` untouched --
+// local-space point, writing the resulting texture uv. Returns false - and leaves `uv` untouched -
 // when the point lies behind the projector or on its plane (w <= 0), where there is no meaningful uv
 // and dividing would produce a mirrored or infinite coordinate. Callers treat that as "no height".
 bool project_uv_projective(const std::array<float, 12> &m, const Vec3f &position, Vec2f &uv);
@@ -340,11 +340,11 @@ bool project_uv_projective(const std::array<float, 12> &m, const Vec3f &position
 // method, tiling scale, rotation, offset and tiling mode. Returns a height in [0, 1].
 //
 // This returns a *height* rather than a UV because TextureProjectionMethod::Triplanar is a blend
-// of three separate axis projections and therefore takes three texture samples per vertex -- there
+// of three separate axis projections and therefore takes three texture samples per vertex - there
 // is no single UV that represents it. The other methods do map to one UV internally.
 //   - `normal` is this specific vertex's own normal; used only by Triplanar (for its blend weights).
-//   - `patch_center`/`patch_axis` describe the painted patch as a whole (its centroid, and -- for
-//     Cylindrical only -- the wrap axis); used only by the Cylindrical/Spherical methods.
+//   - `patch_center`/`patch_axis` describe the painted patch as a whole (its centroid, and - for
+//     Cylindrical only - the wrap axis); used only by the Cylindrical/Spherical methods.
 //   - `lscm_uv`, when non-null, is this vertex's precomputed LSCM coordinate and takes precedence
 //     over `layer.projection_method` (LSCM is a single per-patch solve, not a per-vertex formula,
 //     so build_texture_displacement() computes it once up front and passes it in here).
@@ -356,7 +356,7 @@ float sample_layer_height(const DecodedHeightTexture &texture, const TextureDisp
                           const Vec2f *lscm_uv = nullptr);
 
 // Area-weighted centroid and average normal of a layer's currently painted patch, in mesh-local
-// coordinates -- the same measurements build_texture_displacement() uses to pick its dominant
+// coordinates - the same measurements build_texture_displacement() uses to pick its dominant
 // projection axis. Used by the GUI to anchor the on-canvas "adjust texture placement" gizmo to
 // wherever the layer is actually painted. Returns false (leaving the outputs untouched) if the
 // layer has nothing painted yet.
@@ -365,7 +365,7 @@ bool compute_layer_paint_anchor(const indexed_triangle_set                    &b
                                  Vec3f                                         &anchor_pos,
                                  Vec3f                                         &anchor_normal);
 
-// Extracts the currently painted patch from a volume's base mesh + stored facet data -- the same
+// Extracts the currently painted patch from a volume's base mesh + stored facet data - the same
 // extraction build_texture_displacement() and compute_layer_paint_anchor() each do internally via
 // TriangleSelector::get_facets_strict(ENFORCER). Returns an empty mesh if nothing is painted.
 // Exposed so GUI code (the LSCM "UV editor" preview pane) can get the same patch build_texture_
@@ -388,7 +388,7 @@ struct PatchUnwrap
     std::vector<int>                         source_vertex; // unwrapped vertex -> index into patch.vertices
     std::vector<int>                         vertex_chart;  // unwrapped vertex -> chart (island) id
     std::vector<stl_triangle_vertex_indices> indices;       // patch triangles, re-indexed into `uvs`
-    // Per chart, the centroid of its uvs -- the point a TextureIsland's rotation turns about.
+    // Per chart, the centroid of its uvs - the point a TextureIsland's rotation turns about.
     std::vector<Vec2f> chart_centroid;
     // Edges belonging to exactly one triangle: the outline of each island. Indices into `uvs`. This
     // is what the UV editor draws highlighted, so the boundaries the seam angle cut are visible.
@@ -424,13 +424,13 @@ bool join_chart_placement(const PatchUnwrap &unwrap, const std::vector<TextureIs
 // Unwraps `patch` as described above. Charts that are flat (within a degree) are projected onto
 // their own tangent plane directly, which is both exact and far cheaper than a solve; only genuinely
 // curved charts go through CGAL's LSCM parameterizer (MeshBoolean::cgal::parameterize_lscm()). A
-// chart that LSCM cannot flatten at all (it is not a topological disk -- closed, or with a hole)
+// chart that LSCM cannot flatten at all (it is not a topological disk - closed, or with a hole)
 // falls back to that same tangent-plane projection.
 //
 // `padding_mm` is the gap the packing leaves between islands; negative means auto (see
 // TextureDisplacementLayer::island_padding_mm). `seam_edges` are extra edges to cut along regardless
 // of angle (manual/auto seams), in the patch's own vertex-index space (which is the mesh's, since the
-// patch carries the whole vertex array -- see get_facets_strict()).
+// patch carries the whole vertex array - see get_facets_strict()).
 //
 // Results are cached, keyed on the patch's geometry, the seam angle, the padding and the seam edges:
 // nothing else about a layer (depth, tiling, rotation, offset, texture, island placement) changes the
@@ -438,8 +438,8 @@ bool join_chart_placement(const PatchUnwrap &unwrap, const std::vector<TextureIs
 PatchUnwrap compute_patch_unwrap(const indexed_triangle_set &patch, float seam_angle_deg = LSCM_DEFAULT_SEAM_ANGLE_DEG,
                                  float padding_mm = -1.f, const std::vector<std::pair<int, int>> &seam_edges = {});
 
-// One UV per patch vertex, for displacement. Displacement is inherently per-vertex -- a vertex has
-// exactly one position, so it can only be pushed out by one height -- which means a seam vertex has
+// One UV per patch vertex, for displacement. Displacement is inherently per-vertex - a vertex has
+// exactly one position, so it can only be pushed out by one height - which means a seam vertex has
 // to settle on a single one of its charts' UVs (the first, arbitrarily). That is not a compromise
 // in the result: the surface stays watertight either way, since neighbouring vertices each move
 // along their own normals and nothing depends on the UVs agreeing across the seam. It is only the
@@ -457,7 +457,7 @@ using TextureDisplacementFacetsData = std::array<TriangleSelector::TriangleSplit
 // nothing is painted or no layer has a usable texture.
 //
 // **Topology-preserving**: the returned mesh has exactly `base_mesh`'s vertices and triangles, in
-// the same order -- only the positions of displaced vertices differ. Every layer's paint mask is
+// the same order - only the positions of displaced vertices differ. Every layer's paint mask is
 // evaluated against `base_mesh` directly, and each vertex accumulates a single signed displacement
 // (in mm) that all the layers covering it fold into, in slot order, via their TextureBlendMode.
 // The vertex is then moved once, along its base-mesh normal, by that accumulated total.
@@ -469,8 +469,8 @@ using TextureDisplacementFacetsData = std::array<TriangleSelector::TriangleSplit
 // it routinely produced an empty bitstream, and the layer was then silently skipped. It is also
 // what forced the per-layer vertex duplication and the final its_compactify_vertices() pass. The
 // accumulate-then-displace formulation has neither problem, is substantially faster (no remap, no
-// welding, one pass over the mesh), and -- because the output keeps the input's exact vertex
-// indexing -- lets the GUI overlay a preview on the base mesh without any index translation.
+// welding, one pass over the mesh), and - because the output keeps the input's exact vertex
+// indexing - lets the GUI overlay a preview on the base mesh without any index translation.
 //
 // A vertex used by even one *unpainted* triangle of a layer's mask is that layer's boundary: its
 // displacement is pinned to zero, so the patch never tears away from the surrounding surface. Only
@@ -498,7 +498,7 @@ indexed_triangle_set build_texture_displacement(const ModelVolume &volume);
 // edge) until every edge is at or below max_edge_length_mm, or max_iterations passes have run,
 // whichever comes first (bounding the worst-case triangle-count explosion on a very fine target).
 //
-// This exists so a low-poly input model can still get fine-grained texture displacement detail --
+// This exists so a low-poly input model can still get fine-grained texture displacement detail -
 // build_texture_displacement() can only ever move existing vertices, so a patch with only a
 // handful of vertices to begin with cannot show much detail no matter the texture's resolution.
 //
@@ -506,7 +506,7 @@ indexed_triangle_set build_texture_displacement(const ModelVolume &volume);
 // mesh while leaving the rest untouched creates a classic T-junction/cracking problem where the
 // denser and sparser regions meet (the finer side has edge midpoints the coarser side doesn't
 // know about). Uniform, whole-mesh subdivision has no such seam and stays manifold, at the cost of
-// applying everywhere rather than just where texture detail is actually wanted -- meant to be run
+// applying everywhere rather than just where texture detail is actually wanted - meant to be run
 // once, deliberately, before painting (see the gizmo's "Subdivide model" button), not automatically
 // during baking.
 indexed_triangle_set subdivide_mesh_uniform(const indexed_triangle_set &mesh, float max_edge_length_mm, int max_iterations = 6);

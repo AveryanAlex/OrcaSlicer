@@ -12,7 +12,7 @@
 
 namespace Slic3r::GUI {
 
-// Everything process() needs, captured by value on the main thread when the job is queued --
+// Everything process() needs, captured by value on the main thread when the job is queued -
 // mirrors TextureDisplacementBakeInput, but a preview never writes back to the Model.
 struct TextureDisplacementPreviewInput
 {
@@ -24,7 +24,7 @@ struct TextureDisplacementPreviewInput
 // Computes the true (unbaked) displaced-mesh preview in the background. With several painted
 // layers this is real, non-trivial CPU work (PNG sampling, per-layer vertex welding), which used
 // to run synchronously on every paint stroke and parameter tweak and made editing feel slow with
-// more than one or two layers. Unlike Bake, this never touches the live Model -- a preview is
+// more than one or two layers. Unlike Bake, this never touches the live Model - a preview is
 // purely informational, there is nothing to commit.
 class TextureDisplacementPreviewJob : public Job
 {
