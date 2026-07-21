@@ -1,12 +1,15 @@
 #include "PresetUpdater.hpp"
 
 #include <algorithm>
+#include <boost/filesystem/directory.hpp>
 #include <boost/filesystem/operations.hpp>
+#include <boost/filesystem/path.hpp>
 #include <boost/nowide/fstream.hpp>
 #include <functional>
 #include <atomic>
 #include <mutex>
 #include <set>
+#include <string>
 #include <thread>
 #include <unordered_map>
 #include <ostream>
@@ -19,6 +22,7 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/log/trivial.hpp>
 
+#include <vector>
 #include <wx/app.h>
 #include <wx/msgdlg.h>
 
@@ -229,6 +233,8 @@ struct PresetUpdater::priv
 	void parse_version_string(const std::string& body) const;
     void sync_resources(std::string http_url, std::map<std::string, Resource> &resources, bool check_patch = false,  std::string current_version="", std::string changelog_file="");
     void sync_vendor_config(const std::string& vendor_id);
+    std::vector<std::string> check_new_vendors();
+	std::set<std::string> get_all_system_vendors();
     void sync_tooltip(std::string http_url, std::string language);
     void sync_plugins(std::string http_url, std::string plugin_version);
     void sync_printer_config(std::string http_url);
@@ -1402,6 +1408,76 @@ void PresetUpdater::check_vendor_update(const std::string& vendor_id)
             BOOST_LOG_TRIVIAL(error) << "[Orca Updater] vendor update failed for " << vendor_id << ": " << e.what();
         }
     });
+}
+
+// TBD the actual shape of the reponse before using this.
+std::vector<std::string> PresetUpdater::priv::check_new_vendors()
+{
+    AppConfig* app_config = GUI::wxGetApp().app_config;
+    std::string url       = app_config->profile_update_url() + "/new?orca_version=" + Http::url_encode(SoftFever_VERSION);
+
+    auto check_cancel = [this](Http::Progress, bool& cancel_http) {
+        if (cancel || vendor_check_cancel)
+            cancel_http = true;
+    };
+
+    std::vector<std::string> vendor_ids;
+    const auto system_vendors = get_all_system_vendors();
+    const std::vector<std::string> system_vendor_list(system_vendors.begin(), system_vendors.end());
+
+    auto post = Http::post(url);
+
+    post.timeout_connect(5);
+    post.on_progress(check_cancel);
+    post.on_error([](std::string body, std::string error, unsigned http_status) {
+            BOOST_LOG_TRIVIAL(warning) << "[Orca Updater] new vendor check HTTP error: " << error;
+        })
+        .on_complete([&vendor_ids](std::string body, unsigned http_status) {
+            if (http_status != 200)
+                return;
+            try {
+                json j = json::parse(body);
+                if (j.is_array()) {
+                    vendor_ids = j.get<std::vector<std::string>>();
+                }
+            } catch (const std::exception& e) {
+                BOOST_LOG_TRIVIAL(warning) << "[Orca Updater] vendor check JSON parse failed: " << e.what();
+            }
+        });
+
+    post.set_post_body(json(system_vendor_list).dump());
+    post.perform_sync();
+
+    return vendor_ids;
+}
+
+std::set<std::string> PresetUpdater::priv::get_all_system_vendors() {
+    std::set<std::string> vendors;
+
+    PresetBundle temp_bundle;
+    boost::filesystem::path dir = boost::filesystem::path(resources_dir()) / "profiles";
+
+    for (auto& entry : boost::filesystem::directory_iterator(dir)) {
+        if (!Slic3r::is_json_file(entry.path().string()))
+            continue;
+        std::string vendor_name = entry.path().filename().stem().string();
+        temp_bundle.load_vendor_configs_from_json(dir.string(), vendor_name, PresetBundle::LoadSystem,
+                                                  ForwardCompatibilitySubstitutionRule::EnableSystemSilent);
+    }
+
+    for (auto& preset : temp_bundle.printers)
+        if (preset.is_system)
+            vendors.insert(preset.vendor->name);
+
+    for (auto& preset : temp_bundle.prints)
+        if (preset.is_system)
+            vendors.insert(preset.vendor->name);
+
+    for (auto& preset : temp_bundle.filaments)
+        if (preset.is_system)
+            vendors.insert(preset.vendor->name);
+
+    return vendors;
 }
 
 void PresetUpdater::slic3r_update_notify()
