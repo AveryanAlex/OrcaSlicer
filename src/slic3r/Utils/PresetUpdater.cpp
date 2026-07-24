@@ -208,8 +208,6 @@ struct PresetUpdater::priv
 
     // Per-vendor update checking
     std::set<std::string> checked_vendors;
-    std::unordered_map<std::string, std::string> vendor_changelogs;
-    mutable std::mutex vendor_changelogs_mutex;
     std::mutex vendor_check_mutex;
     std::vector<std::thread> vendor_check_threads;
     std::atomic<bool> vendor_check_cancel{false};
@@ -677,9 +675,6 @@ void PresetUpdater::priv::sync_vendor_config(const std::string& vendor_id)
 
     std::string online_version_str; // this represents the PROFILE VERSION, not ORCA VERSION
     std::string download_url_str;
-    std::string changelog;
-
-    BOOST_LOG_TRIVIAL(info) << "[Orca Updater] fetching vendor update status from " << url;
 
     Http::get(url)
         .timeout_connect(5)
@@ -692,13 +687,9 @@ void PresetUpdater::priv::sync_vendor_config(const std::string& vendor_id)
             if (http_status != 200) return;
             try {
                 json j = json::parse(body);
-                BOOST_LOG_TRIVIAL(info) << "[Orca Updater] url: " << url << " returned:" << body;
-
-                if ((j.contains("version") || j.contains("vendor_version")) && j.contains("download_url")) {
-                    online_version_str = j.contains("version") ? j["version"].get<std::string>()
-                                                               : j["vendor_version"].get<std::string>();
+                if (j.contains("vendor_version") && j.contains("download_url")) {
+                    online_version_str = j["vendor_version"].get<std::string>();
                     download_url_str = j["download_url"].get<std::string>();
-                    changelog        = j.value("changelog", std::string());
                 }
             } catch (const std::exception& e) {
                 BOOST_LOG_TRIVIAL(warning) << "[Orca Updater] vendor check JSON parse failed: " << e.what();
@@ -720,6 +711,7 @@ void PresetUpdater::priv::sync_vendor_config(const std::string& vendor_id)
     boost::system::error_code ec;
     fs::remove_all(cache_profile_path / vendor_id, ec);
     fs::remove(cache_profile_path / (vendor_id + ".json"), ec);
+    fs::remove(cache_profile_path / (vendor_id + ".changelog"), ec);
 
     // Download the zip
     BOOST_LOG_TRIVIAL(info) << "[Orca Updater] downloading update for " << vendor_id
@@ -756,11 +748,6 @@ void PresetUpdater::priv::sync_vendor_config(const std::string& vendor_id)
     fs::remove(download_file, ec);
 
     if (cancel || vendor_check_cancel) return;
-
-    {
-        std::lock_guard<std::mutex> lock(vendor_changelogs_mutex);
-        vendor_changelogs[vendor_id] = std::move(changelog);
-    }
 
     BOOST_LOG_TRIVIAL(info) << "[Orca Updater] vendor " << vendor_id << " update cached, notifying UI";
     GUI::wxGetApp().CallAfter([] {
@@ -1203,12 +1190,6 @@ Updates PresetUpdater::priv::get_config_updates(const Semver &old_slic3r_version
     if (!fs::exists(cache_profile_path))
         return updates;
 
-    std::unordered_map<std::string, std::string> changelogs;
-    {
-        std::lock_guard<std::mutex> lock(vendor_changelogs_mutex);
-        changelogs = vendor_changelogs;
-    }
-
     for (auto &dir_entry : boost::filesystem::directory_iterator(cache_profile_path)) {
         const auto &path = dir_entry.path();
         std::string file_path = path.string();
@@ -1242,8 +1223,15 @@ Updates PresetUpdater::priv::get_config_updates(const Semver &old_slic3r_version
                 if (config_version)
                     cache_ver = *config_version;
 
-                const auto changelog_it = changelogs.find(vendor_name);
-                std::string changelog = changelog_it != changelogs.end() ? changelog_it->second : std::string();
+                std::string changelog;
+                std::string changelog_file = (cache_profile_path / (vendor_name + ".changelog")).string();
+                boost::nowide::ifstream ifs(changelog_file);
+                if (ifs) {
+                    std::ostringstream oss;
+                    oss<< ifs.rdbuf();
+                    changelog = oss.str();
+                    ifs.close();
+                }
 
                 if (vendor_ver < cache_ver) {
                     BOOST_LOG_TRIVIAL(info) << "[Orca Updater]:need to update settings from " << vendor_ver.to_string()
