@@ -3935,9 +3935,17 @@ void GUI_App::switch_printer_agent()
 
 void GUI_App::select_machine(const std::string& agent_id)
 {
-    // Skip for BBL agent for now - uses its own device discovery/selection
-    // Orca todo: revisit in future if we want to support auto-switching for BBL printers
+    // The BBL agent uses its own device discovery/selection, so don't auto-switch.
+    // But swapping agents disconnected its printer link (NetworkAgent::set_printer_agent),
+    // so when it becomes active again re-select the machine; the same-dev_id paths in
+    // DeviceManager::set_selected_machine re-establish the LAN MQTT session (lan) or
+    // refresh the subscription (cloud).
     if (agent_id == BBL_PRINTER_AGENT_ID) {
+        if (m_device_manager) {
+            MachineObject* sel = m_device_manager->get_selected_machine();
+            if (sel)
+                m_device_manager->set_selected_machine(sel->get_dev_id());
+        }
         return;
     }
 
