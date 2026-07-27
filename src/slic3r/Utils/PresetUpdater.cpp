@@ -1094,10 +1094,9 @@ void PresetUpdater::priv::check_installed_vendor_profiles() const
                         Semver resource_ver = get_version_from_json(file_path);
                         Semver vendor_ver = get_version_from_json(path_in_vendor.string());
 
-                        bool version_match = ((resource_ver.maj() == vendor_ver.maj()) && (resource_ver.min() == vendor_ver.min()));
-
-                        if (!version_match || (vendor_ver < resource_ver)) {
-                            BOOST_LOG_TRIVIAL(info) << "[Orca Updater]:found vendor "<<vendor_name<<" newer version "<<resource_ver.to_string() <<" from resource, old version "<<vendor_ver.to_string();
+                        if (vendor_ver < resource_ver) {
+                            BOOST_LOG_TRIVIAL(info) << "[Orca Updater]:found vendor " << vendor_name << " newer version "
+                                                    << resource_ver.to_string() << " from resource, old version " << vendor_ver.to_string();
                             bundles.insert(vendor_name);
                         }
                     }
