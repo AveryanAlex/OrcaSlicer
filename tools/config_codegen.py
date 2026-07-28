@@ -10,11 +10,10 @@ Usage:
     protoc --proto_path=src/PrintConfigs --descriptor_set_out=config.desc \
            --include_imports src/PrintConfigs/*.proto
 
-    # Step 2: Generate Python bindings (one-time, or when config_metadata.proto changes)
-    protoc --proto_path=src/PrintConfigs --python_out=tools/ config_metadata.proto
+    # Step 2: Run codegen
+    python tools/config_codegen.py config.desc src/slic3r/GUI/generated/
 
-    # Step 3: Run codegen
-    python tools/config_codegen.py config.desc codegen/generated/
+    (tools/run_codegen.py does both, and resolves protoc for you)
 
 Outputs:
     - PrintConfigDef_generated.cpp  (init_fff_params body)
@@ -29,19 +28,21 @@ import re
 import argparse
 from pathlib import Path
 
-# Add tools/ to path so we can import generated config_metadata_pb2
+# Add tools/ to path so we can import the sibling helper modules
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 try:
     from google.protobuf import descriptor_pb2
-    # Import the generated bindings - this registers extensions globally
-    import config_metadata_pb2 as meta_pb2
+    from config_metadata import load_descriptor_set
 except ImportError as e:
     print(f"ERROR: {e}")
-    print("Ensure google-protobuf is installed: pip install protobuf")
-    print("And that config_metadata_pb2.py exists in tools/")
-    print("Generate it with: protoc --proto_path=src/PrintConfigs --python_out=tools/ config_metadata.proto")
+    print("Ensure protobuf is installed: pip install protobuf")
+    print("Or just run the pipeline, which bootstraps it: python tools/run_codegen.py")
     sys.exit(1)
+
+# The orca.* option extensions and enum constants, bound by main() from the
+# descriptor set (see config_metadata.py for why they aren't imported).
+meta_pb2 = None
 
 
 # Proto FieldDescriptorProto.Type enum values
@@ -179,9 +180,8 @@ def parse_field_options(field_desc_proto):
     Re-parse FieldOptions from a FieldDescriptorProto with extensions registered.
     This is needed because the FileDescriptorSet parser doesn't know about our
     custom extensions, so they end up as unknown fields. Re-parsing with the
-    extensions registered (via config_metadata_pb2 import) resolves them.
+    extensions registered (see config_metadata.load_descriptor_set) resolves them.
     """
-    from google.protobuf import descriptor_pb2
     opts = field_desc_proto.options
     if not opts.ByteSize():
         return descriptor_pb2.FieldOptions()
@@ -981,11 +981,8 @@ def main():
         print(f"ERROR: Descriptor file not found: {desc_path}")
         sys.exit(1)
 
-    with open(desc_path, 'rb') as f:
-        raw = f.read()
-
-    file_descriptor_set = descriptor_pb2.FileDescriptorSet()
-    file_descriptor_set.ParseFromString(raw)
+    global meta_pb2
+    file_descriptor_set, meta_pb2 = load_descriptor_set(desc_path)
 
     print(f"Loaded {len(file_descriptor_set.file)} proto files")
     for fd in file_descriptor_set.file:

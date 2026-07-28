@@ -831,6 +831,16 @@ else ()
 endif ()
 target_include_directories(libslic3r_gui PRIVATE Utils ${CMAKE_CURRENT_BINARY_DIR})
 
+# Tab.cpp #includes GUI/generated/TabLayout_generated.cpp, so it must not be compiled
+# while the codegen is rewriting it (same contract as libslic3r's generated includes).
+if(TARGET codegen_config)
+    add_dependencies(libslic3r_gui codegen_config)
+    set_source_files_properties(
+        "${CMAKE_CURRENT_SOURCE_DIR}/GUI/Tab.cpp"
+        PROPERTIES OBJECT_DEPENDS "${CONFIG_GENERATED_SOURCES}"
+    )
+endif()
+
 if (WIN32)
     target_include_directories(libslic3r_gui SYSTEM PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../../deps/WebView2/include)
     target_link_libraries(libslic3r_gui Advapi32)

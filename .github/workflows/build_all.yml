@@ -283,10 +283,8 @@ jobs:
           scripts/flatpak/com.orcaslicer.OrcaSlicer.yml
       shell: bash
     - name: Generate config sources
-      run: |
-        python3 -m venv /tmp/codegen_venv
-        /tmp/codegen_venv/bin/pip install grpcio-tools pyyaml -q
-        /tmp/codegen_venv/bin/python tools/run_codegen.py
+      # Generated on the host: the flatpak build itself runs offline.
+      run: python3 tools/run_codegen.py
       shell: bash
     - uses: flatpak/flatpak-github-actions/flatpak-builder@master
       with:

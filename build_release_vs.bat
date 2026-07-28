@@ -147,7 +147,8 @@ echo "building Orca Slicer..."
 cd %WP%
 
 echo "generating config sources from proto..."
-pip install grpcio-tools -q
+REM run_codegen.py resolves protoc and its python packages itself (grpcio-tools has
+REM no wheel on ARM64 and fails to build there).
 python tools/run_codegen.py
 if errorlevel 1 (
     echo "ERROR: config codegen failed"

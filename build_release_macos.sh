@@ -241,10 +241,9 @@ function verify_python_runtime() {
 
 function build_slicer() {
     echo "Generating config sources from proto..."
-    python3 -m venv /tmp/codegen_venv
-    /tmp/codegen_venv/bin/pip install grpcio-tools pyyaml -q
-    /tmp/codegen_venv/bin/python tools/run_codegen.py || { echo "ERROR: config codegen failed"; exit 1; }
-    CODEGEN_PYTHON="/tmp/codegen_venv/bin/python3"
+    # Resolves protoc and its Python packages itself (into .codegen-tools/), so nothing
+    # is installed into the system interpreter.
+    python3 tools/run_codegen.py || { echo "ERROR: config codegen failed"; exit 1; }
 
     # iterate over two architectures: x86_64 and arm64
     for _ARCH in x86_64 arm64; do
@@ -270,7 +269,6 @@ function build_slicer() {
                     -DCMAKE_OSX_ARCHITECTURES="${_ARCH}" \
                     -DCMAKE_OSX_DEPLOYMENT_TARGET="${OSX_DEPLOYMENT_TARGET}" \
                     -DCMAKE_IGNORE_PREFIX_PATH="${CMAKE_IGNORE_PREFIX_PATH}" \
-                    -DPython3_EXECUTABLE="${CODEGEN_PYTHON}" \
                     ${CMAKE_POLICY_COMPAT}
             fi
             cmake --build . --config "$BUILD_CONFIG" --target "$SLICER_BUILD_TARGET"

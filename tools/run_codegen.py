@@ -6,38 +6,28 @@ Convenience script: runs the codegen pipeline.
 2. Generate C++ from descriptors (config_codegen.py)
 3. Validate output against original
 
+The toolchain (protoc, protobuf, pyyaml) is resolved by codegen_toolchain.py, so
+this script is the single entry point every build script and CI job calls -- no
+`pip install` lines needed around it.
+
 Usage:
     python tools/run_codegen.py                 # full pipeline
     python tools/run_codegen.py --validate-only # just validate
 """
 
 import argparse
-import shutil
 import subprocess
 import sys
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import codegen_toolchain  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
 PROTO_DIR = ROOT / "src" / "PrintConfigs"
 CODEGEN_OUT = ROOT / "src" / "slic3r" / "GUI" / "generated"
 DESC_FILE = ROOT / "config.desc"
 LAYOUT_YAML = PROTO_DIR / "layout.yaml"
-
-
-def _ensure_pyyaml():
-    """Install pyyaml if not present — needed for tab layout generation."""
-    try:
-        import yaml  # noqa: F401
-        return True
-    except ImportError:
-        print("  Installing pyyaml (required for tab layout generation)...")
-        result = subprocess.run(
-            [sys.executable, "-m", "pip", "install", "pyyaml", "-q"],
-            capture_output=True)
-        if result.returncode != 0:
-            print("  ERROR: failed to install pyyaml")
-            return False
-        return True
 
 
 def run(cmd, **kwargs):
@@ -49,19 +39,6 @@ def run(cmd, **kwargs):
     return True
 
 
-def _protoc_cmd():
-    """Return the protoc command list. Prefers standalone protoc, falls back to grpc_tools."""
-    if shutil.which("protoc"):
-        return ["protoc"]
-    try:
-        import grpc_tools.protoc  # noqa: F401
-        return [sys.executable, "-m", "grpc_tools.protoc"]
-    except ImportError:
-        pass
-    print("  ERROR: protoc not found. Install protoc or run: pip install grpcio-tools")
-    return None
-
-
 def step_compile():
     print("\n=== Step 1: Compile .proto -> descriptor set ===")
     proto_files = [f for f in PROTO_DIR.glob("*.proto") if not f.name.endswith("_gen.proto") and f.name != "config_metadata.proto"]
@@ -69,7 +46,7 @@ def step_compile():
         print("  ERROR: No .proto files found")
         return False
 
-    protoc = _protoc_cmd()
+    protoc = codegen_toolchain.find_protoc()
     if protoc is None:
         return False
 
@@ -82,7 +59,6 @@ def step_compile():
 
 def step_generate():
     print("\n=== Step 2: Generate C++ from descriptors + layout.yaml ===")
-    _ensure_pyyaml()  # tab layout generation requires pyyaml
     return run([sys.executable, str(ROOT / "tools" / "config_codegen.py"),
                 str(DESC_FILE), str(CODEGEN_OUT)])
 
@@ -106,8 +82,11 @@ def main():
                         help="Skip validation step (used by cmake build)")
     args = parser.parse_args()
 
+    # Re-execs into a virtualenv with protobuf/pyyaml if this interpreter lacks them.
+    codegen_toolchain.ensure_python_runtime()
+
     if args.validate_only:
-        # Compile + lint the protos, then check the committed generated files are current.
+        # Compile + lint the protos, then check the generated files against PrintConfig.cpp.
         sys.exit(0 if (step_compile() and step_lint() and step_validate()) else 1)
 
     for name, fn in [("Compile", step_compile), ("Generate", step_generate)]:
