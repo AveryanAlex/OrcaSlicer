@@ -58,8 +58,18 @@ jobs:
           useCloudCache: true
 
       - name: Install codegen tools and generate config sources
+        # grpcio-tools has no Windows/ARM64 wheel for current Python and fails to build its
+        # grpcio C-extension from source there. The codegen only needs a protoc binary plus the
+        # protobuf runtime and pyyaml, so install those directly (works on x64 and arm64 Windows;
+        # the x64 protoc runs under emulation on arm64). protobuf must be >= the version the
+        # committed config_metadata_pb2.py was generated with (see its runtime-version check).
         run: |
-          pip install grpcio-tools
+          pip install "protobuf>=6.33.5,<7" pyyaml
+          $protocVer = "28.3"
+          $url = "https://github.com/protocolbuffers/protobuf/releases/download/v$protocVer/protoc-$protocVer-win64.zip"
+          Invoke-WebRequest -Uri $url -OutFile "$env:RUNNER_TEMP\protoc.zip"
+          Expand-Archive -Path "$env:RUNNER_TEMP\protoc.zip" -DestinationPath "$env:RUNNER_TEMP\protoc" -Force
+          $env:PATH = "$env:RUNNER_TEMP\protoc\bin;$env:PATH"
           python tools/run_codegen.py
         if: runner.os == 'Windows'
         shell: pwsh
