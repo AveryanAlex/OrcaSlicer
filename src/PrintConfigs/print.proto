@@ -7432,4 +7432,71 @@ message PrintSettings {
     (enum_label_entries) = "ColPic",
     (invalidates) = STEP_GCODE_EXPORT
   ];
+
+
+  int32 bottom_surface_fill_order = 501 [
+    (label)     = "Bottom surface fill order",
+    (tooltip)     = "Direction in which bottom surfaces are filled when using a center-based pattern (Concentric, Archimedean Chords, Octagram Spiral).\\nInward starts each surface with the wider outer curves, which improves first layer adhesion on build plates where the tight curves at the center may not stick. Outward starts at the center, pushing any excess material towards the edge.\\nDefault uses shortest-path ordering, which may run in either direction.",
+    (category)     = "Strength",
+    (co_type_hint)     = coEnum,
+    (enum_keys_map_ref)     = "ConfigOptionEnum<SurfaceFillOrder>::get_enum_values()",
+    (mode)     = MODE_ADVANCED,
+    (has_default)     = true,
+    (default_value) = "SurfaceFillOrder::Default"
+  ];
+
+
+  repeated float flush_multiplier_fast = 502 [
+    (label)     = "Flush multiplier (Fast mode)",
+    (tooltip)     = "The flush multiplier used in fast purge mode.",
+    (has_default)     = true,
+    (default_value) = "1.2"
+  ];
+
+
+  repeated string plugins = 503 [
+    (label)     = "Plugins Used",
+    (mode)     = MODE_DEVELOP,
+    (has_default)     = true,
+    (default_value) = ""
+  ];
+
+
+  int32 prime_volume_mode = 504 [
+    (label)     = "Prime volume mode",
+    (tooltip)     = "Selects how the wipe-tower prime and flush volumes are computed on multi-extruder printers.",
+    (co_type_hint)     = coEnum,
+    (enum_keys_map_ref)     = "ConfigOptionEnum<PrimeVolumeMode>::get_enum_values()",
+    (mode)     = MODE_DEVELOP,
+    (has_default)     = true,
+    (default_value) = "pvmDefault",
+    (enum_value_entries) = "Default",
+    (enum_value_entries) = "Saving",
+    (enum_value_entries) = "Fast",
+    (enum_label_entries) = "Default",
+    (enum_label_entries) = "Saving",
+    (enum_label_entries) = "Fast"
+  ];
+
+
+  repeated float retract_after_wipe = 505 [
+    (label)     = "Retract amount after wipe",
+    (tooltip)     = "The length of fast retraction after wipe, relative to retraction length.\\nThe value will be clamped by 100% minus the retract amount before the wipe value.",
+    (sidetext)     = "%",
+    (co_type_hint)     = coPercents,
+    (mode)     = MODE_EXPERT,
+    (has_default)     = true,
+    (default_value) = "0"
+  ];
+
+
+  repeated string slicing_pipeline_plugin = 506 [
+    (label)     = "Slicing Pipeline Plugin",
+    (tooltip)     = "Python plugin(s) invoked at each slicing pipeline step to read and modify intermediate slicing data, including a final G-code post-processing step. Research/experimental.",
+    (gui_type)     = plugin_picker,
+    (mode)     = MODE_ADVANCED,
+    (has_default)     = true,
+    (default_value) = ""
+  ];
+
 }

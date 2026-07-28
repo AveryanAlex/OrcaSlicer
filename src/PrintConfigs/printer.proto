@@ -780,4 +780,188 @@ message PrinterSettings {
     (invalidates) = STEP_GCODE_EXPORT
   ];
 
+
+
+  bool cooling_filter_enabled = 43 [
+    (label)     = "Use cooling filter",
+    (tooltip)     = "Enable this if printer support cooling filter",
+    (mode)     = MODE_ADVANCED,
+    (preset)     = PRESET_PRINTER,
+    (has_default)     = true,
+    (default_value) = "false"
+  ];
+
+
+  repeated float deretract_speed_extruder_change = 44 [
+    (label)     = "Deretraction speed (extruder change)",
+    (tooltip)     = "Speed for reloading filament into the nozzle when switching extruder.",
+    (sidetext)     = "mm/s",
+    (is_nullable)     = true,
+    (mode)     = MODE_DEVELOP,
+    (preset)     = PRESET_PRINTER,
+    (has_default)     = true,
+    (default_value) = "0."
+  ];
+
+
+  bool enable_pre_heating = 45 [
+    (label)     = "enable_pre_heating",
+    (preset)     = PRESET_PRINTER,
+    (has_default)     = true,
+    (default_value) = "false"
+  ];
+
+
+  repeated int32 extruder_max_nozzle_count = 46 [
+    (label)     = "extruder_max_nozzle_count",
+    (is_nullable)     = true,
+    (mode)     = MODE_DEVELOP,
+    (preset)     = PRESET_PRINTER,
+    (has_default)     = true,
+    (default_value) = "1"
+  ];
+
+
+  repeated int32 extruder_nozzle_count = 47 [
+    (label)     = "extruder nozzle count",
+    (tooltip)     = "extruder nozzle count",
+    (mode)     = MODE_DEVELOP,
+    (preset)     = PRESET_PRINTER,
+    (has_default)     = true,
+    (default_value) = "1"
+  ];
+
+
+  repeated string extruder_nozzle_stats = 48 [
+    (label)     = "Extruder nozzle stats",
+    (tooltip)     = "Physical nozzle counts per extruder, keyed by nozzle volume type.",
+    (preset)     = PRESET_PRINTER,
+    (has_default)     = true,
+    (default_value) = ""
+  ];
+
+
+  repeated int32 extruder_nozzle_volume_type = 49 [
+    (label)     = "Extruder nozzle volume type",
+    (tooltip)     = "Nozzle volume type per physical nozzle of an extruder.",
+    (co_type_hint)     = coEnums,
+    (enum_keys_map_ref)     = "ConfigOptionEnum<NozzleVolumeType>::get_enum_values()",
+    (mode)     = MODE_DEVELOP,
+    (preset)     = PRESET_PRINTER,
+    (has_default)     = true,
+    (default_value) = "NozzleVolumeType::nvtStandard",
+    (enum_value_entries) = "Standard",
+    (enum_value_entries) = "High Flow",
+    (enum_value_entries) = "TPU High Flow",
+    (enum_label_entries) = "Standard",
+    (enum_label_entries) = "High Flow",
+    (enum_label_entries) = "TPU High Flow"
+  ];
+
+
+  int32 fan_direction = 50 [
+    (label)     = "Fan direction",
+    (tooltip)     = "Cooling fan direction of the printer",
+    (co_type_hint)     = coEnum,
+    (enum_keys_map_ref)     = "ConfigOptionEnum<FanDirection>::get_enum_values()",
+    (mode)     = MODE_DEVELOP,
+    (preset)     = PRESET_PRINTER,
+    (has_default)     = true,
+    (default_value) = "fdUndefine",
+    (enum_value_entries) = "undefine",
+    (enum_value_entries) = "left",
+    (enum_value_entries) = "right",
+    (enum_value_entries) = "both",
+    (enum_label_entries) = "Undefined",
+    (enum_label_entries) = "Left",
+    (enum_label_entries) = "Right",
+    (enum_label_entries) = "Both"
+  ];
+
+
+  bool farthest_point_timelapse = 51 [
+    (label)     = "Farthest point timelapse",
+    (tooltip)     = "When enabled, the timelapse snapshot is taken at the farthest point from camera instead of traveling to the wipe tower or excess chute. Only effective in traditional timelapse mode on non-I3 printers.",
+    (mode)     = MODE_SIMPLE,
+    (preset)     = PRESET_PRINTER,
+    (has_default)     = true,
+    (default_value) = "false"
+  ];
+
+
+  bool group_algo_with_time = 52 [
+    (label)     = "group_algo_with_time",
+    (mode)     = MODE_DEVELOP,
+    (preset)     = PRESET_PRINTER,
+    (has_default)     = true,
+    (default_value) = "false"
+  ];
+
+
+  bool handle_hotend_as_extruder = 53 [
+    (label)     = "handle_hotend_as_extruder",
+    (mode)     = MODE_DEVELOP,
+    (preset)     = PRESET_PRINTER,
+    (has_default)     = true,
+    (default_value) = "false"
+  ];
+
+
+  repeated float hotend_cooling_rate = 54 [
+    (label)     = "hotend_cooling_rate",
+    (is_nullable)     = true,
+    (preset)     = PRESET_PRINTER,
+    (has_default)     = true,
+    (default_value) = "2"
+  ];
+
+
+  repeated float hotend_heating_rate = 55 [
+    (label)     = "hotend_heating_rate",
+    (is_nullable)     = true,
+    (preset)     = PRESET_PRINTER,
+    (has_default)     = true,
+    (default_value) = "2"
+  ];
+
+
+  float machine_hotend_change_time = 56 [
+    (label)     = "Hotend change time",
+    (tooltip)     = "Time to change hotend.",
+    (sidetext)     = "s",
+    (min_value)     = 0,
+    (mode)     = MODE_ADVANCED,
+    (preset)     = PRESET_PRINTER,
+    (has_default)     = true,
+    (default_value) = "0.0"
+  ];
+
+
+  float machine_prepare_compensation_time = 57 [
+    (label)     = "machine_prepare_compensation_time",
+    (mode)     = MODE_DEVELOP,
+    (preset)     = PRESET_PRINTER,
+    (has_default)     = true,
+    (default_value) = "260"
+  ];
+
+
+  bool support_cooling_filter = 58 [
+    (label)     = "support_cooling_filter",
+    (mode)     = MODE_ADVANCED,
+    (preset)     = PRESET_PRINTER,
+    (has_default)     = true,
+    (default_value) = "false"
+  ];
+
+
+  bool support_fast_purge_mode = 59 [
+    (label)     = "Support fast purge mode",
+    (tooltip)     = "Whether this printer supports fast purge mode with optimized temperature and multiplier.",
+    (mode)     = MODE_DEVELOP,
+    (preset)     = PRESET_PRINTER,
+    (has_default)     = true,
+    (default_value) = "false"
+  ];
+
 }

@@ -1947,4 +1947,322 @@ message FilamentSettings {
     (has_default)  = true,
     (default_value) = "18"
   ];
+
+
+  repeated int32 chamber_minimal_temperature = 121 [
+    (label)     = "Minimal",
+    (tooltip)     = "This is the chamber temperature at which printing should start, while the chamber continues heating toward the \\\"Target\\\" chamber temperature. For example, set the Target to 60 and the Minimal to 50 to begin printing once the chamber reaches 50℃, without waiting for the full 60℃.\\n\\nIt sets a G-code variable named chamber_minimal_temperature, which can be passed to your print start macro or a heat soak macro, like this: PRINT_START (other variables) CHAMBER_MIN_TEMP=[chamber_minimal_temperature].\\n\\n",
+    (sidetext)     = "\\u2103",
+    (min_value)     = 0,
+    (preset)     = PRESET_FILAMENT,
+    (has_default)     = true,
+    (default_value) = "0"
+  ];
+
+
+  repeated float filament_change_length_nc = 122 [
+    (label)     = "Hotend change",
+    (tooltip)     = "When changing the hotend, it is recommended to extrude a certain length of filament from the original nozzle. This helps minimize nozzle oozing.",
+    (sidetext)     = "mm",
+    (min_value)     = 0,
+    (mode)     = MODE_ADVANCED,
+    (preset)     = PRESET_FILAMENT,
+    (has_default)     = true,
+    (default_value) = "10"
+  ];
+
+
+  repeated string filament_dev_ams_drying_ams_limitations = 123 [
+    (label)     = "filament_dev_ams_drying_ams_limitations",
+    (preset)     = PRESET_FILAMENT,
+    (has_default)     = true,
+    (default_value) = ""
+  ];
+
+
+  repeated float filament_dev_ams_drying_heat_distortion_temperature = 124 [
+    (label)     = "filament_dev_ams_drying_heat_distortion_temperature",
+    (preset)     = PRESET_FILAMENT,
+    (has_default)     = true,
+    (default_value) = "0"
+  ];
+
+
+  repeated float filament_dev_ams_drying_temperature = 125 [
+    (label)     = "filament_dev_ams_drying_temperature",
+    (preset)     = PRESET_FILAMENT,
+    (has_default)     = true,
+    (default_value) = "0"
+  ];
+
+
+  repeated float filament_dev_ams_drying_time = 126 [
+    (label)     = "filament_dev_ams_drying_time",
+    (preset)     = PRESET_FILAMENT,
+    (has_default)     = true,
+    (default_value) = "0"
+  ];
+
+
+  repeated float filament_dev_chamber_drying_bed_temperature = 127 [
+    (label)     = "filament_dev_chamber_drying_bed_temperature",
+    (preset)     = PRESET_FILAMENT,
+    (has_default)     = true,
+    (default_value) = "0"
+  ];
+
+
+  repeated float filament_dev_chamber_drying_time = 128 [
+    (label)     = "filament_dev_chamber_drying_time",
+    (preset)     = PRESET_FILAMENT,
+    (has_default)     = true,
+    (default_value) = "0"
+  ];
+
+
+  repeated float filament_dev_drying_cooling_temperature = 129 [
+    (label)     = "filament_dev_drying_cooling_temperature",
+    (mode)     = MODE_SIMPLE,
+    (preset)     = PRESET_FILAMENT,
+    (has_default)     = true,
+    (default_value) = "0"
+  ];
+
+
+  repeated float filament_dev_drying_softening_temperature = 130 [
+    (label)     = "filament_dev_drying_softening_temperature",
+    (preset)     = PRESET_FILAMENT,
+    (has_default)     = true,
+    (default_value) = "0"
+  ];
+
+
+  repeated int32 filament_extruder_compatibility = 131 [
+    (label)     = "Filament-extruder compatibility",
+    (tooltip)     = "A single 32-bit int encoding the compatibility level of a filament across all extruders (up to 10). Every 3 bits represent one extruder (bits [3*i, 3*i+2] for extruder i). 0: printable, 1: error, 2: critical warning, 3: warning, 4-7: reserved.",
+    (mode)     = MODE_DEVELOP,
+    (preset)     = PRESET_FILAMENT,
+    (has_default)     = true,
+    (default_value) = "0"
+  ];
+
+
+  repeated int32 filament_flush_temp_fast = 132 [
+    (label)     = "Flush temperature",
+    (tooltip)     = "Flush temperature used in fast purge mode.",
+    (sidetext)     = "\\u2103",
+    (is_nullable)     = true,
+    (min_value)     = 0,
+    (mode)     = MODE_ADVANCED,
+    (preset)     = PRESET_FILAMENT,
+    (has_default)     = true,
+    (default_value) = "0"
+  ];
+
+
+  repeated int32 filament_map_2 = 133 [
+    (label)     = "Filament map plus for multi nozzle",
+    (tooltip)     = "Filament map to the index identified by extruder and nozzle_volume_type",
+    (mode)     = MODE_DEVELOP,
+    (preset)     = PRESET_FILAMENT,
+    (has_default)     = true,
+    (default_value) = "1"
+  ];
+
+
+  repeated float filament_max_temperature_drop_when_ec = 134 [
+    (label)     = "filament_max_temperature_drop_when_ec",
+    (mode)     = MODE_DEVELOP,
+    (preset)     = PRESET_FILAMENT,
+    (has_default)     = true,
+    (default_value) = "0"
+  ];
+
+
+  repeated int32 filament_nozzle_map = 135 [
+    (label)     = "filament_nozzle_map",
+    (mode)     = MODE_DEVELOP,
+    (preset)     = PRESET_FILAMENT,
+    (has_default)     = true,
+    (default_value) = "1"
+  ];
+
+
+  repeated int32 filament_pre_cooling_temperature = 136 [
+    (label)     = "Extruder change",
+    (tooltip)     = "To prevent oozing, the nozzle temperature will be cooled during ramming. Therefore, the ramming time must be greater than the cooldown time. 0 means disabled.",
+    (sidetext)     = "\\u2103",
+    (is_nullable)     = true,
+    (min_value)     = 0,
+    (mode)     = MODE_ADVANCED,
+    (preset)     = PRESET_FILAMENT,
+    (has_default)     = true,
+    (default_value) = "0"
+  ];
+
+
+  repeated int32 filament_pre_cooling_temperature_nc = 137 [
+    (label)     = "Hotend change",
+    (tooltip)     = "To prevent oozing, the nozzle temperature will be cooled during ramming. Note: only a cooldown command and fan activation are triggered, reaching the target temperature is not guaranteed. 0 means disabled.",
+    (sidetext)     = "\\u2103",
+    (is_nullable)     = true,
+    (min_value)     = 0,
+    (mode)     = MODE_ADVANCED,
+    (preset)     = PRESET_FILAMENT,
+    (has_default)     = true,
+    (default_value) = "0"
+  ];
+
+
+  repeated float filament_preheat_temperature_delta = 138 [
+    (label)     = "Preheat temperature delta",
+    (tooltip)     = "Temperature delta applied during pre-heating before tool change.",
+    (sidetext)     = "\\u2103",
+    (is_nullable)     = true,
+    (mode)     = MODE_DEVELOP,
+    (preset)     = PRESET_FILAMENT,
+    (has_default)     = true,
+    (default_value) = "0"
+  ];
+
+
+  repeated float filament_prime_volume = 139 [
+    (label)     = "Filament change",
+    (tooltip)     = "The volume of material required to prime the extruder on the tower, excluding a hotend change.",
+    (sidetext)     = "mm³",
+    (min_value)     = 1.0,
+    (mode)     = MODE_SIMPLE,
+    (preset)     = PRESET_FILAMENT,
+    (has_default)     = true,
+    (default_value) = "45."
+  ];
+
+
+  repeated float filament_prime_volume_nc = 140 [
+    (label)     = "Hotend change",
+    (tooltip)     = "The volume of material required to prime the extruder for a hotend change on the tower.",
+    (sidetext)     = "mm³",
+    (min_value)     = 1.0,
+    (mode)     = MODE_SIMPLE,
+    (preset)     = PRESET_FILAMENT,
+    (has_default)     = true,
+    (default_value) = "60."
+  ];
+
+
+  repeated float filament_ramming_travel_time = 141 [
+    (label)     = "Extruder change",
+    (tooltip)     = "To prevent oozing, the nozzle will perform a reverse travel movement for a certain period after the ramming is complete. The setting define the travel time.",
+    (sidetext)     = "s",
+    (is_nullable)     = true,
+    (min_value)     = 0,
+    (mode)     = MODE_ADVANCED,
+    (preset)     = PRESET_FILAMENT,
+    (has_default)     = true,
+    (default_value) = "0"
+  ];
+
+
+  repeated float filament_ramming_travel_time_nc = 142 [
+    (label)     = "Hotend change",
+    (tooltip)     = "To prevent oozing, the nozzle will perform a reverse travel movement for a certain period after the ramming is complete. The setting define the travel time.",
+    (sidetext)     = "s",
+    (is_nullable)     = true,
+    (min_value)     = 0,
+    (mode)     = MODE_ADVANCED,
+    (preset)     = PRESET_FILAMENT,
+    (has_default)     = true,
+    (default_value) = "0"
+  ];
+
+
+  repeated float filament_ramming_volumetric_speed = 143 [
+    (label)     = "Extruder change",
+    (tooltip)     = "The maximum volumetric speed for ramming before extruder change, where -1 means using the maximum volumetric speed.",
+    (sidetext)     = "mm³/s",
+    (is_nullable)     = true,
+    (min_value)     = -1,
+    (max_value)     = 200,
+    (mode)     = MODE_ADVANCED,
+    (preset)     = PRESET_FILAMENT,
+    (has_default)     = true,
+    (default_value) = "-1"
+  ];
+
+
+  repeated float filament_ramming_volumetric_speed_nc = 144 [
+    (label)     = "Hotend change",
+    (tooltip)     = "The maximum volumetric speed for ramming before a hotend change, where -1 means using the maximum volumetric speed.",
+    (sidetext)     = "mm³/s",
+    (is_nullable)     = true,
+    (min_value)     = -1,
+    (max_value)     = 200,
+    (mode)     = MODE_ADVANCED,
+    (preset)     = PRESET_FILAMENT,
+    (has_default)     = true,
+    (default_value) = "-1"
+  ];
+
+
+  repeated float filament_retract_length_nc = 145 [
+    (label)     = "length when change hotend",
+    (tooltip)     = "When this retraction value is modified, it will be used as the amount of filament retracted inside the hotend before changing hotends.",
+    (sidetext)     = "mm",
+    (is_nullable)     = true,
+    (min_value)     = 0,
+    (max_value)     = 18,
+    (mode)     = MODE_DEVELOP,
+    (preset)     = PRESET_FILAMENT,
+    (has_default)     = true,
+    (default_value) = "10."
+  ];
+
+
+  repeated int32 filament_volume_map = 146 [
+    (label)     = "filament_volume_map",
+    (mode)     = MODE_DEVELOP,
+    (preset)     = PRESET_FILAMENT,
+    (has_default)     = true,
+    (default_value) = "(int)(NozzleVolumeType::nvtStandard)"
+  ];
+
+
+  float machine_bed_mass_Y = 147 [
+    (label)     = "machine_bed_mass_Y",
+    (tooltip)     = "The machine bed mass load of Y axis",
+    (category)     = "Machine limits",
+    (sidetext)     = "g",
+    (min_value)     = 0,
+    (mode)     = MODE_DEVELOP,
+    (preset)     = PRESET_FILAMENT,
+    (has_default)     = true,
+    (default_value) = "0"
+  ];
+
+
+  float machine_max_force_Y = 148 [
+    (label)     = "machine_max_force_Y",
+    (tooltip)     = "The allowed maximum output force of Y axis",
+    (category)     = "Machine limits",
+    (sidetext)     = "N",
+    (min_value)     = 0,
+    (mode)     = MODE_DEVELOP,
+    (preset)     = PRESET_FILAMENT,
+    (has_default)     = true,
+    (default_value) = "0"
+  ];
+
+
+  float machine_max_printed_mass = 149 [
+    (label)     = "machine_max_printed_mass",
+    (tooltip)     = "The allowed max printed mass on a plate",
+    (category)     = "Machine limits",
+    (sidetext)     = "g",
+    (min_value)     = 0,
+    (mode)     = MODE_DEVELOP,
+    (preset)     = PRESET_FILAMENT,
+    (has_default)     = true,
+    (default_value) = "0"
+  ];
+
 }

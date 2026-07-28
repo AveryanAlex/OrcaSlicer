@@ -79,9 +79,21 @@ const std::vector<std::string> filament_extruder_override_keys = {
     "filament_wipe",
     // percents
     "filament_retract_before_wipe",
+    // Orca
+    "filament_retract_after_wipe",
+    // BBS
     "filament_long_retractions_when_cut",
     "filament_retraction_distances_when_cut"
 };
+
+// Some filament override parameters are generated from filament_extruder_override_keys,
+// while filament_retract_length_nc is defined separately. Keep the generator list
+// unchanged and use this helper for behavior checks that need the full override set.
+bool is_filament_extruder_override_key(const std::string &opt_key)
+{
+    return std::find(filament_extruder_override_keys.begin(), filament_extruder_override_keys.end(), opt_key) != filament_extruder_override_keys.end() ||
+           opt_key == "filament_retract_length_nc";
+}
 
 size_t get_extruder_index(const GCodeConfig& config, unsigned int filament_id)
 {
@@ -301,6 +313,14 @@ static t_config_enum_values s_keys_map_WallDirection{
 };
 CONFIG_OPTION_ENUM_DEFINE_STATIC_MAPS(WallDirection)
 
+//Orca
+static t_config_enum_values s_keys_map_SurfaceFillOrder{
+    { "default",  int(SurfaceFillOrder::Default) },
+    { "outward",  int(SurfaceFillOrder::Outward) },
+    { "inward",   int(SurfaceFillOrder::Inward) },
+};
+CONFIG_OPTION_ENUM_DEFINE_STATIC_MAPS(SurfaceFillOrder)
+
 //BBS
 static t_config_enum_values s_keys_map_PrintSequence {
     { "by layer",     int(PrintSequence::ByLayer) },
@@ -311,6 +331,8 @@ CONFIG_OPTION_ENUM_DEFINE_STATIC_MAPS(PrintSequence)
 static t_config_enum_values s_keys_map_PrintOrder{
     { "default",     int(PrintOrder::Default) },
     { "as_obj_list", int(PrintOrder::AsObjectList)},
+    { "best_of",       int(PrintOrder::BestOfStrategies)},
+    { "snake", int(PrintOrder::Snake)},
 };
 CONFIG_OPTION_ENUM_DEFINE_STATIC_MAPS(PrintOrder)
 
@@ -503,6 +525,14 @@ static t_config_enum_values s_keys_map_NozzleType {
 };
 CONFIG_OPTION_ENUM_DEFINE_STATIC_MAPS(NozzleType)
 
+static t_config_enum_values s_keys_map_FanDirection {
+    { "undefine",       int(FanDirection::fdUndefine) },
+    { "left",           int(FanDirection::fdLeft) },
+    { "right",          int(FanDirection::fdRight) },
+    { "both",           int(FanDirection::fdBoth) }
+};
+CONFIG_OPTION_ENUM_DEFINE_STATIC_MAPS(FanDirection)
+
 static t_config_enum_values s_keys_map_PrinterStructure {
     {"undefine",        int(PrinterStructure::psUndefine)},
     {"corexy",          int(PrinterStructure::psCoreXY)},
@@ -588,16 +618,27 @@ CONFIG_OPTION_ENUM_DEFINE_STATIC_MAPS(ExtruderType)
 
 static const t_config_enum_values s_keys_map_NozzleVolumeType = {
     { "Standard",  nvtStandard },
-    { "High Flow", nvtHighFlow }
+    { "High Flow", nvtHighFlow },
+    { "TPU High Flow", nvtTPUHighFlow },
+    { "Hybrid", nvtHybrid }
 };
 CONFIG_OPTION_ENUM_DEFINE_STATIC_MAPS(NozzleVolumeType)
 
 static const t_config_enum_values s_keys_map_FilamentMapMode = {
     { "Auto For Flush", fmmAutoForFlush },
     { "Auto For Match", fmmAutoForMatch },
-    { "Manual", fmmManual }
+    { "Manual", fmmManual },
+    { "Nozzle Manual", fmmNozzleManual }
 };
 CONFIG_OPTION_ENUM_DEFINE_STATIC_MAPS(FilamentMapMode)
+
+// PrimeVolumeMode. Serialized string keys must stay stable; they round-trip through .3mf.
+static const t_config_enum_values s_keys_map_PrimeVolumeMode = {
+    { "Default", pvmDefault },
+    { "Saving",  pvmSaving },
+    { "Fast",    pvmFast }
+};
+CONFIG_OPTION_ENUM_DEFINE_STATIC_MAPS(PrimeVolumeMode)
 
 
 //BBS
@@ -610,7 +651,8 @@ std::string get_extruder_variant_string(ExtruderType extruder_type, NozzleVolume
         //extruder_type = etDirectDrive;
         return variant_string;
     }
-    if (nozzle_volume_type > nvtMaxNozzleVolumeType) {
+    auto nozzle_volume_types = get_valid_nozzle_volume_type();
+    if (nozzle_volume_types.count(nozzle_volume_type) == 0) {
         BOOST_LOG_TRIVIAL(error) << __FUNCTION__ << boost::format(", unsupported NozzleVolumeType=%1%")%nozzle_volume_type;
         //extruder_type = etDirectDrive;
         return variant_string;
@@ -619,6 +661,16 @@ std::string get_extruder_variant_string(ExtruderType extruder_type, NozzleVolume
     variant_string+= " ";
     variant_string+= s_keys_names_NozzleVolumeType[nozzle_volume_type];
     return variant_string;
+}
+
+int get_config_index_base(NozzleVolumeType volume_type, ExtruderType extruder_type, int variant_id_1based, const std::vector<std::string>& variant_list, const std::vector<int>& variant_ids_1based)
+{
+    assert(variant_list.size() == variant_ids_1based.size());
+    std::string extruder_variant = get_extruder_variant_string(extruder_type, volume_type);
+    for (int index = 0; index < int(variant_list.size()); ++index) {
+        if (extruder_variant == variant_list[index] && variant_ids_1based[index] == variant_id_1based) { return index; }
+    }
+    return 0;
 }
 
 std::string get_nozzle_volume_type_string(NozzleVolumeType nozzle_volume_type)
@@ -667,6 +719,89 @@ std::vector<std::string> save_extruder_ams_count_to_string(const std::vector<std
         extruder_ams_count_str.push_back(oss.str());
     }
     return extruder_ams_count_str;
+}
+
+// Maps a full extruder variant string such as "Direct Drive High Flow" to its
+// NozzleVolumeType: the extruder-type prefix is stripped, the remainder is trimmed
+// and looked up as a volume-type name. Returns nvtHybrid when the string cannot
+// be parsed.
+NozzleVolumeType convert_to_nvt_type(const std::string &variant_str) {
+    const auto &ext_types = ConfigOptionEnum<ExtruderType>::get_enum_names();
+
+    auto trim = [](std::string &s) {
+        s.erase(s.find_last_not_of(" \t\r\n") + 1);
+        s.erase(0, s.find_first_not_of(" \t\r\n"));
+    };
+
+    for (auto ext_type : ext_types) {
+        size_t pos = variant_str.find(ext_type);
+        if (pos == std::string::npos)
+            continue;
+
+        std::string result = variant_str;
+        result.erase(pos, ext_type.size());
+        trim(result);
+
+        auto iter = s_keys_map_NozzleVolumeType.find(result);
+        if (iter != s_keys_map_NozzleVolumeType.end())
+            return NozzleVolumeType(iter->second);
+    }
+
+    return nvtHybrid;
+}
+
+// Parses the extruder_nozzle_stats option: one "|"-separated token list per
+// extruder, each token
+// "<volume_type_name>#<count>". Empty string => no per-type stats for that extruder.
+std::vector<std::map<NozzleVolumeType, int>> get_extruder_nozzle_stats(const std::vector<std::string> &strs)
+{
+    std::vector<std::map<NozzleVolumeType, int>> extruder_nozzle_counts;
+    for (const std::string &str : strs) {
+        std::map<NozzleVolumeType, int> nozzle_count_map;
+        if (str.empty()) {
+            extruder_nozzle_counts.emplace_back(nozzle_count_map);
+            continue;
+        }
+        std::vector<std::string> nozzle_infos;
+        boost::algorithm::split(nozzle_infos, str, boost::algorithm::is_any_of("|"));
+        for (auto &nozzle_info : nozzle_infos) {
+            std::vector<std::string> attr;
+            boost::algorithm::split(attr, nozzle_info, boost::algorithm::is_any_of("#"));
+            // Guard against malformed device/project data: skip tokens without a "<type>#<count>"
+            // shape or with an unknown volume-type key instead of throwing (.at) or reading attr[1]
+            // out of bounds. Corrupt tokens are dropped and logged; the rest still parse.
+            if (attr.size() < 2) {
+                BOOST_LOG_TRIVIAL(warning) << "get_extruder_nozzle_stats: skipping malformed token '" << nozzle_info << "'";
+                continue;
+            }
+            auto it = s_keys_map_NozzleVolumeType.find(attr[0]);
+            if (it == s_keys_map_NozzleVolumeType.end()) {
+                BOOST_LOG_TRIVIAL(warning) << "get_extruder_nozzle_stats: skipping unknown nozzle volume type '" << attr[0] << "'";
+                continue;
+            }
+            NozzleVolumeType volume_type = NozzleVolumeType(it->second);
+            int              nozzle_count = std::atoi(attr[1].c_str());
+            nozzle_count_map[volume_type] = nozzle_count;
+        }
+        extruder_nozzle_counts.emplace_back(nozzle_count_map);
+    }
+    return extruder_nozzle_counts;
+}
+
+std::vector<std::string> save_extruder_nozzle_stats_to_string(const std::vector<std::map<NozzleVolumeType, int>> &extruder_nozzle_stats)
+{
+    std::vector<std::string> extruder_nozzle_count_str;
+    for (size_t idx = 0; idx < extruder_nozzle_stats.size(); ++idx) {
+        std::ostringstream oss;
+        const auto        &item = extruder_nozzle_stats[idx];
+        for (auto it = item.begin(); it != item.end(); ++it) {
+            oss << get_nozzle_volume_type_string(it->first) << "#" << it->second;
+            if (std::next(it) != item.end())
+                oss << "|";
+        }
+        extruder_nozzle_count_str.emplace_back(oss.str());
+    }
+    return extruder_nozzle_count_str;
 }
 
 static void assign_printer_technology_to_unknown(t_optiondef_map &options, PrinterTechnology printer_technology)
@@ -847,6 +982,9 @@ void PrintConfigDef::init_common_params()
     def->tooltip = L("Select the network agent implementation for printer communication.");
     def->mode = comAdvanced;
     def->cli = ConfigOptionDef::nocli;
+    // Plugin-backed (see ConfigOptionDef::is_plugin_backed), but edited through the Choice widget above
+    // rather than a plugin_picker field.
+    def->plugin_type = "printer-connection";
     def->set_default_value(new ConfigOptionString(""));
 
     def = this->add("print_host", coString);
@@ -944,6 +1082,22 @@ void PrintConfigDef::init_common_params()
         def = this->add("preset_name", coString);
         def->set_default_value(new ConfigOptionString());
     }
+
+    // One key per preset type (Preset::plugin_overrides_key), so the print, printer and filament
+    // overrides don't clobber each other when the presets merge into one full config. No handle_legacy
+    // migration from the shared "plugin_config_overrides" they replace: it only ever shipped in
+    // nightlies. Never a text field — GUIType::plugin_config renders a button opening PluginsConfigDialog.
+    for (const char* key : {"print_plugin_config_overrides", "printer_plugin_config_overrides", "filament_plugin_config_overrides"}) {
+        def = this->add(key, coString);
+        def->label = L("Capabilities");
+        def->tooltip = L("Configuration for the plugin capabilities this preset uses, overriding the global "
+                         "Capabilities configuration. Stored as a raw JSON array and edited through the dialog "
+                         "behind the button, never typed in directly.");
+        def->gui_type = ConfigOptionDef::GUIType::plugin_config;
+        def->mode = comAdvanced;
+        def->cli = ConfigOptionDef::nocli;
+        def->set_default_value(new ConfigOptionString(""));
+    }
 }
 
 void PrintConfigDef::init_fff_params()
@@ -964,6 +1118,7 @@ void PrintConfigDef::init_extruder_option_keys()
     m_extruder_retract_keys = {
         "deretraction_speed",
         "long_retractions_when_cut",
+        "retract_after_wipe",
         "retract_before_wipe",
         "retract_lift_above",
         "retract_lift_below",
@@ -989,7 +1144,9 @@ void PrintConfigDef::init_filament_option_keys()
 
     m_filament_retract_keys = {
         "deretraction_speed",
+        "filament_retract_length_nc",
         "long_retractions_when_cut",
+        "retract_after_wipe",
         "retract_before_wipe",
         "retract_lift_above",
         "retract_lift_below",
@@ -1886,7 +2043,8 @@ void PrintConfigDef::handle_legacy(t_config_option_key &opt_key, std::string &va
         "retraction_distance_when_cut",
         "internal_bridge_support_thickness", "top_area_threshold", "reduce_wall_solid_infill","filament_load_time","filament_unload_time",
         "smooth_coefficient", "overhang_totally_speed", "silent_mode",
-        "overhang_speed_classic", "filament_prime_volume",
+        "overhang_speed_classic",
+        "anisotropic_surfaces", // superseded by top_surface_fill_order / bottom_surface_fill_order
     };
 
     if (ignore.find(opt_key) != ignore.end()) {
@@ -2007,6 +2165,15 @@ std::set<std::string> print_options_with_variant = {
 std::set<std::string> filament_options_with_variant = {
     "filament_flow_ratio",
     "filament_max_volumetric_speed",
+    // Per-variant ramming / pre-cooling / nozzle-change filament overrides
+    "filament_ramming_volumetric_speed",
+    "filament_pre_cooling_temperature",
+    "filament_ramming_travel_time",
+    "filament_ramming_volumetric_speed_nc",
+    "filament_pre_cooling_temperature_nc",
+    "filament_ramming_travel_time_nc",
+    "filament_retract_length_nc",
+    "filament_preheat_temperature_delta",
     //"filament_extruder_id",
     "filament_extruder_variant",
     "filament_retraction_length",
@@ -2024,6 +2191,9 @@ std::set<std::string> filament_options_with_variant = {
     //BBS
     "filament_wipe_distance",
     "filament_retract_before_wipe",
+    // Orca
+    "filament_retract_after_wipe",
+    //BBS
     "filament_long_retractions_when_cut",
     "filament_retraction_distances_when_cut",
     "long_retractions_when_ec",
@@ -2054,7 +2224,8 @@ std::set<std::string> printer_extruder_options = {
     "extruder_printable_area",
     "extruder_printable_height",
     "min_layer_height",
-    "max_layer_height"
+    "max_layer_height",
+    "extruder_max_nozzle_count"     // Per-extruder max (sub-)nozzle count
 };
 
 std::set<std::string> printer_options_with_variant_1 = {
@@ -2073,6 +2244,8 @@ std::set<std::string> printer_options_with_variant_1 = {
     "wipe",
     "wipe_distance",
     "retract_before_wipe",
+    // Orca:
+    "retract_after_wipe",
     "retract_length_toolchange",
     "retract_restart_extra",
     "retract_restart_extra_toolchange",
@@ -2082,6 +2255,9 @@ std::set<std::string> printer_options_with_variant_1 = {
     "nozzle_type",
     "printer_extruder_id",
     "printer_extruder_variant",
+    // Per-variant hotend heat-up / cool-down rates (pre-heat time model)
+    "hotend_cooling_rate",
+    "hotend_heating_rate",
     "nozzle_flush_dataset"
 };
 
@@ -2106,6 +2282,17 @@ std::set<std::string> printer_options_with_variant_2 = {
 };
 
 std::set<std::string> empty_options;
+
+std::set<std::string> filament_dev_options = {
+    "filament_dev_ams_drying_ams_limitations",
+    "filament_dev_ams_drying_temperature",
+    "filament_dev_ams_drying_time",
+    "filament_dev_ams_drying_heat_distortion_temperature",
+    "filament_dev_chamber_drying_bed_temperature",
+    "filament_dev_chamber_drying_time",
+    "filament_dev_drying_softening_temperature",
+    "filament_dev_drying_cooling_temperature"
+};
 
 DynamicPrintConfig DynamicPrintConfig::full_print_config()
 {
@@ -2664,6 +2851,9 @@ int DynamicPrintConfig::get_index_for_extruder(int extruder_or_filament_id, std:
     if (variant_opt != nullptr) {
         int v_size = variant_opt->values.size();
         const bool has_complete_id_map = id_opt && int(id_opt->values.size()) >= v_size;
+        // nvtHybrid not supported in presets, switch to nvtStandard to match the preset values
+        if (nozzle_volume_type == nvtHybrid)
+            nozzle_volume_type = nvtStandard;
         std::string extruder_variant = get_extruder_variant_string(extruder_type, nozzle_volume_type);
         for (int index = 0; index < v_size; index++)
         {
@@ -3077,7 +3267,7 @@ int DynamicPrintConfig::update_values_from_multi_to_multi_2(const std::vector<st
                     bool has_value = false;
                     double target_value = std::numeric_limits<double>::max();
                     for(auto idx : indices){
-                        if(opt && !opt->is_nil(idx)){
+                        if(opt && idx < opt->values.size() && !opt->is_nil(idx)){
                             has_value = true;
                             target_value = std::min(target_value, src_values[idx]);
                         }
@@ -3264,184 +3454,229 @@ DynamicPrintConfig::get_filament_type() const
     return std::string();
 }
 
-void DynamicPrintConfig::update_values_to_printer_extruders(DynamicPrintConfig& printer_config, std::set<std::string>& key_set, std::string id_name, std::string variant_name, unsigned int stride, unsigned int extruder_id)
+int DynamicPrintConfig::get_extruder_nozzle_volume_count(int extruder_count, std::vector<std::vector<NozzleVolumeType>>& nozzle_volume_types) const
 {
-    int extruder_count;
-    bool different_extruder = printer_config.support_different_extruders(extruder_count);
-    if ((extruder_count > 1) || different_extruder)
-    {
-        BOOST_LOG_TRIVIAL(info) << __FUNCTION__ << boost::format(", Line %1%: different extruders processing")%__LINE__;
-        //apply process settings
-        //auto opt_nozzle_diameters = this->option<ConfigOptionFloats>("nozzle_diameter");
-        //int extruder_count = opt_nozzle_diameters->size();
-        auto opt_extruder_type = dynamic_cast<const ConfigOptionEnumsGeneric*>(printer_config.option("extruder_type"));
-        auto opt_nozzle_volume_type = dynamic_cast<const ConfigOptionEnumsGeneric*>(printer_config.option("nozzle_volume_type"));
-        if (!opt_extruder_type || !opt_nozzle_volume_type) {
-            BOOST_LOG_TRIVIAL(warning) << __FUNCTION__ << boost::format(", Line %1%: extruder_type or nozzle_volume_type option not found, skipping")%__LINE__;
-            return;
-        }
-        std::vector<int> variant_index;
-
-        if (extruder_id > 0 && extruder_id <= static_cast<unsigned> (extruder_count)) {
-            variant_index.resize(1);
-            ExtruderType extruder_type = (ExtruderType)(opt_extruder_type->get_at(extruder_id - 1));
-            NozzleVolumeType nozzle_volume_type = (NozzleVolumeType)(opt_nozzle_volume_type->get_at(extruder_id - 1));
-
-            //variant index
-            variant_index[0] = get_index_for_extruder(extruder_id, id_name, extruder_type, nozzle_volume_type, variant_name);
-
-            if (variant_index[0] < 0) {
-                BOOST_LOG_TRIVIAL(error) << __FUNCTION__ << boost::format(", Line %1%: could not found extruder_type %2%, nozzle_volume_type %3%, for filament")
-                    % __LINE__ % s_keys_names_ExtruderType[extruder_type] % s_keys_names_NozzleVolumeType[nozzle_volume_type];
-                assert(false);
-            }
-
-            extruder_count = 1;
-        }
-        else {
-            variant_index.resize(extruder_count);
-
-            for (int e_index = 0; e_index < extruder_count; e_index++)
-            {
-                ExtruderType extruder_type = (ExtruderType)(opt_extruder_type->get_at(e_index));
-                NozzleVolumeType nozzle_volume_type = (NozzleVolumeType)(opt_nozzle_volume_type->get_at(e_index));
-
-                //variant index
-                variant_index[e_index] = get_index_for_extruder(e_index+1, id_name, extruder_type, nozzle_volume_type, variant_name);
-                if (variant_index[e_index] < 0) {
-                    // Orca: This is expected during transient UI states (e.g. popup windows),
-                    // fall back to 0 silently.
-                    variant_index[e_index] = 0;
-                }
-            }
-        }
-
-        const ConfigDef       *config_def     = this->def();
-        if (!config_def) {
-            BOOST_LOG_TRIVIAL(error) << __FUNCTION__ << boost::format(", Line %1%: can not find config define")%__LINE__;
-            return;
-        }
-        for (auto& key: key_set)
+    int count = extruder_count;
+    auto opt_extruder_nozzle_stats = dynamic_cast<const ConfigOptionStrings*>(this->option("extruder_nozzle_stats"));
+    nozzle_volume_types.resize(extruder_count, std::vector<NozzleVolumeType>{});
+    if (opt_extruder_nozzle_stats && (int(opt_extruder_nozzle_stats->values.size()) == extruder_count)) {
+        std::vector<std::map<NozzleVolumeType, int>> extruder_nozzle_counts = get_extruder_nozzle_stats(opt_extruder_nozzle_stats->values);
+        count = 0;
+        for (int i = 0; i < extruder_count; i++)
         {
-            const ConfigOptionDef *optdef  = config_def->get(key);
-            if (!optdef) {
-                BOOST_LOG_TRIVIAL(warning) << __FUNCTION__ << boost::format(", Line %1%: can not find opt define for %2%")%__LINE__%key;
-                continue;
-            }
-            switch (optdef->type) {
-                case coStrings:
-                {
-                    ConfigOptionStrings * opt = this->option<ConfigOptionStrings>(key);
-                    std::vector<std::string> new_values;
-
-                    new_values.resize(extruder_count * stride);
-                    for (int e_index = 0; e_index < extruder_count; e_index++)
-                    {
-                        for (unsigned int i = 0; i < stride; i++)
-                            new_values[e_index*stride + i] = opt->get_at(variant_index[e_index]*stride + i);
-                    }
-                    opt->values = new_values;
-                    break;
-                }
-                case coInts:
-                {
-                    ConfigOptionInts * opt = this->option<ConfigOptionInts>(key);
-                    std::vector<int> new_values;
-
-                    new_values.resize(extruder_count * stride);
-                    for (int e_index = 0; e_index < extruder_count; e_index++)
-                    {
-                        for (unsigned int i = 0; i < stride; i++)
-                            new_values[e_index*stride + i] = opt->get_at(variant_index[e_index]*stride + i);
-                    }
-                    opt->values = new_values;
-                    break;
-                }
-                case coFloats:
-                {
-                    ConfigOptionFloats * opt = this->option<ConfigOptionFloats>(key);
-                    std::vector<double> new_values;
-
-                    new_values.resize(extruder_count * stride);
-                    for (int e_index = 0; e_index < extruder_count; e_index++)
-                    {
-                        for (unsigned int i = 0; i < stride; i++)
-                            new_values[e_index*stride + i] = opt->get_at(variant_index[e_index]*stride + i);
-                    }
-                    opt->values = new_values;
-                    break;
-                }
-                case coPercents:
-                {
-                    ConfigOptionPercents * opt = this->option<ConfigOptionPercents>(key);
-                    std::vector<double> new_values;
-
-                    new_values.resize(extruder_count * stride);
-                    for (int e_index = 0; e_index < extruder_count; e_index++)
-                    {
-                        for (unsigned int i = 0; i < stride; i++)
-                            new_values[e_index*stride + i] = opt->get_at(variant_index[e_index]*stride + i);
-                    }
-                    opt->values = new_values;
-                    break;
-                }
-                case coFloatsOrPercents:
-                {
-                    ConfigOptionFloatsOrPercents * opt = this->option<ConfigOptionFloatsOrPercents>(key);
-                    std::vector<FloatOrPercent> new_values;
-
-                    new_values.resize(extruder_count * stride);
-                    for (int e_index = 0; e_index < extruder_count; e_index++)
-                    {
-                        for (unsigned int i = 0; i < stride; i++)
-                            new_values[e_index*stride + i] = opt->get_at(variant_index[e_index]*stride + i);
-                    }
-                    opt->values = new_values;
-                    break;
-                }
-                case coBools:
-                {
-                    ConfigOptionBools * opt = this->option<ConfigOptionBools>(key);
-                    std::vector<unsigned char> new_values;
-
-                    new_values.resize(extruder_count * stride);
-                    for (int e_index = 0; e_index < extruder_count; e_index++)
-                    {
-                        for (unsigned int i = 0; i < stride; i++)
-                            new_values[e_index*stride + i] = opt->get_at(variant_index[e_index]*stride + i);
-                    }
-                    opt->values = new_values;
-                    break;
-                }
-                case coEnums:
-                {
-                    ConfigOptionEnumsGeneric * opt = this->option<ConfigOptionEnumsGeneric>(key);
-                    std::vector<int> new_values;
-
-                    new_values.resize(extruder_count * stride);
-                    for (int e_index = 0; e_index < extruder_count; e_index++)
-                    {
-                        for (unsigned int i = 0; i < stride; i++)
-                            new_values[e_index*stride + i] = opt->get_at(variant_index[e_index]*stride + i);
-                    }
-                    opt->values = new_values;
-                    break;
-                }
-                default:
-                    BOOST_LOG_TRIVIAL(warning) << __FUNCTION__ << boost::format(", Line %1%: unsupported option type for %2%")%__LINE__%key;
-                    break;
-            }
+            count += extruder_nozzle_counts[i].size();
+            // std::map iteration order gives the canonical slot order: ascending NozzleVolumeType
+            for (auto& iter : extruder_nozzle_counts[i])
+                nozzle_volume_types[i].push_back(iter.first);
         }
     }
+    return count;
 }
 
-void DynamicPrintConfig::update_values_to_printer_extruders_for_multiple_filaments(DynamicPrintConfig& printer_config, std::set<std::string>& key_set, std::string id_name, std::string variant_name)
+std::vector<int> DynamicPrintConfig::update_values_to_printer_extruders(DynamicPrintConfig& printer_config, int extruder_count, int extruder_nozzle_volume_count, std::vector<std::vector<NozzleVolumeType>>& nv_types,
+    std::set<std::string>& key_set, std::string id_name, std::string variant_name, unsigned int stride, unsigned int extruder_id, NozzleVolumeType filament_nvt)
 {
-    int extruder_count;
-    bool different_extruder = printer_config.support_different_extruders(extruder_count);
-    if ((extruder_count > 1) || different_extruder)
+    std::vector<int> variant_index;
+    int variant_count = extruder_count;
+
+    BOOST_LOG_TRIVIAL(info) << __FUNCTION__ << boost::format(", Line %1%: extruder_count %2%, extruder_nozzle_volume_count %3%")%__LINE__ %extruder_count %extruder_nozzle_volume_count;
+
+    auto opt_extruder_type = dynamic_cast<const ConfigOptionEnumsGeneric*>(printer_config.option("extruder_type"));
+    auto opt_nozzle_volume_type = dynamic_cast<const ConfigOptionEnumsGeneric*>(printer_config.option("nozzle_volume_type"));
+    if (!opt_extruder_type || !opt_nozzle_volume_type) {
+        BOOST_LOG_TRIVIAL(warning) << __FUNCTION__ << boost::format(", Line %1%: extruder_type or nozzle_volume_type option not found, skipping")%__LINE__;
+        return variant_index;
+    }
+
+    if (extruder_id > 0 && extruder_id <= static_cast<unsigned> (extruder_count)) {
+        variant_index.resize(1);
+        ExtruderType extruder_type = (ExtruderType)(opt_extruder_type->get_at(extruder_id - 1));
+        NozzleVolumeType nozzle_volume_type = (NozzleVolumeType)(opt_nozzle_volume_type->get_at(extruder_id - 1));
+
+        if (nozzle_volume_type == nvtHybrid) {
+            // a mixed-nozzle extruder has no preset column of its own: the filament's concrete
+            // volume type selects the slot
+            nozzle_volume_type = filament_nvt;
+        }
+        else if (nozzle_volume_type != filament_nvt) {
+            BOOST_LOG_TRIVIAL(info) << __FUNCTION__
+                                    << boost::format(", Line %1%: nozzle_volume_type is %2%,  not equal to filament_nvt %3%") % __LINE__ % nozzle_volume_type % filament_nvt;
+        }
+
+        //variant index
+        variant_index[0] = get_index_for_extruder(extruder_id, id_name, extruder_type, nozzle_volume_type, variant_name);
+
+        if (variant_index[0] < 0) {
+            BOOST_LOG_TRIVIAL(error) << __FUNCTION__ << boost::format(", Line %1%: could not found extruder_type %2%, nozzle_volume_type %3%, for filament")
+                % __LINE__ % s_keys_names_ExtruderType[extruder_type] % s_keys_names_NozzleVolumeType[nozzle_volume_type];
+        }
+
+        variant_count = 1;
+    }
+    else {
+        // Orca: emit the slots first, then size variant_count from what was actually
+        // emitted. extruder_nozzle_volume_count only equals the emitted total when every
+        // extruder carries per-type stats; an extruder with an empty stats entry combined
+        // with a Hybrid extruder would otherwise overrun a table pre-sized from that count.
+        for (int e_index = 0; e_index < extruder_count; e_index++)
+        {
+            ExtruderType extruder_type = (ExtruderType)(opt_extruder_type->get_at(e_index));
+            NozzleVolumeType nozzle_volume_type = (NozzleVolumeType)(opt_nozzle_volume_type->get_at(e_index));
+
+            // Orca: latch the decision before the inner loop reassigns nozzle_volume_type;
+            // re-testing the reassigned value would make every slot after the first reuse
+            // the first slot's volume type.
+            const bool per_type_slots = extruder_nozzle_volume_count > extruder_count || nozzle_volume_type == nvtHybrid;
+            const int nvt_count = per_type_slots ? int(nv_types[e_index].size()) : 1;
+            for (int nvt_index = 0; nvt_index < nvt_count; nvt_index++)
+            {
+                if (per_type_slots)
+                    nozzle_volume_type = nv_types[e_index][nvt_index];
+                //variant index
+                int slot_index = get_index_for_extruder(e_index+1, id_name, extruder_type, nozzle_volume_type, variant_name);
+                if (slot_index < 0) {
+                    // Orca: This is expected during transient UI states (e.g. popup windows),
+                    // fall back to 0 silently.
+                    slot_index = 0;
+                }
+                variant_index.push_back(slot_index);
+            }
+        }
+        variant_count = int(variant_index.size());
+    }
+
+    const ConfigDef       *config_def     = this->def();
+    if (!config_def) {
+        BOOST_LOG_TRIVIAL(error) << __FUNCTION__ << boost::format(", Line %1%: can not find config define")%__LINE__;
+        return variant_index;
+    }
+    for (auto& key: key_set)
     {
-        BOOST_LOG_TRIVIAL(info) << __FUNCTION__ << boost::format(", Line %1%:  extruder_count=%2%, different_extruder=%3%")%__LINE__ %extruder_count %different_extruder;
+        const ConfigOptionDef *optdef  = config_def->get(key);
+        if (!optdef) {
+            BOOST_LOG_TRIVIAL(warning) << __FUNCTION__ << boost::format(", Line %1%: can not find opt define for %2%")%__LINE__%key;
+            continue;
+        }
+        switch (optdef->type) {
+            case coStrings:
+            {
+                ConfigOptionStrings * opt = this->option<ConfigOptionStrings>(key);
+                if (!opt) continue;
+                std::vector<std::string> new_values;
+
+                new_values.resize(variant_count * stride);
+                for (int e_index = 0; e_index < variant_count; e_index++)
+                {
+                    for (unsigned int i = 0; i < stride; i++)
+                        new_values[e_index*stride + i] = opt->get_at(variant_index[e_index]*stride + i);
+                }
+                opt->values = new_values;
+                break;
+            }
+            case coInts:
+            {
+                ConfigOptionInts * opt = this->option<ConfigOptionInts>(key);
+                if (!opt) continue;
+                std::vector<int> new_values;
+
+                new_values.resize(variant_count * stride);
+                for (int e_index = 0; e_index < variant_count; e_index++)
+                {
+                    for (unsigned int i = 0; i < stride; i++)
+                        new_values[e_index*stride + i] = opt->get_at(variant_index[e_index]*stride + i);
+                }
+                opt->values = new_values;
+                break;
+            }
+            case coFloats:
+            {
+                ConfigOptionFloats * opt = this->option<ConfigOptionFloats>(key);
+                if (!opt) continue;
+                std::vector<double> new_values;
+
+                new_values.resize(variant_count * stride);
+                for (int e_index = 0; e_index < variant_count; e_index++)
+                {
+                    for (unsigned int i = 0; i < stride; i++)
+                        new_values[e_index*stride + i] = opt->get_at(variant_index[e_index]*stride + i);
+                }
+                opt->values = new_values;
+                break;
+            }
+            case coPercents:
+            {
+                ConfigOptionPercents * opt = this->option<ConfigOptionPercents>(key);
+                if (!opt) continue;
+                std::vector<double> new_values;
+
+                new_values.resize(variant_count * stride);
+                for (int e_index = 0; e_index < variant_count; e_index++)
+                {
+                    for (unsigned int i = 0; i < stride; i++)
+                        new_values[e_index*stride + i] = opt->get_at(variant_index[e_index]*stride + i);
+                }
+                opt->values = new_values;
+                break;
+            }
+            case coFloatsOrPercents:
+            {
+                ConfigOptionFloatsOrPercents * opt = this->option<ConfigOptionFloatsOrPercents>(key);
+                if (!opt) continue;
+                std::vector<FloatOrPercent> new_values;
+
+                new_values.resize(variant_count * stride);
+                for (int e_index = 0; e_index < variant_count; e_index++)
+                {
+                    for (unsigned int i = 0; i < stride; i++)
+                        new_values[e_index*stride + i] = opt->get_at(variant_index[e_index]*stride + i);
+                }
+                opt->values = new_values;
+                break;
+            }
+            case coBools:
+            {
+                ConfigOptionBools * opt = this->option<ConfigOptionBools>(key);
+                if (!opt) continue;
+                std::vector<unsigned char> new_values;
+
+                new_values.resize(variant_count * stride);
+                for (int e_index = 0; e_index < variant_count; e_index++)
+                {
+                    for (unsigned int i = 0; i < stride; i++)
+                        new_values[e_index*stride + i] = opt->get_at(variant_index[e_index]*stride + i);
+                }
+                opt->values = new_values;
+                break;
+            }
+            case coEnums:
+            {
+                ConfigOptionEnumsGeneric * opt = this->option<ConfigOptionEnumsGeneric>(key);
+                if (!opt) continue;
+                std::vector<int> new_values;
+
+                new_values.resize(variant_count * stride);
+                for (int e_index = 0; e_index < variant_count; e_index++)
+                {
+                    for (unsigned int i = 0; i < stride; i++)
+                        new_values[e_index*stride + i] = opt->get_at(variant_index[e_index]*stride + i);
+                }
+                opt->values = new_values;
+                break;
+            }
+            default:
+                BOOST_LOG_TRIVIAL(warning) << __FUNCTION__ << boost::format(", Line %1%: unsupported option type for %2%")%__LINE__%key;
+                break;
+        }
+    }
+
+    return variant_index;
+}
+
+void DynamicPrintConfig::update_values_to_printer_extruders_for_multiple_filaments(DynamicPrintConfig& printer_config, int extruder_count, int extruder_nozzle_volume_count, std::set<std::string>& key_set, std::string id_name, std::string variant_name)
+{
+    BOOST_LOG_TRIVIAL(info) << __FUNCTION__ << boost::format(", Line %1%: extruder_count %2%, extruder_nozzle_volume_count %3%")%__LINE__ %extruder_count %extruder_nozzle_volume_count;
+
+    {
         auto opt_filament_map = printer_config.option<ConfigOptionInts>("filament_map");
         if (!opt_filament_map) {
             BOOST_LOG_TRIVIAL(warning) << __FUNCTION__ << boost::format(", Line %1%: filament_map option not found, skipping")%__LINE__;
@@ -3450,14 +3685,22 @@ void DynamicPrintConfig::update_values_to_printer_extruders_for_multiple_filamen
         std::vector<int> filament_maps = opt_filament_map->values;
         size_t filament_count = filament_maps.size();
         //apply process settings
-        //auto opt_nozzle_diameters = this->option<ConfigOptionFloats>("nozzle_diameter");
-        //int extruder_count = opt_nozzle_diameters->size();
         auto opt_extruder_type = dynamic_cast<const ConfigOptionEnumsGeneric*>(printer_config.option("extruder_type"));
         auto opt_nozzle_volume_type = dynamic_cast<const ConfigOptionEnumsGeneric*>(printer_config.option("nozzle_volume_type"));
         if (!opt_extruder_type || !opt_nozzle_volume_type) {
             BOOST_LOG_TRIVIAL(warning) << __FUNCTION__ << boost::format(", Line %1%: extruder_type or nozzle_volume_type option not found, skipping")%__LINE__;
             return;
         }
+
+        auto opt_filament_volume_maps = dynamic_cast<const ConfigOptionInts*>(printer_config.option("filament_volume_map"));
+        std::vector<int> filament_volume_maps;
+        // Orca: honour the per-filament volume map only when a producer sized it to the
+        // filament count. The full-config producers (PresetBundle injection, engine
+        // write-back) always size it; mis-sized maps (stale project values, CLI runs until
+        // the per-filament synthesis lands there) must not distort slot resolution nor be
+        // indexed out of bounds.
+        if (opt_filament_volume_maps && opt_filament_volume_maps->values.size() == filament_count)
+            filament_volume_maps = opt_filament_volume_maps->values;
         auto opt_ids = id_name.empty()? nullptr: dynamic_cast<const ConfigOptionInts*>(this->option(id_name));
         std::vector<int> variant_index;
 
@@ -3467,6 +3710,10 @@ void DynamicPrintConfig::update_values_to_printer_extruders_for_multiple_filamen
         {
             ExtruderType extruder_type = (ExtruderType)(opt_extruder_type->get_at(filament_maps[f_index] - 1));
             NozzleVolumeType nozzle_volume_type = (NozzleVolumeType)(opt_nozzle_volume_type->get_at(filament_maps[f_index] - 1));
+
+            if ((extruder_nozzle_volume_count > extruder_count || nozzle_volume_type == nvtHybrid) && (!filament_volume_maps.empty())) {
+                nozzle_volume_type = (NozzleVolumeType)(filament_volume_maps[f_index]);
+            }
 
             //variant index
             variant_index[f_index] = get_index_for_extruder(f_index+1, id_name, extruder_type, nozzle_volume_type, variant_name);
@@ -3492,8 +3739,11 @@ void DynamicPrintConfig::update_values_to_printer_extruders_for_multiple_filamen
             BOOST_LOG_TRIVIAL(error) << __FUNCTION__ << boost::format(", Line %1%: can not find config define")%__LINE__;
             return;
         }
+        bool has_id_key = !id_name.empty() && key_set.count(id_name) > 0;
         for (auto& key: key_set)
         {
+            if (has_id_key && key == id_name)
+                continue;
             const ConfigOptionDef *optdef  = config_def->get(key);
             if (!optdef) {
                 BOOST_LOG_TRIVIAL(warning) << __FUNCTION__ << boost::format(", Line %1%: can not find opt define for %2%")%__LINE__%key;
@@ -3653,6 +3903,155 @@ void DynamicPrintConfig::update_values_to_printer_extruders_for_multiple_filamen
                     break;
             }
         }
+        // Orca: also require a non-empty id list; get_at on an empty vector is undefined.
+        if (has_id_key && opt_ids && !opt_ids->values.empty()) {
+            // remap the id list itself last: the lookups above still need the original ids
+            std::vector<int> new_values;
+            new_values.resize(filament_count);
+            for (int f_index = 0; f_index < filament_count; f_index++) {
+                new_values[f_index] = opt_ids->get_at(variant_index[f_index]);
+            }
+            const_cast<ConfigOptionInts*>(opt_ids)->values = new_values;
+        }
+    }
+}
+
+// Regathers a vector option's values through per-slot source indices (one input index per
+// output slot). Out-of-range indices keep the first value, matching get_at's fallback.
+template<typename OptType, typename ValueType>
+static void gather_option_values(const std::string &key, OptType *opt, const std::vector<int> &slot_param_indices)
+{
+    if (!opt || opt->values.empty()) {
+        BOOST_LOG_TRIVIAL(warning) << __FUNCTION__ << boost::format(", Line %1%: option %2% not found or empty, skipping")%__LINE__%key;
+        return;
+    }
+    std::vector<ValueType> new_values;
+    new_values.reserve(slot_param_indices.size());
+    for (int idx : slot_param_indices) {
+        if (idx < 0 || static_cast<size_t>(idx) >= opt->values.size()) {
+            BOOST_LOG_TRIVIAL(warning) << __FUNCTION__ << boost::format(", Line %1%: option %2% slot index %3% out of range, keeping first value")%__LINE__%key%idx;
+            new_values.emplace_back(opt->values.front());
+        }
+        else
+            new_values.emplace_back(opt->values[idx]);
+    }
+    opt->values = std::move(new_values);
+}
+
+void DynamicPrintConfig::update_filament_config_values_for_multiple_extruders(DynamicPrintConfig& printer_config,
+    const std::unordered_map<int, std::vector<FilamentVariantUse>>& filament_variant_uses,
+    int extruder_count, int extruder_nozzle_volume_count,
+    std::set<std::string>& key_set, std::string id_name, std::string variant_name,
+    std::vector<int>* slot_machine_indices)
+{
+    BOOST_LOG_TRIVIAL(info) << __FUNCTION__ << boost::format(", Line %1%: extruder_count %2%, extruder_nozzle_volume_count %3%")%__LINE__ %extruder_count %extruder_nozzle_volume_count;
+
+    auto opt_filament_map = printer_config.option<ConfigOptionInts>("filament_map");
+    if (!opt_filament_map) {
+        BOOST_LOG_TRIVIAL(warning) << __FUNCTION__ << boost::format(", Line %1%: filament_map option not found, skipping")%__LINE__;
+        return;
+    }
+    std::vector<int> filament_maps = opt_filament_map->values;
+    size_t filament_count = filament_maps.size();
+    auto opt_extruder_type = dynamic_cast<const ConfigOptionEnumsGeneric*>(printer_config.option("extruder_type"));
+    auto opt_nozzle_volume_type = dynamic_cast<const ConfigOptionEnumsGeneric*>(printer_config.option("nozzle_volume_type"));
+    if (!opt_extruder_type || !opt_nozzle_volume_type) {
+        BOOST_LOG_TRIVIAL(warning) << __FUNCTION__ << boost::format(", Line %1%: extruder_type or nozzle_volume_type option not found, skipping")%__LINE__;
+        return;
+    }
+
+    auto opt_filament_volume_maps = dynamic_cast<const ConfigOptionInts*>(printer_config.option("filament_volume_map"));
+    std::vector<int> filament_volume_maps;
+    // Orca: same sizing guard as the single-slot rebuild above — honour the per-filament volume
+    // map only when a producer sized it to the filament count.
+    if (opt_filament_volume_maps && opt_filament_volume_maps->values.size() == filament_count)
+        filament_volume_maps = opt_filament_volume_maps->values;
+    auto opt_ids = id_name.empty() ? nullptr : dynamic_cast<const ConfigOptionInts*>(this->option(id_name));
+
+    std::vector<int> slot_param_indices;
+    slot_param_indices.reserve(filament_count * 2);
+    if (slot_machine_indices) {
+        slot_machine_indices->clear();
+        slot_machine_indices->reserve(filament_count * 2);
+    }
+
+    auto resolve_slot = [&](int f_index, ExtruderType extruder_type, NozzleVolumeType nozzle_volume_type, int extruder_id_1based) {
+        int param_index = get_index_for_extruder(f_index + 1, id_name, extruder_type, nozzle_volume_type, variant_name);
+        if (param_index < 0) {
+            BOOST_LOG_TRIVIAL(error) << __FUNCTION__ << boost::format(", Line %1%: could not found extruder_type %2%, nozzle_volume_type %3%, filament_index %4%, extruder index %5%")
+                %__LINE__ %s_keys_names_ExtruderType[extruder_type] % s_keys_names_NozzleVolumeType[nozzle_volume_type] % (f_index+1) %extruder_id_1based;
+            assert(false);
+            //for some updates happens in a invalid state(caused by popup window)
+            //we need to avoid crash
+            param_index = 0;
+            if (opt_ids) {
+                for (int i = 0; i < opt_ids->values.size(); i++)
+                    if (opt_ids->values[i] == (f_index + 1)) {
+                        param_index = i;
+                        break;
+                    }
+            }
+        }
+        slot_param_indices.push_back(param_index);
+        if (slot_machine_indices) {
+            // Orca: key each output slot to the machine slot of its own variant (the same
+            // derivation the per-filament slot map uses), so the retract-override nil fallback
+            // stays aligned when a filament occupies more than one slot.
+            int machine_index = printer_config.get_index_for_extruder(extruder_id_1based, "print_extruder_id", extruder_type, nozzle_volume_type, "print_extruder_variant");
+            slot_machine_indices->push_back(std::max(machine_index, 0));
+        }
+    };
+
+    for (int f_index = 0; f_index < static_cast<int>(filament_count); f_index++) {
+        auto uses_it = filament_variant_uses.find(f_index);
+        if (uses_it != filament_variant_uses.end() && !uses_it->second.empty()) {
+            for (const FilamentVariantUse &use : uses_it->second)
+                resolve_slot(f_index, use.extruder_type, use.nozzle_volume_type, use.extruder_id + 1);
+        }
+        else {
+            ExtruderType extruder_type = (ExtruderType)(opt_extruder_type->get_at(filament_maps[f_index] - 1));
+            NozzleVolumeType nozzle_volume_type = (NozzleVolumeType)(opt_nozzle_volume_type->get_at(filament_maps[f_index] - 1));
+            if ((extruder_nozzle_volume_count > extruder_count || nozzle_volume_type == nvtHybrid) && !filament_volume_maps.empty())
+                nozzle_volume_type = (NozzleVolumeType)(filament_volume_maps[f_index]);
+            resolve_slot(f_index, extruder_type, nozzle_volume_type, filament_maps[f_index]);
+        }
+    }
+
+    const ConfigDef *config_def = this->def();
+    if (!config_def) {
+        BOOST_LOG_TRIVIAL(error) << __FUNCTION__ << boost::format(", Line %1%: can not find config define")%__LINE__;
+        return;
+    }
+    bool has_id_key = !id_name.empty() && key_set.count(id_name) > 0;
+    for (auto &key : key_set) {
+        if (has_id_key && key == id_name)
+            continue;
+        const ConfigOptionDef *optdef = config_def->get(key);
+        if (!optdef) {
+            BOOST_LOG_TRIVIAL(warning) << __FUNCTION__ << boost::format(", Line %1%: can not find opt define for %2%")%__LINE__%key;
+            continue;
+        }
+        switch (optdef->type) {
+            case coStrings:          gather_option_values<ConfigOptionStrings, std::string>(key, this->option<ConfigOptionStrings>(key), slot_param_indices); break;
+            case coInts:             gather_option_values<ConfigOptionInts, int>(key, this->option<ConfigOptionInts>(key), slot_param_indices); break;
+            case coFloats:           gather_option_values<ConfigOptionFloats, double>(key, this->option<ConfigOptionFloats>(key), slot_param_indices); break;
+            case coPercents:         gather_option_values<ConfigOptionPercents, double>(key, this->option<ConfigOptionPercents>(key), slot_param_indices); break;
+            case coFloatsOrPercents: gather_option_values<ConfigOptionFloatsOrPercents, FloatOrPercent>(key, this->option<ConfigOptionFloatsOrPercents>(key), slot_param_indices); break;
+            case coBools:            gather_option_values<ConfigOptionBools, unsigned char>(key, this->option<ConfigOptionBools>(key), slot_param_indices); break;
+            case coEnums:            gather_option_values<ConfigOptionEnumsGeneric, int>(key, this->option<ConfigOptionEnumsGeneric>(key), slot_param_indices); break;
+            default:
+                BOOST_LOG_TRIVIAL(warning) << __FUNCTION__ << boost::format(", Line %1%: unsupported option type for %2%")%__LINE__%key;
+                break;
+        }
+    }
+    // Orca: also require a non-empty id list; get_at on an empty vector is undefined.
+    if (has_id_key && opt_ids && !opt_ids->values.empty()) {
+        // remap the id list itself last: the slot resolution above still needs the original ids
+        std::vector<int> new_values;
+        new_values.reserve(slot_param_indices.size());
+        for (int idx : slot_param_indices)
+            new_values.push_back(opt_ids->get_at(idx));
+        const_cast<ConfigOptionInts*>(opt_ids)->values = std::move(new_values);
     }
 }
 
@@ -3931,7 +4330,7 @@ void DynamicPrintConfig::update_diff_values_to_child_config(DynamicPrintConfig& 
 }
 
 void compute_filament_override_value(const std::string& opt_key, const ConfigOption *opt_old_machine, const ConfigOption *opt_new_machine, const ConfigOption *opt_new_filament, const DynamicPrintConfig& new_full_config,
-    t_config_option_keys& diff_keys, DynamicPrintConfig& filament_overrides, std::vector<int>& f_maps)
+    t_config_option_keys& diff_keys, DynamicPrintConfig& filament_overrides, std::vector<int>& f_map_indices)
 {
     bool is_nil = opt_new_filament->is_nil();
 
@@ -3953,7 +4352,7 @@ void compute_filament_override_value(const std::string& opt_key, const ConfigOpt
     }
 
     auto opt_copy = opt_new_machine->clone();
-    opt_copy->apply_override(opt_new_filament, f_maps);
+    opt_copy->apply_override(opt_new_filament, f_map_indices);
     bool changed = *opt_old_machine != *opt_copy;
 
     if (changed) {
@@ -3964,6 +4363,28 @@ void compute_filament_override_value(const std::string& opt_key, const ConfigOpt
         delete opt_copy;
 }
 
+
+void update_static_print_config_from_dynamic(ConfigBase& config, const DynamicPrintConfig& dest_config, std::vector<int> variant_index, std::set<std::string>& key_set1, int stride)
+{
+    if (variant_index.size() > 0) {
+        const t_config_option_keys &keys = dest_config.keys();
+        for (auto& opt : keys) {
+            ConfigOption *opt_src = config.option(opt);
+            const ConfigOption *opt_dest = dest_config.option(opt);
+            if (opt_src && opt_dest && (*opt_src != *opt_dest)) {
+                if (opt_dest->is_scalar() || (key_set1.find(opt) == key_set1.end()))
+                    opt_src->set(opt_dest);
+                else {
+                    ConfigOptionVectorBase* opt_vec_src = static_cast<ConfigOptionVectorBase*>(opt_src);
+                    const ConfigOptionVectorBase* opt_vec_dest = static_cast<const ConfigOptionVectorBase*>(opt_dest);
+                    opt_vec_src->set_to_index(opt_vec_dest, variant_index, stride);
+                }
+            }
+        }
+    }
+    else
+        config.apply(dest_config, true);
+}
 
 //BBS: pass map to recording all invalid valies
 //FIXME localize this function.

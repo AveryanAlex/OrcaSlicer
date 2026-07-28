@@ -252,7 +252,7 @@ void extend_default_config_length(DynamicPrintConfig& config, const bool set_nil
     auto replace_nil_and_resize = [&](const std::string & key, int length){
         ConfigOption* raw_ptr = config.option(key);
         ConfigOptionVectorBase* opt_vec = static_cast<ConfigOptionVectorBase *>(raw_ptr);
-        if(set_nil_to_default && raw_ptr->is_nil() && defaults.has(key) && std::find(filament_extruder_override_keys.begin(), filament_extruder_override_keys.end(), key) == filament_extruder_override_keys.end()){
+        if(set_nil_to_default && raw_ptr->is_nil() && defaults.has(key) && !is_filament_extruder_override_key(key)){
             opt_vec->clear();
             opt_vec->resize(length, defaults.option(key));
         }
@@ -469,6 +469,8 @@ void Preset::normalize(DynamicPrintConfig &config)
             if (key == "compatible_prints" || key == "compatible_printers")
                 continue;
             if (filament_options_with_variant.find(key) != filament_options_with_variant.end())
+                continue;
+            if (filament_dev_options.find(key) != filament_dev_options.end())
                 continue;
             auto *opt = config.option(key, false);
             /*assert(opt != nullptr);
@@ -890,12 +892,11 @@ std::string Preset::get_printer_type(PresetBundle *preset_bundle)
 {
     if (preset_bundle) {
         auto config = &preset_bundle->printers.get_edited_preset().config;
-        std::string vendor_name;
-        for (auto vendor_profile : preset_bundle->vendors) {
-            for (auto vendor_model : vendor_profile.second.models)
-                if (vendor_model.name == config->opt_string("printer_model"))
+        const auto& printer_model = config->opt_string("printer_model");
+        for (const auto& vendor_profile : preset_bundle->vendors) {
+            for (const auto& vendor_model : vendor_profile.second.models)
+                if (vendor_model.name == printer_model)
                 {
-                    vendor_name = vendor_profile.first;
                     return vendor_model.model_id;
                 }
         }
@@ -907,11 +908,10 @@ std::string Preset::get_current_printer_type(PresetBundle *preset_bundle)
 {
     if (preset_bundle) {
         auto config = &(this->config);
-        std::string vendor_name;
-        for (auto vendor_profile : preset_bundle->vendors) {
-            for (auto vendor_model : vendor_profile.second.models)
-                if (vendor_model.name == config->opt_string("printer_model")) {
-                    vendor_name = vendor_profile.first;
+        const auto& printer_model = config->opt_string("printer_model");
+        for (const auto& vendor_profile : preset_bundle->vendors) {
+            for (const auto& vendor_model : vendor_profile.second.models)
+                if (vendor_model.name == printer_model) {
                     return vendor_model.model_id;
                 }
         }
@@ -1012,6 +1012,8 @@ static std::vector<std::string> s_Preset_machine_limits_options {
     "machine_min_extruding_rate", "machine_min_travel_rate",
     "machine_max_jerk_x", "machine_max_jerk_y", "machine_max_jerk_z", "machine_max_jerk_e",
     "machine_max_junction_deviation",
+    // Bedslinger mass/force limits
+    "machine_max_force_Y", "machine_bed_mass_Y", "machine_max_printed_mass",
     //resonance avoidance ported from qidi slicer
     "resonance_avoidance", "min_resonance_avoidance_speed", "max_resonance_avoidance_speed",
     // Orca: input shaping
@@ -1126,6 +1128,15 @@ const std::vector<std::string>& Preset::printer_options()
         return opts;
     }();
     return s_opts;
+}
+
+const char* Preset::plugin_overrides_key(Type type)
+{
+    switch (type) {
+    case TYPE_PRINTER:  return "printer_plugin_config_overrides";
+    case TYPE_FILAMENT: return "filament_plugin_config_overrides";
+    default:            return "print_plugin_config_overrides";
+    }
 }
 
 PresetCollection::PresetCollection(Preset::Type type, const std::vector<std::string> &keys, const Slic3r::StaticPrintConfig &defaults, const std::string &default_name) :
@@ -3044,7 +3055,18 @@ void add_correct_opts_to_diff(const std::string &opt_key, t_config_option_keys& 
 
     for (int i = 0; i < int(opt_cur->values.size()); i++)
     {
-        int init_id = i <= opt_init_max_id ? i : 0;
+        const bool is_new_index = i > opt_init_max_id;
+        int init_id = is_new_index ? 0 : i;
+        if (is_new_index) {
+            // Orca: intentional divergence from upstream. Any new vector index (at or
+            // beyond the reference vector's length) is flagged dirty unconditionally --
+            // independent of its value and nil-state -- so preset dirty-detection notices
+            // per-extruder/filament entries added by growth (e.g. extruder count). This
+            // applies to every vector option type routed through deep_diff().
+            // Covered by tests/libslic3r/test_preset_diff.cpp.
+            vec.emplace_back(opt_key + "#" + std::to_string(i));
+            continue;
+        }
         if (opt_cur->values[i] != opt_init->values[init_id]) {
             if (opt_cur->nullable()) {
                 if (opt_cur->is_nil(i)) {
@@ -3079,7 +3101,7 @@ inline t_config_option_keys deep_diff(const ConfigBase &config_this, const Confi
         if (this_opt != nullptr && other_opt != nullptr && *this_opt != *other_opt)
         {
             //BBS: add bed_exclude_area
-            if (opt_key == "printable_area" || opt_key == "bed_exclude_area" || opt_key == "compatible_prints" || opt_key == "compatible_printers" || opt_key == "thumbnails" ||  opt_key == "wrapping_exclude_area") {
+            if (opt_key == "printable_area" || opt_key == "bed_exclude_area" || opt_key == "compatible_prints" || opt_key == "compatible_printers" || opt_key == "thumbnails" ||  opt_key == "wrapping_exclude_area" || opt_key == "slicing_pipeline_plugin") {
                 // Scalar variable, or a vector variable, which is independent from number of extruders,
                 // thus the vector is presented to the user as a single input.
                 diff.emplace_back(opt_key);
@@ -3408,6 +3430,26 @@ void PresetCollection::set_custom_preset_alias(Preset &preset)
     preset.alias = std::move(alias_name);
     m_map_alias_to_profile_name[preset.alias].push_back(preset.name);
     set_printer_hold_alias(preset.alias, preset);
+}
+
+std::string PresetCollection::get_preset_alias(Preset &preset, bool force)
+{
+    if (!preset.alias.empty())
+        return preset.alias;
+    else
+        set_custom_preset_alias(preset);
+
+    if (!preset.alias.empty() || !force)
+        return preset.alias;
+
+    std::string alias_name;
+    std::string preset_name = preset.name;
+    size_t      end_pos     = preset_name.find_first_of("@");
+    if (end_pos != std::string::npos) {
+        alias_name = preset_name.substr(0, end_pos);
+        boost::trim_right(alias_name);
+    }
+    return alias_name;
 }
 
 void PresetCollection::set_printer_hold_alias(const std::string &alias, Preset &preset, bool remove)
