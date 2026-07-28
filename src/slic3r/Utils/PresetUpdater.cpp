@@ -374,10 +374,18 @@ bool PresetUpdater::priv::extract_file(const fs::path &source_path, const fs::pa
 // Remove leftover paritally downloaded files, if any.
 void PresetUpdater::priv::prune_tmps() const
 {
-    for (auto &dir_entry : boost::filesystem::directory_iterator(cache_path))
+	boost::system::error_code ec;
+	auto dir_it = boost::filesystem::directory_iterator(cache_path, ec);
+	if (ec) {
+		BOOST_LOG_TRIVIAL(warning) << "[Orca Updater]failed to list cache dir " << cache_path.string() << ": " << ec.message();
+		return;
+	}
+	for (auto &dir_entry : dir_it)
 		if (is_plain_file(dir_entry) && dir_entry.path().extension() == TMP_EXTENSION) {
 			BOOST_LOG_TRIVIAL(debug) << "[Orca Updater]remove old cached files: " << dir_entry.path().string();
-			fs::remove(dir_entry.path());
+			fs::remove(dir_entry.path(), ec);
+			if (ec)
+				BOOST_LOG_TRIVIAL(warning) << "[Orca Updater]failed to remove " << dir_entry.path().string() << ": " << ec.message();
 		}
 }
 
