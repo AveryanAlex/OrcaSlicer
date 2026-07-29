@@ -6,7 +6,6 @@
 #include <boost/filesystem.hpp>
 #include <boost/log/trivial.hpp>
 #include <boost/program_options.hpp>
-#include <boost/system/error_code.hpp>
 #include <iostream>
 
 using namespace Slic3r;

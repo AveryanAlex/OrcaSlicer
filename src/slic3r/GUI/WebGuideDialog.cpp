@@ -1,6 +1,7 @@
 #include "WebGuideDialog.hpp"
 #include "ConfigWizard.hpp"
 
+#include <boost/algorithm/string/join.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/nowide/fstream.hpp>
 #include <boost/filesystem/path.hpp>
@@ -190,8 +191,7 @@ GuideFrame::GuideFrame(GUI_App *pGUI, long style)
 
 GuideFrame::~GuideFrame()
 {
-    m_destroy = true;
-    *m_cancel_token = true; // signal any queued CallAfter lambdas before join
+    *m_cancel_token = true; // stop the loading thread and any queued CallAfter lambdas before join
     if (m_load_task && m_load_task->joinable())
         m_load_task->join();
     m_load_task.reset();
@@ -300,13 +300,19 @@ void GuideFrame::OnNavigationRequest(wxWebViewEvent &evt)
 /**
  * Callback invoked when a navigation request was accepted
  */
-void GuideFrame::init_guide_paths()
+// The empty shape every profile-loading path starts from or falls back to.
+void GuideFrame::reset_profile_json()
 {
-    m_ProfileJson             = json::parse("{}");
     m_ProfileJson["model"]    = json::array();
     m_ProfileJson["machine"]  = json::object();
     m_ProfileJson["filament"] = json::object();
     m_ProfileJson["process"]  = json::array();
+}
+
+void GuideFrame::init_guide_paths()
+{
+    m_ProfileJson = json::parse("{}");
+    reset_profile_json();
 
     vendor_dir      = (boost::filesystem::path(Slic3r::data_dir()) / PRESET_SYSTEM_DIR).make_preferred();
     rsrc_vendor_dir = (boost::filesystem::path(resources_dir()) / "profiles").make_preferred();
@@ -349,7 +355,7 @@ void GuideFrame::OnNavigationComplete(wxWebViewEvent &evt)
         try {
             init_guide_paths();
             if (BuildProfileDataFromPresetBundle()) {
-                if (!m_destroy)
+                if (!*m_cancel_token)
                     on_profile_loaded();
             } else {
                 // Presets not yet in memory — delegate to background thread.
@@ -1184,11 +1190,7 @@ bool GuideFrame::BuildProfileJson(const PresetBundle& bundle, bool require_all_r
                     if (!nozzle_str.empty()) nozzle_str += ";";
                     nozzle_str += v.name;
                 }
-                std::string materials_str;
-                for (const auto& m : model.default_materials) {
-                    if (!materials_str.empty()) materials_str += ";";
-                    materials_str += m;
-                }
+                const std::string materials_str = boost::algorithm::join(model.default_materials, ";");
                 boost::filesystem::path cover_path =
                     (boost::filesystem::path(resources_dir()) / "profiles" / vp.id / (model.id + "_cover.png"))
                         .make_preferred();
@@ -1224,6 +1226,7 @@ bool GuideFrame::BuildProfileJson(const PresetBundle& bundle, bool require_all_r
         }
 
         // Filament map from system filament presets (vendor/type already resolved in config)
+        const json& machines = m_ProfileJson["machine"];
         for (const Preset& p : bundle.filaments()) {
             if (!p.is_system || !p.vendor) continue;
             const auto* fila_vendor     = p.config.option<ConfigOptionStrings>("filament_vendor");
@@ -1236,9 +1239,10 @@ bool GuideFrame::BuildProfileJson(const PresetBundle& bundle, bool require_all_r
             std::string model_list;
             if (compat_printers) {
                 for (const std::string& pname : compat_printers->values) {
-                    if (m_ProfileJson["machine"].contains(pname)) {
-                        std::string m = m_ProfileJson["machine"][pname]["model"];
-                        std::string n = m_ProfileJson["machine"][pname]["nozzle"];
+                    auto it = machines.find(pname);
+                    if (it != machines.end()) {
+                        const std::string m = (*it)["model"];
+                        const std::string n = (*it)["nozzle"];
                         model_list += "[" + m + "++" + n + "]";
                     }
                 }
@@ -1264,20 +1268,16 @@ bool GuideFrame::BuildProfileJson(const PresetBundle& bundle, bool require_all_r
         }
 
         if (require_all_resource_vendors) {
-            // If rsrc_vendor_dir has vendor JSONs not covered by the current bundle, the
+            // If rsrc_vendor_dir has vendors (profile JSONs, or the preset caches a
+            // packaged build ships instead) not covered by the current bundle, the
             // bundle is incomplete (e.g. dev env where data_dir/system only has
-            // OrcaFilamentLibrary+Custom). Fall back so LoadProfileFamily reads both dirs.
+            // OrcaFilamentLibrary+Custom). Fall back so the slow path reads both dirs.
             try {
-                for (const auto& e : boost::filesystem::directory_iterator(rsrc_vendor_dir)) {
-                    if (e.path().extension().string() != ".json") continue;
-                    const std::string stem = e.path().stem().string();
-                    if (bundle.vendors.find(stem) == bundle.vendors.end()) {
-                        BOOST_LOG_TRIVIAL(info) << "GuideFrame: vendor '" << stem
+                for (const std::string& name : vendor_names_in(rsrc_vendor_dir)) {
+                    if (bundle.vendors.find(name) == bundle.vendors.end()) {
+                        BOOST_LOG_TRIVIAL(info) << "GuideFrame: vendor '" << name
                             << "' in resources but not in preset_bundle — falling back to JSON loading";
-                        m_ProfileJson["model"]    = json::array();
-                        m_ProfileJson["machine"]  = json::object();
-                        m_ProfileJson["filament"] = json::object();
-                        m_ProfileJson["process"]  = json::array();
+                        reset_profile_json();
                         return false;
                     }
                 }
@@ -1292,10 +1292,7 @@ bool GuideFrame::BuildProfileJson(const PresetBundle& bundle, bool require_all_r
     } catch (const std::exception& e) {
         BOOST_LOG_TRIVIAL(warning) << "GuideFrame::BuildProfileJson failed: " << e.what()
                                    << " — falling back to JSON loading";
-        m_ProfileJson["model"]    = json::array();
-        m_ProfileJson["machine"]  = json::object();
-        m_ProfileJson["filament"] = json::object();
-        m_ProfileJson["process"]  = json::array();
+        reset_profile_json();
         return false;
     }
 }
@@ -1340,7 +1337,7 @@ bool GuideFrame::BuildProfileDataFromVendors()
         if (vendor_files.count(filament_library))
             load_vendor(bundle, filament_library, nullptr);
         for (const auto& entry : vendor_files) {
-            if (m_destroy)
+            if (*m_cancel_token)
                 return false;   // as in the scan below: a vendor without a cache is parsed, and that takes time
             const std::string& vendor = entry.first;
             // A cache is only ever written for a versioned vendor; a JSON has to be
@@ -1358,10 +1355,7 @@ bool GuideFrame::BuildProfileDataFromVendors()
         return BuildProfileJson(bundle, /*require_all_resource_vendors=*/false);
     } catch (const std::exception& e) {
         BOOST_LOG_TRIVIAL(error) << __FUNCTION__ << " failed: " << e.what();
-        m_ProfileJson["model"]    = json::array();
-        m_ProfileJson["machine"]  = json::object();
-        m_ProfileJson["filament"] = json::object();
-        m_ProfileJson["process"]  = json::array();
+        reset_profile_json();
         return false;
     }
 }
@@ -1395,7 +1389,7 @@ int GuideFrame::LoadProfileData()
                     LoadProfileFamily(w2s(strVendor), iter->path().string());
                     loaded_vendors.insert(w2s(strVendor));
                 }
-                if (m_destroy) return 0;
+                if (*m_cancel_token) return 0;
             }
 
             boost::filesystem::directory_iterator others_endIter;
@@ -1410,7 +1404,7 @@ int GuideFrame::LoadProfileData()
                     LoadProfileFamily(w2s(strVendor), iter->path().string());
                     loaded_vendors.insert(w2s(strVendor));
                 }
-                if (m_destroy) return 0;
+                if (*m_cancel_token) return 0;
             }
         }
 

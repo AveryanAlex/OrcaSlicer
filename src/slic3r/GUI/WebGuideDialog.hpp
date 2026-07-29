@@ -87,6 +87,7 @@ public:
     bool BuildProfileJson(const PresetBundle& bundle, bool require_all_resource_vendors);
     bool BuildProfileDataFromPresetBundle();
     bool BuildProfileDataFromVendors();
+    void reset_profile_json();
     int SaveProfile();
     int GetFilamentInfo( std::string VendorDirectory,json & pFilaList, std::string filepath, std::string &sVendor, std::string &sType);
 
@@ -121,9 +122,9 @@ private:
 
     //First Load
     bool bFirstComplete{false};
-    std::atomic<bool> m_destroy{false};
-    // Shared cancel token captured by CallAfter lambdas so they don't touch
-    // `this` after the destructor has run and the object is freed.
+    // Set once in the destructor. Read through `this` by the loading thread
+    // (joined before `this` dies) and captured as the shared_ptr by CallAfter
+    // lambdas so they don't touch `this` after the object is freed.
     std::shared_ptr<std::atomic<bool>> m_cancel_token{std::make_shared<std::atomic<bool>>(false)};
     std::unique_ptr<boost::thread> m_load_task;
 

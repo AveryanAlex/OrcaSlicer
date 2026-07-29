@@ -14,6 +14,10 @@
 #include <boost/filesystem/path.hpp>
 #include <unordered_set>
 
+namespace cereal {
+	class BinaryInputArchive;
+	class BinaryOutputArchive;
+}
 
 #define DEFAULT_USER_FOLDER_NAME "default"
 #define BUNDLE_STRUCTURE_JSON_NAME "bundle_structure.json"
@@ -488,8 +492,11 @@ public:
     // not the profile JSONs are still there. A whole-vendor load comes from the
     // vendor's preset cache whenever one covers the profile on disk, and is parsed
     // from the JSONs (falling back to the ones in resources) only when none does.
+    // `lib_version_hint` is the filament library version in effect, when the caller
+    // loads many vendors and has already resolved it once; empty resolves it here.
     std::pair<PresetsConfigSubstitutions, size_t> load_vendor_configs_from_json(
-        const std::string &dir, const std::string &vendor_name, LoadConfigBundleAttributes flags, ForwardCompatibilitySubstitutionRule compatibility_rule, const PresetBundle* base_bundle = nullptr);
+        const std::string &dir, const std::string &vendor_name, LoadConfigBundleAttributes flags, ForwardCompatibilitySubstitutionRule compatibility_rule, const PresetBundle* base_bundle = nullptr,
+        const std::string &lib_version_hint = {});
 
     // Export a config bundle file containing all the presets and the names of the active presets.
     //void                        export_configbundle(const std::string &path, bool export_system_settings = false, bool export_physical_printers = false);
@@ -573,21 +580,26 @@ public:
 private:
     // Load one vendor from its preset cache: the one in `dir`, or — when that is
     // missing or stale — the one shipped in resources/profiles, both judged against
-    // the vendor as installed in `dir` and against the filament library in effect.
+    // the vendor as installed in `dir` and against the filament library in effect
+    // (resolved here unless the caller passes the already-resolved version).
     // False, with this bundle left clean, when neither is usable and the vendor has
     // to be parsed. This is how load_vendor_configs_from_json reads a cache.
-    bool load_vendor_cache(const boost::filesystem::path& dir, const std::string& vendor_name);
+    bool load_vendor_cache(const boost::filesystem::path& dir, const std::string& vendor_name, const std::string& lib_version_hint = {});
 
     // Read raw cache blob: verify magic, size, CRC.
     static bool read_cache_blob(const std::string& path, std::string& out_blob);
-    // Write a cache blob with the standard 20-byte file header.
-    static void write_cache_blob(const std::string& path, const std::string& blob);
+    // Write a cache blob with the standard 20-byte file header. False when the
+    // file could not be opened or written whole.
+    static bool write_cache_blob(const std::string& path, const std::string& blob);
 
     // (De)serialization of one collection's slice for the per-vendor cache:
     // every non-default, non-external preset (system or user) plus
     // m_printer_hold_alias. See save_vendor_cache/load_vendor_cache.
     static void save_collection(cereal::BinaryOutputArchive& ar, const PresetCollection& coll);
     static void load_collection(cereal::BinaryInputArchive& ar, PresetCollection& coll, const VendorMap& vendors);
+
+    // Clear every collection's m_printer_hold_alias, which reset() leaves alone.
+    void clear_printer_hold_aliases();
 
     // Whether to (re)write a per-vendor cache after a JSON parse.
     bool m_generate_vendor_caches { false };
@@ -641,6 +653,10 @@ extern bool is_vendor_installed(const std::string& vendor);
 // The version of the installed vendor: what its profile claims, or what its cache
 // was stamped with where only the cache is installed. Invalid Semver if neither is.
 extern Semver installed_vendor_version(const std::string& vendor);
+
+// Remove every form `vendor` can be installed as from data_dir()/system: its
+// profile, its preset cache, and its preset directory.
+extern void remove_installed_vendor(const std::string& vendor);
 
 // The vendors `dir` holds, sorted: one is named by its profile or, in a build that
 // ships preset caches instead of the raw profile JSONs, by its cache alone.

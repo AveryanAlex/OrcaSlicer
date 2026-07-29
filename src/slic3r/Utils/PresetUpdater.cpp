@@ -1069,12 +1069,7 @@ void PresetUpdater::priv::check_installed_vendor_profiles() const
                 }
                 else {
                     //need to be removed because not installed
-                    const auto path_in_vendor = vendor_path / (vendor_name + ".json");
-                    fs::remove(path_in_vendor);
-                    fs::remove(vendor_path / (vendor_name + ".opc"));
-                    const auto path_of_vendor = vendor_path / vendor_name;
-                    if (fs::exists(path_of_vendor))
-                        fs::remove_all(path_of_vendor);
+                    remove_installed_vendor(vendor_name);
                 }
             }
             else if (is_vendor_enabled) {

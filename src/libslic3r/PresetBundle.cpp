@@ -6,8 +6,11 @@
 #include "PresetBundle.hpp"
 
 #include <boost/crc.hpp>
+#include <boost/iostreams/device/array.hpp>
+#include <boost/iostreams/stream.hpp>
 #include <cereal/archives/binary.hpp>
 #include <cereal/types/map.hpp>
+#include <cereal/types/set.hpp>
 #include <cereal/types/string.hpp>
 #include <cereal/types/vector.hpp>
 #include "PrintConfig.hpp"
@@ -2281,6 +2284,15 @@ Semver installed_vendor_version(const std::string& vendor)
     return ver ? *ver : Semver();
 }
 
+void remove_installed_vendor(const std::string& vendor)
+{
+    const boost::filesystem::path dir = boost::filesystem::path(data_dir()) / PRESET_SYSTEM_DIR;
+    boost::filesystem::remove(dir / (vendor + ".json"));
+    boost::filesystem::remove(dir / (vendor + ".opc"));
+    if (boost::filesystem::exists(dir / vendor))
+        boost::filesystem::remove_all(dir / vendor);
+}
+
 std::set<std::string> vendor_names_in(const boost::filesystem::path& dir)
 {
     std::set<std::string> names;
@@ -2298,21 +2310,21 @@ std::set<std::string> vendor_names_in(const boost::filesystem::path& dir)
 // generated before that profile was bumped is out of date, and a cache that cannot
 // be read is no installation at all — and the vendor is installed the way it was
 // before caches existed, as its profile and the preset JSONs it points at. Returns
-// the version the cache is stamped with, or nothing when it is not the form to install.
-static std::string installable_cache_version(const boost::filesystem::path& dir, const std::string& vendor)
+// the version the cache is stamped with, invalid when it is not the form to install.
+static Semver installable_cache_version(const boost::filesystem::path& dir, const std::string& vendor)
 {
     const auto cache_ver = Semver::parse(PresetBundle::peek_vendor_cache_version((dir / (vendor + ".opc")).string(), vendor));
     if (! cache_ver)
-        return {};
+        return Semver::invalid();
     const Semver profile_ver = get_version_from_json((dir / (vendor + ".json")).string());
-    return profile_ver.valid() && *cache_ver < profile_ver ? std::string() : cache_ver->to_string();
+    return profile_ver.valid() && *cache_ver < profile_ver ? Semver::invalid() : *cache_ver;
 }
 
 Semver resource_vendor_version(const std::string& vendor)
 {
     const boost::filesystem::path dir = boost::filesystem::path(resources_dir()) / "profiles";
-    const auto ver = Semver::parse(installable_cache_version(dir, vendor));
-    return ver ? *ver : get_version_from_json((dir / (vendor + ".json")).string());
+    const Semver ver = installable_cache_version(dir, vendor);
+    return ver.valid() ? ver : get_version_from_json((dir / (vendor + ".json")).string());
 }
 
 bool install_vendor_bundles_from_resources(
@@ -2347,7 +2359,7 @@ bool install_vendor_bundles_from_resources(
 
             std::string error_message;
             bool installed_cache = false;
-            if (! installable_cache_version(rsrc_path, bundle).empty()) {
+            if (installable_cache_version(rsrc_path, bundle).valid()) {
                 installed_cache = copy_file(cache_in_rsrc.string(), cache_in_vendors.string(), error_message, false) == CopyFileResult::SUCCESS;
                 if (! installed_cache)
                     BOOST_LOG_TRIVIAL(warning) << "Failed to copy " << bundle << ".opc: " << error_message;
@@ -2405,6 +2417,17 @@ bool install_vendor_bundles_from_resources(
     return true;
 }
 
+// m_printer_hold_alias survives reset() (and a cache body that failed partway
+// in), so every full-bundle rebuild clears all five collections' maps by hand.
+void PresetBundle::clear_printer_hold_aliases()
+{
+    this->prints.m_printer_hold_alias.clear();
+    this->sla_prints.m_printer_hold_alias.clear();
+    this->filaments.m_printer_hold_alias.clear();
+    this->sla_materials.m_printer_hold_alias.clear();
+    this->printers.m_printer_hold_alias.clear();
+}
+
 //BBS: add json related logic, load system presets from json
 std::pair<PresetsConfigSubstitutions, std::string> PresetBundle::load_system_presets_from_json(ForwardCompatibilitySubstitutionRule compatibility_rule)
 {
@@ -2456,11 +2479,7 @@ std::pair<PresetsConfigSubstitutions, std::string> PresetBundle::load_system_pre
             // Match a fresh launch before parsing: hold aliases and the error
             // counter survive reset(), and would otherwise leak prior-cycle
             // state into the library cache the load below writes.
-            this->prints.m_printer_hold_alias.clear();
-            this->sla_prints.m_printer_hold_alias.clear();
-            this->filaments.m_printer_hold_alias.clear();
-            this->sla_materials.m_printer_hold_alias.clear();
-            this->printers.m_printer_hold_alias.clear();
+            this->clear_printer_hold_aliases();
             this->m_errors = 0;
             append(substitutions, this->load_vendor_configs_from_json(dir.string(), orca_lib_vendor, PresetBundle::LoadSystem, compatibility_rule).first);
             first = false;
@@ -2479,6 +2498,11 @@ std::pair<PresetsConfigSubstitutions, std::string> PresetBundle::load_system_pre
     std::vector<PresetsConfigSubstitutions>         parallel_substitutions(other_vendors.size());
     std::vector<std::string>                        parallel_errors(other_vendors.size());
 
+    // The filament library version every vendor below is judged against. Fixed
+    // from here on — step 1 was the last thing that could touch the library on
+    // disk — so resolve it once instead of once per vendor.
+    const std::string lib_version = effective_lib_version(dir);
+
     tbb::parallel_for(tbb::blocked_range<size_t>(0, other_vendors.size()),
         [&](const tbb::blocked_range<size_t>& range) {
             for (size_t i = range.begin(); i < range.end(); ++i) {
@@ -2487,7 +2511,7 @@ std::pair<PresetsConfigSubstitutions, std::string> PresetBundle::load_system_pre
                 bundle->set_generate_vendor_caches(m_generate_vendor_caches);
                 try {
                     auto result = bundle->load_vendor_configs_from_json(
-                        dir.string(), other_vendors[i], PresetBundle::LoadSystem, compatibility_rule, this);
+                        dir.string(), other_vendors[i], PresetBundle::LoadSystem, compatibility_rule, this, lib_version);
                     parallel_substitutions[i] = std::move(result.first);
                     parallel_bundles[i] = std::move(bundle);
                 } catch (const std::runtime_error &err) {
@@ -4953,7 +4977,8 @@ void PresetBundle::load_config_file_config(const std::string &name_or_path, bool
 
 //BBS: Load a config bundle file from json
 std::pair<PresetsConfigSubstitutions, size_t> PresetBundle::load_vendor_configs_from_json(
-    const std::string &dir, const std::string &vendor_name, LoadConfigBundleAttributes flags, ForwardCompatibilitySubstitutionRule compatibility_rule, const PresetBundle* base_bundle)
+    const std::string &dir, const std::string &vendor_name, LoadConfigBundleAttributes flags, ForwardCompatibilitySubstitutionRule compatibility_rule, const PresetBundle* base_bundle,
+    const std::string &lib_version_hint)
 {
     // Enable substitutions for user config bundle, throw an exception when loading a system profile.
     ConfigSubstitutionContext  substitution_context { compatibility_rule };
@@ -4969,7 +4994,7 @@ std::pair<PresetsConfigSubstitutions, size_t> PresetBundle::load_vendor_configs_
     // scans want a slice of one. Validation reads the JSONs whatever is cached.
     const boost::filesystem::path dir_path(dir);
     const bool cacheable = flags.has(LoadConfigBundleAttribute::LoadSystem) && ! flags.has(LoadConfigBundleAttribute::LoadFilamentOnly);
-    if (cacheable && ! validation_mode && this->load_vendor_cache(dir_path, vendor_name)) {
+    if (cacheable && ! validation_mode && this->load_vendor_cache(dir_path, vendor_name, lib_version_hint)) {
         size_t presets_loaded = 0;
         for (const PresetCollection* coll : std::initializer_list<const PresetCollection*>{
                  &this->prints, &this->sla_prints, &this->filaments, &this->sla_materials, &this->printers })
@@ -5550,7 +5575,8 @@ std::pair<PresetsConfigSubstitutions, size_t> PresetBundle::load_vendor_configs_
         const std::string version = vendor_profile.config_version.to_string();
         // The library is its own reference point; every other vendor's cache holds
         // filaments resolved against it, and is stamped with the version in effect.
-        const std::string lib_version = vendor_name == ORCA_FILAMENT_LIBRARY ? version : effective_lib_version(dir_path);
+        const std::string lib_version = vendor_name == ORCA_FILAMENT_LIBRARY ? version
+            : ! lib_version_hint.empty() ? lib_version_hint : effective_lib_version(dir_path);
         if (! lib_version.empty() &&
             ! this->save_vendor_cache((dir_path / (vendor_name + ".opc")).string(), vendor_name, version, lib_version))
             BOOST_LOG_TRIVIAL(warning) << "PresetBundle: failed to save vendor cache for " << vendor_name;
@@ -6218,21 +6244,26 @@ static bool cache_covers_version(const std::string& cached, const std::string& o
 // values — serialization_key_ordinal IS the config wire format). Any mismatch
 // means bytes written by another build could deserialize into the wrong
 // fields, so the cache is rejected wholesale before its body is read.
-std::string compute_cache_schema_fingerprint()
+const std::string& compute_cache_schema_fingerprint()
 {
-    std::string schema;
-    schema += SLIC3R_VERSION;
-    schema += ';';
-    for (const auto& [key, def] : print_config_def.options) {   // std::map => stable order
-        schema += key;
-        schema += '#'; schema += std::to_string(int(def.type));
-        schema += '@'; schema += std::to_string(def.serialization_key_ordinal);
-        for (const std::string& ev : def.enum_values) { schema += ','; schema += ev; }
+    // Constant for the lifetime of the process (print_config_def is immutable
+    // after static initialization), and asked for once per cache load and save.
+    static const std::string fingerprint = [] {
+        std::string schema;
+        schema += SLIC3R_VERSION;
         schema += ';';
-    }
-    boost::crc_32_type crc;
-    crc.process_bytes(schema.data(), schema.size());
-    return std::to_string(crc.checksum());
+        for (const auto& [key, def] : print_config_def.options) {   // std::map => stable order
+            schema += key;
+            schema += '#'; schema += std::to_string(int(def.type));
+            schema += '@'; schema += std::to_string(def.serialization_key_ordinal);
+            for (const std::string& ev : def.enum_values) { schema += ','; schema += ev; }
+            schema += ';';
+        }
+        boost::crc_32_type crc;
+        crc.process_bytes(schema.data(), schema.size());
+        return std::to_string(crc.checksum());
+    }();
+    return fingerprint;
 }
 
 } // anonymous namespace
@@ -6268,7 +6299,7 @@ bool PresetBundle::read_cache_blob(const std::string& path, std::string& out_blo
 }
 
 // static
-void PresetBundle::write_cache_blob(const std::string& path, const std::string& blob)
+bool PresetBundle::write_cache_blob(const std::string& path, const std::string& blob)
 {
     boost::crc_32_type crc;
     crc.process_bytes(blob.data(), blob.size());
@@ -6277,7 +6308,7 @@ void PresetBundle::write_cache_blob(const std::string& path, const std::string& 
         boost::nowide::ofstream ofs(path, std::ios::binary | std::ios::trunc);
         if (!ofs.is_open()) {
             BOOST_LOG_TRIVIAL(warning) << "SystemPresetsCache: cannot open for writing: " << path;
-            return;
+            return false;
         }
         CacheFileHeader fhdr;
         fhdr.magic     = CACHE_MAGIC;
@@ -6286,8 +6317,13 @@ void PresetBundle::write_cache_blob(const std::string& path, const std::string& 
         fhdr.crc32     = crc.checksum();
         ofs.write(reinterpret_cast<const char*>(&fhdr), sizeof(fhdr));
         ofs.write(blob.data(), static_cast<std::streamsize>(blob.size()));
+        ofs.close();   // flush; close() raises failbit on error
+        if (! ofs.good())
+            BOOST_LOG_TRIVIAL(warning) << "SystemPresetsCache: write failed (" << path << ")";
+        return ofs.good();
     } catch (const std::exception& e) {
         BOOST_LOG_TRIVIAL(warning) << "SystemPresetsCache: write failed (" << path << "): " << e.what();
+        return false;
     }
 }
 
@@ -6373,9 +6409,7 @@ bool PresetBundle::save_vendor_cache(const std::string& cache_path, const std::s
                this->obsolete_presets.printers);
             ar(this->m_errors);
         }
-        write_cache_blob(cache_path, body.str());
-        std::string verify;
-        return read_cache_blob(cache_path, verify);   // magic + size + CRC
+        return write_cache_blob(cache_path, body.str());
     } catch (const std::exception& e) {
         BOOST_LOG_TRIVIAL(warning) << "PresetBundle: failed to save vendor cache " << cache_path << ": " << e.what();
         return false;
@@ -6415,7 +6449,7 @@ std::string PresetBundle::peek_vendor_cache_version(const std::string& cache_pat
     }
 }
 
-bool PresetBundle::load_vendor_cache(const boost::filesystem::path& dir, const std::string& vendor_name)
+bool PresetBundle::load_vendor_cache(const boost::filesystem::path& dir, const std::string& vendor_name, const std::string& lib_version_hint)
 {
     // Whichever cache answers is judged against the vendor as installed in `dir`:
     // the profile there, or — with none, as when the cache is the whole of the
@@ -6425,7 +6459,7 @@ bool PresetBundle::load_vendor_cache(const boost::filesystem::path& dir, const s
     const boost::filesystem::path profile = dir / (vendor_name + ".json");
     const std::string version = boost::filesystem::exists(profile) ? get_vendor_cache_version(profile.string())
                                                                    : std::string(CACHE_ANY_VERSION);
-    const std::string lib_version = effective_lib_version(dir);
+    const std::string lib_version = ! lib_version_hint.empty() ? lib_version_hint : effective_lib_version(dir);
     const boost::filesystem::path rsrc = boost::filesystem::path(resources_dir()) / "profiles";
     return this->load_vendor_cache((dir / (vendor_name + ".opc")).string(), vendor_name, version, lib_version)
         || (dir != rsrc && this->load_vendor_cache((rsrc / (vendor_name + ".opc")).string(), vendor_name, version, lib_version));
@@ -6438,7 +6472,9 @@ bool PresetBundle::load_vendor_cache(const std::string& cache_path, const std::s
     if (! read_cache_blob(cache_path, blob))
         return false;
     try {
-        std::istringstream body(blob, std::ios::binary);
+        // Read in place: an istringstream would copy the blob (tens of MB for
+        // the largest vendors) once more just to stream over it.
+        boost::iostreams::stream<boost::iostreams::array_source> body(blob.data(), blob.size());
         cereal::BinaryInputArchive ar(body);
         uint32_t cache_version = 0;
         ar(cache_version);
@@ -6474,14 +6510,10 @@ bool PresetBundle::load_vendor_cache(const std::string& cache_path, const std::s
         this->m_config_maps.clear();
         this->m_filament_id_maps.clear();
         this->m_errors = 0;
-        // reset() does not clear m_printer_hold_alias, and a mid-body failure may
-        // have left collections it never reached (each load_collection clears its
-        // own collection's map only when it runs) with stale aliases.
-        this->prints.m_printer_hold_alias.clear();
-        this->sla_prints.m_printer_hold_alias.clear();
-        this->filaments.m_printer_hold_alias.clear();
-        this->sla_materials.m_printer_hold_alias.clear();
-        this->printers.m_printer_hold_alias.clear();
+        // A mid-body failure may have left collections the deserialization never
+        // reached (each load_collection clears its own collection's map only when
+        // it runs) with stale aliases.
+        this->clear_printer_hold_aliases();
         return false;
     }
 }

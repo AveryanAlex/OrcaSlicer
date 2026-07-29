@@ -54,6 +54,14 @@ std::string write_versionless_vendor_json(const fs::path& dir, const std::string
     return p.string();
 }
 
+// Whole file as bytes, for the byte-identity comparisons below.
+std::string slurp(const fs::path& p)
+{
+    std::string s;
+    load_string_file(p, s);
+    return s;
+}
+
 void corrupt_blob_byte(const std::string& path)
 {
     std::fstream f(path, std::ios::in | std::ios::out | std::ios::binary);
@@ -907,10 +915,6 @@ TEST_CASE("printer hold aliases survive a cache round-trip", "[VendorCache]")
     REQUIRE(loaded.load_vendor_cache(cache1.string(), vid, "1.0.0","1.0.0"));
     REQUIRE(save_one_vendor(loaded, cache2.string(), vid, "1.0.0"));
 
-    auto slurp = [](const fs::path& p) {
-        std::ifstream ifs(p.string(), std::ios::binary);
-        return std::string(std::istreambuf_iterator<char>(ifs), {});
-    };
     REQUIRE(slurp(cache1) == slurp(cache2));
 }
 
@@ -964,10 +968,6 @@ TEST_CASE("a loaded cache re-serializes to byte-identical output", "[VendorCache
     PresetBundle loaded;
     REQUIRE(loaded.load_vendor_cache(cache1.string(), "Acme", "1.0.0", "1.0.0"));
     REQUIRE(loaded.save_vendor_cache(cache2.string(), "Acme", "1.0.0", "1.0.0"));
-    auto slurp = [](const fs::path& p) {
-        std::ifstream ifs(p.string(), std::ios::binary);
-        return std::string(std::istreambuf_iterator<char>(ifs), {});
-    };
     REQUIRE(slurp(cache1) == slurp(cache2));
 }
 
@@ -1023,11 +1023,7 @@ TEST_CASE("a cache that fails mid-body deserialization is rejected and leaves th
     PresetBundle   clean;
     REQUIRE(out.save_vendor_cache(out_after.string(), vid, "1.0.0","1.0.0"));
     REQUIRE(clean.save_vendor_cache(clean_ref.string(), vid, "1.0.0","1.0.0"));
-    auto slurp2 = [](const fs::path& p) {
-        std::ifstream ifs(p.string(), std::ios::binary);
-        return std::string(std::istreambuf_iterator<char>(ifs), {});
-    };
-    CHECK(slurp2(out_after) == slurp2(clean_ref));
+    CHECK(slurp(out_after) == slurp(clean_ref));
 
     // The recovery must leave a bundle a caller can still load a good cache into.
     REQUIRE(out.load_vendor_cache(valid_cache.string(), vid, "1.0.0","1.0.0"));

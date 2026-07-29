@@ -16,13 +16,7 @@
 #include "Semver.hpp"
 #include "ProjectTask.hpp"
 
-#include <cereal/archives/binary.hpp>
-#include <cereal/cereal.hpp>
-#include <cereal/types/map.hpp>
-#include <cereal/types/polymorphic.hpp>
-#include <cereal/types/set.hpp>
-#include <cereal/types/string.hpp>
-#include <cereal/types/vector.hpp>
+#include <cereal/access.hpp>
 
 //BBS: change system directories
 #define PRESET_SYSTEM_DIR      "system"
