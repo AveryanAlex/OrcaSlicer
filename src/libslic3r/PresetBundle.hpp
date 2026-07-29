@@ -6,12 +6,14 @@
 #include "enum_bitmask.hpp"
 
 #include <memory>
+#include <set>
 #include <shared_mutex>
 #include <unordered_map>
 #include <optional>
 #include <array>
 #include <boost/filesystem/path.hpp>
 #include <unordered_set>
+
 
 #define DEFAULT_USER_FOLDER_NAME "default"
 #define BUNDLE_STRUCTURE_JSON_NAME "bundle_structure.json"
@@ -170,6 +172,44 @@ struct PresetBundleMetadata
 class PresetBundle
 {
 public:
+    // ---- Per-vendor preset cache --------------------------------------------
+    // One cache file per vendor (plus the Orca filament library), stamped with
+    // the vendor's own profile version rather than a directory scan.
+
+    // The cache is not something a caller loads from: a vendor is loaded with
+    // load_vendor_configs_from_json, which comes from the cache whenever one covers
+    // it. What is public here is what the cache's own tests drive directly.
+
+    // Save this bundle's slice belonging to one vendor (vendor_name at
+    // vendor_version), built against the given filament library version.
+    bool save_vendor_cache(const std::string& cache_path, const std::string& vendor_name,
+                          const std::string& vendor_version, const std::string& lib_version) const;
+
+    // Expected version meaning "no profile sits beside this cache", so nothing can
+    // be newer than it and only its own integrity decides whether it is used. Not
+    // the same as an empty version, which means a profile is there but unreadable.
+    static constexpr const char* CACHE_ANY_VERSION = "*";
+
+    // Load a validated per-vendor cache into this bundle. Rejects (returns
+    // false) unless the cache version, schema fingerprint and vendor name match
+    // and the cache was built from a vendor profile and filament library at
+    // least as new as the expected ones. Profiles without a version (empty
+    // string) are never served from cache.
+    bool load_vendor_cache(const std::string& cache_path, const std::string& expected_vendor_name,
+                          const std::string& expected_vendor_version, const std::string& expected_lib_version);
+
+    // Read the profile version a cache was stamped with, without deserializing its
+    // presets. Empty if the file is unreadable, not a cache this build understands,
+    // or not this vendor's. This is how an installed vendor's version is known when
+    // only its cache is installed.
+    static std::string peek_vendor_cache_version(const std::string& cache_path, const std::string& expected_vendor_name);
+
+    // Enable writing a per-vendor cache after a JSON parse (off by default). Only
+    // for bundles whose parses are complete — load_system_presets_from_json loads
+    // the filament library first and every other vendor against it, so its parses
+    // qualify; a wizard's one-off parse of a single vendor does not.
+    void set_generate_vendor_caches(bool enable) { m_generate_vendor_caches = enable; }
+
     static DynamicPrintConfig construct_full_config(Preset                         &in_printer_preset,
                                                     Preset                         &in_print_preset,
                                                     const DynamicPrintConfig       &project_config,
@@ -444,8 +484,12 @@ public:
     /*std::pair<PresetsConfigSubstitutions, size_t> load_configbundle(
         const std::string &path, LoadConfigBundleAttributes flags, ForwardCompatibilitySubstitutionRule compatibility_rule);*/
     //Orca: load config bundle from json, pass the base bundle to support cross vendor inheritance
+    // Orca: `dir` is where the vendor is looked for — its own directory, whether or
+    // not the profile JSONs are still there. A whole-vendor load comes from the
+    // vendor's preset cache whenever one covers the profile on disk, and is parsed
+    // from the JSONs (falling back to the ones in resources) only when none does.
     std::pair<PresetsConfigSubstitutions, size_t> load_vendor_configs_from_json(
-        const std::string &path, const std::string &vendor_name, LoadConfigBundleAttributes flags, ForwardCompatibilitySubstitutionRule compatibility_rule, const PresetBundle* base_bundle = nullptr);
+        const std::string &dir, const std::string &vendor_name, LoadConfigBundleAttributes flags, ForwardCompatibilitySubstitutionRule compatibility_rule, const PresetBundle* base_bundle = nullptr);
 
     // Export a config bundle file containing all the presets and the names of the active presets.
     //void                        export_configbundle(const std::string &path, bool export_system_settings = false, bool export_physical_printers = false);
@@ -521,7 +565,33 @@ public:
     // compatible_prints references a deleted (unknown) or renamed (old) preset name.
     bool check_preset_references() const;
 
+    // Merge one vendor's presets with the other vendor's presets, report duplicates.
+    // Public so per-vendor-cache consumers (e.g. the setup wizard) can assemble a
+    // bundle out of several per-vendor caches loaded into separate PresetBundle instances.
+    std::vector<std::string>    merge_presets(PresetBundle &&other);
+
 private:
+    // Load one vendor from its preset cache: the one in `dir`, or — when that is
+    // missing or stale — the one shipped in resources/profiles, both judged against
+    // the vendor as installed in `dir` and against the filament library in effect.
+    // False, with this bundle left clean, when neither is usable and the vendor has
+    // to be parsed. This is how load_vendor_configs_from_json reads a cache.
+    bool load_vendor_cache(const boost::filesystem::path& dir, const std::string& vendor_name);
+
+    // Read raw cache blob: verify magic, size, CRC.
+    static bool read_cache_blob(const std::string& path, std::string& out_blob);
+    // Write a cache blob with the standard 20-byte file header.
+    static void write_cache_blob(const std::string& path, const std::string& blob);
+
+    // (De)serialization of one collection's slice for the per-vendor cache:
+    // every non-default, non-external preset (system or user) plus
+    // m_printer_hold_alias. See save_vendor_cache/load_vendor_cache.
+    static void save_collection(cereal::BinaryOutputArchive& ar, const PresetCollection& coll);
+    static void load_collection(cereal::BinaryInputArchive& ar, PresetCollection& coll, const VendorMap& vendors);
+
+    // Whether to (re)write a per-vendor cache after a JSON parse.
+    bool m_generate_vendor_caches { false };
+
     // Orca: validation only - flag any printer with two or more compatible
     // filament presets sharing one filament_id (ambiguous AMS subtype match).
     bool check_duplicate_filament_subtypes() const;
@@ -529,8 +599,6 @@ private:
     //std::pair<PresetsConfigSubstitutions, std::string> load_system_presets(ForwardCompatibilitySubstitutionRule compatibility_rule);
     //BBS: add json related logic
     std::pair<PresetsConfigSubstitutions, std::string> load_system_presets_from_json(ForwardCompatibilitySubstitutionRule compatibility_rule);
-    // Merge one vendor's presets with the other vendor's presets, report duplicates.
-    std::vector<std::string>    merge_presets(PresetBundle &&other);
     // Update the multicolor information for filaments.
     void update_filament_multi_color();
     // Update renamed_from and alias maps of system profiles.
@@ -564,6 +632,34 @@ private:
 };
 
 ENABLE_ENUM_BITMASK_OPERATORS(PresetBundle::LoadConfigBundleAttribute)
+
+// True if `vendor` is installed in data_dir()/system. A build that ships preset
+// caches installs the cache alone, so it — not the profile — marks a vendor
+// installed, and either one on its own counts.
+extern bool is_vendor_installed(const std::string& vendor);
+
+// The version of the installed vendor: what its profile claims, or what its cache
+// was stamped with where only the cache is installed. Invalid Semver if neither is.
+extern Semver installed_vendor_version(const std::string& vendor);
+
+// The vendors `dir` holds, sorted: one is named by its profile or, in a build that
+// ships preset caches instead of the raw profile JSONs, by its cache alone.
+extern std::set<std::string> vendor_names_in(const boost::filesystem::path& dir);
+
+// The version a build ships `vendor` at: whichever of its preset cache and its
+// profile is newer, that being the one installing lays down. Invalid Semver if the
+// build ships neither.
+extern Semver resource_vendor_version(const std::string& vendor);
+
+// Install vendors from the resources directory into the data directory, each as
+// its preset cache or as its profile and preset JSONs — whichever of the two the
+// build ships at the newer version. Anything the previous install of that vendor
+// left behind goes, so only the form just installed is there to be loaded.
+// bundle_names: vendor names, without extension.
+// Returns false on the first vendor that cannot be installed.
+extern bool install_vendor_bundles_from_resources(const std::vector<std::string>& bundle_names,
+                                                  const std::string& resource_subdir = "profiles",
+                                                  const std::string& data_subdir     = "system");
 
 } // namespace Slic3r
 

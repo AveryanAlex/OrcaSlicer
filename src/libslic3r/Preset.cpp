@@ -147,6 +147,17 @@ Semver get_version_from_json(std::string file_path)
         return Semver();
         //throw ConfigurationError(format("Failed loading configuration file \"%1%\": %2%", file_path, err.what()));
     }
+    catch(...) {
+        return Semver();
+    }
+}
+
+std::string get_vendor_cache_version(const std::string& json_path)
+{
+    // The version a vendor's cache is stamped with. A profile without a parsable
+    // version cannot be judged for staleness, so it is simply never cached.
+    const Semver ver = get_version_from_json(json_path);
+    return ver.valid() ? ver.to_string() : std::string();
 }
 
 //BBS: add a function to load the key-values from xxx.json
