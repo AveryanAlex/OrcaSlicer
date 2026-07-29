@@ -4535,6 +4535,16 @@ void GLCanvas3D::on_mouse(wxMouseEvent& evt)
     else if (evt.Dragging() || is_camera_rotate(evt, button_mappings) || is_camera_pan(evt, button_mappings)) {
         m_mouse.dragging = true;
 
+        // Orca: this event reports the position the pointer was teleported to by the infinite
+        // camera drag. Restart the drag from there, so the jump is not turned into a camera
+        // movement. Dropping the origin also keeps the drag consistent on platforms which
+        // silently ignore the warp request (Wayland), where the pointer never actually moved.
+        if (m_mouse.drag.pointer_wrapped) {
+            m_mouse.drag.pointer_wrapped = false;
+            m_mouse.set_start_position_2D_as_invalid();
+            m_mouse.set_start_position_3D_as_invalid();
+        }
+
         if (m_layers_editing.state != LayersEditing::Unknown && layer_editing_object_idx != -1) {
             if (m_layers_editing.state == LayersEditing::Editing) {
                 _perform_layer_editing_action(&evt);
@@ -4616,6 +4626,7 @@ void GLCanvas3D::on_mouse(wxMouseEvent& evt)
                 camera.auto_type(Camera::EType::Perspective);
                 m_dirty = true;
                 m_mouse.ignore_right_up = true;  // will be reset on button up event even if not right button is pressed
+                _wrap_mouse_pointer_on_canvas_border(pos);
             }
 
             m_camera_movement = true;
@@ -4642,6 +4653,7 @@ void GLCanvas3D::on_mouse(wxMouseEvent& evt)
                 camera.set_target(camera.get_target() + orig - cur_pos);
                 m_dirty = true;
                 m_mouse.ignore_right_up = true;  // will be reset on button up event even if not right button is pressed
+                _wrap_mouse_pointer_on_canvas_border(pos);
             }
 
             m_camera_movement = true;
@@ -5529,6 +5541,7 @@ void GLCanvas3D::mouse_up_cleanup()
     m_moving = false;
     m_camera_movement = false;
     m_mouse.drag.move_volume_idx = -1;
+    m_mouse.drag.pointer_wrapped = false;
     m_mouse.set_start_position_3D_as_invalid();
     m_mouse.set_start_position_2D_as_invalid();
     m_mouse.dragging = false;
@@ -10224,6 +10237,47 @@ Vec3d GLCanvas3D::_mouse_to_3d(const Point& mouse_pos, float* z)
 Vec3d GLCanvas3D::_mouse_to_bed_3d(const Point& mouse_pos)
 {
     return mouse_ray(mouse_pos).intersect_plane(0.0);
+}
+
+// Orca: Blender-like infinite camera drag. Once a pan/orbit drag reaches a canvas border the
+// pointer is teleported to the opposite one, so that the movement is only limited by how long
+// the user keeps dragging and not by the window (or screen) bounds.
+// The drag is flagged instead of being offset by the jump, because the warp request is not
+// honoured everywhere - Wayland compositors ignore it, in which case the pointer stays at the
+// border and the drag simply stops there, exactly as it does with this feature disabled.
+void GLCanvas3D::_wrap_mouse_pointer_on_canvas_border(const Point& mouse_pos)
+{
+    if (m_canvas == nullptr || !wxGetApp().app_config->get_bool("infinite_camera_drag"))
+        return;
+
+    const Size cnv_size = get_canvas_size();
+
+    auto wrapped_coord = [](int coord, int size) {
+        // The pointer is teleported once it comes this close to a border and lands the same
+        // distance away from the opposite one, so that it never wraps back on the next event.
+        // The margin is proportional to the canvas because the pointer can travel a lot between
+        // two motion events of a fast drag, and the border would be missed if it were too thin.
+        const int border = std::clamp(size / 32, 12, 48);
+        const int span   = size - 2 * border;
+        // Nothing to wrap into if the canvas is smaller than the two margins.
+        if (span <= 0 || (coord >= border && coord <= size - border))
+            return coord;
+        // Clamping matters when the pointer is reported far outside of the canvas.
+        return std::clamp(coord + (coord < border ? span : -span), border, size - border);
+    };
+
+    const Point wrapped(wrapped_coord(static_cast<int>(mouse_pos.x()), cnv_size.get_width()),
+                        wrapped_coord(static_cast<int>(mouse_pos.y()), cnv_size.get_height()));
+    if (wrapped == mouse_pos)
+        return;
+
+    Vec2d logical_pos = wrapped.cast<double>();
+#if ENABLE_RETINA_GL
+    const double factor = m_retina_helper->get_scale_factor();
+    logical_pos /= factor;
+#endif // ENABLE_RETINA_GL
+    m_canvas->WarpPointer(static_cast<int>(std::lround(logical_pos.x())), static_cast<int>(std::lround(logical_pos.y())));
+    m_mouse.drag.pointer_wrapped = true;
 }
 
 // While it looks like we can call
