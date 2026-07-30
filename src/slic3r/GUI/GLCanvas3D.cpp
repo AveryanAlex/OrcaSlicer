@@ -4626,7 +4626,7 @@ void GLCanvas3D::on_mouse(wxMouseEvent& evt)
                 camera.auto_type(Camera::EType::Perspective);
                 m_dirty = true;
                 m_mouse.ignore_right_up = true;  // will be reset on button up event even if not right button is pressed
-                _wrap_mouse_pointer_on_canvas_border(pos);
+                _wrap_mouse_pointer_on_canvas_border(pos, Point(m_mouse.drag.start_position_3D.x(), m_mouse.drag.start_position_3D.y()));
             }
 
             m_camera_movement = true;
@@ -4653,7 +4653,7 @@ void GLCanvas3D::on_mouse(wxMouseEvent& evt)
                 camera.set_target(camera.get_target() + orig - cur_pos);
                 m_dirty = true;
                 m_mouse.ignore_right_up = true;  // will be reset on button up event even if not right button is pressed
-                _wrap_mouse_pointer_on_canvas_border(pos);
+                _wrap_mouse_pointer_on_canvas_border(pos, m_mouse.drag.start_position_2D);
             }
 
             m_camera_movement = true;
@@ -10239,35 +10239,43 @@ Vec3d GLCanvas3D::_mouse_to_bed_3d(const Point& mouse_pos)
     return mouse_ray(mouse_pos).intersect_plane(0.0);
 }
 
-// Orca: Blender-like infinite camera drag. Once a pan/orbit drag reaches a canvas border the
-// pointer is teleported to the opposite one, so that the movement is only limited by how long
-// the user keeps dragging and not by the window (or screen) bounds.
+// Orca: Blender-like infinite camera drag. Once a pan/orbit drag drives the pointer into a canvas
+// border it is teleported to the opposite one, so that the movement is only limited by how long
+// the user keeps dragging and not by the window (or screen) bounds. prev_pos is the position the
+// drag is coming from, which tells which border the pointer is being pushed against.
 // The drag is flagged instead of being offset by the jump, because the warp request is not
 // honoured everywhere - Wayland compositors ignore it, in which case the pointer stays at the
 // border and the drag simply stops there, exactly as it does with this feature disabled.
-void GLCanvas3D::_wrap_mouse_pointer_on_canvas_border(const Point& mouse_pos)
+void GLCanvas3D::_wrap_mouse_pointer_on_canvas_border(const Point& mouse_pos, const Point& prev_pos)
 {
     if (m_canvas == nullptr || !wxGetApp().app_config->get_bool("infinite_camera_drag"))
         return;
 
     const Size cnv_size = get_canvas_size();
 
-    auto wrapped_coord = [](int coord, int size) {
-        // The pointer is teleported once it comes this close to a border and lands the same
-        // distance away from the opposite one, so that it never wraps back on the next event.
-        // The margin is proportional to the canvas because the pointer can travel a lot between
-        // two motion events of a fast drag, and the border would be missed if it were too thin.
+    auto wrapped_coord = [](int coord, int prev_coord, int size) {
+        // The pointer is teleported once it comes this close to a border. The margin is
+        // proportional to the canvas because the pointer can travel a long way between two
+        // motion events of a fast drag, and a thin border would be stepped over.
         const int border = std::clamp(size / 32, 12, 48);
-        const int span   = size - 2 * border;
-        // Nothing to wrap into if the canvas is smaller than the two margins.
-        if (span <= 0 || (coord >= border && coord <= size - border))
+        // It then lands this far from the opposite border. A fixed inset is used rather than the
+        // mirrored crossing point: the latter leaves the pointer as close to the opposite border
+        // as it just came to this one, so grazing a border would wrap back and forth.
+        const int inset = std::clamp(size / 8, 48, 160);
+        // Nothing to wrap into if the canvas is too small to land clear of both borders.
+        if (size <= 2 * inset)
             return coord;
-        // Clamping matters when the pointer is reported far outside of the canvas.
-        return std::clamp(coord + (coord < border ? span : -span), border, size - border);
+        // Only the axis the drag actually pushes into a border is wrapped, so that panning along
+        // a border - horizontally over the bottom of the canvas, say - does not wrap the other one.
+        if (coord > size - border && coord > prev_coord)
+            return inset;
+        if (coord < border && coord < prev_coord)
+            return size - inset;
+        return coord;
     };
 
-    const Point wrapped(wrapped_coord(static_cast<int>(mouse_pos.x()), cnv_size.get_width()),
-                        wrapped_coord(static_cast<int>(mouse_pos.y()), cnv_size.get_height()));
+    const Point wrapped(wrapped_coord(static_cast<int>(mouse_pos.x()), static_cast<int>(prev_pos.x()), cnv_size.get_width()),
+                        wrapped_coord(static_cast<int>(mouse_pos.y()), static_cast<int>(prev_pos.y()), cnv_size.get_height()));
     if (wrapped == mouse_pos)
         return;
 

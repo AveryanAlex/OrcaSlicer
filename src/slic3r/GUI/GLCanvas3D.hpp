@@ -1224,9 +1224,9 @@ public:
 private:
     bool _is_shown_on_screen() const;
 
-    // Orca: teleports the pointer to the opposite canvas border when a camera drag reaches
-    // one, so that panning/orbiting is not limited by the window bounds.
-    void _wrap_mouse_pointer_on_canvas_border(const Point& mouse_pos);
+    // Orca: teleports the pointer to the opposite canvas border when a camera drag pushes it
+    // into one, so that panning/orbiting is not limited by the window bounds.
+    void _wrap_mouse_pointer_on_canvas_border(const Point& mouse_pos, const Point& prev_pos);
 
     void _update_slice_error_status();
 
