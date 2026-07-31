@@ -70,7 +70,7 @@
 	"wipe_tower_no_sparse_layers": "0",
 	"wipe_tower_cone_angle": "30",
 	"wipe_tower_wall_type": "rib",
-	"wipe_tower_extra_rib_length": "0",
+	"wipe_tower_extra_rib_length": "8",
 	"prime_tower_width": "35",
 	"prime_volume": "30",
 	"wall_generator": "arachne",
