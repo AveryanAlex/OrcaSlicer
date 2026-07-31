@@ -26,7 +26,7 @@
 	"bridge_flow": "0.7",
 	"enable_arc_fitting": "0",
 	"ooze_prevention": "1",
-	"precise_outer_wall": "0",
+	"precise_outer_wall": "1",
 	"slowdown_for_curled_perimeters": "0",
 	"standby_temperature_delta": "-150",
 	"support_threshold_angle": "35",
