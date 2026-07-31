@@ -1,9 +1,9 @@
 {
 	"type": "filament",
-	"name": "Snapmaker TPU 95A @U1 base",
 	"from": "system",
-	"filament_id": "297165629001",
 	"instantiation": "false",
+	"name": "Snapmaker TPU 95A @U1 base",
+	"filament_id": "297165629001",
 	"overhang_fan_threshold": [
 		"95%"
 	],
@@ -42,9 +42,6 @@
 	],
 	"filament_retraction_speed": [
 		"nil"
-	],
-	"filament_settings_id": [
-		""
 	],
 	"filament_soluble": [
 		"0"

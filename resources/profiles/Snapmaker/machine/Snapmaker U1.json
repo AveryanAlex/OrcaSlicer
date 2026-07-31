@@ -1,8 +1,8 @@
 {
 	"type": "machine_model",
-	"name": "Snapmaker U1",
 	"machine_tech": "FFF",
 	"family": "Snapmaker",
+	"name": "Snapmaker U1",
 	"url": "",
 	"model_id": "797581801",
 	"bed_model": "Snapmaker U1_bed.stl",

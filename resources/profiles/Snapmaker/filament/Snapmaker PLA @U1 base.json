@@ -1,10 +1,10 @@
 {
 	"type": "filament",
-	"name": "Snapmaker PLA @U1 base",
-	"inherits": "fdm_filament_pla",
 	"from": "system",
-	"filament_id": "14170311270",
 	"instantiation": "false",
+	"name": "Snapmaker PLA @U1 base",
+	"filament_id": "14170311270",
+	"inherits": "fdm_filament_pla",
 	"filament_end_gcode": [
 		""
 	],
