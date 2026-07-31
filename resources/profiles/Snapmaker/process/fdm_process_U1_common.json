@@ -70,5 +70,6 @@
 	"prime_tower_width": "35",
 	"wall_generator": "arachne",
 	"compatible_printers": [],
+	"wipe_tower_extra_rib_length": "8",
 	"exclude_object": "1"
 }
