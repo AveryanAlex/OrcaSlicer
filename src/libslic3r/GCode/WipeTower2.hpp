@@ -41,6 +41,11 @@ public:
     // Shared with the entry routing in GCode.cpp so the router and the tower agree.
     static bool use_gap_wall(const PrintConfig& config);
 
+    // Whether the blocking toolchange temperature wait moves onto the wipe tower.
+    // Shared with the defer flag in GCode.cpp append_tcr2 so the deferral and the
+    // tower's tagged M109 can never disagree.
+    static bool wait_for_temp_enabled(const PrintConfig& config);
+
 	// x			-- x coordinates of wipe tower in mm ( left bottom corner )
 	// y			-- y coordinates of wipe tower in mm ( left bottom corner )
 	// width		-- width of wipe tower in mm ( default 60 mm - leave as it is )
@@ -268,6 +273,7 @@ private:
     float m_bed_width; // width of the bed bounding box
     Vec2f m_bed_bottom_left; // bottom-left corner coordinates (for rectangular beds)
     BoundingBoxf m_bed_bbox; // bounding box of the printable area
+    Polygon m_bed_polygon; // printable_area contour (scaled), for beds neither rectangular nor circular
 
 	float m_perimeter_width = 0.4f * Width_To_Nozzle_Ratio; // Width of an extrusion line, also a perimeter spacing for 100% infill.
 	float m_extrusion_flow = 0.038f; //0.029f;// Extrusion flow is derived from m_perimeter_width, layer height and filament diameter.

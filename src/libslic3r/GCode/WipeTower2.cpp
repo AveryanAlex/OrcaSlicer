@@ -1009,6 +1009,13 @@ bool WipeTower2::use_gap_wall(const PrintConfig& config)
     return config.prime_tower_skip_points.value && config.wipe_tower_wall_type.value != wtwCone;
 }
 
+bool WipeTower2::wait_for_temp_enabled(const PrintConfig& config)
+{
+    // SEMM runs its own unload/load temperature sequence; the GUI hides the option
+    // there but a profile may still carry it set.
+    return config.wait_for_temp_on_wipe_tower.value && !config.single_extruder_multi_material.value;
+}
+
 WipeTower2::WipeTower2(const PrintConfig& config, const PrintRegionConfig& default_region_config,int plate_idx, Vec3d plate_origin, const std::vector<std::vector<float>>& wiping_matrix, size_t initial_tool) :
     m_semm(config.single_extruder_multi_material.value),
     m_enable_filament_ramming(config.enable_filament_ramming.value),
@@ -1039,7 +1046,7 @@ WipeTower2::WipeTower2(const PrintConfig& config, const PrintRegionConfig& defau
     m_use_gap_wall(use_gap_wall(config)),
     m_enable_tower_interface_features(config.enable_tower_interface_features.value),
     m_enable_tower_interface_cooldown_during_tower(config.enable_tower_interface_cooldown_during_tower.value),
-    m_wait_for_temp_on_wipe_tower(config.wait_for_temp_on_wipe_tower.value && !config.single_extruder_multi_material.value)
+    m_wait_for_temp_on_wipe_tower(wait_for_temp_enabled(config))
 {
     // Read absolute value of first layer speed, if given as percentage,
     // it is taken over following default. Speeds from config are not
@@ -1090,6 +1097,7 @@ WipeTower2::WipeTower2(const PrintConfig& config, const PrintRegionConfig& defau
     m_bed_bottom_left = m_bed_shape == RectangularBed
                   ? Vec2f(bed_points.front().x(), bed_points.front().y())
                   : Vec2f::Zero();
+    m_bed_polygon = Polygon::new_scale(bed_points);
 }
 
 
@@ -1703,9 +1711,10 @@ void WipeTower2::toolchange_Change(
     // The Tn above was issued without a blocking temperature wait (OozePrevention::post_toolchange
     // only restores the target); block here, before the deretraction below, which must not extrude
     // on a cold nozzle. Like the Bambu H2C, park beside the tower for the heat-up so drool lands
-    // next to it instead of on its top surface — nearest x side first, the other side as fallback,
-    // in place if both would leave the bed. Raw pre-rotated moves (see the repositioning move
-    // below) keep the writer's tracked position at the tower entry. The tag keeps the
+    // next to it instead of on its top surface — nearest x side first, then that side clamped
+    // toward the bed edge, then the far side, in place if all would leave the bed. Raw
+    // pre-rotated moves (see the repositioning move below) keep the writer's tracked position
+    // at the tower entry. The tag keeps the
     // interface-temp deduplication pass in append_tcr2 from stripping the M109.
     if (wait_for_temp_here && wait_beside_tower) {
         // The rib wall and the stabilization cone bulge past the nominal width rectangle
@@ -1736,28 +1745,54 @@ void WipeTower2::toolchange_Change(
             min_x -= brim;
             max_x += brim;
         }
-        constexpr float gap    = 2.f;
-        const float     near_x = writer.x() < m_wipe_tower_width / 2.f ? min_x - gap : max_x + gap;
-        const float     far_x  = near_x < m_wipe_tower_width / 2.f ? max_x + gap : min_x - gap;
-        const float     a      = float(m_wipe_tower_rotation_angle * M_PI / 180.);
+        constexpr float gap     = 2.f;
+        constexpr float min_gap = 0.5f;
+        const bool      on_left = writer.x() < m_wipe_tower_width / 2.f;
+        const float     near_x  = on_left ? min_x - gap : max_x + gap;
+        const float     far_x   = on_left ? max_x + gap : min_x - gap;
+        const float     a       = float(m_wipe_tower_rotation_angle * M_PI / 180.);
         const float     c = std::cos(a), s = std::sin(a);
-        for (float side_x : { near_x, far_x }) {
-            const Vec2f stop = writer.rotated(Vec2f(side_x, writer.y()));
-            const Vec2f wt   = stop + m_rib_offset;
+        auto park_pt_on_bed = [this, &writer, c, s](float side_x) {
+            const Vec2f wt = writer.rotated(Vec2f(side_x, writer.y())) + m_rib_offset;
             const Vec2f bed_pt(c * wt.x() - s * wt.y() + m_wipe_tower_pos.x(),
                                s * wt.x() + c * wt.y() + m_wipe_tower_pos.y());
-            bool on_bed = false;
             if (m_bed_shape == RectangularBed)
-                on_bed = m_bed_bbox.contains(bed_pt.cast<double>());
-            else if (m_bed_shape == CircularBed)
-                on_bed = (bed_pt.cast<double>() - m_bed_bbox.center()).norm() <= m_bed_width / 2.;
-            if (!on_bed)
-                continue;
+                return m_bed_bbox.contains(bed_pt.cast<double>());
+            if (m_bed_shape == CircularBed)
+                return (bed_pt.cast<double>() - m_bed_bbox.center()).norm() <= m_bed_width / 2.;
+            return m_bed_polygon.contains(Point::new_scale(bed_pt.x(), bed_pt.y()));
+        };
+        float park_x    = near_x;
+        bool  have_park = park_pt_on_bed(near_x);
+        if (!have_park) {
+            // The ideal near point hangs off the bed: pull it back to the bed edge as long
+            // as that still clears the tower envelope by min_gap (the BBL tower clamps its
+            // stop_pos against the bed the same way in append_tcr). Bisection, because with
+            // tower rotation and non-rectangular beds the bed edge is not axis-aligned.
+            const float limit_x = on_left ? min_x - min_gap : max_x + min_gap;
+            if (park_pt_on_bed(limit_x)) {
+                float on = limit_x, off = near_x;
+                for (int i = 0; i < 8; ++i) {
+                    const float mid = 0.5f * (on + off);
+                    if (park_pt_on_bed(mid))
+                        on = mid;
+                    else
+                        off = mid;
+                }
+                park_x    = on;
+                have_park = true;
+            }
+        }
+        if (!have_park && park_pt_on_bed(far_x)) {
+            park_x    = far_x;
+            have_park = true;
+        }
+        if (have_park) {
+            const Vec2f stop = writer.rotated(Vec2f(park_x, writer.y()));
             writer.feedrate(m_travel_speed * 60.f)
                   .append(std::string("G1 X") + Slic3r::float_to_string_decimal_point(stop.x())
                                      +  " Y"  + Slic3r::float_to_string_decimal_point(stop.y())
                                      + never_skip_tag() + "\n");
-            break;
         }
         writer.set_extruder_temp(wait_for_temp, true, wait_for_temp_tag());
     }

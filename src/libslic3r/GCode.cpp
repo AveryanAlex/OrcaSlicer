@@ -1557,7 +1557,7 @@ static std::vector<Vec2d> get_path_of_change_filament(const Print& print)
                 toolchange_temp_override = interface_temp;
             }
             toolchange_gcode_str = gcodegen.set_extruder(new_extruder_id, tcr.print_z, false, toolchange_temp_override,
-                                                         gcodegen.config().wait_for_temp_on_wipe_tower.value); // TODO: toolchange_z vs print_z
+                                                         WipeTower2::wait_for_temp_enabled(gcodegen.m_config)); // TODO: toolchange_z vs print_z
             if (!travel_to_tower_now && !tcr.priming && WipeTower2::use_gap_wall(gcodegen.m_config)) {
                 // The tool changed in place (multi-tool printer without ramming), so the
                 // tower entry is the tcr's own positioning move — a straight line across
@@ -9350,8 +9350,23 @@ std::string GCode::set_extruder(unsigned int new_filament_id, double print_z, bo
         check_add_eol(gcode);
     }
     // Set the new extruder to the operating temperature.
+    std::string restore_temp_gcode;
     if (m_ooze_prevention.enable)
-        gcode += m_ooze_prevention.post_toolchange(*this, !defer_temp_wait);
+        restore_temp_gcode = m_ooze_prevention.post_toolchange(*this, !defer_temp_wait);
+    if (defer_temp_wait && restore_temp_gcode.empty()) {
+        // The blocking M109 is emitted by the wipe tower generator; with no temperature
+        // command here the nozzle would only start heating once the head arrives there.
+        // Heat non-blocking now so the heat-up overlaps the travel, targeting what the
+        // tower will wait on (OozePrevention::_get_temp logic plus the interface override).
+        int temp = toolchange_temp_override > 0 ?
+            toolchange_temp_override :
+            (m_layer == nullptr || m_layer->id() == 0 || m_config.nozzle_temperature.get_at(new_fi) == 0 ?
+                 m_config.nozzle_temperature_initial_layer.get_at(new_fi) :
+                 m_config.nozzle_temperature.get_at(new_fi));
+        if (temp > 0)
+            restore_temp_gcode = m_writer.set_temperature(temp, false, new_filament_id);
+    }
+    gcode += restore_temp_gcode;
 
     if (m_config.enable_pressure_advance.get_at(new_filament_id)) {
         gcode += m_writer.set_pressure_advance(m_config.pressure_advance.get_at(new_filament_id));
