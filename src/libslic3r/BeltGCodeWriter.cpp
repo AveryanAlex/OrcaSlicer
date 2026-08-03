@@ -87,7 +87,8 @@ std::string BeltGCodeWriter::travel_to_xy(const Vec2d &point, const std::string 
         m_first_layer_plane, m_first_layer_thickness_mm, m_is_first_layer,
         Vec3d(point.x(), point.y(), m_pos.z()));
     auto speed = first_layer_for_point
-        ? this->config.get_abs_value("initial_layer_travel_speed") : this->config.travel_speed.value;
+        ? this->config.get_abs_value_at("initial_layer_travel_speed", m_cached_extruder_idx)
+        : this->config.travel_speed.get_at(m_cached_extruder_idx);
     w.emit_f(speed * 60.0);
     w.emit_comment(GCodeWriter::full_gcode_comment, comment);
     return w.string();
@@ -110,13 +111,13 @@ std::string BeltGCodeWriter::_travel_to_z(double z, const std::string &comment)
 {
     m_pos(2) = z;
 
-    double speed = this->config.travel_speed_z.value;
+    double speed = this->config.travel_speed_z.get_at(m_cached_extruder_idx);
     if (speed == 0.) {
         const bool first_layer_for_point = belt_point_on_first_layer(
             m_first_layer_plane, m_first_layer_thickness_mm, m_is_first_layer,
             Vec3d(m_pos.x(), m_pos.y(), z));
-        speed = first_layer_for_point ? this->config.get_abs_value("initial_layer_travel_speed")
-                                      : this->config.travel_speed.value;
+        speed = first_layer_for_point ? this->config.get_abs_value_at("initial_layer_travel_speed", m_cached_extruder_idx)
+                                      : this->config.travel_speed.get_at(m_cached_extruder_idx);
     }
 
     // Belt printer: a Z-only move in slicing frame needs to emit both Y and Z in machine coords.
@@ -182,8 +183,8 @@ std::string BeltGCodeWriter::travel_to_xyz(const Vec3d &point, const std::string
     const bool first_layer_for_point = belt_point_on_first_layer(
         m_first_layer_plane, m_first_layer_thickness_mm, m_is_first_layer, point);
     auto travel_speed =
-        first_layer_for_point ? this->config.get_abs_value("initial_layer_travel_speed")
-                              : this->config.travel_speed.value;
+        first_layer_for_point ? this->config.get_abs_value_at("initial_layer_travel_speed", m_cached_extruder_idx)
+                              : this->config.travel_speed.get_at(m_cached_extruder_idx);
 
     // Handle pending z_hop
     if (std::abs(m_to_lift) > EPSILON) {
@@ -216,7 +217,17 @@ std::string BeltGCodeWriter::travel_to_xyz(const Vec3d &point, const std::string
                 w0.emit_comment(GCodeWriter::full_gcode_comment, comment);
                 slop_move = w0.string();
             }
-            else if (m_to_lift_type == LiftType::NormalLift) {
+            else if (m_to_lift_type == LiftType::NormalLift && this->is_current_position_clear()) {
+                // Only lift-in-place when the current position is known. On a normal
+                // printer _travel_to_z emits a Z-only move, but in belt mode Z is coupled
+                // to Y/X, so _travel_to_z re-emits the current m_pos through the belt
+                // shear. At print start (and after custom gcode) m_pos.xy is still the
+                // uninitialised origin (0,0), which shears into a bogus machine point
+                // (e.g. X=bed_max, Y=layer_z) far up the gantry. Skipping the separate
+                // lift here is safe: there is nothing to lift over yet, and the
+                // xy_z_move below travels straight to the destination with full XYZ,
+                // establishing the correct position. This mirrors the SlopeLift branch
+                // above, which already guards on is_current_position_clear().
                 slop_move = _travel_to_z(target.z(), "normal lift Z");
             }
         }
@@ -253,7 +264,7 @@ std::string BeltGCodeWriter::travel_to_xyz(const Vec3d &point, const std::string
     // Belt mode: always emit full XYZ
     GCodeG1Formatter w;
     w.emit_xyz(point_on_plate);
-    w.emit_f(this->config.travel_speed.value * 60.0);
+    w.emit_f(this->config.travel_speed.get_at(m_cached_extruder_idx) * 60.0);
     w.emit_comment(GCodeWriter::full_gcode_comment, comment);
 
     m_pos = dest_point;
