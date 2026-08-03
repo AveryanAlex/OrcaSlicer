@@ -1027,7 +1027,7 @@ static StringObjectException layered_print_cleareance_valid(const Print &print, 
     //float               v            = config.wiping_volume.value;
 
     float        depth                     = print.wipe_tower_data(filaments_count).depth;
-    //float        brim_width                = print.wipe_tower_data(filaments_count).brim_width;
+    float        brim_width                = print.wipe_tower_data(filaments_count).brim_width;
 
     if (config.wipe_tower_wall_type.value == WipeTowerWallType::wtwRib)
         width = depth;
@@ -1065,6 +1065,15 @@ static StringObjectException layered_print_cleareance_valid(const Print &print, 
     }
     if (print_config.enable_wrapping_detection.value && !intersection({wrapping_poly}, convex_hulls_temp).empty()) {
         return {L("Prime Tower") + L(" is too close to clumping detection area, and collisions will be caused.\n")};
+    }
+    if (!convex_hulls_temp.empty()) {
+        // The shared printable polygon is plate-local, while the tower polygons above are
+        // already shifted by the plate origin.
+        Polygons printable_polys = print.get_extruder_shared_printable_polygon();
+        std::for_each(printable_polys.begin(), printable_polys.end(),
+                      [&plate_origin](Polygon& p) { p.translate(scale_(plate_origin.x()), scale_(plate_origin.y())); });
+        if (!diff(offset(convex_hulls_temp, float(scale_(brim_width))), printable_polys).empty())
+            return {L("Prime Tower") + L(" (including the brim) is partially outside the printable area, and it cannot be printed.\n")};
     }
     return {};
 }
