@@ -163,7 +163,7 @@ void ConnectPrinterDialog::on_button_confirm(wxCommandEvent &event)
         }
     }
     if (m_obj) {
-        m_obj->set_user_access_code(code.ToStdString());
+        m_obj->set_access_code(code.ToStdString());
     }
     EndModal(wxID_OK);
 }

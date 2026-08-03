@@ -2166,12 +2166,12 @@ void GUI_App::init_networking_callbacks()
                     obj->is_tunnel_mqtt = tunnel;
                     obj->command_request_push_all(true);
                     obj->command_get_version();
-                    // Do NOT erase user code. Erasing will cause has_access_right to be false
+                    // Do NOT erase the access code. Erasing will cause has_access_right to be false
                     // whenever the device slot isn't populated yet (e.g. LAN reselect after logout).
                     // This filters this printer out of get_my_machine_list, silently dropping every status message
                     // AND the get_access_code reply that would refill the code, leaving a permanently
                     // dead "connected but no live data" state.
-                    // obj -> set_user_access_code("");
+                    // obj -> set_access_code("");
                     obj->command_get_access_code();
                     if (m_agent)
                         m_agent->install_device_cert(obj->get_dev_id(), obj->is_lan_mode_printer());
@@ -2221,7 +2221,6 @@ void GUI_App::init_networking_callbacks()
                                 wxString text;
                                 if (msg == "5") {
                                     obj->set_access_code("");
-                                    obj->erase_user_access_code();
                                     text = wxString::Format(_L("Incorrect password"));
                                     wxGetApp().show_dialog(text);
                                 } else {
@@ -8291,7 +8290,7 @@ bool GUI_App::show_modal_ip_address_enter_dialog(bool input_sn, wxString title)
                 wxGetApp().app_config->save();
 
                 obj->set_dev_ip(ip_address.ToStdString());
-                obj->set_user_access_code(access_code.ToStdString());
+                obj->set_access_code(access_code.ToStdString());
             }
         }
     });
