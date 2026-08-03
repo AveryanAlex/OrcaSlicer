@@ -22,6 +22,9 @@ class WipeTower2
 {
 public:
     static const std::string never_skip_tag() { return "_GCODE_WIPE_TOWER_NEVER_SKIP_TAG"; }
+    // Marks the wait-for-temp-on-wipe-tower M109 so the interface-temp deduplication pass
+    // in WipeTowerIntegration::append_tcr2 does not strip it.
+    static const std::string wait_for_temp_tag() { return ";_WAIT_FOR_TEMP_ON_WIPE_TOWER"; }
 	static std::pair<double, double> get_wipe_tower_cone_base(double width, double height, double depth, double angle_deg);
 	static std::vector<std::vector<float>> extract_wipe_volumes(const PrintConfig& config);
 
@@ -227,6 +230,7 @@ private:
     size_t m_first_layer_idx    = size_t(-1);
     bool   m_enable_tower_interface_features = false;
     bool   m_enable_tower_interface_cooldown_during_tower = false;
+    bool   m_wait_for_temp_on_wipe_tower = false;
     bool   m_prev_layer_had_interface = false;
     bool   m_current_layer_has_interface = false;
 
@@ -263,6 +267,7 @@ private:
     } m_bed_shape;
     float m_bed_width; // width of the bed bounding box
     Vec2f m_bed_bottom_left; // bottom-left corner coordinates (for rectangular beds)
+    BoundingBoxf m_bed_bbox; // bounding box of the printable area
 
 	float m_perimeter_width = 0.4f * Width_To_Nozzle_Ratio; // Width of an extrusion line, also a perimeter spacing for 100% infill.
 	float m_extrusion_flow = 0.038f; //0.029f;// Extrusion flow is derived from m_perimeter_width, layer height and filament diameter.
@@ -385,7 +390,9 @@ private:
 	void toolchange_Change(
 		WipeTowerWriter2 &writer,
         const size_t		new_tool,
-		const std::string& 		new_material);
+		const std::string& 		new_material,
+		const int 				wait_for_temp,
+		const bool 				wait_beside_tower);
 	
 	void toolchange_Load(
 		WipeTowerWriter2 &writer,

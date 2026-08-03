@@ -412,10 +412,12 @@ static std::vector<Vec2d> get_path_of_change_filament(const Print& print)
         return gcode;
     }
 
-    std::string OozePrevention::post_toolchange(GCode& gcodegen)
+    std::string OozePrevention::post_toolchange(GCode& gcodegen, bool wait)
     {
+        // With wait_for_temp_on_wipe_tower the blocking M109 is emitted by the wipe tower
+        // generator once the head is back over the tower; here only the target is restored.
         return (gcodegen.config().standby_temperature_delta.value != 0) ?
-            gcodegen.writer().set_temperature(this->_get_temp(gcodegen), true, gcodegen.writer().filament()->id()) :
+            gcodegen.writer().set_temperature(this->_get_temp(gcodegen), wait, gcodegen.writer().filament()->id()) :
             std::string();
     }
 
@@ -1554,7 +1556,8 @@ static std::vector<Vec2d> get_path_of_change_filament(const Print& print)
                     interface_temp = gcodegen.config().nozzle_temperature_range_high.get_at(new_extruder_id);
                 toolchange_temp_override = interface_temp;
             }
-            toolchange_gcode_str = gcodegen.set_extruder(new_extruder_id, tcr.print_z, false, toolchange_temp_override); // TODO: toolchange_z vs print_z
+            toolchange_gcode_str = gcodegen.set_extruder(new_extruder_id, tcr.print_z, false, toolchange_temp_override,
+                                                         gcodegen.config().wait_for_temp_on_wipe_tower.value); // TODO: toolchange_z vs print_z
             if (!travel_to_tower_now && !tcr.priming && WipeTower2::use_gap_wall(gcodegen.m_config)) {
                 // The tool changed in place (multi-tool printer without ramming), so the
                 // tower entry is the tcr's own positioning move — a straight line across
@@ -1705,7 +1708,7 @@ static std::vector<Vec2d> get_path_of_change_filament(const Print& print)
                 std::string trimmed = line;
                 trimmed.erase(0, trimmed.find_first_not_of(" \t"));
                 bool skip_line = false;
-                if (boost::starts_with(trimmed, "M109")) {
+                if (boost::starts_with(trimmed, "M109") && trimmed.find(WipeTower2::wait_for_temp_tag()) == std::string::npos) {
                     bool matches_extruder = true;
                     if (trimmed.find('T') != std::string::npos)
                         matches_extruder = trimmed.find(t_token) != std::string::npos;
@@ -8936,7 +8939,7 @@ void GCode::update_placeholder_parser_with_variant_params()
     }
 }
 
-std::string GCode::set_extruder(unsigned int new_filament_id, double print_z, bool by_object, int toolchange_temp_override)
+std::string GCode::set_extruder(unsigned int new_filament_id, double print_z, bool by_object, int toolchange_temp_override, bool defer_temp_wait)
 {
     int new_extruder_id = get_extruder_id(new_filament_id);
     if (!m_writer.need_toolchange(new_filament_id))
@@ -9348,7 +9351,7 @@ std::string GCode::set_extruder(unsigned int new_filament_id, double print_z, bo
     }
     // Set the new extruder to the operating temperature.
     if (m_ooze_prevention.enable)
-        gcode += m_ooze_prevention.post_toolchange(*this);
+        gcode += m_ooze_prevention.post_toolchange(*this, !defer_temp_wait);
 
     if (m_config.enable_pressure_advance.get_at(new_filament_id)) {
         gcode += m_writer.set_pressure_advance(m_config.pressure_advance.get_at(new_filament_id));

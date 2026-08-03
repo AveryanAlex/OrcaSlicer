@@ -5,8 +5,10 @@
 #include "test_helpers.hpp"
 
 #include <cctype>
+#include <limits>
 #include <set>
 #include <string>
+#include <vector>
 
 using namespace Slic3r;
 using namespace Slic3r::Test;
@@ -84,6 +86,122 @@ TEST_CASE("Per-object wall filament override is honored", "[MultiFilament]")
         { {}, { { "outer_wall_filament_id", 2 }, { "inner_wall_filament_id", 2 } } });
     CHECK(tools_for_role(gcode, "perimeter") == std::set<int>{ 0, 1 });
     CHECK(tools_for_role(gcode, "infill")    == std::set<int>{ 0 }); // infill not overridden: stays on F1
+}
+
+// With wait_for_temp_on_wipe_tower the blocking M109 moves from right after the Tn command to
+// a stop point parked beside the wipe tower (heat-up drool falls next to the tower, not onto
+// its top): tagged with _WAIT_FOR_TEMP_ON_WIPE_TOWER, after the toolchange and before the
+// repositioning move and the first extrusion of the purge, while the post-toolchange restore
+// demotes to a non-blocking M104. Ordering and the off-tower stop are the contract here.
+TEST_CASE("Toolchange temperature wait moves to the wipe tower when enabled", "[MultiFilament]")
+{
+    const bool wait_on_tower = GENERATE(false, true);
+    DYNAMIC_SECTION("wait_for_temp_on_wipe_tower " << (wait_on_tower ? 1 : 0)) {
+        const std::string gcode = slice_with_object_overrides(
+            { cube(20), cube(20) },
+            multifilament_config(2, {
+                { "nozzle_diameter",                "0.4,0.4" },
+                { "printer_extruder_id",            "1,2" },
+                { "printer_extruder_variant",       "Direct Drive Standard,Direct Drive Standard" },
+                { "extruder_printable_height",      "0,0" },
+                { "single_extruder_multi_material", 0 },
+                { "enable_prime_tower",             1 },
+                { "prime_tower_width",              35 },
+                { "wipe_tower_x",                   "50" },
+                { "wipe_tower_y",                   "50" },
+                { "ooze_prevention",                1 },
+                { "standby_temperature_delta",      -40 },
+                { "wait_for_temp_on_wipe_tower",    wait_on_tower ? 1 : 0 },
+            }),
+            // One filament per object -> a toolchange on every layer. Assigned at the object
+            // level: the used-filament count that gates the prime tower is derived from
+            // object/volume configs on the harness's single apply (region filament ids such
+            // as sparse_infill_filament_id are not counted there and the tower would be
+            // silently disabled).
+            { { { "extruder", 1 } }, { { "extruder", 2 } } });
+
+        // Split into lines and scan the "; CP TOOLCHANGE START".."; CP TOOLCHANGE END" blocks.
+        std::vector<std::string> lines;
+        for (size_t pos = 0; pos < gcode.size();) {
+            size_t eol = gcode.find('\n', pos);
+            if (eol == std::string::npos)
+                eol = gcode.size();
+            lines.emplace_back(gcode.substr(pos, eol - pos));
+            pos = eol + 1;
+        }
+        const auto is_tool_line   = [](const std::string& l) { return l.size() >= 2 && l[0] == 'T' && std::isdigit((unsigned char)l[1]); };
+        const auto is_m109_line   = [](const std::string& l) { return l.rfind("M109", 0) == 0; };
+        const auto is_tagged_wait = [](const std::string& l) { return l.find("_WAIT_FOR_TEMP_ON_WIPE_TOWER") != std::string::npos; };
+        const auto is_extruding   = [](const std::string& l) {
+            if (l.rfind("G1 ", 0) != 0)
+                return false;
+            const size_t e = l.find(" E");
+            return e != std::string::npos && l.find_first_of("XY") != std::string::npos && l[e + 2] != '-';
+        };
+
+        int checked_blocks = 0;
+        for (size_t i = 0; i < lines.size(); ++i) {
+            if (lines[i].find("; CP TOOLCHANGE START") == std::string::npos)
+                continue;
+            size_t block_end = i;
+            while (block_end < lines.size() && lines[block_end].find("; CP TOOLCHANGE END") == std::string::npos)
+                ++block_end;
+            size_t tool_line = block_end;
+            for (size_t j = i; j < block_end; ++j)
+                if (is_tool_line(lines[j])) { tool_line = j; break; }
+            if (tool_line == block_end)
+                continue; // final unload block, no toolchange
+            ++checked_blocks;
+
+            size_t tagged_wait = block_end, untagged_m109 = block_end, first_extrusion = block_end;
+            for (size_t j = tool_line + 1; j < block_end; ++j) {
+                if (is_m109_line(lines[j]) && tagged_wait == block_end && is_tagged_wait(lines[j]))
+                    tagged_wait = j;
+                if (is_m109_line(lines[j]) && untagged_m109 == block_end && !is_tagged_wait(lines[j]))
+                    untagged_m109 = j;
+                if (first_extrusion == block_end && is_extruding(lines[j]))
+                    first_extrusion = j;
+            }
+            INFO("toolchange block at line " << i + 1);
+            if (wait_on_tower) {
+                // The only blocking wait is the tagged one, parked beside the tower before the purge.
+                REQUIRE(tagged_wait < block_end);
+                CHECK(untagged_m109 == block_end);
+                REQUIRE(first_extrusion < block_end);
+                CHECK(tagged_wait < first_extrusion);
+                // The travel preceding the wait parks outside the tower footprint. The tower
+                // auto-sizes, so derive its extent from the purge extrusions of this block.
+                size_t stop_line = block_end;
+                for (size_t j = tagged_wait; j-- > tool_line;)
+                    if (lines[j].rfind("G1 ", 0) == 0 && lines[j].find('X') != std::string::npos) { stop_line = j; break; }
+                REQUIRE(stop_line < block_end);
+                const double stop_x = std::stod(lines[stop_line].substr(lines[stop_line].find('X') + 1));
+                double purge_min_x = std::numeric_limits<double>::max(), purge_max_x = std::numeric_limits<double>::lowest();
+                for (size_t j = tagged_wait; j < block_end; ++j) {
+                    const size_t x_pos = lines[j].find('X');
+                    if (!is_extruding(lines[j]) || x_pos == std::string::npos)
+                        continue;
+                    const double x = std::stod(lines[j].substr(x_pos + 1));
+                    purge_min_x = std::min(purge_min_x, x);
+                    purge_max_x = std::max(purge_max_x, x);
+                }
+                REQUIRE(purge_min_x <= purge_max_x);
+                INFO("stop travel: " << lines[stop_line] << " purge x range: " << purge_min_x << ".." << purge_max_x);
+                const bool beside_tower = stop_x < purge_min_x - 0.5 || stop_x > purge_max_x + 0.5;
+                CHECK(beside_tower);
+            } else {
+                // Stock behavior: the blocking wait follows the toolchange command directly.
+                REQUIRE(untagged_m109 < block_end);
+                CHECK(tagged_wait == block_end);
+                if (first_extrusion < block_end)
+                    CHECK(untagged_m109 < first_extrusion);
+            }
+            i = block_end;
+        }
+        REQUIRE(checked_blocks > 0);
+        if (!wait_on_tower)
+            CHECK(gcode.find("_WAIT_FOR_TEMP_ON_WIPE_TOWER") == std::string::npos);
+    }
 }
 
 // max_layer_height can be shorter than the extruder count (normalization sizes it to the
