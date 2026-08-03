@@ -956,7 +956,15 @@ static std::vector<Vec2d> get_path_of_change_filament(const Print& print)
         for (auto& p : avoid_points.points)
             p = wipe_tower_point_to_object_point(gcodegen, transform_wt2_pt(unscale(p).cast<float>()) + plate_origin_2d);
         BoundingBox avoid_bbx(avoid_points.points);
-        if (avoid_bbx.contains(route_start))
+        // The avoid envelope covers the first-layer brim (and rib flare), which a travel
+        // may cross freely: early-out only when the approach already starts over the
+        // tower body itself, so a start between the wall and the brim edge still gets
+        // routed in through the wall opening.
+        const float body_width = gcodegen.m_config.wipe_tower_wall_type.value == WipeTowerWallType::wtwRib ? m_wipe_tower_depth : m_right;
+        Polygon body_points = scaled(BoundingBoxf(Vec2d(0., 0.), Vec2d(body_width, m_wipe_tower_depth))).polygon();
+        for (auto& p : body_points.points)
+            p = wipe_tower_point_to_object_point(gcodegen, transform_wt2_pt(unscale(p).cast<float>()) + plate_origin_2d);
+        if (BoundingBox(body_points.points).contains(route_start))
             return {};
         const Polygons bed_polygons = printer_travel_polygons(gcodegen);
         // The router inflates the avoid box by wipe_tower_routing_clearance and refuses
