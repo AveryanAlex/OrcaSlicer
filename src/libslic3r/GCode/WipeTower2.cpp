@@ -735,14 +735,23 @@ public:
         float edge_length = std::sqrt(area);
         Vec2f box_max     = center + Vec2f{step_length, step_length};
         Vec2f box_min     = center - Vec2f{step_length, step_length};
+        // The ironing area is unbounded user input; keep the spiral inside the margin band
+        // around the tower outline that every tower envelope already accounts for.
+        // step_length is the perimeter line width, and writer coordinates are offset
+        // from the tower outline by m_y_shift in y.
+        const float lim = float(WIPE_TOWER_MARGIN) - step_length / 2.f;
+        const Vec2f clamp_min{-lim, -lim - m_y_shift};
+        const Vec2f clamp_max{m_wipe_tower_width + lim, m_wipe_tower_depth + lim - m_y_shift};
         int   n           = std::ceil(edge_length / step_length / 2.f);
         if (n <= 0)
             return;
         while (n--) {
-            travel(box_max.x(), m_current_pos.y(), feedrate);
-            travel(m_current_pos.x(), box_max.y(), feedrate);
-            travel(box_min.x(), m_current_pos.y(), feedrate);
-            travel(m_current_pos.x(), box_min.y(), feedrate);
+            const Vec2f lap_max{std::min(box_max.x(), clamp_max.x()), std::min(box_max.y(), clamp_max.y())};
+            const Vec2f lap_min{std::max(box_min.x(), clamp_min.x()), std::max(box_min.y(), clamp_min.y())};
+            travel(lap_max.x(), m_current_pos.y(), feedrate);
+            travel(m_current_pos.x(), lap_max.y(), feedrate);
+            travel(lap_min.x(), m_current_pos.y(), feedrate);
+            travel(m_current_pos.x(), lap_min.y(), feedrate);
 
             box_max += Vec2f{step_length, step_length};
             box_min -= Vec2f{step_length, step_length};
@@ -1913,11 +1922,14 @@ void WipeTower2::toolchange_Wipe(
                 ironing_length = std::max(xr - writer.x(), 0.f);
             const float retract_length = m_filpar[m_current_tool].retract_length;
             const float retract_speed  = m_filpar[m_current_tool].retract_speed * 60.f;
+            // Keep the dry scrub inside the margin band around the tower outline that
+            // every tower envelope already accounts for.
+            const float scrub_lim = float(WIPE_TOWER_MARGIN) - m_perimeter_width / 2.f;
             writer.extrude(writer.x() + ironing_length, writer.y(), wipe_speed);
+            const Vec2f iron_end = writer.pos();
             writer.retract(retract_length, retract_speed);
-            writer.travel(writer.x() - 1.5f * ironing_length, writer.y(), 600.f);
-            writer.travel(writer.x() + 0.5f * ironing_length, writer.y(), 240.f);
-            const Vec2f iron_end(writer.x() + ironing_length, writer.y());
+            writer.travel(std::clamp(writer.x() - 1.5f * ironing_length, -scrub_lim, m_wipe_tower_width + scrub_lim), writer.y(), 600.f);
+            writer.travel(std::clamp(writer.x() + 0.5f * ironing_length, -scrub_lim, m_wipe_tower_width + scrub_lim), writer.y(), 240.f);
             writer.spiral_flat_ironing(writer.pos(), m_filpar[m_current_tool].tower_ironing_area, m_perimeter_width, flat_iron_speed);
             writer.travel(iron_end, wipe_speed);
             writer.retract(-retract_length, retract_speed);
