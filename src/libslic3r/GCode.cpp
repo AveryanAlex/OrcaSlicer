@@ -770,26 +770,38 @@ static std::vector<Vec2d> get_path_of_change_filament(const Print& print)
         return changes;
     }
 
+    // Clearance the tower-approach router keeps around the tower: the avoid box is
+    // inflated by this much before routing, and the inflated corners must stay on the
+    // bed for a route to be generated at all.
+    static constexpr float wipe_tower_routing_clearance = 2.f;
+
     // BBS
     // start_pos refers to the last position before the wipe_tower.
     // end_pos refers to the wipe tower's start_pos.
     // using the print coordinate system
-    Polyline WipeTowerIntegration::generate_path_to_wipe_tower(const Point& start_pos,const Point &end_pos , const BoundingBox& avoid_polygon , const BoundingBox& printer_bbx) const
+    Polyline WipeTowerIntegration::generate_path_to_wipe_tower(const Point& start_pos,const Point &end_pos , const BoundingBox& avoid_polygon , const Polygons& bed_polygons) const
     {
         Polyline    res;
-        coord_t         alpha = scaled(2.f); // offset distance
+        coord_t         alpha = scaled(wipe_tower_routing_clearance); // offset distance
         BoundingBox avoid_polygon_inner = avoid_polygon;
         avoid_polygon_inner.offset(alpha);
         coord_t width = avoid_polygon_inner.max[0] - avoid_polygon_inner.min[0];
-        Polygon bed_polygon = printer_bbx.polygon();
         Vec2f v(1, 0);                                                      // the first print direction of end_pos.
         if (abs(end_pos[0] - avoid_polygon_inner.min[0]) < width / 2) v = -v; // judge whether the wipe tower's infill goes to the left or right.
-        // Judge whether the avoid_polygon_inner is outside the printer_bbx.
+        // Judge whether the avoid_polygon_inner is outside the bed. The real printable
+        // outline is tested (not its bounding box), so on circular/custom beds corners
+        // hanging off the bed are rejected.
         // If so, do nothing and just go directly to the end_pos.
         bool is_bbx_in_bed = true;
         Points avoid_points  = avoid_polygon_inner.polygon().points;
         for (auto &wipe_tower_bbx_p : avoid_points) {
-            if (ClipperLib::PointInPolygon(wipe_tower_bbx_p, bed_polygon.points) != 1) {
+            bool on_bed = false;
+            for (const Polygon &bed_polygon : bed_polygons)
+                if (ClipperLib::PointInPolygon(wipe_tower_bbx_p, bed_polygon.points) == 1) {
+                    on_bed = true;
+                    break;
+                }
+            if (!on_bed) {
                 is_bbx_in_bed = false;
                 break;
             }
@@ -900,27 +912,30 @@ static std::vector<Vec2d> get_path_of_change_filament(const Print& print)
         return Eigen::Rotation2Df(alpha) * (pt + m_rib_offset) + m_wipe_tower_pos;
     }
 
-    // Printable-area bounds for tower-approach routing, in object coordinates (shared by
-    // the BBL avoid-perimeter path in append_tcr and the Type2 skip-points router).
+    // Printable-area outline for tower-approach routing, in object coordinates (shared by
+    // the BBL avoid-perimeter path in append_tcr and the Type2 skip-points router). The
+    // real printable_area polygon is returned (not its bounding box) so the router's
+    // on-bed containment tests fail where circular/custom beds have no bed.
     // Multi-nozzle: clamp the travel bounds to the region every extruder can reach
     // (get_extruder_shared_printable_polygon) instead of the full bed. Gated on the
     // multi-nozzle predicate so every existing single/dual printer keeps the historic
     // full-printable_area routing byte-identical.
-    BoundingBox WipeTowerIntegration::printer_travel_bounds(GCode &gcodegen) const
+    Polygons WipeTowerIntegration::printer_travel_polygons(GCode &gcodegen) const
     {
         const Vec2f plate_origin_2d(m_plate_origin(0), m_plate_origin(1));
-        BoundingBox printer_bbx;
+        Polygons bed_polygons;
         if (is_multi_nozzle_printer(gcodegen.m_config)) {
-            printer_bbx     = get_extents(gcodegen.m_print->get_extruder_shared_printable_polygon());
-            printer_bbx.min = wipe_tower_point_to_object_point(gcodegen, unscaled<float>(printer_bbx.min) + plate_origin_2d);
-            printer_bbx.max = wipe_tower_point_to_object_point(gcodegen, unscaled<float>(printer_bbx.max) + plate_origin_2d);
+            bed_polygons = gcodegen.m_print->get_extruder_shared_printable_polygon();
+            for (Polygon &poly : bed_polygons)
+                for (Point &p : poly.points)
+                    p = wipe_tower_point_to_object_point(gcodegen, unscaled<float>(p) + plate_origin_2d);
         } else {
-            Points bed_points;
+            Polygon bed_polygon;
             for (const auto& p : gcodegen.m_config.printable_area.values)
-                bed_points.push_back(wipe_tower_point_to_object_point(gcodegen, p.cast<float>() + plate_origin_2d));
-            printer_bbx = BoundingBox(bed_points);
+                bed_polygon.points.push_back(wipe_tower_point_to_object_point(gcodegen, p.cast<float>() + plate_origin_2d));
+            bed_polygons.emplace_back(std::move(bed_polygon));
         }
-        return printer_bbx;
+        return bed_polygons;
     }
 
     // With skip points enabled the Type2 tower wall has an opening at each toolchange's
@@ -943,7 +958,18 @@ static std::vector<Vec2d> get_path_of_change_filament(const Print& print)
         BoundingBox avoid_bbx(avoid_points.points);
         if (avoid_bbx.contains(route_start))
             return {};
-        Polyline    travel_polyline = generate_path_to_wipe_tower(route_start, start_wipe_pos, avoid_bbx, printer_travel_bounds(gcodegen));
+        const Polygons bed_polygons = printer_travel_polygons(gcodegen);
+        // The router inflates the avoid box by wipe_tower_routing_clearance and refuses
+        // to route once any inflated corner leaves the bed: clamp the box against the bed
+        // shrunk by that clearance so a tower parked near the bed edge is still routed
+        // along the clamped side instead of always travelling straight across the tower.
+        BoundingBox clamp_bbx = get_extents(bed_polygons);
+        clamp_bbx.offset(-(scaled(wipe_tower_routing_clearance) + SCALED_EPSILON));
+        avoid_bbx.min = avoid_bbx.min.cwiseMax(clamp_bbx.min);
+        avoid_bbx.max = avoid_bbx.max.cwiseMin(clamp_bbx.max);
+        if (avoid_bbx.min.x() >= avoid_bbx.max.x() || avoid_bbx.min.y() >= avoid_bbx.max.y())
+            return {};
+        Polyline    travel_polyline = generate_path_to_wipe_tower(route_start, start_wipe_pos, avoid_bbx, bed_polygons);
         std::string gcode;
         // The polyline's last point is start_wipe_pos itself — emitted by the caller.
         for (size_t i = 0; i + 1 < travel_polyline.points.size(); ++i)
@@ -1324,7 +1350,7 @@ static std::vector<Vec2d> get_path_of_change_filament(const Print& print)
                 Vec2f       gcode_last_pos2d{gcode_last_pos[0], gcode_last_pos[1]};
                 Point       gcode_last_pos2d_object = gcodegen.gcode_to_point(gcode_last_pos2d.cast<double>() + plate_origin_2d.cast<double>());
                 Point       start_wipe_pos          = wipe_tower_point_to_object_point(gcodegen, tool_change_start_pos + plate_origin_2d);
-                BoundingBox avoid_bbx, printer_bbx = printer_travel_bounds(gcodegen);
+                BoundingBox avoid_bbx;
                 {
                     // set avoid_bbx
                     avoid_bbx            = scaled(m_wipe_tower_bbx);
@@ -1336,7 +1362,7 @@ static std::vector<Vec2d> get_path_of_change_filament(const Print& print)
                     avoid_bbx = BoundingBox(avoid_points.points);
                 }
                 std::string travel_to_wipe_tower_gcode;
-                Polyline    travel_polyline = generate_path_to_wipe_tower(gcode_last_pos2d_object, start_wipe_pos, avoid_bbx, printer_bbx);
+                Polyline    travel_polyline = generate_path_to_wipe_tower(gcode_last_pos2d_object, start_wipe_pos, avoid_bbx, printer_travel_polygons(gcodegen));
 
                 for (size_t i = 0; i < travel_polyline.points.size(); ++i) {
                     const auto &p = travel_polyline.points[i];
