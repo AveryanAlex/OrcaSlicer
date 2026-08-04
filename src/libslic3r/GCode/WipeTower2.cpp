@@ -746,8 +746,8 @@ public:
         if (n <= 0)
             return;
         while (n--) {
-            const Vec2f lap_max{std::min(box_max.x(), clamp_max.x()), std::min(box_max.y(), clamp_max.y())};
-            const Vec2f lap_min{std::max(box_min.x(), clamp_min.x()), std::max(box_min.y(), clamp_min.y())};
+            const Vec2f lap_max = box_max.cwiseMin(clamp_max);
+            const Vec2f lap_min = box_min.cwiseMax(clamp_min);
             travel(lap_max.x(), m_current_pos.y(), feedrate);
             travel(m_current_pos.x(), lap_max.y(), feedrate);
             travel(lap_min.x(), m_current_pos.y(), feedrate);
@@ -1087,7 +1087,6 @@ WipeTower2::WipeTower2(const PrintConfig& config, const PrintRegionConfig& defau
     // Calculate where the priming lines should be - very naive test not detecting parallelograms etc.
     const std::vector<Vec2d>& bed_points = config.printable_area.values;
     BoundingBoxf bb(bed_points);
-    m_bed_bbox  = bb;
     m_bed_width = float(bb.size().x());
     m_bed_shape = (bed_points.size() == 4 ? RectangularBed : CircularBed);
 
@@ -1759,16 +1758,9 @@ void WipeTower2::toolchange_Change(
         const bool      on_left = writer.x() < m_wipe_tower_width / 2.f;
         const float     near_x  = on_left ? min_x - gap : max_x + gap;
         const float     far_x   = on_left ? max_x + gap : min_x - gap;
-        const float     a       = float(m_wipe_tower_rotation_angle * M_PI / 180.);
-        const float     c = std::cos(a), s = std::sin(a);
-        auto park_pt_on_bed = [this, &writer, c, s](float side_x) {
-            const Vec2f wt = writer.rotated(Vec2f(side_x, writer.y())) + m_rib_offset;
-            const Vec2f bed_pt(c * wt.x() - s * wt.y() + m_wipe_tower_pos.x(),
-                               s * wt.x() + c * wt.y() + m_wipe_tower_pos.y());
-            if (m_bed_shape == RectangularBed)
-                return m_bed_bbox.contains(bed_pt.cast<double>());
-            if (m_bed_shape == CircularBed)
-                return (bed_pt.cast<double>() - m_bed_bbox.center()).norm() <= m_bed_width / 2.;
+        const Eigen::Rotation2Df to_bed(float(Geometry::deg2rad(m_wipe_tower_rotation_angle)));
+        auto park_pt_on_bed = [this, &writer, to_bed](float side_x) {
+            const Vec2f bed_pt = to_bed * (writer.rotated(Vec2f(side_x, writer.y())) + m_rib_offset) + m_wipe_tower_pos;
             return m_bed_polygon.contains(Point::new_scale(bed_pt.x(), bed_pt.y()));
         };
         float park_x    = near_x;
@@ -2149,15 +2141,17 @@ std::pair<double, double> WipeTower2::get_wipe_tower_cone_base(double width, dou
 }
 
 // Static method to extract wipe_volumes[from][to] from the configuration.
-std::vector<std::vector<float>> WipeTower2::extract_wipe_volumes(const PrintConfig& config)
+// Takes a ConfigBase so the GUI's wipe tower size estimate can pass the plate's
+// DynamicPrintConfig directly instead of materializing a full PrintConfig per call.
+std::vector<std::vector<float>> WipeTower2::extract_wipe_volumes(const ConfigBase& config)
 {
     // Get wiping matrix to get number of extruders and convert vector<double> to vector<float>:
-    std::vector<float> wiping_matrix(cast<float>(config.flush_volumes_matrix.values));
-    auto scale = config.flush_multiplier.get_at(0);
+    std::vector<float> wiping_matrix(cast<float>(config.option<ConfigOptionFloats>("flush_volumes_matrix")->values));
+    auto scale = config.option<ConfigOptionFloats>("flush_multiplier")->get_at(0);
 
     // The values shall only be used when SEMM is enabled. The purging for other printers
     // is determined by filament_minimal_purge_on_wipe_tower.
-    if (! config.purge_in_prime_tower.value || ! config.single_extruder_multi_material.value)
+    if (! config.option<ConfigOptionBool>("purge_in_prime_tower")->value || ! config.option<ConfigOptionBool>("single_extruder_multi_material")->value)
         std::fill(wiping_matrix.begin(), wiping_matrix.end(), 0.f);
 
     // Extract purging volumes for each extruder pair:
@@ -2167,11 +2161,26 @@ std::vector<std::vector<float>> WipeTower2::extract_wipe_volumes(const PrintConf
         wipe_volumes.push_back(std::vector<float>(wiping_matrix.begin()+i*number_of_extruders, wiping_matrix.begin()+(i+1)*number_of_extruders));
 
     // Also include filament_minimal_purge_on_wipe_tower. This is needed for the preview.
+    const auto *minimal_purge = config.option<ConfigOptionFloats>("filament_minimal_purge_on_wipe_tower");
     for (unsigned int i = 0; i<number_of_extruders; ++i)
         for (unsigned int j = 0; j<number_of_extruders; ++j)
-            wipe_volumes[i][j] = std::max<float>(wipe_volumes[i][j] * scale, config.filament_minimal_purge_on_wipe_tower.get_at(j));
+            wipe_volumes[i][j] = std::max<float>(wipe_volumes[i][j] * scale, minimal_purge->get_at(j));
 
     return wipe_volumes;
+}
+
+float WipeTower2::estimate_semm_flush_volume(const ConfigBase& config, size_t filaments_cnt)
+{
+    std::vector<std::vector<float>> wipe_volumes = extract_wipe_volumes(config);
+    std::vector<float>              max_wipe_volumes;
+    for (const std::vector<float> &v : wipe_volumes)
+        max_wipe_volumes.emplace_back(*std::max_element(v.begin(), v.end()));
+    float maximum = std::accumulate(max_wipe_volumes.begin(), max_wipe_volumes.end(), 0.f);
+    maximum       = maximum * filaments_cnt / max_wipe_volumes.size();
+
+    // Orca: it's overshooting a bit, so let's reduce it a bit
+    maximum *= 0.6;
+    return maximum;
 }
 
 static float get_wipe_depth(float volume, float layer_height, float perimeter_width, float extra_flow, float extra_spacing, float width)

@@ -51,8 +51,9 @@ public:
     OozePrevention() : enable(false) {}
     std::string pre_toolchange(GCode &gcodegen);
     std::string post_toolchange(GCode &gcodegen, bool wait = true);
-
-private:
+    // The operating temperature for the writer's current filament; public so the
+    // wait_for_temp_on_wipe_tower pre-heat in GCode::set_extruder targets the same
+    // temperature the tower's blocking M109 will wait on.
     int _get_temp(const GCode &gcodegen) const;
 };
 
@@ -130,7 +131,7 @@ public:
 private:
     WipeTowerIntegration& operator=(const WipeTowerIntegration&);
     std::string append_tcr(GCode &gcodegen, const WipeTower::ToolChangeResult &tcr, int new_extruder_id, double z = -1.) const;
-    Polyline generate_path_to_wipe_tower(const Point &start_pos, const Point &end_pos, const BoundingBox &avoid_polygon, const Polygons &bed_polygons) const;
+    Polyline generate_path_to_wipe_tower(const Point &start_pos, const Point &end_pos, const BoundingBox &avoid_polygon, const Polygons &bed_polygons, bool clamp_avoid_to_bed = false) const;
     std::string append_tcr2(GCode &gcodegen, const WipeTower::ToolChangeResult &tcr, int new_extruder_id, double z = -1.) const;
     std::string travel_to_tower_gap(GCode &gcodegen, const Point &route_start, const Point &start_wipe_pos) const;
     Vec2f transform_wt2_pt(const Vec2f &pt) const;

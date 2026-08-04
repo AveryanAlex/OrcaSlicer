@@ -7,6 +7,7 @@
 #include <cctype>
 #include <limits>
 #include <set>
+#include <sstream>
 #include <string>
 #include <vector>
 
@@ -27,6 +28,31 @@ static std::set<int> tools_for_role(const std::string& gcode, const std::string&
             tools.insert(current_tool);
     });
     return tools;
+}
+
+// X where the nozzle sits while each tagged _WAIT_FOR_TEMP_ON_WIPE_TOWER M109 blocks:
+// the nearest preceding G1 carrying an X (the park travel emitted just before the wait).
+static std::vector<double> wait_park_xs(const std::string& gcode)
+{
+    std::vector<std::string> lines;
+    std::istringstream stream(gcode);
+    for (std::string line; std::getline(stream, line);)
+        lines.emplace_back(std::move(line));
+    std::vector<double> xs;
+    for (size_t i = 0; i < lines.size(); ++i) {
+        if (lines[i].rfind("M109", 0) != 0 || lines[i].find("_WAIT_FOR_TEMP_ON_WIPE_TOWER") == std::string::npos)
+            continue;
+        for (size_t j = i; j-- > 0;) {
+            if (lines[j].rfind("G1 ", 0) != 0)
+                continue;
+            const size_t x_pos = lines[j].find('X');
+            if (x_pos == std::string::npos)
+                continue;
+            xs.push_back(std::stod(lines[j].substr(x_pos + 1)));
+            break;
+        }
+    }
+    return xs;
 }
 
 // Tool index = filament id - 1; brim and skirt follow the wall filament.
@@ -122,13 +148,9 @@ TEST_CASE("Toolchange temperature wait moves to the wipe tower when enabled", "[
 
         // Split into lines and scan the "; CP TOOLCHANGE START".."; CP TOOLCHANGE END" blocks.
         std::vector<std::string> lines;
-        for (size_t pos = 0; pos < gcode.size();) {
-            size_t eol = gcode.find('\n', pos);
-            if (eol == std::string::npos)
-                eol = gcode.size();
-            lines.emplace_back(gcode.substr(pos, eol - pos));
-            pos = eol + 1;
-        }
+        std::istringstream gcode_stream(gcode);
+        for (std::string line; std::getline(gcode_stream, line);)
+            lines.emplace_back(std::move(line));
         const auto is_tool_line   = [](const std::string& l) { return l.size() >= 2 && l[0] == 'T' && std::isdigit((unsigned char)l[1]); };
         const auto is_m109_line   = [](const std::string& l) { return l.rfind("M109", 0) == 0; };
         const auto is_tagged_wait = [](const std::string& l) { return l.find("_WAIT_FOR_TEMP_ON_WIPE_TOWER") != std::string::npos; };
@@ -201,6 +223,79 @@ TEST_CASE("Toolchange temperature wait moves to the wipe tower when enabled", "[
         REQUIRE(checked_blocks > 0);
         if (!wait_on_tower)
             CHECK(gcode.find("_WAIT_FOR_TEMP_ON_WIPE_TOWER") == std::string::npos);
+    }
+}
+
+// The temperature-wait park picks its side of the tower by testing bed containment with the
+// tower position at psWipeTower generation time, while WipeTowerIntegration shifts the cached
+// moves by the CURRENT position at export. Moving the tower normally invalidates only
+// psSkirtBrim (tower gcode is position-independent), but the park makes it bed-relative, so a
+// GUI-style move-and-reslice on the same Print must regenerate the tower — otherwise the stale
+// park prints outside the bed. Contract: every tagged wait parks inside the printable area.
+TEST_CASE("Wipe tower temperature-wait park is regenerated when the tower moves", "[MultiFilament]")
+{
+    // Two objects, one filament each: a toolchange (and a tagged wait) on every layer, like
+    // the wait test above — but on a single-extruder machine profile: the synthetic
+    // dual-extruder keys would drag in the extruder-variant expansion, which is not
+    // idempotent on the default machine profile and would pollute the re-apply diff below.
+    // Rectangle wall and no brim keep the tower-local footprint inside [0, 35], so the park
+    // sits at the generator's 2mm side gap: local -2 or 37.
+    DynamicPrintConfig config = multifilament_config(2, {
+        { "single_extruder_multi_material", 0 },
+        { "enable_prime_tower",             1 },
+        { "prime_tower_width",              35 },
+        { "wipe_tower_wall_type",           "rectangle" }, // the default rib bulges past the width
+        { "prime_tower_brim_width",         0 },           // the default 3 widens the first-layer envelope
+        { "printable_area",                 "0x0,200x0,200x200,0x200" },
+        { "wipe_tower_x",                   "0" },
+        { "wipe_tower_y",                   "50" },
+        { "ooze_prevention",                1 },
+        { "standby_temperature_delta",      -40 },
+        { "wait_for_temp_on_wipe_tower",    1 },
+    });
+    // init_print force-sets this on its own copy; set it here too so the re-apply below
+    // diffs in wipe_tower_x ONLY — the exact GUI increment under test.
+    config.set_key_value("gcode_comments", new ConfigOptionBool(true));
+
+    Print print;
+    Model model;
+    const std::vector<std::vector<ConfigBase::SetDeserializeItem>> overrides{
+        { { "extruder", 1 } }, { { "extruder", 2 } } }; // object-level, see the wait test above
+    init_print(std::vector<TriangleMesh>{ cube(20), cube(20) }, print, model, config, &overrides);
+
+    const std::string         at_edge       = gcode(print);
+    const std::vector<double> at_edge_parks = wait_park_xs(at_edge);
+    REQUIRE(!at_edge_parks.empty()); // the feature under test is active
+    for (double x : at_edge_parks) {
+        INFO("wait park X " << x << " with the tower at x=0 on a 200mm bed");
+        CHECK(x >= -0.05);
+        CHECK(x <= 200.05);
+    }
+    REQUIRE(print.is_step_done(psWipeTower));
+
+    // Move the tower to the right bed edge (164 + 35 = 199 keeps the body printable) and
+    // re-apply on the SAME Print, as the GUI does. Base the re-apply on the print's own
+    // resolved config so the diff is wipe_tower_x alone — re-applying the caller's config
+    // would also diff the apply-time extruder normalization write-backs, and those keys
+    // regenerate the tower for the wrong reason. The cached right-side park would export
+    // at 164 + 37 = 201, off the bed; regeneration clamps the park against the bed edge.
+    // Assemble the moved config exactly the way init_print assembled the first one — the
+    // apply-time normalization is only idempotent when both applies start from the same
+    // derivation, and any stray diff key would regenerate the tower for the wrong reason.
+    config.set_deserialize_strict({ { "wipe_tower_x", "164" } });
+    DynamicPrintConfig moved_config = DynamicPrintConfig::full_print_config();
+    moved_config.apply(config);
+    moved_config.set_key_value("gcode_comments", new ConfigOptionBool(true));
+    print.apply(model, moved_config);
+    CHECK_FALSE(print.is_step_done(psWipeTower)); // the move must re-generate the tower
+
+    const std::string         moved       = gcode(print);
+    const std::vector<double> moved_parks = wait_park_xs(moved);
+    REQUIRE(!moved_parks.empty()); // the waits must survive the re-slice
+    for (double x : moved_parks) {
+        INFO("wait park X " << x << " with the tower at x=164 on a 200mm bed");
+        CHECK(x >= -0.05);
+        CHECK(x <= 200.05);
     }
 }
 

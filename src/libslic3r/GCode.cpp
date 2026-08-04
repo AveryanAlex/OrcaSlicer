@@ -779,11 +779,26 @@ static std::vector<Vec2d> get_path_of_change_filament(const Print& print)
     // start_pos refers to the last position before the wipe_tower.
     // end_pos refers to the wipe tower's start_pos.
     // using the print coordinate system
-    Polyline WipeTowerIntegration::generate_path_to_wipe_tower(const Point& start_pos,const Point &end_pos , const BoundingBox& avoid_polygon , const Polygons& bed_polygons) const
+    Polyline WipeTowerIntegration::generate_path_to_wipe_tower(const Point& start_pos,const Point &end_pos , const BoundingBox& avoid_polygon , const Polygons& bed_polygons, bool clamp_avoid_to_bed) const
     {
         Polyline    res;
         coord_t         alpha = scaled(wipe_tower_routing_clearance); // offset distance
         BoundingBox avoid_polygon_inner = avoid_polygon;
+        if (clamp_avoid_to_bed) {
+            // The inflated corners must stay on the bed for a route to be generated at all
+            // (tested below): clamp the box against the bed shrunk by the clearance so a
+            // tower parked near the bed edge is still routed along the clamped side instead
+            // of always travelling straight across the tower.
+            BoundingBox clamp_bbx = get_extents(bed_polygons);
+            clamp_bbx.offset(-(alpha + SCALED_EPSILON));
+            avoid_polygon_inner.min = avoid_polygon_inner.min.cwiseMax(clamp_bbx.min);
+            avoid_polygon_inner.max = avoid_polygon_inner.max.cwiseMin(clamp_bbx.max);
+            if (avoid_polygon_inner.min.x() >= avoid_polygon_inner.max.x() ||
+                avoid_polygon_inner.min.y() >= avoid_polygon_inner.max.y()) {
+                res.points.push_back(end_pos);
+                return res;
+            }
+        }
         avoid_polygon_inner.offset(alpha);
         coord_t width = avoid_polygon_inner.max[0] - avoid_polygon_inner.min[0];
         Vec2f v(1, 0);                                                      // the first print direction of end_pos.
@@ -792,20 +807,9 @@ static std::vector<Vec2d> get_path_of_change_filament(const Print& print)
         // outline is tested (not its bounding box), so on circular/custom beds corners
         // hanging off the bed are rejected.
         // If so, do nothing and just go directly to the end_pos.
-        bool is_bbx_in_bed = true;
         Points avoid_points  = avoid_polygon_inner.polygon().points;
-        for (auto &wipe_tower_bbx_p : avoid_points) {
-            bool on_bed = false;
-            for (const Polygon &bed_polygon : bed_polygons)
-                if (ClipperLib::PointInPolygon(wipe_tower_bbx_p, bed_polygon.points) == 1) {
-                    on_bed = true;
-                    break;
-                }
-            if (!on_bed) {
-                is_bbx_in_bed = false;
-                break;
-            }
-        }
+        const bool is_bbx_in_bed = std::all_of(avoid_points.begin(), avoid_points.end(),
+            [&bed_polygons](const Point &pt) { return contains(bed_polygons, pt, /*border_result=*/false); });
         if (!is_bbx_in_bed) {
             res.points.push_back(end_pos);
             return res;
@@ -964,20 +968,12 @@ static std::vector<Vec2d> get_path_of_change_filament(const Print& print)
         Polygon body_points = scaled(BoundingBoxf(Vec2d(0., 0.), Vec2d(body_width, m_wipe_tower_depth))).polygon();
         for (auto& p : body_points.points)
             p = wipe_tower_point_to_object_point(gcodegen, transform_wt2_pt(unscale(p).cast<float>()) + plate_origin_2d);
-        if (BoundingBox(body_points.points).contains(route_start))
+        // Test the rotated polygon itself, not its bounding box — at rotation angles off
+        // the axes the box's corner triangles cover most of the brim ring.
+        if (body_points.contains(route_start))
             return {};
-        const Polygons bed_polygons = printer_travel_polygons(gcodegen);
-        // The router inflates the avoid box by wipe_tower_routing_clearance and refuses
-        // to route once any inflated corner leaves the bed: clamp the box against the bed
-        // shrunk by that clearance so a tower parked near the bed edge is still routed
-        // along the clamped side instead of always travelling straight across the tower.
-        BoundingBox clamp_bbx = get_extents(bed_polygons);
-        clamp_bbx.offset(-(scaled(wipe_tower_routing_clearance) + SCALED_EPSILON));
-        avoid_bbx.min = avoid_bbx.min.cwiseMax(clamp_bbx.min);
-        avoid_bbx.max = avoid_bbx.max.cwiseMin(clamp_bbx.max);
-        if (avoid_bbx.min.x() >= avoid_bbx.max.x() || avoid_bbx.min.y() >= avoid_bbx.max.y())
-            return {};
-        Polyline    travel_polyline = generate_path_to_wipe_tower(route_start, start_wipe_pos, avoid_bbx, bed_polygons);
+        Polyline    travel_polyline = generate_path_to_wipe_tower(route_start, start_wipe_pos, avoid_bbx,
+                                                                  printer_travel_polygons(gcodegen), /*clamp_avoid_to_bed=*/true);
         std::string gcode;
         // The polyline's last point is start_wipe_pos itself — emitted by the caller.
         for (size_t i = 0; i + 1 < travel_polyline.points.size(); ++i)
@@ -9391,12 +9387,9 @@ std::string GCode::set_extruder(unsigned int new_filament_id, double print_z, bo
         // The blocking M109 is emitted by the wipe tower generator; with no temperature
         // command here the nozzle would only start heating once the head arrives there.
         // Heat non-blocking now so the heat-up overlaps the travel, targeting what the
-        // tower will wait on (OozePrevention::_get_temp logic plus the interface override).
-        int temp = toolchange_temp_override > 0 ?
-            toolchange_temp_override :
-            (m_layer == nullptr || m_layer->id() == 0 || m_config.nozzle_temperature.get_at(new_fi) == 0 ?
-                 m_config.nozzle_temperature_initial_layer.get_at(new_fi) :
-                 m_config.nozzle_temperature.get_at(new_fi));
+        // tower will wait on (the writer already holds the new filament, so _get_temp
+        // resolves its column) plus the interface override.
+        int temp = toolchange_temp_override > 0 ? toolchange_temp_override : m_ooze_prevention._get_temp(*this);
         if (temp > 0)
             restore_temp_gcode = m_writer.set_temperature(temp, false, new_filament_id);
     }

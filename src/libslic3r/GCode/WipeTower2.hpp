@@ -17,6 +17,7 @@ namespace Slic3r
 
 class WipeTowerWriter2;
 class PrintRegionConfig;
+class ConfigBase;
 
 class WipeTower2
 {
@@ -26,7 +27,10 @@ public:
     // in WipeTowerIntegration::append_tcr2 does not strip it.
     static const std::string wait_for_temp_tag() { return ";_WAIT_FOR_TEMP_ON_WIPE_TOWER"; }
 	static std::pair<double, double> get_wipe_tower_cone_base(double width, double height, double depth, double angle_deg);
-	static std::vector<std::vector<float>> extract_wipe_volumes(const PrintConfig& config);
+	static std::vector<std::vector<float>> extract_wipe_volumes(const ConfigBase& config);
+	// Estimated total flush volume of a SEMM print with the given number of filaments,
+	// used to reserve wipe tower space before the tower is generated.
+	static float estimate_semm_flush_volume(const ConfigBase& config, size_t filaments_cnt);
 
     
     // Construct ToolChangeResult from current state of WipeTower2 and WipeTowerWriter2.
@@ -272,8 +276,7 @@ private:
     } m_bed_shape;
     float m_bed_width; // width of the bed bounding box
     Vec2f m_bed_bottom_left; // bottom-left corner coordinates (for rectangular beds)
-    BoundingBoxf m_bed_bbox; // bounding box of the printable area
-    Polygon m_bed_polygon; // printable_area contour (scaled), for beds neither rectangular nor circular
+    Polygon m_bed_polygon; // printable_area contour (scaled)
 
 	float m_perimeter_width = 0.4f * Width_To_Nozzle_Ratio; // Width of an extrusion line, also a perimeter spacing for 100% infill.
 	float m_extrusion_flow = 0.038f; //0.029f;// Extrusion flow is derived from m_perimeter_width, layer height and filament diameter.

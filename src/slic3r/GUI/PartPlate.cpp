@@ -2263,6 +2263,12 @@ Vec3d PartPlate::estimate_wipe_tower_size(const DynamicPrintConfig & config, con
     double volume = wipe_volume * (extruder_count == 2 ? plate_extruder_size : (plate_extruder_size - 1));
     if (extruder_count == 2) volume += filament_change_volume * (int) (plate_extruder_size / 2);
     if (use_rib_wall) {
+        // Read from the passed plate config — m_print may not have been applied yet
+        // (fresh plates, CLI), in which case its PrintConfig still holds defaults.
+        const auto *purge_opt = config.option<ConfigOptionBool>("purge_in_prime_tower");
+        const auto *semm_opt  = config.option<ConfigOptionBool>("single_extruder_multi_material");
+        if (purge_opt && purge_opt->value && semm_opt && semm_opt->value)
+            volume = WipeTower2::estimate_semm_flush_volume(config, plate_extruder_size);
         depth = std::sqrt(volume / layer_height * extra_spacing);
         if (need_wipe_tower || plate_extruder_size > 1) {
             float min_wipe_tower_depth = WipeTower::get_limit_depth_by_height(max_height);
