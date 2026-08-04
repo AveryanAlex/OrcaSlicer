@@ -3,6 +3,8 @@
 	"name": "Snapmaker PLA Wood @U1 0.4 nozzle",
 	"inherits": "fdm_filament_pla",
 	"from": "system",
+	"setting_id": "XvizDDHbds3bVrzi",
+	"filament_id": "GFL9922",
 	"instantiation": "true",
 	"compatible_printers": [
 		"Snapmaker U1 (0.4 nozzle)"
@@ -102,7 +104,5 @@
 	],
 	"temperature_vitrification": [
 		"45"
-	],
-	"setting_id": "XvizDDHbds3bVrzi",
-	"filament_id": "GFL9922"
+	]
 }

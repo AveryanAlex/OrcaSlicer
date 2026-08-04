@@ -1,5 +1,8 @@
 {
 	"type": "filament",
+	"name": "Polymaker Tough PLA Family @U1",
+	"inherits": "Polymaker PLA @U1 base",
+	"from": "system",
 	"setting_id": "d6CC81Es2hp46bto",
 	"instantiation": "true",
 	"compatible_printers": [
@@ -14,9 +17,6 @@
 	"filament_vendor": [
 		"Polymaker"
 	],
-	"from": "system",
-	"inherits": "Polymaker PLA @U1 base",
-	"name": "Polymaker Tough PLA Family @U1",
 	"slow_down_layer_time": [
 		"6"
 	],

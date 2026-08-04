@@ -1,10 +1,10 @@
 {
 	"type": "filament",
+	"name": "Snapmaker PLA SnapSpeed @U1 0.2 nozzle",
+	"inherits": "Snapmaker PLA SnapSpeed @U1 base2",
 	"from": "system",
 	"setting_id": "jsAgNNiUC6DoO7rz",
 	"instantiation": "true",
-	"name": "Snapmaker PLA SnapSpeed @U1 0.2 nozzle",
-	"inherits": "Snapmaker PLA SnapSpeed @U1 base2",
 	"filament_deretraction_speed": [
 		"30"
 	],

@@ -1,10 +1,10 @@
 {
 	"type": "machine",
 	"name": "Snapmaker U1 (0.4 nozzle)",
+	"inherits": "fdm_U1",
 	"from": "system",
 	"setting_id": "UeTP4RqAd7xAMHVE",
 	"instantiation": "true",
-	"inherits": "fdm_U1",
 	"printer_model": "Snapmaker U1",
 	"printer_variant": "0.4",
 	"auxiliary_fan": "1",

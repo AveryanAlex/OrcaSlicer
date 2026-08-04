@@ -1,10 +1,10 @@
 {
 	"type": "filament",
-	"from": "system",
-	"instantiation": "false",
 	"name": "Snapmaker PLA Translucent @U1 base",
-	"filament_id": "SPTR001",
 	"inherits": "fdm_filament_pla",
+	"from": "system",
+	"filament_id": "SPTR001",
+	"instantiation": "false",
 	"filament_end_gcode": [
 		""
 	],

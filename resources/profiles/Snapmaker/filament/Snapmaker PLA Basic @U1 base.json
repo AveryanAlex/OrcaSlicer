@@ -1,9 +1,9 @@
 {
 	"type": "filament",
-	"from": "system",
-	"instantiation": "false",
 	"name": "Snapmaker PLA Basic @U1 base",
+	"from": "system",
 	"filament_id": "1417031127011",
+	"instantiation": "false",
 	"filament_end_gcode": [
 		""
 	],

@@ -1,10 +1,10 @@
 {
 	"type": "filament",
+	"name": "Snapmaker PLA Translucent @U1 0.6 nozzle",
+	"inherits": "Snapmaker PLA Translucent @U1 base",
 	"from": "system",
 	"setting_id": "OZHemzEcvzFMN8fL",
 	"instantiation": "true",
-	"name": "Snapmaker PLA Translucent @U1 0.6 nozzle",
-	"inherits": "Snapmaker PLA Translucent @U1 base",
 	"compatible_printers": [
 		"Snapmaker U1 (0.6 nozzle)"
 	],

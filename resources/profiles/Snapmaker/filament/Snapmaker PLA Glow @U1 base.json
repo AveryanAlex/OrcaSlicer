@@ -1,10 +1,10 @@
 {
 	"type": "filament",
-	"from": "system",
-	"instantiation": "false",
 	"name": "Snapmaker PLA Glow @U1 base",
-	"filament_id": "SPGLOW001",
 	"inherits": "fdm_filament_pla",
+	"from": "system",
+	"filament_id": "SPGLOW001",
+	"instantiation": "false",
 	"filament_end_gcode": [
 		""
 	],
