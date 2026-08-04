@@ -3,6 +3,7 @@
 	"name": "Polymaker PLA @U1 base",
 	"inherits": "fdm_filament_pla",
 	"from": "system",
+	"filament_id": "OGFL99",
 	"instantiation": "false",
 	"compatible_printers": [
 		"Snapmaker U1 (0.4 nozzle)"
@@ -102,6 +103,5 @@
 	],
 	"filament_end_gcode": [
 		"; filament end gcode\n"
-	],
-	"filament_id": "OGFL99"
+	]
 }

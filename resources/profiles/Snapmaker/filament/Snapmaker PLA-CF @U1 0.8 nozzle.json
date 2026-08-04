@@ -3,6 +3,8 @@
 	"name": "Snapmaker PLA-CF @U1 0.8 nozzle",
 	"inherits": "fdm_filament_pla",
 	"from": "system",
+	"setting_id": "fhhnfJm4dN9FXpWQ",
+	"filament_id": "GFL98111",
 	"instantiation": "true",
 	"compatible_printers": [
 		"Snapmaker U1 (0.8 nozzle)"
@@ -129,7 +131,5 @@
 	],
 	"additional_cooling_fan_speed": [
 		"0"
-	],
-	"setting_id": "fhhnfJm4dN9FXpWQ",
-	"filament_id": "GFL98111"
+	]
 }

@@ -1,5 +1,8 @@
 {
 	"type": "filament",
+	"name": "Polymaker Silk PLA Family @U1",
+	"inherits": "Polymaker PLA @U1 base",
+	"from": "system",
 	"setting_id": "h8vIYpXbxFtHPV6e",
 	"instantiation": "true",
 	"compatible_printers": [
@@ -11,9 +14,6 @@
 	"filament_vendor": [
 		"Polymaker"
 	],
-	"from": "system",
-	"inherits": "Polymaker PLA @U1 base",
-	"name": "Polymaker Silk PLA Family @U1",
 	"nozzle_temperature": [
 		"230"
 	],
