@@ -1075,6 +1075,20 @@ void GLVolumeCollection::render(GLVolumeCollection::ERenderType       type,
 
     const float support_normal_z = get_selection_support_normal_z();
 
+    // Compute up direction accounting for build plate tilt. This is frame-invariant
+    // (config cannot change mid-render), so compute it once before the volume loop.
+    Vec3f up_direction = Vec3f::UnitZ();
+    {
+        const DynamicPrintConfig& prt_cfg = GUI::wxGetApp().preset_bundle->printers.get_edited_preset().config;
+        double tilt_x_deg = prt_cfg.opt_float("build_plate_tilt_x");
+        double tilt_y_deg = prt_cfg.opt_float("build_plate_tilt_y");
+        if (tilt_x_deg != 0. || tilt_y_deg != 0.) {
+            double tilt_x_rad = Geometry::deg2rad(tilt_x_deg);
+            double tilt_y_rad = Geometry::deg2rad(tilt_y_deg);
+            up_direction = Vec3f(float(tan(tilt_y_rad)), float(tan(tilt_x_rad)), 1.f).normalized();
+        }
+    }
+
     for (GLVolumeWithIdAndZ& volume : to_render) {
 #if ENABLE_MODIFIERS_ALWAYS_TRANSPARENT
         if (type == ERenderType::Transparent) {
@@ -1132,21 +1146,6 @@ void GLVolumeCollection::render(GLVolumeCollection::ERenderType       type,
             shader->set_uniform("print_volume.type", -1);
         }
 
-        const float normal_z = get_selection_support_normal_z();
-
-        // Compute up direction accounting for build plate tilt
-        Vec3f up_direction = Vec3f::UnitZ();
-        {
-            const DynamicPrintConfig& prt_cfg = GUI::wxGetApp().preset_bundle->printers.get_edited_preset().config;
-            double tilt_x_deg = prt_cfg.opt_float("build_plate_tilt_x");
-            double tilt_y_deg = prt_cfg.opt_float("build_plate_tilt_y");
-            if (tilt_x_deg != 0. || tilt_y_deg != 0.) {
-                double tilt_x_rad = Geometry::deg2rad(tilt_x_deg);
-                double tilt_y_rad = Geometry::deg2rad(tilt_y_deg);
-                up_direction = Vec3f(float(tan(tilt_y_rad)), float(tan(tilt_x_rad)), 1.f).normalized();
-            }
-        }
-
         // Per-extruder printable-height shading. The flag is set to
         // 2.0 only for multi-extruder printers (two per-extruder heights); otherwise it is forced to 0.0
         // on every render so no stale flag survives a multi->single-extruder plate switch, keeping the
@@ -1167,7 +1166,7 @@ void GLVolumeCollection::render(GLVolumeCollection::ERenderType       type,
         shader->set_uniform("volume_world_matrix", volume.first->world_matrix());
         shader->set_uniform("slope.actived", m_slope.isGlobalActive && !volume.first->is_modifier && !volume.first->is_wipe_tower);
         shader->set_uniform("slope.volume_world_normal_matrix", static_cast<Matrix3f>(volume.first->world_matrix().matrix().block(0, 0, 3, 3).inverse().transpose().cast<float>()));
-        shader->set_uniform("slope.normal_z", normal_z);
+        shader->set_uniform("slope.normal_z", support_normal_z);
         shader->set_uniform("slope.up_direction", up_direction);
 
 #if ENABLE_ENVIRONMENT_MAP
