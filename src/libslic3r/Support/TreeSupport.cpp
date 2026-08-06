@@ -2859,7 +2859,6 @@ void TreeSupport::drop_nodes()
     const size_t tip_layers = base_radius / layer_height; //The number of layers to be shrinking the circle to create a tip. This produces a 45 degree angle.
     const coordf_t radius_sample_resolution = m_ts_data->m_radius_sample_resolution;
     const bool support_on_buildplate_only = config.support_on_build_plate_only.value;
-    const size_t top_interface_layers = config.support_interface_top_layers.value;
     const auto belt_floor_mode = m_print_config->belt_support_floor_mode.value;
     const bool has_belt_floor = std::abs(m_slicing_params.belt_floor_shear_factor) > EPSILON
         && belt_floor_mode == BeltSupportFloorMode::GeneratorOnly;
@@ -3100,19 +3099,21 @@ void TreeSupport::drop_nodes()
                     // Treat as object-surface termination (not buildplate) so
                     // the node gets floor/interface areas instead of base pads.
                     if (has_belt_floor && print_z_next <= belt_floor_print_z(next_position)) {
+                        std::scoped_lock lock(m_ts_data->m_mutex);
                         node_parent->to_buildplate = false;
+                        neighbour->valid = false;
+                        p_node->valid = false;
                     } else {
                         const bool to_buildplate = !is_inside_ex(get_collision(0, obj_layer_nr_next), next_position);
                         SupportNode* next_node = m_ts_data->create_node(next_position, node_parent->distance_to_top + 1, obj_layer_nr_next,
                             node_parent->support_roof_layers_below - (node_parent->distance_to_top >= 0 ? 1 : 0),
                             to_buildplate, node_parent, print_z_next, height_next);
                         get_max_move_dist(next_node);
-                        m_ts_data->m_mutex.lock();
+                        std::scoped_lock lock(m_ts_data->m_mutex);
                         contact_nodes[layer_nr_next].push_back(next_node);
-                        m_ts_data->m_mutex.unlock();
+                        neighbour->valid = false;
+                        p_node->valid = false;
                     }
-                    neighbour->valid = false;
-                    p_node->valid = false;
                 }
                 else if (neighbours.size() > 1) //Don't merge leaf nodes because we would then incur movement greater than the maximum move distance.
                 {
