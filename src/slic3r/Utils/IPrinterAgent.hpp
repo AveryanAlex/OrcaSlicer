@@ -93,6 +93,19 @@ public:
     { return ORCA_NETWORK_ERR_CMD_NOT_SUPPORTED; }
     virtual int command_ams_select_tray(std::string, std::string, int, bool)
     { return ORCA_NETWORK_ERR_CMD_NOT_SUPPORTED; }
+    virtual int command_xyz_abs(std::string dev_id, int sequence_id, bool lan_mode)
+    { return ORCA_NETWORK_ERR_CMD_NOT_SUPPORTED; }
+    virtual int command_auto_leveling(std::string dev_id, int sequence_id, bool lan_mode)
+    { return ORCA_NETWORK_ERR_CMD_NOT_SUPPORTED; }
+    virtual int command_go_home(std::string dev_id, bool is_printing, bool supports_mqtt_homing, int sequence_id, bool lan_mode)
+    { return ORCA_NETWORK_ERR_CMD_NOT_SUPPORTED; }
+    virtual int command_set_bed(std::string dev_id, int temp, bool supports_mqtt_bed_ctrl, int sequence_id, bool lan_mode)
+    { return ORCA_NETWORK_ERR_CMD_NOT_SUPPORTED; }
+    virtual int command_set_nozzle(std::string dev_id, int temp, int sequence_id, bool lan_mode)
+    { return ORCA_NETWORK_ERR_CMD_NOT_SUPPORTED; }
+    virtual int command_axis_control(std::string dev_id, std::string axis, double unit, double input_val, int speed,
+                                      bool is_core_xy, bool supports_mqtt_axis_control, int sequence_id, bool lan_mode)
+    { return ORCA_NETWORK_ERR_CMD_NOT_SUPPORTED; }
 
     /**
      * Establish a direct LAN connection to a printer.

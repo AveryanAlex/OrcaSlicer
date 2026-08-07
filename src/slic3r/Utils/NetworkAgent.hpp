@@ -145,6 +145,13 @@ public:
     int command_ams_refresh_rfid(std::string dev_id, std::string tray_id, int sequence_id, bool lan_mode);
     int command_ams_calibrate(std::string dev_id, int ams_id, int sequence_id, bool lan_mode);
     int command_ams_select_tray(std::string dev_id, std::string tray_id, int sequence_id, bool lan_mode);
+    int command_xyz_abs(std::string dev_id, int sequence_id, bool lan_mode);
+    int command_auto_leveling(std::string dev_id, int sequence_id, bool lan_mode);
+    int command_go_home(std::string dev_id, bool is_printing, bool supports_mqtt_homing, int sequence_id, bool lan_mode);
+    int command_set_bed(std::string dev_id, int temp, bool supports_mqtt_bed_ctrl, int sequence_id, bool lan_mode);
+    int command_set_nozzle(std::string dev_id, int temp, int sequence_id, bool lan_mode);
+    int command_axis_control(std::string dev_id, std::string axis, double unit, double input_val, int speed,
+                              bool is_core_xy, bool supports_mqtt_axis_control, int sequence_id, bool lan_mode);
     int connect_printer(std::string dev_id, std::string dev_ip, std::string username, std::string password, bool use_ssl);
     int disconnect_printer();
     int send_message_to_printer(std::string dev_id, std::string json_str, int qos, int flag);

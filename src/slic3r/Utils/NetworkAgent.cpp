@@ -788,6 +788,49 @@ int NetworkAgent::command_ams_select_tray(std::string dev_id, std::string tray_i
     return -1;
 }
 
+int NetworkAgent::command_xyz_abs(std::string dev_id, int sequence_id, bool lan_mode)
+{
+    if (m_printer_agent)
+        return m_printer_agent->command_xyz_abs(dev_id, sequence_id, lan_mode);
+    return -1;
+}
+
+int NetworkAgent::command_auto_leveling(std::string dev_id, int sequence_id, bool lan_mode)
+{
+    if (m_printer_agent)
+        return m_printer_agent->command_auto_leveling(dev_id, sequence_id, lan_mode);
+    return -1;
+}
+
+int NetworkAgent::command_go_home(std::string dev_id, bool is_printing, bool supports_mqtt_homing, int sequence_id, bool lan_mode)
+{
+    if (m_printer_agent)
+        return m_printer_agent->command_go_home(dev_id, is_printing, supports_mqtt_homing, sequence_id, lan_mode);
+    return -1;
+}
+
+int NetworkAgent::command_set_bed(std::string dev_id, int temp, bool supports_mqtt_bed_ctrl, int sequence_id, bool lan_mode)
+{
+    if (m_printer_agent)
+        return m_printer_agent->command_set_bed(dev_id, temp, supports_mqtt_bed_ctrl, sequence_id, lan_mode);
+    return -1;
+}
+
+int NetworkAgent::command_set_nozzle(std::string dev_id, int temp, int sequence_id, bool lan_mode)
+{
+    if (m_printer_agent)
+        return m_printer_agent->command_set_nozzle(dev_id, temp, sequence_id, lan_mode);
+    return -1;
+}
+
+int NetworkAgent::command_axis_control(std::string dev_id, std::string axis, double unit, double input_val, int speed,
+                                        bool is_core_xy, bool supports_mqtt_axis_control, int sequence_id, bool lan_mode)
+{
+    if (m_printer_agent)
+        return m_printer_agent->command_axis_control(dev_id, axis, unit, input_val, speed, is_core_xy, supports_mqtt_axis_control, sequence_id, lan_mode);
+    return -1;
+}
+
 int NetworkAgent::connect_printer(std::string dev_id, std::string dev_ip, std::string username, std::string password, bool use_ssl)
 {
     if (m_printer_agent)
