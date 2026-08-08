@@ -381,6 +381,10 @@ bool ToolOrdering::insert_wipe_tower_extruder()
 {
     if (!m_print_config_ptr || !m_print_config_ptr->enable_prime_tower)
         return false;
+    // Belt mode has no classic wipe tower; the dedicated wipe tower filament
+    // must not inject extra toolchanges into the purge prism planning.
+    if (m_print_config_ptr->belt_printer)
+        return false;
     if (m_print_config_ptr->wipe_tower_filament == 0)
         return false;
 

@@ -7321,6 +7321,31 @@ void PrintConfigDef::init_fff_params()
         def->set_default_value(new ConfigOptionEnum<BeltSupportZOffsetMode>(BeltSupportZOffsetMode::Unconditional));
     }
 
+    def = this->add("enable_belt_purge_tower", coBool);
+    def->label = L("Enable belt purge tower");
+    def->category = L("Multimaterial");
+    def->tooltip = L("Belt-printer replacement for the wipe/prime tower. When enabled on a belt "
+                     "printer, a purge prism is automatically generated next to the printed parts "
+                     "and filament-change purging is routed into it (the classic wipe tower cannot "
+                     "be used on belt printers because its G-code bypasses the belt transform). "
+                     "Only available on belt printers.");
+    def->mode = comAdvanced;
+    def->set_default_value(new ConfigOptionBool(false));
+
+    def = this->add("belt_purge_tower_width", coFloat);
+    def->label = L("Belt purge tower width");
+    def->category = L("Printable space");
+    def->tooltip = L("Width (machine X, across the belt) of the purge prism that is automatically "
+                     "generated on belt printers when the prime tower is enabled and multiple "
+                     "filaments are used. Filament-change purging is routed into this prism's "
+                     "extrusions instead of a classic wipe tower. Its height is computed "
+                     "automatically from the worst-case purge volume per layer: a wider prism "
+                     "results in a shorter one.");
+    def->sidetext = L("mm");
+    def->min = 1.;
+    def->mode = comAdvanced;
+    def->set_default_value(new ConfigOptionFloat(35.));
+
     def = this->add("tree_support_branch_angle", coFloat);
     def->label = L("Tree support branch angle");
     def->category = L("Support");
@@ -7964,6 +7989,16 @@ void PrintConfigDef::init_fff_params()
     def->tooltip = L("This object will be used to purge the nozzle after a filament change to save filament and decrease the print time. "
         "Colors of the objects will be mixed as a result. "
         "It will not take effect unless the prime tower is enabled.");
+    def->set_default_value(new ConfigOptionBool(false));
+
+    // Internal marker (not shown in any settings tab): identifies the auto-generated
+    // belt purge prism so it can be updated/removed by the auto-manager and aligned
+    // to the object layer grid by the backend. Persisted to 3mf like any per-object key.
+    def = this->add("belt_purge_tower_object", coBool);
+    def->category = L("Flush options");
+    def->label = L("Belt purge tower object");
+    def->tooltip = L("Marks the auto-generated belt purge prism. Managed automatically; do not set manually.");
+    def->mode = comDevelop;
     def->set_default_value(new ConfigOptionBool(false));
 
     def = this->add("wipe_tower_bridging", coFloat);

@@ -2866,7 +2866,13 @@ void GLCanvas3D::reload_scene(bool refresh_immediately, bool force_full_scene_re
             need_wipe_tower |= dynamic_cast<const ConfigOptionBool*>(dconfig.option("enable_wrapping_detection"))->value;
         }
 
-        if (wt && (need_wipe_tower || filaments_count > 1) && !wxGetApp().plater()->only_gcode_mode() && !wxGetApp().plater()->is_gcode_3mf()) {
+        // Belt printers replace the classic wipe tower with the auto-generated
+        // belt purge prism (a real model object), so never draw the tower widget.
+        bool is_belt_printer = false;
+        if (const auto *belt_opt = wxGetApp().preset_bundle->printers.get_edited_preset().config.option<ConfigOptionBool>("belt_printer"))
+            is_belt_printer = belt_opt->value;
+
+        if (wt && !is_belt_printer && (need_wipe_tower || filaments_count > 1) && !wxGetApp().plater()->only_gcode_mode() && !wxGetApp().plater()->is_gcode_3mf()) {
             for (int plate_id = 0; plate_id < n_plates; plate_id++) {
                 // If print ByObject and there is only one object in the plate, the wipe tower is allowed to be generated.
                 PartPlate* part_plate = ppl.get_plate(plate_id);
@@ -2942,6 +2948,28 @@ void GLCanvas3D::reload_scene(bool refresh_immediately, bool force_full_scene_re
     }
 
     update_volumes_colors_by_extruder();
+
+    // ORCA-Belt: render the auto-generated belt purge prism like a wipe tower —
+    // semi-transparent, in its (filament) color. It is a real sliced object, so
+    // the G-code preview already shows the actual per-layer purge colors; here in
+    // the editor we just make the block translucent so it reads as a purge tower
+    // rather than a solid part. update_colors_by_extruder() preserves alpha when
+    // not updating alpha, so lowering it once sticks across recolors.
+    if (m_model != nullptr) {
+        for (GLVolume *volume : m_volumes.volumes) {
+            if (volume == nullptr || volume->volume_idx() < 0)
+                continue;
+            const int obj_idx = volume->object_idx();
+            if (obj_idx < 0 || obj_idx >= (int) m_model->objects.size())
+                continue;
+            const ConfigOption *opt = m_model->objects[obj_idx]->config.option("belt_purge_tower_object");
+            if (opt != nullptr && opt->getBool()) {
+                volume->color.a(0.66f);
+                volume->force_transparent = true;
+            }
+        }
+    }
+
 	// Update selection indices based on the old/new GLVolumeCollection.
     if (m_selection.get_mode() == Selection::Instance)
         m_selection.instances_changed(instance_ids_selected);
