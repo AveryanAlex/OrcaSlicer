@@ -1,5 +1,4 @@
-#ifndef slic3r_GUI_BeltPurgeTower_hpp_
-#define slic3r_GUI_BeltPurgeTower_hpp_
+#pragma once
 
 // ORCA-Belt: auto-managed purge prism for belt printers.
 //
@@ -23,12 +22,12 @@ struct BeltPurgeSignature
 {
     bool valid          = false;
     int  filament_count = 0;
-    long key[7]         = {0}; // rounded geometry inputs (0.1 mm units)
+    long key[10]        = {0}; // rounded geometry inputs (0.1 mm units)
     bool operator==(const BeltPurgeSignature &o) const
     {
         if (valid != o.valid || filament_count != o.filament_count)
             return false;
-        for (int i = 0; i < 7; ++i)
+        for (int i = 0; i < 10; ++i)
             if (key[i] != o.key[i])
                 return false;
         return true;
@@ -44,5 +43,3 @@ bool ensure_belt_purge_tower(Model &model, PartPlateList &partplate_list, Object
 
 } // namespace GUI
 } // namespace Slic3r
-
-#endif // slic3r_GUI_BeltPurgeTower_hpp_

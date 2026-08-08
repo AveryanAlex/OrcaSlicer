@@ -50,7 +50,7 @@ public:
     // tower to tell which prism fills carry purge vs. which are unclaimed waste.
     bool is_entity_overridden(const ExtrusionEntity* entity, const PrintObject *object, size_t copy_id) const {
         auto it = entity_map.find(std::make_tuple(entity, object));
-        return it == entity_map.end() ? false : it->second[copy_id] != -1;
+        return it != entity_map.end() && copy_id < it->second.size() && it->second[copy_id] != -1;
     }
 
     bool is_overriddable(const ExtrusionEntityCollection& ee, const PrintConfig& print_config, const PrintObject& object, const PrintRegion& region) const;

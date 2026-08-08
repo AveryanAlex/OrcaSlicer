@@ -142,7 +142,14 @@ bool ensure_belt_purge_tower(Model &model, PartPlateList &partplate_list, Object
     }
 
     // --- Sizing -----------------------------------------------------------
-    const double width   = print_config.has("belt_purge_tower_width") ? std::max(1., print_config.opt_float("belt_purge_tower_width")) : 35.;
+    const int    n_islands = std::max(1, (int) filaments.size() - 1);
+    const double gap       = 1.0;
+    // Every disconnected island needs at least 1 mm of printable width. Honor
+    // the configured total width whenever possible, but never let the island
+    // layout silently grow past the footprint used for placement.
+    const double min_width = n_islands + (n_islands - 1) * gap;
+    const double width     = std::max(min_width,
+        print_config.has("belt_purge_tower_width") ? print_config.opt_float("belt_purge_tower_width") : 35.);
     const double layer_h = print_config.has("layer_height") ? print_config.opt_float("layer_height") : 0.2;
 
     // Belt geometry. The rotation axis is the gantry tilt axis; the belt
@@ -219,6 +226,9 @@ bool ensure_belt_purge_tower(Model &model, PartPlateList &partplate_list, Object
     new_sig.key[4] = q(belt_max);
     new_sig.key[5] = q(lat_min);
     new_sig.key[6] = q(z_max);
+    new_sig.key[7] = static_cast<long>(rot);
+    new_sig.key[8] = std::lround(theta * 10000.0);
+    new_sig.key[9] = q(lat_max);
     if (prism_idxs.size() == 1 && new_sig == sig)
         return false; // already up to date — do not touch the model
 
@@ -279,15 +289,13 @@ bool ensure_belt_purge_tower(Model &model, PartPlateList &partplate_list, Object
     // lets each swap claim its own island. Total lateral footprint stays `width`
     // (each island width/N wide, separated by a small gap), so per-layer capacity
     // per island ~= max_flush, matching the height sizing.
-    const int    n_islands = std::max(1, (int) filaments.size() - 1);
     // Minimal gap between sub-bars: they must stay just-separated so the slicer
     // keeps them as distinct islands (hence distinct infill collections, one per
     // simultaneous swap). Zero gap would union them into one collection and
     // reintroduce the multi-swap-per-layer absorption bug; a hair over ~2 line
     // widths also keeps gap-fill from bridging them. 1 mm is about as close as
     // they can butt up while staying individually purgeable.
-    const double gap       = 1.0;
-    const double w_sub     = std::max(1.0, (width - (n_islands - 1) * gap) / n_islands);
+    const double w_sub = (width - (n_islands - 1) * gap) / n_islands;
 
     // --- (Re)create ---------------------------------------------------------
     if (!prism_idxs.empty())

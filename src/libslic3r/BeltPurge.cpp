@@ -42,10 +42,15 @@ bool Print::has_belt_purge_tower() const
 {
     // Its own purge-tower "type", gated by the belt-only enable_belt_purge_tower
     // option (not the classic enable_prime_tower).
-    return m_config.belt_printer.value
-        && m_config.enable_belt_purge_tower.value
-        && !m_config.spiral_mode.value
-        && m_config.filament_diameter.values.size() > 1;
+    if (!(m_config.belt_printer.value
+          && m_config.enable_belt_purge_tower.value
+          && !m_config.spiral_mode.value
+          && m_config.filament_diameter.values.size() > 1))
+        return false;
+
+    return std::any_of(m_objects.begin(), m_objects.end(), [](const PrintObject *object) {
+        return object->config().belt_purge_tower_object.value;
+    });
 }
 
 // Belt mode: align ALL objects on the plate (the printed objects AND the purge

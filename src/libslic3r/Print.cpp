@@ -1477,13 +1477,13 @@ StringObjectException Print::validate(std::vector<StringObjectException> *warnin
 
     if (m_config.belt_printer.value && m_config.enable_belt_purge_tower.value
         && m_config.print_sequence == PrintSequence::ByObject
-        && extruders.size() > 1 && warning != nullptr) {
+        && extruders.size() > 1) {
         StringObjectException warningtemp;
         warningtemp.string     = L("The belt purge tower is not generated in \"By object\" print sequence; "
                                    "filament changes will not be purged.");
         warningtemp.opt_key    = "enable_belt_purge_tower";
         warningtemp.is_warning = true;
-        *warning               = warningtemp;
+        add_warning(warningtemp);
     }
 
     if (m_config.enable_prime_tower) {
