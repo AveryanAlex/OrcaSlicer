@@ -565,6 +565,10 @@ private:
     // Belt mode: remove layers above z (cancel the purge prism past the last
     // toolchange). Returns how many layers were dropped.
     size_t belt_truncate_layers_above(coordf_t z);
+    // Restore layers removed by belt_truncate_layers_above() before replanning.
+    // Wipe-tower-only invalidations do not necessarily reslice the object, so
+    // truncation must be reversible when later toolchanges move upward.
+    void belt_restore_truncated_layers();
     //BBS
     ExPolygons _shrink_contour_holes(double contour_delta, double hole_delta, const ExPolygons& polys) const;
     // BBS
@@ -607,6 +611,7 @@ private:
 
     SlicingParameters                       m_slicing_params;
     LayerPtrs                               m_layers;
+    LayerPtrs                               m_belt_truncated_layers;
     SupportLayerPtrs                        m_support_layers;
     // Belt brim, generated in posSupportMaterial by BeltBrim.cpp.  Object-local
     // slicing frame, one entry per object layer plus a prologue of brim-only

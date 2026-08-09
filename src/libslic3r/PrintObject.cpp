@@ -1116,6 +1116,9 @@ void PrintObject::clear_layers()
         for (Layer *l : m_layers)
             delete l;
         m_layers.clear();
+        for (Layer *l : m_belt_truncated_layers)
+            delete l;
+        m_belt_truncated_layers.clear();
     }
 }
 

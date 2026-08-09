@@ -22,12 +22,12 @@ struct BeltPurgeSignature
 {
     bool valid          = false;
     int  filament_count = 0;
-    long key[10]        = {0}; // rounded geometry inputs (0.1 mm units)
+    long key[12]        = {0}; // rounded geometry and plate inputs (0.1 mm units)
     bool operator==(const BeltPurgeSignature &o) const
     {
         if (valid != o.valid || filament_count != o.filament_count)
             return false;
-        for (int i = 0; i < 10; ++i)
+        for (int i = 0; i < 12; ++i)
             if (key[i] != o.key[i])
                 return false;
         return true;

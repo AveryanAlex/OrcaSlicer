@@ -150,6 +150,7 @@ bool ensure_belt_purge_tower(Model &model, PartPlateList &partplate_list, Object
     const double min_width = n_islands + (n_islands - 1) * gap;
     const double width     = std::max(min_width,
         print_config.has("belt_purge_tower_width") ? print_config.opt_float("belt_purge_tower_width") : 35.);
+    const double printable_width = width - (n_islands - 1) * gap;
     const double layer_h = print_config.has("layer_height") ? print_config.opt_float("layer_height") : 0.2;
 
     // Belt geometry. The rotation axis is the gantry tilt axis; the belt
@@ -203,15 +204,15 @@ bool ensure_belt_purge_tower(Model &model, PartPlateList &partplate_list, Object
     const double v_layer = double(filaments.size() - 1) * max_flush;
 
     // Height from the per-layer purge demand. A tilted slicing plane cuts a
-    // width x (height/sin) rectangle out of the bar, so one layer slab absorbs
-    // width * (height/sin) * layer_height of purge. Solve for the height that
+    // printable_width x (height/sin) rectangle out of the bars, so one layer
+    // slab absorbs printable_width * (height/sin) * layer_height of purge. Solve for the height that
     // holds the worst-case per-layer purge, with eta (infill/perimeter packing)
     // and a safety margin for the tilt ramps / grid-alignment slop, plus a
     // minimum so the tower is a real printable body rather than a sliver.
     const double eta    = 0.85;
     const double safety = 1.6;
     const double printable_height = printer_config.has("printable_height") ? printer_config.opt_float("printable_height") : 250.;
-    double       height = safety * v_layer * sin_t / (width * layer_h * eta);
+    double       height = safety * v_layer * sin_t / (printable_width * layer_h * eta);
     height = std::clamp(height, 8.0, std::max(8.0, printable_height));
 
     // --- Idempotence (input-keyed) ----------------------------------------
@@ -229,7 +230,10 @@ bool ensure_belt_purge_tower(Model &model, PartPlateList &partplate_list, Object
     new_sig.key[7] = static_cast<long>(rot);
     new_sig.key[8] = std::lround(theta * 10000.0);
     new_sig.key[9] = q(lat_max);
-    if (prism_idxs.size() == 1 && new_sig == sig)
+    const Vec3d plate_origin = plate->get_origin();
+    new_sig.key[10] = q(plate_origin.x());
+    new_sig.key[11] = q(plate_origin.y());
+    if (prism_idxs.size() == 1 && model.objects[size_t(prism_idxs.front())]->instances.size() == 1 && new_sig == sig)
         return false; // already up to date — do not touch the model
 
     // --- Position ----------------------------------------------------------
@@ -243,7 +247,8 @@ bool ensure_belt_purge_tower(Model &model, PartPlateList &partplate_list, Object
     // belt). The trailing z_max*cot term dominates the bar's own ramp.
     const double margin            = 5.;
     const double ramp_compensation = height / sin_t;
-    const double belt_start   = std::max(0.0, belt_min - ramp_compensation);             // leading ramp, toward Y=0
+    const double belt_origin  = plate_origin[belt_is_y ? 1 : 0];
+    const double belt_start   = std::max(belt_origin, belt_min - ramp_compensation);     // leading ramp, toward belt origin
     const double belt_end     = belt_max + margin + ramp_compensation + z_max * cot_t;   // + parts' top-feature belt reach
     const double length       = std::max(belt_end - belt_start, 10.);
     const double belt_center  = 0.5 * (belt_start + belt_end);
@@ -253,7 +258,6 @@ bool ensure_belt_purge_tower(Model &model, PartPlateList &partplate_list, Object
     // on the bed. The bed (printable_area) is plate-local but model instances
     // live in the plate's world frame, so add the plate origin's lateral
     // component. lat_min/lat_max come from instance_bounding_box (world frame).
-    const Vec3d  plate_origin = plate->get_origin();
     const double lat_origin   = plate_origin[belt_is_y ? 0 : 1];
     const double inset        = 1.;
     double       lat_center   = lat_max + 5. + 0.5 * width; // fallback: just past the parts

@@ -335,6 +335,23 @@ TEST_CASE("Belt purge planning requires its managed purge object", "[Print][Purg
     CHECK_FALSE(print.has_wipe_tower());
 }
 
+TEST_CASE("Belt purge rejects multiple managed purge objects", "[Print][PurgeTower][Regression]")
+{
+    DynamicPrintConfig config = multifilament_config(2, {
+        { "belt_printer",             1 },
+        { "enable_belt_purge_tower", 1 }
+    });
+
+    Model model;
+    Print print;
+    build_cubes(model, print, config, /*n=*/2, /*overlap=*/false);
+    for (ModelObject *object : model.objects)
+        object->config.set_key_value("belt_purge_tower_object", new ConfigOptionBool(true));
+    print.apply(model, config);
+
+    CHECK_FALSE(print.validate().string.empty());
+}
+
 TEST_CASE("A default slice emits perimeter, infill, and skirt", "[Print]")
 {
     const std::string gcode = slice({ cube(20) }, {

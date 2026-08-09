@@ -79,7 +79,7 @@ void Print::_align_belt_purge_layers()
 {
     PrintObject *prism = nullptr;
     for (PrintObject *po : m_objects)
-        if (po->config().belt_purge_tower_object.value) {
+        if (po->config().belt_purge_tower_object.value && !po->layers().empty()) {
             prism = po;
             break;
         }
@@ -144,6 +144,13 @@ void Print::_plan_belt_purge()
 {
     m_wipe_tower_data.clear();
 
+    // psWipeTower may be invalidated without posSlice (for example after a
+    // filament-map or tool-ordering change). Restore a prism shortened by the
+    // previous plan so a newly higher toolchange can use its original layers.
+    for (PrintObject *po : m_objects)
+        if (po->config().belt_purge_tower_object.value)
+            po->belt_restore_truncated_layers();
+
     // Must run before ToolOrdering is built: LayerTools merge per-object layer
     // print_z values, and the prism only absorbs purge where its (snapped)
     // layers coincide with the toolchange layers.
@@ -191,7 +198,7 @@ void Print::_plan_belt_purge()
                 if (e != cur_ext) { last_tc_z = lt.print_z; cur_ext = e; }
         if (last_tc_z >= 0.)
             for (PrintObject *po : m_objects)
-                if (po->config().belt_purge_tower_object.value) {
+                if (po->config().belt_purge_tower_object.value && !po->layers().empty()) {
                     po->belt_truncate_layers_above(last_tc_z);
                     break;
                 }
@@ -244,32 +251,9 @@ void Print::_plan_belt_purge()
             current_extruder_id = extruder_id;
         }
 
-        // Plastic saving: drop the prism's infill that no toolchange on this
-        // layer claimed. At this point (after the real-purge marking, before the
-        // force-override pass below) the prism's OVERRIDDEN fills are exactly the
-        // purge; the rest is infill that would otherwise print as the prism's own
-        // filament for nothing — which is most of the prism on layers with little
-        // or no purge. We keep perimeters so the bar's wall shell stays
-        // continuous along the belt. (Must run before ensure_perimeters_infills_
-        // order, which force-overrides every remaining fill and would make them
-        // all look "claimed".)
-        if (prism_po != nullptr) {
-            if (Layer *pl = prism_po->get_layer_at_printz(layer_tools.print_z, EPSILON)) {
-                const auto &we = layer_tools.wiping_extrusions();
-                for (LayerRegion *lr : pl->regions()) {
-                    auto  &ents = lr->fills.entities;
-                    size_t keep = 0;
-                    for (size_t r = 0; r < ents.size(); ++r) {
-                        if (we.is_entity_overridden(ents[r], prism_po, 0))
-                            ents[keep++] = ents[r];
-                        else
-                            delete ents[r];
-                    }
-                    ents.resize(keep);
-                }
-            }
-        }
-
+        // Do not destructively remove unclaimed fill entities here. psWipeTower
+        // can rerun without regenerating infill, and a later tool ordering may
+        // need entities that were unclaimed by the previous plan.
         layer_tools.wiping_extrusions().ensure_perimeters_infills_order(*this);
         if (layer_leftover > 0.f) {
             total_leftover += layer_leftover;
@@ -328,14 +312,15 @@ void PrintObject::belt_shift_layer_grid(double delta)
 // layer's upper-layer link. Returns the number of layers removed.
 size_t PrintObject::belt_truncate_layers_above(coordf_t z)
 {
+    // A repeated plan always starts from the restored full layer set.
+    assert(m_belt_truncated_layers.empty());
     size_t keep = m_layers.size();
     while (keep > 0 && m_layers[keep - 1]->print_z > z + EPSILON)
         --keep;
     if (keep >= m_layers.size())
         return 0;
     const size_t removed = m_layers.size() - keep;
-    for (size_t i = keep; i < m_layers.size(); ++i)
-        delete m_layers[i];
+    m_belt_truncated_layers.assign(m_layers.begin() + keep, m_layers.end());
     m_layers.resize(keep);
     if (!m_layers.empty())
         m_layers.back()->upper_layer = nullptr;
@@ -343,6 +328,19 @@ size_t PrintObject::belt_truncate_layers_above(coordf_t z)
         << " kept=" << keep << " removed=" << removed
         << " new_top=" << (m_layers.empty() ? 0. : m_layers.back()->print_z);
     return removed;
+}
+
+void PrintObject::belt_restore_truncated_layers()
+{
+    if (m_belt_truncated_layers.empty())
+        return;
+
+    m_layers.insert(m_layers.end(), m_belt_truncated_layers.begin(), m_belt_truncated_layers.end());
+    m_belt_truncated_layers.clear();
+    for (size_t i = 0; i < m_layers.size(); ++i) {
+        m_layers[i]->lower_layer = i == 0 ? nullptr : m_layers[i - 1];
+        m_layers[i]->upper_layer = i + 1 < m_layers.size() ? m_layers[i + 1] : nullptr;
+    }
 }
 
 } // namespace Slic3r
