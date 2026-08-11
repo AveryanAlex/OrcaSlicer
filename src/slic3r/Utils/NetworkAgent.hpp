@@ -155,6 +155,8 @@ public:
     int connect_printer(std::string dev_id, std::string dev_ip, std::string username, std::string password, bool use_ssl);
     int disconnect_printer();
     int send_message_to_printer(std::string dev_id, std::string json_str, int qos, int flag);
+    std::string get_local_camera_url(std::string dev_ip, std::string username, std::string password);
+    std::string default_lan_username() const;
     int check_cert();
     void install_device_cert(std::string dev_id, bool lan_only);
     bool start_discovery(bool start, bool sending);

@@ -852,6 +852,20 @@ int NetworkAgent::send_message_to_printer(std::string dev_id, std::string json_s
     return -1;
 }
 
+std::string NetworkAgent::get_local_camera_url(std::string dev_ip, std::string username, std::string password)
+{
+    if (m_printer_agent)
+        return m_printer_agent->get_local_camera_url(dev_ip, username, password);
+    return {};
+}
+
+std::string NetworkAgent::default_lan_username() const
+{
+    if (m_printer_agent)
+        return m_printer_agent->default_lan_username();
+    return {};
+}
+
 int NetworkAgent::check_cert()
 {
     if (m_printer_agent)

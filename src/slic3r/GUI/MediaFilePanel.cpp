@@ -466,8 +466,8 @@ void MediaFilePanel::fetchUrl(boost::weak_ptr<PrinterFileSystem> wfs)
     m_waiting_support = false;
     NetworkAgent *agent = wxGetApp().getAgent();
     std::string  agent_version = agent ? agent->get_version() : "";
-    if ((m_lan_mode || !m_remote_proto) && m_local_proto && !m_lan_ip.empty()) {
-        std::string url = "bambu:///local/" + m_lan_ip + ".?port=6000&user=" + m_lan_user + "&passwd=" + m_lan_passwd;
+    if (agent && (m_lan_mode || !m_remote_proto) && m_local_proto && !m_lan_ip.empty()) {
+        std::string url = agent->get_local_camera_url(m_lan_ip, m_lan_user, m_lan_passwd);
         url += "&device=" + m_machine;
         url += "&net_ver=" + agent_version;
         url += "&dev_ver=" + m_dev_ver;

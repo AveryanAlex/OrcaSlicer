@@ -108,6 +108,19 @@ public:
     { return ORCA_NETWORK_ERR_CMD_NOT_SUPPORTED; }
 
     /**
+     * Build a ready-to-use local (LAN) camera stream URL for this agent's protocol.
+     * Returns an empty string if the agent has no local camera stream support.
+     */
+    virtual std::string get_local_camera_url(std::string dev_ip, std::string username, std::string password)
+    { return {}; }
+
+    /**
+     * Default LAN account username for this agent's protocol, if it has a fixed one.
+     * Returns an empty string if the agent has no fixed default (e.g. caller must supply one).
+     */
+    virtual std::string default_lan_username() const { return {}; }
+
+    /**
      * Establish a direct LAN connection to a printer.
      */
     virtual int connect_printer(std::string dev_id, std::string dev_ip, std::string username, std::string password, bool use_ssl) = 0;

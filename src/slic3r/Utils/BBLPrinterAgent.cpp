@@ -246,6 +246,11 @@ int BBLPrinterAgent::send_message_to_printer(std::string dev_id, std::string jso
     return -1;
 }
 
+std::string BBLPrinterAgent::get_local_camera_url(std::string dev_ip, std::string username, std::string password)
+{
+    return "bambu:///local/" + dev_ip + ".?port=6000&user=" + username + "&passwd=" + password;
+}
+
 // ============================================================================
 // Certificates
 // ============================================================================
@@ -509,8 +514,15 @@ int BBLPrinterAgent::start_local_print_with_record(PrintParams params, OnUpdateS
 
 int BBLPrinterAgent::start_send_gcode_to_sdcard(PrintParams params, OnUpdateStatusFn update_fn, WasCancelledFn cancel_fn, OnWaitFn wait_fn)
 {
-    return dispatch_start<func_start_send_gcode_to_sdcard_legacy, func_start_send_gcode_to_sdcard_0203>(
+    int result = dispatch_start<func_start_send_gcode_to_sdcard_legacy, func_start_send_gcode_to_sdcard_0203>(
         BBLNetworkPlugin::instance().get_start_send_gcode_to_sdcard(), params, update_fn, cancel_fn, wait_fn);
+    if (result != 0) {
+        BOOST_LOG_TRIVIAL(error) << "start_send_gcode_to_sdcard failed: result=" << result
+            << ", try_emmc_print=" << params.try_emmc_print
+            << ", legacy_mode=" << BBLNetworkPlugin::instance().use_legacy_network()
+            << ", dev_ip=" << params.dev_ip << ", dev_id=" << params.dev_id;
+    }
+    return result;
 }
 
 int BBLPrinterAgent::start_local_print(PrintParams params, OnUpdateStatusFn update_fn, WasCancelledFn cancel_fn)

@@ -45,6 +45,8 @@ public:
     int connect_printer(std::string dev_id, std::string dev_ip, std::string username, std::string password, bool use_ssl) override;
     int disconnect_printer() override;
     int send_message_to_printer(std::string dev_id, std::string json_str, int qos, int flag) override;
+    std::string get_local_camera_url(std::string dev_ip, std::string username, std::string password) override;
+    std::string default_lan_username() const override { return "bblp"; }
 
     // Certificates
     int check_cert() override;
