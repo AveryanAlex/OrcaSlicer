@@ -873,6 +873,8 @@ int NetworkAgent::get_file_transfer_url(std::string dev_id, std::function<void(F
 {
     if (m_printer_agent)
         return m_printer_agent->get_file_transfer_url(std::move(dev_id), std::move(callback), std::move(params));
+    if (callback)
+        callback({});
     return -1;
 }
 

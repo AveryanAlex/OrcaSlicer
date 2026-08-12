@@ -197,8 +197,12 @@ public:
      */
     virtual std::string get_local_file_transfer_url(const FileTransferURLParams& params) { return ""; }
 
-    virtual int get_file_transfer_url(std::string, std::function<void(FileTransferURLResult)>, FileTransferURLParams)
-    { return ORCA_NETWORK_ERR_CMD_NOT_SUPPORTED; }
+    virtual int get_file_transfer_url(std::string, std::function<void(FileTransferURLResult)> callback, FileTransferURLParams)
+    {
+        if (callback)
+            callback({});
+        return ORCA_NETWORK_ERR_CMD_NOT_SUPPORTED;
+    }
 
     /**
      * Default LAN account username for this agent's protocol, if it has a fixed one.
