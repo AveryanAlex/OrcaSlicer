@@ -29,11 +29,6 @@ namespace Slic3r { namespace GUI {
 
 class SkipPartCanvas;
 
-enum URL_STATE {
-    URL_TCP,
-    URL_TUTK,
-};
-
 class PartSkipConfirmDialog : public DPIDialog
 {
 private:

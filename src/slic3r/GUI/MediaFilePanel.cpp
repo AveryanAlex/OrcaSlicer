@@ -11,6 +11,7 @@
 #include "Widgets/ProgressDialog.hpp"
 #include <libslic3r/Model.hpp>
 #include <libslic3r/Format/bbs_3mf.hpp>
+#include <slic3r/GUI/DeviceManager.hpp>
 #include "DeviceCore/DevStorage.h"
 
 #ifdef __WXMSW__
@@ -206,7 +207,7 @@ MediaFilePanel::MediaFilePanel(wxWindow * parent)
     Bind(wxEVT_SHOW, onShowHide);
     parent->GetParent()->Bind(wxEVT_SHOW, onShowHide);
 
-    m_lan_user = "bblp";
+    m_lan_user = wxGetApp().getAgent()->default_lan_username();
 }
 
 MediaFilePanel::~MediaFilePanel()
@@ -465,14 +466,9 @@ void MediaFilePanel::fetchUrl(boost::weak_ptr<PrinterFileSystem> wfs)
     BOOST_LOG_TRIVIAL(info) << "MediaFilePanel::fetchUrl: " << m_local_proto << m_remote_proto;
     m_waiting_support = false;
     NetworkAgent *agent = wxGetApp().getAgent();
-    std::string  agent_version = agent ? agent->get_version() : "";
     if (agent && (m_lan_mode || !m_remote_proto) && m_local_proto && !m_lan_ip.empty()) {
-        std::string url = agent->get_local_camera_url(m_lan_ip, m_lan_user, m_lan_passwd);
-        url += "&device=" + m_machine;
-        url += "&net_ver=" + agent_version;
-        url += "&dev_ver=" + m_dev_ver;
-        url += "&cli_id=" + wxGetApp().app_config->get("slicer_uuid");
-        url += "&cli_ver=" + std::string(SLIC3R_VERSION);
+        std::string url = agent->get_local_camera_url({m_lan_ip, m_lan_user, m_lan_passwd, LVL_None,
+            m_machine, agent->get_version(), m_dev_ver, "", wxGetApp().app_config->get("slicer_uuid"), SLIC3R_VERSION});
         fs->SetUrl(url);
         return;
     }
@@ -494,33 +490,22 @@ void MediaFilePanel::fetchUrl(boost::weak_ptr<PrinterFileSystem> wfs)
     if (agent) {
         std::string protocols[] = {"", "\"tutk\"", "\"agora\"", "\"tutk\",\"agora\""};
         agent->get_camera_url(m_machine + "|" + m_dev_ver + "|" + protocols[m_remote_proto],
-            [this, wfs, m = m_machine, v = agent->get_version(), dv = m_dev_ver](std::string url) {
-            if (boost::algorithm::starts_with(url, "bambu:///")) {
-                url += "&device=" + m;
-                url += "&net_ver=" + v;
-                url += "&dev_ver=" + dv;
-                url += "&refresh_url=" + boost::lexical_cast<std::string>(&refresh_agora_url);
-                url += "&cli_id=" + wxGetApp().app_config->get("slicer_uuid");
-                url += "&cli_ver=" + std::string(SLIC3R_VERSION);
-            }
+            [this, wfs, m = m_machine](CameraURLResult result) {
+            std::string url = std::move(result.url);
             BOOST_LOG_TRIVIAL(info) << "MediaFilePanel::fetchUrl: camera_url: " << hide_passwd(url, {"?uid=", "authkey=", "passwd="});
             CallAfter([=] {
                 boost::shared_ptr fs(wfs.lock());
                 if (!fs || fs != m_image_grid->GetFileSystem()) return;
-                if (boost::algorithm::starts_with(url, "bambu:///")) {
+                if (result.is_success) {
                     fs->SetUrl(url);
                 } else {
                     m_image_grid->SetStatus(m_bmp_failed, _L("Connection Failed. Please check the network and try again"));
-                    std::string res = "3";
-                    if (boost::ends_with(url, "]")) {
-                        size_t n = url.find_last_of('[');
-                        if (n != std::string::npos)
-                            res = url.substr(n + 1, url.length() - n - 2);
-                    }
+                    std::string res = result.error_code >= 0 ? std::to_string(result.error_code) : "3";
                     fs->SetUrl(res);
                 }
             });
-        }, wxGetApp().get_printer_cloud_provider());
+        }, wxGetApp().get_printer_cloud_provider(), CameraURLParams{"", "", "", LVL_None, m_machine, agent->get_version(), m_dev_ver,
+            boost::lexical_cast<std::string>(&refresh_agora_url), wxGetApp().app_config->get("slicer_uuid"), SLIC3R_VERSION, true});
     }
 }
 

@@ -2,15 +2,64 @@
 #define __NETWORK_Agent_HPP__
 
 #include "bambu_networking.hpp"
+
 #include "libslic3r/ProjectTask.hpp"
 #include "ICloudServiceAgent.hpp"
-#include "IPrinterAgent.hpp"
+#include "slic3r/GUI/DeviceManager.hpp"
+
 #include <map>
 #include <memory>
 #include <string>
 #include <vector>
 
 namespace Slic3r {
+
+class IPrinterAgent;
+enum class FilamentSyncMode;
+
+enum URL_STATE {
+    URL_TCP,
+    URL_TUTK,
+};
+
+struct CameraURLParams {
+    std::string ip_address;
+    std::string user;
+    std::string password;
+    LiveviewLocal protocol;
+    std::string device;
+    std::string network_version;
+    std::string device_version;
+    std::string refresh_url;
+    std::string client_id;
+    std::string client_version;
+    bool        apply_meta{false};
+};
+
+struct FileTransferURLParams {
+    URL_STATE   url_state{URL_TCP};
+    std::string ip_address;
+    std::string username;
+    std::string password;
+    std::string device_id;
+    std::string network_version;
+    std::string device_version;
+    std::string refresh_url;
+    std::string client_id;
+    std::string client_version;
+};
+
+struct FileTransferURLResult {
+    bool        is_success{false};
+    std::string url;
+    int         error_code{-1};
+};
+
+struct CameraURLResult {
+    bool        is_success{false};
+    std::string url;
+    int         error_code{-1};
+};
 
 // Forward declaration
 class BBLNetworkPlugin;
@@ -108,7 +157,8 @@ public:
     int get_slice_info(std::string project_id, std::string profile_id, int plate_index, std::string* slice_json, const std::string& provider = ORCA_CLOUD_PROVIDER);
     int query_bind_status(std::vector<std::string> query_list, unsigned int* http_code, std::string* http_body, const std::string& provider = ORCA_CLOUD_PROVIDER);
     int modify_printer_name(std::string dev_id, std::string dev_name, const std::string& provider = ORCA_CLOUD_PROVIDER);
-    int get_camera_url(std::string dev_id, std::function<void(std::string)> callback, const std::string& provider = ORCA_CLOUD_PROVIDER);
+    int get_camera_url(std::string dev_id, std::function<void(CameraURLResult)> callback,
+                       const std::string& provider = ORCA_CLOUD_PROVIDER, CameraURLParams params = {});
     int get_design_staffpick(int offset, int limit, std::function<void(std::string)> callback, const std::string& provider = ORCA_CLOUD_PROVIDER);
     int start_publish(PublishParams params, OnUpdateStatusFn update_fn, WasCancelledFn cancel_fn, std::string* out, const std::string& provider = ORCA_CLOUD_PROVIDER);
     int get_model_publish_url(std::string* url, const std::string& provider = ORCA_CLOUD_PROVIDER);
@@ -155,7 +205,10 @@ public:
     int connect_printer(std::string dev_id, std::string dev_ip, std::string username, std::string password, bool use_ssl);
     int disconnect_printer();
     int send_message_to_printer(std::string dev_id, std::string json_str, int qos, int flag);
-    std::string get_local_camera_url(std::string dev_ip, std::string username, std::string password);
+    std::string get_local_camera_url(CameraURLParams params);
+    std::string get_local_file_transfer_url(const FileTransferURLParams& params);
+    int get_file_transfer_url(std::string dev_id, std::function<void(FileTransferURLResult)> callback,
+                              FileTransferURLParams params = {});
     std::string default_lan_username() const;
     int check_cert();
     void install_device_cert(std::string dev_id, bool lan_only);

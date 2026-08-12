@@ -4,6 +4,7 @@
 #include <algorithm>
 
 #include <boost/log/trivial.hpp>
+#include "IPrinterAgent.hpp"
 #include "libslic3r/Utils.hpp"
 #include "NetworkAgent.hpp"
 #include "BBLNetworkPlugin.hpp"
@@ -507,11 +508,12 @@ int NetworkAgent::modify_printer_name(std::string dev_id, std::string dev_name, 
     return -1;
 }
 
-int NetworkAgent::get_camera_url(std::string dev_id, std::function<void(std::string)> callback, const std::string& provider)
+int NetworkAgent::get_camera_url(std::string dev_id, std::function<void(CameraURLResult)> callback,
+                                 const std::string& provider, CameraURLParams params)
 {
     const auto cloud_agent = get_cloud_agent(provider);
     if (cloud_agent)
-        return cloud_agent->get_camera_url(std::move(dev_id), std::move(callback));
+        return cloud_agent->get_camera_url(std::move(dev_id), std::move(callback), std::move(params));
     return -1;
 }
 
@@ -852,11 +854,26 @@ int NetworkAgent::send_message_to_printer(std::string dev_id, std::string json_s
     return -1;
 }
 
-std::string NetworkAgent::get_local_camera_url(std::string dev_ip, std::string username, std::string password)
+std::string NetworkAgent::get_local_camera_url(CameraURLParams params)
 {
     if (m_printer_agent)
-        return m_printer_agent->get_local_camera_url(dev_ip, username, password);
+        return m_printer_agent->get_local_camera_url(params);
     return {};
+}
+
+std::string NetworkAgent::get_local_file_transfer_url(const FileTransferURLParams& params)
+{
+    if (m_printer_agent)
+        return m_printer_agent->get_local_file_transfer_url(params);
+    return {};
+}
+
+int NetworkAgent::get_file_transfer_url(std::string dev_id, std::function<void(FileTransferURLResult)> callback,
+                                        FileTransferURLParams params)
+{
+    if (m_printer_agent)
+        return m_printer_agent->get_file_transfer_url(std::move(dev_id), std::move(callback), std::move(params));
+    return -1;
 }
 
 std::string NetworkAgent::default_lan_username() const

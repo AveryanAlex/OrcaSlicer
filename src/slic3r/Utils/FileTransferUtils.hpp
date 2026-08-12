@@ -1,13 +1,7 @@
 #pragma once
 #include <string>
-#include <functional>
-#include <vector>
-#include <cstddef>
 #include <cstdint>
 #include <stdexcept>
-#include <utility>
-#include <cstring>
-#include <memory>
 #include <boost/log/trivial.hpp>
 
 #ifdef _WIN32
@@ -134,103 +128,11 @@ struct FileTransferModule
     FileTransferModule &operator=(const FileTransferModule &) = delete;
 };
 
-class FileTransferTunnel
-{
-public:
-    using ConnectionCb   = std::function<void(bool is_success, int err_code, std::string error_msg)>;
-    using TunnelStatusCb = std::function<void(int old_status, int new_status, int err_code, std::string error_msg)>;
-
-    explicit FileTransferTunnel(FileTransferModule &m, const std::string &url);
-    ~FileTransferTunnel() { reset(); }
-
-    FileTransferTunnel(const FileTransferTunnel &)            = delete;
-    FileTransferTunnel &operator=(const FileTransferTunnel &) = delete;
-    FileTransferTunnel(FileTransferTunnel &&)                 = delete;
-    FileTransferTunnel &operator=(FileTransferTunnel &&)      = delete;
-
-    void start_connect();
-    bool sync_start_connect();
-    void on_connection(ConnectionCb cb);
-    void on_status(TunnelStatusCb cb);
-
-    void shutdown();
-
-    int              get_status() const { return status_; }
-    bool             check_valid() const { return h_ != nullptr; }
-    FT_TunnelHandle *native() const noexcept { return h_; }
-
-private:
-    void reset() noexcept
-    {
-        if (h_) {
-            m_->ft_tunnel_release(h_);
-            h_ = nullptr;
-        }
-    }
-
-    int                 status_{};
-    FileTransferModule *m_{};
-    FT_TunnelHandle    *h_{};
-    ConnectionCb        conn_cb_{};
-    TunnelStatusCb      status_cb_{};
-};
-
-class FileTransferJob
-{
-public:
-    using ResultCb = std::function<void(int res, int resp_ec, std::string json_res, std::vector<std::byte> bin_res)>;
-    using MsgCb = std::function<void(int kind, std::string json)>;
-
-    explicit FileTransferJob(FileTransferModule &m, const std::string &params_json);
-    ~FileTransferJob() { reset(); }
-
-    FileTransferJob(const FileTransferJob &)            = delete;
-    FileTransferJob &operator=(const FileTransferJob &) = delete;
-    FileTransferJob(FileTransferJob &&)                 = delete;
-    FileTransferJob &operator=(FileTransferJob &&)      = delete;
-
-    void on_result(ResultCb cb);
-
-    bool get_result(int &ec, int &resp_ec, std::string &json, std::vector<std::byte> &bin, uint32_t timeout_ms);
-
-    void start_on(FileTransferTunnel &t);
-
-    void on_msg(MsgCb cb);
-
-    bool try_get_msg(int &kind, std::string &json);
-
-    bool get_msg(uint32_t timeout_ms, int &kind, std::string &json);
-
-    FT_JobHandle *native() const noexcept { return h_; }
-    bool          check_valid() const { return h_ != nullptr; }
-    bool          finished() const { return finished_; }
-
-    void cancel()
-    {
-        if (m_->ft_job_cancel && h_) m_->ft_job_cancel(h_);
-    }
-
-private:
-    void reset() noexcept
-    {
-        if (h_) {
-            m_->ft_job_release(h_);
-            h_ = nullptr;
-        }
-    }
-
-    void solve_result(ft_job_result result);
-
-    FileTransferModule    *m_{};
-    FT_JobHandle          *h_{};
-    ResultCb               result_cb_{};
-    MsgCb                  msg_cb_{};
-    bool                   finished_ = false;
-    int                    res_      = 0;
-    int                    resp_ec_  = 0;
-    std::string            res_json_;
-    std::vector<std::byte> res_bin_;
-};
+// FileTransferTunnel/FileTransferJob (the OOP wrapper around the ft_tunnel_*/
+// ft_job_* ABI below) live in BBLPrinterAgent.hpp as BBLFileTransferTunnel/
+// BBLFileTransferJob, implementing IFileTransferTunnel/IFileTransferJob
+// (IPrinterAgent.hpp) - this header stays the low-level symbol-table layer
+// only, same role as bambu_networking.hpp's function pointer typedefs.
 
 namespace detail {
 inline FileTransferModule *g_mod = nullptr;

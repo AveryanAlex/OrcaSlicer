@@ -1,6 +1,7 @@
 #include "SendToPrinter.hpp"
 #include "I18N.hpp"
 
+#include "IPrinterAgent.hpp"
 #include "libslic3r/Utils.hpp"
 #include "libslic3r/Thread.hpp"
 #include "GUI.hpp"
@@ -25,7 +26,6 @@
 
 #include "DeviceCore/DevManager.h"
 #include "DeviceCore/DevStorage.h"
-#include "slic3r/Utils/FileTransferUtils.hpp"
 
 
 namespace Slic3r {
@@ -1715,62 +1715,91 @@ void SendToPrinterDialog::GetConnection()
         if (m_tcp_try_connect) {
             std::string devIP      = obj->get_dev_ip();
             std::string accessCode = obj->get_access_code();
-            std::string url        = "bambu:///local/" + devIP + "?port=6000&user=" + "bblp" + "&passwd=" + accessCode;
             BOOST_LOG_TRIVIAL(info) << __FUNCTION__ << ": Connect method tcp";
-            m_filetransfer_tunnel  = std::make_unique<FileTransferTunnel>(module(), url);
-            m_filetransfer_tunnel->on_connection([this](bool is_success, int err_code, std::string error_msg) {
-                CallAfter([this, is_success, err_code, error_msg]() {
-                       OnConnection(is_success, err_code, error_msg);
-                });
-            });
-            m_filetransfer_tunnel->start_connect();
+
+            if (agent->get_printer_agent()) {
+                try {
+                    m_filetransfer_tunnel  = agent->get_printer_agent()->create_file_transfer_tunnel(devIP, accessCode);
+                } catch (const std::exception& e) {
+                    BOOST_LOG_TRIVIAL(error) << __FUNCTION__ << ": failed to create TCP file-transfer tunnel: " << e.what();
+                }
+
+                if (m_filetransfer_tunnel && m_filetransfer_tunnel->check_valid()) {
+                    m_filetransfer_tunnel->on_connection([this](bool is_success, int err_code, std::string error_msg) {
+                        CallAfter([this, is_success, err_code, error_msg]() {
+                               OnConnection(is_success, err_code, error_msg);
+                        });
+                    });
+                    m_filetransfer_tunnel->start_connect();
+                } else {
+                    show_file_transfer_error(PrintDialogStatus::PrintStatusNotSupportedSendToSDCard,
+                                             _L("The selected printer does not support file transfer."));
+                }
+            } else {
+                show_file_transfer_error(PrintDialogStatus::PrintStatusNotSupportedSendToSDCard,
+                                         _L("The selected printer does not support file transfer."));
+            }
         }
         else if (m_tutk_try_connect)
         {
             std::string protocols[] = {"", "\"tutk\"", "\"agora\"", "\"tutk\",\"agora\""};
-            agent->get_camera_url(obj->get_dev_id() + "|" + dev_ver + "|" + protocols[1], [this, m = dev_id, v = agent->get_version(), dv = dev_ver](std::string url) {
-                if (boost::algorithm::starts_with(url, "bambu:///")) {
-                    url += "&device=" + m;
-                    url += "&net_ver=" + v;
-                    url += "&dev_ver=" + dv;
-                    url += "&refresh_url=" + boost::lexical_cast<std::string>(&refresh_agora_url);
-                    url += "&cli_id=" + wxGetApp().app_config->get("slicer_uuid");
-                    url += "&cli_ver=" + std::string(SLIC3R_VERSION);
-                }
-
-                if (m_url_timer && m_url_timer->IsRunning())
-                {
-                    m_url_timer->Stop();
-                }
-
-                #if !BBL_RELEASE_TO_PUBLIC
-                                BOOST_LOG_TRIVIAL(info) << "SendToPrinter::camera_url: " << hide_passwd(url, {"?uid=", "authkey=", "passwd="});
-                #endif
-
-
-                if (boost::algorithm::starts_with(url, "bambu:///"))
-                {
-                    BOOST_LOG_TRIVIAL(info) << __FUNCTION__ << ": Connect method tutk";
-                    m_filetransfer_tunnel = std::make_unique<FileTransferTunnel>(module(), url);
-                    m_filetransfer_tunnel->on_connection([this](bool is_success, int err_code, std::string error_msg) {
-                        CallAfter([this, is_success, err_code, error_msg]() { OnConnection(is_success, err_code, error_msg); });
-                    });
-                    m_filetransfer_tunnel->start_connect();
-                }
-                else
-                {
-                    std::string res = "";
-                    if (!url.empty() && boost::ends_with(url, "]"))
-                    {
-                        size_t n = url.find_last_of('[');
-                        if (n != std::string::npos)
-                            res = url.substr(n + 1, url.length() - n - 2);
+            agent->get_camera_url(
+                obj->get_dev_id() + "|" + dev_ver + "|" + protocols[1],
+                [this, pa = agent->get_printer_agent()](CameraURLResult result) {
+                    std::string url = std::move(result.url);
+                    if (m_url_timer && m_url_timer->IsRunning()) {
+                        m_url_timer->Stop();
                     }
-                    BOOST_LOG_TRIVIAL(error) << __FUNCTION__ << " : Tutk url error: ress = " << res;
-                }
-            });
+
+#if !BBL_RELEASE_TO_PUBLIC
+                    BOOST_LOG_TRIVIAL(info) << "SendToPrinter::camera_url: " << hide_passwd(url, {"?uid=", "authkey=", "passwd="});
+#endif
+
+                    if (result.is_success) {
+                        BOOST_LOG_TRIVIAL(info) << __FUNCTION__ << ": Connect method tutk";
+                        if (!pa) {
+                            show_file_transfer_error(PrintDialogStatus::PrintStatusNotSupportedSendToSDCard,
+                                                     _L("The selected printer does not support file transfer."));
+                            return;
+                        }
+
+                        try {
+                            m_filetransfer_tunnel = pa->create_file_transfer_tunnel_from_url(url);
+                        } catch (const std::exception& e) {
+                            BOOST_LOG_TRIVIAL(error) << __FUNCTION__ << ": failed to create TUTK file-transfer tunnel: " << e.what();
+                        }
+                        if (!m_filetransfer_tunnel || !m_filetransfer_tunnel->check_valid()) {
+                            show_file_transfer_error(PrintDialogStatus::PrintStatusNotSupportedSendToSDCard,
+                                                     _L("The selected printer does not support file transfer."));
+                            return;
+                        }
+
+                        m_filetransfer_tunnel->on_connection([this](bool is_success, int err_code, std::string error_msg) {
+                            CallAfter([this, is_success, err_code, error_msg]() { OnConnection(is_success, err_code, error_msg); });
+                        });
+                        m_filetransfer_tunnel->start_connect();
+                    } else {
+                        std::string res = result.error_code >= 0 ? std::to_string(result.error_code) : "";
+                        BOOST_LOG_TRIVIAL(error) << __FUNCTION__ << " : Tutk url error: ress = " << res;
+                        show_file_transfer_error(PrintDialogStatus::PrintStatusPublicInitFailed,
+                                                 _L("Connection failed. Please check your network and try again."));
+                    }
+                },
+                wxGetApp().get_printer_cloud_provider(),
+                CameraURLParams{"", "", "", LVL_None, dev_id, agent->get_version(), dev_ver,
+                                boost::lexical_cast<std::string>(&refresh_agora_url), wxGetApp().app_config->get("slicer_uuid"), SLIC3R_VERSION, true});
         }
     }
+}
+
+void SendToPrinterDialog::show_file_transfer_error(PrintDialogStatus status, wxString message)
+{
+    if (m_url_timer && m_url_timer->IsRunning())
+        m_url_timer->Stop();
+    m_connection_status = ConnectionStatus::CONNECTION_FAILED;
+    GetConnection();
+    show_status(status);
+    update_print_status_msg(message, false, true);
 }
 
 void SendToPrinterDialog::OnConnection(bool is_success, int error_code, std::string error_msg) {
@@ -1854,8 +1883,24 @@ void SendToPrinterDialog::ResetTunnelAndJob()
 
 void SendToPrinterDialog::CreateMediaAbilityJob()
 {
+     NetworkAgent *agent = wxGetApp().getAgent();
+     if (!agent || !agent->get_printer_agent()) {
+         BOOST_LOG_TRIVIAL(error) << __FUNCTION__ << ": no printer agent available";
+         show_file_transfer_error(PrintDialogStatus::PrintStatusNotSupportedSendToSDCard,
+                                  _L("The selected printer does not support file transfer."));
+         return;
+     }
      nlohmann::json media_ability = {{"cmd_type", 7}};
-     m_filetransfer_mediability_job = std::make_unique<FileTransferJob>(module(), std::string(media_ability.dump()));
+     try {
+         m_filetransfer_mediability_job = agent->get_printer_agent()->create_file_transfer_job(std::string(media_ability.dump()));
+     } catch (const std::exception& e) {
+         BOOST_LOG_TRIVIAL(error) << __FUNCTION__ << ": failed to create media-ability job: " << e.what();
+     }
+     if (!m_filetransfer_mediability_job || !m_filetransfer_mediability_job->check_valid()) {
+         show_file_transfer_error(PrintDialogStatus::PrintStatusNotSupportedSendToSDCard,
+                                  _L("The selected printer does not support file transfer."));
+         return;
+     }
      m_filetransfer_mediability_job->on_result([this](int res, int resp_ec, std::string json_res, std::vector<std::byte> bin_res) {
          //this pl
          CallAfter([this, res, resp_ec, json_res] {
@@ -1897,10 +1942,11 @@ void SendToPrinterDialog::CreateMediaAbilityJob()
          });
      });
      // Guard against a null transfer tunnel before dereferencing.
-     if (m_filetransfer_tunnel) {
+     if (m_filetransfer_tunnel && m_filetransfer_tunnel->check_valid()) {
         m_filetransfer_mediability_job->start_on(*m_filetransfer_tunnel);
      } else {
-        BOOST_LOG_TRIVIAL(info) << "CreateMediaAbilityJob: file transfer tunnel is null";
+        show_file_transfer_error(PrintDialogStatus::PrintStatusNotSupportedSendToSDCard,
+                                 _L("The selected printer does not support file transfer."));
      }
 }
 
@@ -1913,8 +1959,25 @@ void SendToPrinterDialog::CreateUploadFileJob(const std::string &path, const std
     upload_params["dest_name"]    = name; // filenme no path
     upload_params["file_path"]    = path;
 
+    NetworkAgent *agent = wxGetApp().getAgent();
+    if (!agent || !agent->get_printer_agent()) {
+        BOOST_LOG_TRIVIAL(error) << __FUNCTION__ << ": no printer agent available";
+        show_file_transfer_error(PrintDialogStatus::PrintStatusPublicUploadFiled,
+                                 _L("The selected printer does not support file transfer."));
+        return;
+    }
+
       BOOST_LOG_TRIVIAL(info) << __FUNCTION__ << ": Begin CreateUploadFileJob";
-    m_filetransfer_uploadfile_job = std::make_unique<FileTransferJob>(module(), std::string(upload_params.dump()));
+    try {
+        m_filetransfer_uploadfile_job = agent->get_printer_agent()->create_file_transfer_job(std::string(upload_params.dump()));
+    } catch (const std::exception& e) {
+        BOOST_LOG_TRIVIAL(error) << __FUNCTION__ << ": failed to create upload job: " << e.what();
+    }
+    if (!m_filetransfer_uploadfile_job || !m_filetransfer_uploadfile_job->check_valid()) {
+        show_file_transfer_error(PrintDialogStatus::PrintStatusPublicUploadFiled,
+                                 _L("The selected printer does not support file transfer."));
+        return;
+    }
     m_filetransfer_uploadfile_job->on_result([this](int res, int resp_ec, std::string json_res, std::vector<std::byte> bin_res) { //
         CallAfter([this, res, resp_ec, json_res, bin_res] {
             UploadFileRessultCallback(res, resp_ec,json_res, bin_res);
@@ -1942,10 +2005,11 @@ void SendToPrinterDialog::CreateUploadFileJob(const std::string &path, const std
         });
     });
     // Guard against a null transfer tunnel before dereferencing.
-    if (m_filetransfer_tunnel) {
+    if (m_filetransfer_tunnel && m_filetransfer_tunnel->check_valid()) {
         m_filetransfer_uploadfile_job->start_on(*m_filetransfer_tunnel);
     } else {
-        BOOST_LOG_TRIVIAL(info) << __FUNCTION__ << ": file transfer tunnel is null";
+        show_file_transfer_error(PrintDialogStatus::PrintStatusPublicUploadFiled,
+                                 _L("The selected printer does not support file transfer."));
     }
 }
 

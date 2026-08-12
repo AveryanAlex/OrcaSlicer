@@ -3,11 +3,82 @@
 
 #include "IPrinterAgent.hpp"
 #include "ICloudServiceAgent.hpp"
+#include "FileTransferUtils.hpp"
 #include <string>
 #include <memory>
 #include <nlohmann/json.hpp>
 
 namespace Slic3r {
+
+/**
+ * BBLFileTransferTunnel - Bambu eMMC tunnel, backed by the Bambu network
+ * plugin's ft_tunnel_* ABI (see FileTransferUtils.hpp). Only BBLPrinterAgent
+ * constructs these; callers only ever see them through IFileTransferTunnel.
+ */
+class BBLFileTransferTunnel : public IFileTransferTunnel
+{
+public:
+    BBLFileTransferTunnel(const std::string &url);
+    ~BBLFileTransferTunnel() override { reset(); }
+
+    void start_connect() override;
+    bool sync_start_connect() override;
+    void shutdown() override;
+    bool check_valid() const override { return h_ != nullptr; }
+    void *native() const noexcept override { return h_; }
+
+private:
+    void reset() noexcept
+    {
+        if (h_) {
+            m_->ft_tunnel_release(h_);
+            h_ = nullptr;
+        }
+    }
+
+    FileTransferModule *m_{};
+    FT_TunnelHandle    *h_{};
+};
+
+/**
+ * BBLFileTransferJob - a single ft_job_* operation (media-ability query,
+ * file upload, ...) run on a BBLFileTransferTunnel. Same ABI-wrapper role
+ * as BBLFileTransferTunnel; only BBLPrinterAgent constructs these.
+ */
+class BBLFileTransferJob : public IFileTransferJob
+{
+public:
+    explicit BBLFileTransferJob(const std::string &params_json);
+    ~BBLFileTransferJob() override { reset(); }
+
+    bool get_result(int &ec, int &resp_ec, std::string &json, std::vector<std::byte> &bin, uint32_t timeout_ms) override;
+    void start_on(IFileTransferTunnel &t) override;
+    // why: unlike on_result() (fires from a trampoline registered once in the ctor),
+    // ft_job_set_msg_cb is only wired up here, lazily, on first real subscriber -
+    // that ABI call has to happen in the concrete class, not the vendor-neutral base.
+    void on_msg(MsgCb cb) override;
+    bool try_get_msg(int &kind, std::string &json) override;
+    bool get_msg(uint32_t timeout_ms, int &kind, std::string &json) override;
+    void *native() const noexcept override { return h_; }
+    bool check_valid() const override { return h_ != nullptr; }
+    void cancel() override
+    {
+        if (m_->ft_job_cancel && h_) m_->ft_job_cancel(h_);
+    }
+
+private:
+    void reset() noexcept
+    {
+        if (h_) {
+            m_->ft_job_release(h_);
+            h_ = nullptr;
+        }
+    }
+    void solve_result(ft_job_result result);
+
+    FileTransferModule *m_{};
+    FT_JobHandle        *h_{};
+};
 
 /**
  * BBLPrinterAgent - BBL DLL wrapper implementation of IPrinterAgent.
@@ -45,7 +116,10 @@ public:
     int connect_printer(std::string dev_id, std::string dev_ip, std::string username, std::string password, bool use_ssl) override;
     int disconnect_printer() override;
     int send_message_to_printer(std::string dev_id, std::string json_str, int qos, int flag) override;
-    std::string get_local_camera_url(std::string dev_ip, std::string username, std::string password) override;
+    std::string get_local_camera_url(CameraURLParams params) override;
+    std::string get_local_file_transfer_url(const FileTransferURLParams& params) override;
+    int get_file_transfer_url(std::string dev_id, std::function<void(FileTransferURLResult)> callback,
+                              FileTransferURLParams params) override;
     std::string default_lan_username() const override { return "bblp"; }
 
     // Certificates
@@ -100,7 +174,13 @@ public:
     int set_queue_on_main_fn(QueueOnMainFn fn) override;
     FilamentSyncMode get_filament_sync_mode() const override;
 
+    std::unique_ptr<IFileTransferTunnel> create_file_transfer_tunnel(std::string& dev_ip, std::string& access_code) override;
+    std::unique_ptr<IFileTransferTunnel> create_file_transfer_tunnel_from_url(std::string url) override;
+    std::unique_ptr<IFileTransferJob> create_file_transfer_job(std::string params_json) override;
+
 private:
+    int verify_local_print_access(PrintParams params);
+
     // why: the lan/cloud DECISION stays machine-side; keep this mechanical branch in sync with publish_json.
     int publish(const std::string& dev_id, const nlohmann::json& j, bool lan_mode);
 

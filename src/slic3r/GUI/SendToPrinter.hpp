@@ -24,6 +24,7 @@
 #include <wx/wrapsizer.h>
 #include <wx/srchctrl.h>
 
+#include "IPrinterAgent.hpp"
 #include "SelectMachine.hpp"
 #include "GUI_Utils.hpp"
 #include "wxExtensions.hpp"
@@ -43,8 +44,6 @@
 
 
 namespace Slic3r {
-class FileTransferTunnel;
-class FileTransferJob;
 
 namespace GUI {
 
@@ -171,9 +170,9 @@ private:
     enum ConnectionStatus { NOT_START, CONNECTING, CONNECTED, CONNECTION_FAILED, DISCONNECTED };
     ConnectionStatus m_connection_status{ConnectionStatus::NOT_START};
 
-    std::unique_ptr<FileTransferTunnel> m_filetransfer_tunnel;
-    std::unique_ptr<FileTransferJob>    m_filetransfer_mediability_job;
-    std::unique_ptr<FileTransferJob>    m_filetransfer_uploadfile_job;
+    std::unique_ptr<IFileTransferTunnel> m_filetransfer_tunnel;
+    std::unique_ptr<IFileTransferJob>    m_filetransfer_mediability_job;
+    std::unique_ptr<IFileTransferJob>    m_filetransfer_uploadfile_job;
     wxDateTime                          m_last_refresh_time;
 
 public:
@@ -223,6 +222,7 @@ public:
 private:
     void ResetConnectMethod();
     void ResetTunnelAndJob();
+    void show_file_transfer_error(PrintDialogStatus status, wxString message);
     void OnConnection(bool is_success, int error_code, std::string error_msg);
     void CreateMediaAbilityJob();
     void CreateUploadFileJob(const std::string &path, const std::string &name);

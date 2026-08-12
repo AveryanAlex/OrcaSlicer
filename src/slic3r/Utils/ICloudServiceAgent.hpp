@@ -47,6 +47,9 @@ struct CloudEvent {
 using AppOnServerConnectedFn = std::function<void(CloudEvent event, int return_code, int reason_code)>;
 using AppOnHttpErrorFn = std::function<void(CloudEvent event, unsigned http_code, std::string http_body)>;
 
+struct CameraURLParams;
+struct CameraURLResult;
+
 class ICloudServiceAgent {
 public:
     virtual ~ICloudServiceAgent() = default;
@@ -328,7 +331,8 @@ public:
     /**
      * Request live camera streaming URL.
      */
-    virtual int get_camera_url(std::string dev_id, std::function<void(std::string)> callback) = 0;
+    virtual int get_camera_url(std::string dev_id, std::function<void(CameraURLResult)> callback,
+                               CameraURLParams params) = 0;
 
     /**
      * Fetch staff-picked designs from model mall.

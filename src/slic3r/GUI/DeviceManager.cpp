@@ -50,6 +50,7 @@
 #include "DeviceCore/DevStatus.h"
 #include "DeviceCore/DevUpgrade.h"
 
+#include "IPrinterAgent.hpp"
 
 #define CALI_DEBUG
 #define MINUTE_30 1800000    //ms
@@ -2853,6 +2854,78 @@ int MachineObject::parse_json(std::string tunnel, std::string payload, bool key_
         if (!restored_json) {
             j = j_pre;
         }
+
+#pragma region CAP_SUBSCRIPTIONS
+        if (j_pre.contains("capabilities")) {
+            auto& caps = j_pre["capabilities"];
+            // if (caps.contains("extruder_count")) {
+            //     GetExtderSystem()->GetTotalExtderCount();
+            // }
+            if (caps.contains("supports_extruder_control"))
+                is_enable_np = caps.value("supports_extruder_control", 0);
+            if (caps.contains("supports_part_skip"))
+                is_support_partskip = caps.value("supports_part_skip", 0);
+            if (caps.contains("has_door_sensor"))
+                is_support_door_open_check = caps.value("has_door_sensor", 0);
+            if (caps.contains("supports_auto_recovery"))
+                is_support_auto_recovery_step_loss = caps.value("supports_auto_recovery", 0);
+            if (caps.contains("supports_prompt_sound"))
+                is_support_prompt_sound = caps.value("supports_prompt_sound", 0);
+            if (caps.contains("supports_spaghetti_detection"))
+                is_support_spaghetti_detection = caps.value("supports_spaghetti_detection", 0);
+            if (caps.contains("supports_purge_chute_pileup_detection"))
+                is_support_purgechutepileup_detection = caps.value("supports_purge_chute_pileup_detection", 0);
+            if (caps.contains("supports_nozzle_clumping_detection"))
+                is_support_nozzleclumping_detection = caps.value("supports_nozzle_clumping_detection", 0);
+            if (caps.contains("supports_build_plate_marker_detection"))
+                is_support_build_plate_marker_detect = caps.value("supports_build_plate_marker_detection", 0);
+            if (caps.contains("supports_ams_humidity"))
+                is_support_ams_humidity = caps.value("supports_ams_humidity", 0);
+            if (caps.contains("supports_pa_calibration_manual"))
+                is_support_pa_calibration = caps.value("supports_pa_calibration_manual", 0);
+            if (caps.contains("supports_flow_rate_calibration_manual"))
+                is_support_flow_calibration = caps.value("supports_flow_rate_calibration_manual", 0);
+
+            if (caps.contains("supports_hotend_rack"))
+                m_nozzle_system->SetSupportNozzleRack(caps.value("supports_hotend_rack", 0));
+            if (caps.contains("has_camera"))
+                has_ipcam = caps.value("has_camera", 0);
+
+            // Printing with no filament loaded
+            if (caps.contains("is_support_ams_air_print_detection"))
+                is_support_air_print_detection = caps.value("is_support_ams_air_print_detection", 0);
+
+            if (caps.contains("is_support_airprinting_detection"))
+                is_support_airprinting_detection = caps.value("is_support_airprinting_detection", 0);
+            if (caps.contains("camera_resolutions"))
+                camera_resolution_supported = caps.value("camera_resolutions", std::vector<std::string>{});
+            // if (caps.contains("ams_unit_count")) 
+            //     DevFilaSystemParser::ParseV1_0(caps["ams_unit_count"], this, m_fila_system.get(), true);
+                
+            // Remaining documented "capabilities" keys are intentionally not wired here yet.
+            //
+            // Already cached elsewhere, but not as a single direct is_support_* bool member
+            // (a differently-named member, a count, a method on another class, or two competing
+            // members), so leave these to their existing plumbing:
+            //   extruder_count                        -> DevExtderSystem::m_total_extder_count
+            //   ams_unit_count                         -> DevFilaSystem::GetAmsCount()
+            //
+            // No existing member at all -- would need a new is_support_* field and a design
+            // decision on naming/semantics before adding:
+            //   has_lidar
+            //   supports_plate_align_detection
+            //   supports_fod_detection
+            //   supports_displacement_detection
+            //   supports_ai_monitoring                 -> only an enabled-state member exists (xcam_ai_monitoring)
+            //   supports_first_layer_inspection        -> only an enabled-state member exists (xcam_first_layer_inspector)
+            //
+            // Genuinely complex (array/object values, or no authoritative single source to derive from):
+            //   supported_nozzle_types, supports_nozzle_blob_detection, has_ams, ams_slot_count,
+            //   supports_ams_rfid, supports_multiple_bed_types, supports_filament_mapping,
+            //   supports_pa_calibration_auto, supports_flow_rate_calibration_auto,
+            //   supports_max_volumetric_speed_calibration, supports_ota_update
+        }
+#pragma endregion
 
         uint64_t t_utc = j.value("t_utc", 0ULL);
         if (t_utc > 0) {

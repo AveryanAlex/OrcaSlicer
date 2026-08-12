@@ -12,6 +12,8 @@
 #include "slic3r/GUI/DeviceCore/DevManager.h"
 #include "slic3r/GUI/DeviceCore/DevUtil.h"
 
+#include "IPrinterAgent.hpp"
+
 namespace Slic3r {
 namespace GUI {
 
@@ -203,41 +205,6 @@ void PrintJob::process(Ctl &ctl)
     params.use_ssl_for_mqtt  = m_local_use_ssl;
     params.username = m_agent->default_lan_username();
     params.password = m_access_code;
-    // Allow disabling the eMMC print path via AppConfig. Plugin 02.03.00.62's
-    // eMMC tunnel code hangs indefinitely at the upload phase with some
-    // printers (e.g., Bambu H2D), so we default to disabled. Users with
-    // working eMMC support can opt-in by setting disable_emmc_print = 0.
-    bool disable_emmc = true;
-    if (wxGetApp().app_config) {
-        auto v = wxGetApp().app_config->get("disable_emmc_print");
-        if (v == "0" || v == "false")
-            disable_emmc = false;
-    }
-    params.try_emmc_print = this->could_emmc_print && !disable_emmc;
-
-    // check access code and ip address
-    if (this->connection_type == "lan" && m_print_type == "from_normal") {
-        params.dev_id = m_dev_id;
-        params.project_name = "verify_job";
-        params.filename = job_data._temp_path.string();
-        params.connection_type = this->connection_type;
-
-        result = m_agent->start_send_gcode_to_sdcard(params, nullptr, nullptr, nullptr);
-
-        if (result != 0) {
-            BOOST_LOG_TRIVIAL(error) << "LAN connection verification failed:"
-                << " result=" << result
-                << ", dev_ip=" << m_dev_ip
-                << ", dev_id=" << m_dev_id
-                << ", password_length=" << m_access_code.size();
-            m_enter_ip_address_fun_fail();
-            m_job_finished = true;
-            return;
-        }
-
-        params.project_name = "";
-        params.filename = "";
-    }
 
     params.dev_id               = m_dev_id;
     params.ftp_folder           = m_ftp_folder;
@@ -264,6 +231,17 @@ void PrintJob::process(Ctl &ctl)
     params.auto_offset_cali     = this->auto_offset_cali;
     params.extruder_cali_manual_mode = this->extruder_cali_manual_mode;
     params.task_ext_change_assist = this->task_ext_change_assist;
+    // Allow disabling the eMMC print path via AppConfig. Plugin 02.03.00.62's
+    // eMMC tunnel code hangs indefinitely at the upload phase with some
+    // printers (e.g., Bambu H2D), so we default to disabled. Users with
+    // working eMMC support can opt-in by setting disable_emmc_print = 0.
+    bool disable_emmc = true;
+    if (wxGetApp().app_config) {
+        auto v = wxGetApp().app_config->get("disable_emmc_print");
+        if (v == "0" || v == "false")
+            disable_emmc = false;
+    }
+    params.try_emmc_print = this->could_emmc_print && !disable_emmc;
 
     if (m_print_type == "from_sdcard_view") {
         params.dst_file = m_dst_path;
@@ -618,6 +596,13 @@ void PrintJob::process(Ctl &ctl)
     }
 
     if (result < 0) {
+        if (result == ORCA_NETWORK_ERR_ACCESS_VERIFICATION_FAILED) {
+            if (m_enter_ip_address_fun_fail)
+                m_enter_ip_address_fun_fail();
+            m_job_finished = true;
+            return;
+        }
+
         curr_percent = -1;
 
         // The printer is still fetching its encryption flag (a transient state), so ask the

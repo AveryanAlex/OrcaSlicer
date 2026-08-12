@@ -1,13 +1,207 @@
 #include "BBLPrinterAgent.hpp"
 #include "BBLNetworkPlugin.hpp"
+#include "FileTransferUtils.hpp"
+#include "IPrinterAgent.hpp"
 #include "NetworkAgentFactory.hpp"
+#include "NetworkAgent.hpp"
 
 #include <boost/format.hpp>
 #include <boost/log/trivial.hpp>
+#include <memory>
 #include <nlohmann/json.hpp>
 #include <cmath>
+#include <slic3r/GUI/DeviceManager.hpp>
+#include <libslic3r/Utils.hpp>
 
 namespace Slic3r {
+
+// ============================================================================
+// File Transfer (Bambu eMMC tunnel ABI)
+// ============================================================================
+
+BBLFileTransferTunnel::BBLFileTransferTunnel(const std::string &url) : IFileTransferTunnel(url)
+{
+    FileTransferModule &m = module();
+    m_ = &m;
+    // Guard against missing symbols in older Bambu networking plugins.
+    // These symbols were added in a newer plugin ABI; if the installed
+    // plugin predates them, ft_tunnel_create/ft_tunnel_set_status_cb
+    // will be null and calling them crashes.
+    if (!m_->ft_tunnel_create || !m_->ft_tunnel_set_status_cb) {
+        throw std::runtime_error("Bambu networking plugin is too old: missing ft_tunnel_* symbols. "
+                                 "Please update the networking plugin.");
+    }
+    FT_TunnelHandle *h{};
+    if (m_->ft_tunnel_create(url.c_str(), &h) != 0 || !h) {
+        throw std::runtime_error("ft_tunnel_create failed");
+    }
+    h_ = h;
+
+    // C API: ft_status_cb(void* user, int old_status, int new_status, int err, const char* msg)
+    auto tramp = [](void *user, int old_status, int new_status, int err_code, const char *msg) noexcept {
+        auto *self    = reinterpret_cast<BBLFileTransferTunnel *>(user);
+        self->status_ = new_status;
+        if (!self->status_cb_) return;
+        try {
+            self->status_cb_(old_status, new_status, err_code, std::string(msg ? msg : ""));
+        } catch (...) {}
+    };
+    if (m_->ft_tunnel_set_status_cb(h_, tramp, this) == ft_err::FT_EXCEPTION) { throw std::runtime_error("ft_tunnel_set_status_cb failed"); }
+}
+
+void BBLFileTransferTunnel::start_connect()
+{
+    // C API: ft_conn_cb(void* user, int ok, int err, const char* msg)
+    auto tramp = [](void *user, int ok, int ec, const char *msg) noexcept {
+        auto *pcb = reinterpret_cast<ConnectionCb *>(user);
+        if (!pcb) return;
+        try {
+            (*pcb)(ok == 0, ec, std::string(msg ? msg : ""));
+        } catch (...) {}
+    };
+    if (m_->ft_tunnel_start_connect(h_, tramp, &conn_cb_) == ft_err::FT_EXCEPTION) { throw std::runtime_error("ft_tunnel_start_connect failed"); }
+}
+
+bool BBLFileTransferTunnel::sync_start_connect()
+{
+    return m_->ft_tunnel_sync_connect(h_) == FT_OK;
+}
+
+void BBLFileTransferTunnel::shutdown()
+{
+    if (m_->ft_tunnel_shutdown) (void) m_->ft_tunnel_shutdown(h_);
+}
+
+BBLFileTransferJob::BBLFileTransferJob(const std::string &params_json) : IFileTransferJob(params_json)
+{
+    m_ = &module();
+    FT_JobHandle *h{};
+    if (m_->ft_job_create(params_json.c_str(), &h) != 0 || !h) {
+        throw std::runtime_error("ft_job_create failed");
+    }
+    h_ = h;
+
+    // C API: ft_job_result_cb(void* user, int tunnel_err, ft_job_result result)
+    auto tramp = [](void *user, ft_job_result r) noexcept {
+        auto *self = reinterpret_cast<BBLFileTransferJob *>(user);
+        if (!self) return;
+
+        try {
+            self->finished_ = true;
+            self->solve_result(r);
+            if (self->result_cb_) self->result_cb_(self->res_, self->resp_ec_, self->res_json_, self->res_bin_);
+        } catch (...) {
+            // swallow
+        }
+
+        try {
+            if (auto *mod = self ? self->m_ : nullptr) {
+                if (mod->ft_job_result_destroy)
+                    mod->ft_job_result_destroy(&r);
+                else if (mod->ft_free) {
+                    if (r.json) mod->ft_free((void *) r.json);
+                    if (r.bin) mod->ft_free((void *) r.bin);
+                }
+            }
+        } catch (...) {}
+    };
+
+    if (m_->ft_job_set_result_cb(h_, tramp, this) == ft_err::FT_EXCEPTION) { throw std::runtime_error("ft_job_set_result_cb failed"); }
+}
+
+bool BBLFileTransferJob::get_result(int &ec, int &resp_ec, std::string &json, std::vector<std::byte> &bin, uint32_t timeout_ms)
+{
+    if (!h_) throw std::runtime_error("job handle invalid");
+    ft_job_result result;
+    if (m_->ft_job_get_result(h_, timeout_ms, &result) == ft_err::FT_EXCEPTION) return false;
+    solve_result(result);
+    m_->ft_job_result_destroy(&result);
+    ec      = res_;
+    resp_ec = res_;
+    json    = res_json_;
+    bin     = res_bin_;
+    return true;
+}
+
+void BBLFileTransferJob::start_on(IFileTransferTunnel &t)
+{
+    if (!h_) throw std::runtime_error("job handle invalid");
+    auto *handle = reinterpret_cast<FT_TunnelHandle *>(t.native());
+    if (m_->ft_tunnel_start_job(handle, h_) == ft_err::FT_EXCEPTION) { throw std::runtime_error("ft_tunnel_start_job failed"); }
+}
+
+void BBLFileTransferJob::on_msg(MsgCb cb)
+{
+    IFileTransferJob::on_msg(std::move(cb));
+    if (!h_) return;
+
+    // C API: ft_job_msg_cb(void* user, ft_job_msg msg)
+    auto tramp = [](void *user, ft_job_msg m) noexcept {
+        auto *self = reinterpret_cast<BBLFileTransferJob *>(user);
+        if (!self) return;
+        try {
+            if (self->msg_cb_) { self->msg_cb_(m.kind, std::string(m.json ? m.json : "")); }
+        } catch (...) {}
+
+        try {
+            if (auto *mod = self->m_) {
+                if (mod->ft_job_msg_destroy)
+                    mod->ft_job_msg_destroy(&m);
+                else if (mod->ft_free && m.json)
+                    mod->ft_free((void *) m.json);
+            }
+        } catch (...) {}
+    };
+
+    if (m_->ft_job_set_msg_cb(h_, tramp, this) == ft_err::FT_EXCEPTION) { throw std::runtime_error("ft_job_set_msg_cb failed"); }
+}
+
+bool BBLFileTransferJob::try_get_msg(int &kind, std::string &json)
+{
+    if (!h_) return false;
+    ft_job_msg m{};
+    int        rc = m_->ft_job_try_get_msg(h_, &m);
+    if (rc != 0) return false;
+
+    kind = m.kind;
+    json.assign(m.json ? m.json : "");
+
+    if (m_->ft_job_msg_destroy)
+        m_->ft_job_msg_destroy(&m);
+    else if (m_->ft_free && m.json)
+        m_->ft_free((void *) m.json);
+
+    return true;
+}
+
+bool BBLFileTransferJob::get_msg(uint32_t timeout_ms, int &kind, std::string &json)
+{
+    if (!h_) return false;
+    ft_job_msg m{};
+    int        rc = m_->ft_job_get_msg(h_, timeout_ms, &m);
+    if (rc != 0) return false;
+
+    kind = m.kind;
+    json.assign(m.json ? m.json : "");
+
+    if (m_->ft_job_msg_destroy)
+        m_->ft_job_msg_destroy(&m);
+    else if (m_->ft_free && m.json)
+        m_->ft_free((void *) m.json);
+
+    return true;
+}
+
+void BBLFileTransferJob::solve_result(ft_job_result result)
+{
+    res_     = result.ec;
+    resp_ec_ = result.resp_ec;
+
+    res_bin_.clear();
+    if (result.bin && result.bin_size) res_bin_.assign(reinterpret_cast<const std::byte *>(result.bin),
+        reinterpret_cast<const std::byte *>(result.bin) + result.bin_size);
+    res_json_.assign(result.json ? result.json : "");
+}
 
 BBLPrinterAgent::BBLPrinterAgent() = default;
 
@@ -246,9 +440,70 @@ int BBLPrinterAgent::send_message_to_printer(std::string dev_id, std::string jso
     return -1;
 }
 
-std::string BBLPrinterAgent::get_local_camera_url(std::string dev_ip, std::string username, std::string password)
+std::string BBLPrinterAgent::get_local_camera_url(CameraURLParams params)
 {
-    return "bambu:///local/" + dev_ip + ".?port=6000&user=" + username + "&passwd=" + password;
+    std::string url;
+    if (params.protocol == LVL_Local)
+        url = "bambu:///local/" + params.ip_address + ".?port=6000&user=" + params.user + "&passwd=" + params.password;
+    else if (params.protocol == LVL_Rtsps)
+        url = "bambu:///rtsps___" + params.user + ":" + params.password + "@" + params.ip_address + "/streaming/live/1?proto=rtsps";
+    else if (params.protocol == LVL_Rtsp)
+        url = "bambu:///rtsp___" + params.user + ":" + params.password + "@" + params.ip_address + "/streaming/live/1?proto=rtsp";
+    else
+        url = "bambu:///local/" + params.ip_address + ".?port=6000&user=" + params.user + "&passwd=" + params.password;
+
+    url += "&device=" + params.device;
+    url += "&net_ver=" + params.network_version;
+    url += "&dev_ver=" + params.device_version;
+    url += "&cli_id=" + params.client_id;
+    url += "&cli_ver=" + params.client_version;
+    return url;
+}
+
+std::string BBLPrinterAgent::get_local_file_transfer_url(const FileTransferURLParams& params)
+{
+    // Keep the historical PartSkipDialog URL unchanged. It is a file-transfer
+    // tunnel URL, not a camera URL, so it intentionally has no camera metadata
+    // suffix and no dot before the query string.
+    return "bambu:///local/" + params.ip_address + "?port=6000&user=" + params.username + "&passwd=" + params.password;
+}
+
+int BBLPrinterAgent::get_file_transfer_url(std::string dev_id, std::function<void(FileTransferURLResult)> callback,
+                                           FileTransferURLParams params)
+{
+    if (params.url_state == URL_TCP) {
+        FileTransferURLResult result;
+        result.url = get_local_file_transfer_url(params);
+        result.is_success = !result.url.empty();
+        result.error_code = result.is_success ? 0 : -1;
+        if (callback)
+            callback(std::move(result));
+        return result.is_success ? 0 : -1;
+    }
+
+    if (!m_cloud_agent) {
+        if (callback)
+            callback({});
+        return -1;
+    }
+
+    const std::string protocols = "\"tutk\",\"agora\"";
+    return m_cloud_agent->get_camera_url(
+        std::move(dev_id) + "|" + params.device_version + "|" + protocols,
+        std::move(callback),
+        CameraURLParams{
+            "",
+            "",
+            "",
+            LVL_None,
+            params.device_id,
+            params.network_version,
+            params.device_version,
+            params.refresh_url,
+            params.client_id,
+            params.client_version,
+            true
+        });
 }
 
 // ============================================================================
@@ -512,6 +767,15 @@ int BBLPrinterAgent::start_local_print_with_record(PrintParams params, OnUpdateS
         BBLNetworkPlugin::instance().get_start_local_print_with_record(), params, update_fn, cancel_fn, wait_fn);
 }
 
+int BBLPrinterAgent::verify_local_print_access(PrintParams params)
+{
+    params.project_name = "verify_job";
+    params.filename = Slic3r::resources_dir() + "/check_access_code.txt";
+    params.try_emmc_print = false;
+
+    return start_send_gcode_to_sdcard(params, nullptr, nullptr, nullptr);
+}
+
 int BBLPrinterAgent::start_send_gcode_to_sdcard(PrintParams params, OnUpdateStatusFn update_fn, WasCancelledFn cancel_fn, OnWaitFn wait_fn)
 {
     int result = dispatch_start<func_start_send_gcode_to_sdcard_legacy, func_start_send_gcode_to_sdcard_0203>(
@@ -527,6 +791,16 @@ int BBLPrinterAgent::start_send_gcode_to_sdcard(PrintParams params, OnUpdateStat
 
 int BBLPrinterAgent::start_local_print(PrintParams params, OnUpdateStatusFn update_fn, WasCancelledFn cancel_fn)
 {
+    if (params.connection_type == "lan" && params.print_type == "from_normal") {
+        const int verify_result = verify_local_print_access(params);
+        if (verify_result != 0) {
+            BOOST_LOG_TRIVIAL(error) << "LAN connection verification failed: result=" << verify_result
+                << ", dev_ip=" << params.dev_ip << ", dev_id=" << params.dev_id
+                << ", password_length=" << params.password.size();
+            return ORCA_NETWORK_ERR_ACCESS_VERIFICATION_FAILED;
+        }
+    }
+
     return dispatch_start<func_start_local_print_legacy, func_start_local_print_0203>(
         BBLNetworkPlugin::instance().get_start_local_print(), params, update_fn, cancel_fn);
 }
@@ -637,6 +911,19 @@ FilamentSyncMode BBLPrinterAgent::get_filament_sync_mode() const
 {
     // BBL uses MQTT subscription for real-time filament updates
     return FilamentSyncMode::subscription;
+}
+
+std::unique_ptr<IFileTransferTunnel> BBLPrinterAgent::create_file_transfer_tunnel(std::string& dev_ip, std::string& access_code) {
+    std::string url        = "bambu:///local/" + dev_ip + "?port=6000&user=" + default_lan_username() + "&passwd=" + access_code;
+    return std::make_unique<BBLFileTransferTunnel>(url);
+}
+
+std::unique_ptr<IFileTransferTunnel> BBLPrinterAgent::create_file_transfer_tunnel_from_url(std::string url) {
+    return std::make_unique<BBLFileTransferTunnel>(url);
+}
+
+std::unique_ptr<IFileTransferJob> BBLPrinterAgent::create_file_transfer_job(std::string params_json) {
+    return std::make_unique<BBLFileTransferJob>(params_json);
 }
 
 } // namespace Slic3r

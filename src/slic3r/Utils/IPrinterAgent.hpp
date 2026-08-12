@@ -2,6 +2,7 @@
 #define __I_PRINTER_AGENT_HPP__
 
 #include "bambu_networking.hpp"
+#include <slic3r/GUI/DeviceManager.hpp>
 // why: these extend the BAMBU_NETWORK_* return space rather than opening a new one - the value
 // flows through the same int domain callers already compare against BAMBU_NETWORK_SUCCESS.
 // They live here and not in bambu_networking.hpp because that file is a vendor header replaced
@@ -9,8 +10,14 @@
 // -70xx is free: the vendor occupies -1..-25 and -10xx through -60xx.
 #define ORCA_NETWORK_ERR_CMD_NOT_SUPPORTED -7010 // no translation exists for this command
 #define ORCA_NETWORK_ERR_CAP_NOT_AVAILABLE -7020 // a translation exists; this printer lacks the capability
+#define ORCA_NETWORK_ERR_ACCESS_VERIFICATION_FAILED -7030 // printer access preflight failed before printing
 #include <string>
 #include <memory>
+#include <vector>
+#include <functional>
+#include <cstdint>
+
+#include "NetworkAgent.hpp"
 
 namespace Slic3r {
 
@@ -41,6 +48,77 @@ enum class FilamentSyncMode {
     none = 0,     ///< Filament synchronization not supported
     subscription, ///< Real-time push updates via subscription (e.g., MQTT)
     pull          ///< On-demand fetch via REST API (blocking call)
+};
+
+class IFileTransferTunnel
+{
+public:
+    using ConnectionCb   = std::function<void(bool is_success, int err_code, std::string error_msg)>;
+    using TunnelStatusCb = std::function<void(int old_status, int new_status, int err_code, std::string error_msg)>;
+
+    explicit IFileTransferTunnel(const std::string& url) : url_(url) {}
+    virtual ~IFileTransferTunnel() = default;
+
+    IFileTransferTunnel(const IFileTransferTunnel&)            = delete;
+    IFileTransferTunnel& operator=(const IFileTransferTunnel&) = delete;
+    IFileTransferTunnel(IFileTransferTunnel&&)                 = delete;
+    IFileTransferTunnel& operator=(IFileTransferTunnel&&)      = delete;
+
+    virtual void start_connect() = 0;
+    virtual bool sync_start_connect() = 0;
+    virtual void on_connection(ConnectionCb cb) { conn_cb_ = std::move(cb); }
+    virtual void on_status(TunnelStatusCb cb) { status_cb_ = std::move(cb); }
+
+    virtual void shutdown() = 0;
+
+    virtual int get_status() const { return status_; }
+    virtual bool check_valid() const = 0;
+
+    // why: IFileTransferJob::start_on() only ever sees a tunnel through this interface,
+    // but needs the concrete backend handle to hand to its own start-job call - native()
+    // is the type-erased escape hatch, same pattern IFileTransferJob::native() already uses.
+    virtual void *native() const noexcept { return nullptr; }
+
+protected:
+    std::string url_;
+    int status_{};
+    ConnectionCb conn_cb_{};
+    TunnelStatusCb status_cb_{};
+};
+
+class IFileTransferJob {
+public:
+    using ResultCb = std::function<void(int res, int resp_ec, std::string json_res, std::vector<std::byte> bin_res)>;
+    using MsgCb = std::function<void(int kind, std::string json)>;
+
+    explicit IFileTransferJob(const std::string &params_json) : params_json_(params_json) {}
+    virtual ~IFileTransferJob() = default;
+
+    IFileTransferJob(const IFileTransferJob &)            = delete;
+    IFileTransferJob &operator=(const IFileTransferJob &) = delete;
+    IFileTransferJob(IFileTransferJob &&)                 = delete;
+    IFileTransferJob &operator=(IFileTransferJob &&)      = delete;
+
+    virtual void on_result(ResultCb cb) { result_cb_ = std::move(cb); }
+    virtual bool get_result(int &ec, int &resp_ec, std::string &json, std::vector<std::byte> &bin, uint32_t timeout_ms) = 0;
+    virtual void start_on(IFileTransferTunnel &t) = 0;
+    virtual void on_msg(MsgCb cb) { msg_cb_ = std::move(cb); }
+    virtual bool try_get_msg(int &kind, std::string &json) = 0;
+    virtual bool get_msg(uint32_t timeout_ms, int &kind, std::string &json) = 0;
+    virtual void *native() const noexcept { return nullptr; }
+    virtual bool          check_valid() const = 0;
+    virtual bool          finished() const { return finished_; }
+    virtual void cancel() = 0;
+
+protected:
+    std::string             params_json_;
+    ResultCb                result_cb_{};
+    MsgCb                   msg_cb_{};
+    bool                    finished_ = false;
+    int                     res_      = 0;
+    int                     resp_ec_  = 0;
+    std::string             res_json_;
+    std::vector<std::byte>  res_bin_;
 };
 
 /**
@@ -111,8 +189,16 @@ public:
      * Build a ready-to-use local (LAN) camera stream URL for this agent's protocol.
      * Returns an empty string if the agent has no local camera stream support.
      */
-    virtual std::string get_local_camera_url(std::string dev_ip, std::string username, std::string password)
-    { return {}; }
+    virtual std::string get_local_camera_url(CameraURLParams params) { return ""; }
+
+    /**
+     * Build a ready-to-use local (LAN) file transfer URL for this agent's protocol.
+     * Returns an empty string if the agent has no local file transfer support.
+     */
+    virtual std::string get_local_file_transfer_url(const FileTransferURLParams& params) { return ""; }
+
+    virtual int get_file_transfer_url(std::string, std::function<void(FileTransferURLResult)>, FileTransferURLParams)
+    { return ORCA_NETWORK_ERR_CMD_NOT_SUPPORTED; }
 
     /**
      * Default LAN account username for this agent's protocol, if it has a fixed one.
@@ -326,6 +412,33 @@ public:
      * Populates the MachineObject's DevFilaSystem with fetched filament data.
      */
     virtual bool fetch_filament_info(std::string dev_id) { return false; }
+
+    /**
+     * Build a local eMMC transfer tunnel for this agent's protocol, if it has one.
+     * Returns nullptr if the agent has no local file-transfer tunnel concept
+     * (matches the inert-default pattern used by get_local_camera_url() etc. above -
+     * this stays non-pure so adding it doesn't force every IPrinterAgent implementation,
+     * including the Python plugin capability bridge, to override a Bambu-only concept).
+     */
+    virtual std::unique_ptr<IFileTransferTunnel> create_file_transfer_tunnel(std::string& dev_ip, std::string& access_code)
+    { return nullptr; }
+
+    /**
+     * Wrap an already-resolved transfer URL (e.g. a cloud-relay/TUTK URL obtained via
+     * a camera-url lookup) in a local transfer tunnel. Same inert-default reasoning as
+     * create_file_transfer_tunnel() above; use that one instead when building a tunnel
+     * straight from dev_ip/access_code.
+     */
+    virtual std::unique_ptr<IFileTransferTunnel> create_file_transfer_tunnel_from_url(std::string url)
+    { return nullptr; }
+
+    /**
+     * Build a file-transfer job (media-ability query, upload, ...) to run on a tunnel
+     * from create_file_transfer_tunnel()/create_file_transfer_tunnel_from_url(). Same
+     * inert-default reasoning as the tunnel factories above.
+     */
+    virtual std::unique_ptr<IFileTransferJob> create_file_transfer_job(std::string params_json)
+    { return nullptr; }
 };
 
 } // namespace Slic3r
