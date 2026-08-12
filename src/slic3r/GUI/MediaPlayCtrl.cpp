@@ -7,7 +7,6 @@
 #include "I18N.hpp"
 #include "MsgDialog.hpp"
 #include "DownloadProgressDialog.hpp"
-#include "slic3r/Utils/BBLNetworkPlugin.hpp"
 
 
 #include <boost/lexical_cast.hpp>
@@ -127,8 +126,6 @@ MediaPlayCtrl::MediaPlayCtrl(wxWindow *parent, wxMediaCtrl2 *media_ctrl, const w
     parent->Bind(wxEVT_SHOW, &MediaPlayCtrl::on_show_hide, this);
     parent->GetParent()->GetParent()->Bind(wxEVT_SHOW, &MediaPlayCtrl::on_show_hide, this);
 
-    m_lan_user = "bblp";
-    m_lan_passwd = "bblp";
 }
 
 MediaPlayCtrl::~MediaPlayCtrl()
@@ -159,8 +156,10 @@ void MediaPlayCtrl::SetMachineObject(MachineObject* obj)
         m_device_busy    = obj->is_camera_busy_off();
         m_tutk_state     = obj->tutk_state;
 
-        if (DevPrinterConfigUtil::get_printer_series_str(obj->printer_type) == "series_o" && BBLNetworkPlugin::instance().use_legacy_network()) {
-            // Legacy plugin cannot support remote play for H2D, force using local mode
+        auto *agent = wxGetApp().getAgent();
+        if (agent && !agent->supports_remote_liveview(obj->printer_type)) {
+            // The selected printer agent may force local mode for incompatible
+            // plugin/printer combinations.
             m_remote_proto = LiveviewRemote::LVR_None;
         }
     } else {
@@ -283,12 +282,17 @@ void MediaPlayCtrl::Play()
 
     BOOST_LOG_TRIVIAL(info) << "MediaPlayCtrl::Play: " << m_lan_proto << m_remote_proto << m_disable_lan;
     NetworkAgent *agent = wxGetApp().getAgent();
-    std::string  agent_version = agent ? agent->get_version() : "";
+    if (!agent) {
+        Stop(_L("Please confirm if the printer is connected."));
+        return;
+    }
+    std::string  agent_version = agent->get_version();
+    const std::string lan_user = agent->default_lan_username();
     if (m_lan_proto > LiveviewLocal::LVL_Disable && (m_lan_mode || !m_remote_proto) && !m_disable_lan && !m_lan_ip.empty()) {
         m_disable_lan = m_remote_proto && !m_lan_mode; // try remote next time
         std::string url = agent->get_local_camera_url({
             m_lan_ip,
-            m_lan_user,
+            lan_user,
             m_lan_passwd,
             LiveviewLocal(m_lan_proto),
             into_u8(m_machine),
@@ -525,7 +529,7 @@ void MediaPlayCtrl::ToggleStream()
     if (m_lan_proto > LiveviewLocal::LVL_Disable && (m_lan_mode || !m_remote_proto) && !m_disable_lan && !m_lan_ip.empty()) {
         NetworkAgent *agent = wxGetApp().getAgent();
         if (!agent) return;
-        std::string url = agent->get_local_camera_url({m_lan_ip, m_lan_user, m_lan_passwd, LiveviewLocal(m_lan_proto),
+        std::string url = agent->get_local_camera_url({m_lan_ip, agent->default_lan_username(), m_lan_passwd, LiveviewLocal(m_lan_proto),
             into_u8(m_machine), agent->get_version(), m_dev_ver, "", wxGetApp().app_config->get("slicer_uuid"), SLIC3R_VERSION});
         BOOST_LOG_TRIVIAL(info) << "MediaPlayCtrl::ToggleStream: " << hide_passwd(hide_id_middle_string(url, url.find(m_lan_ip), m_lan_ip.length()), {m_lan_passwd});
         std::string             file_url = data_dir() + "/cameratools/url.txt";

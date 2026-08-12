@@ -1797,7 +1797,6 @@ void SendToPrinterDialog::show_file_transfer_error(PrintDialogStatus status, wxS
     if (m_url_timer && m_url_timer->IsRunning())
         m_url_timer->Stop();
     m_connection_status = ConnectionStatus::CONNECTION_FAILED;
-    GetConnection();
     show_status(status);
     update_print_status_msg(message, false, true);
 }

@@ -868,6 +868,14 @@ std::string NetworkAgent::get_local_file_transfer_url(const FileTransferURLParam
     return {};
 }
 
+bool NetworkAgent::supports_remote_liveview(const std::string& printer_type) const
+{
+    // Preserve the historical permissive behavior while the printer agent is
+    // being selected.  A missing agent must not turn a supported remote
+    // protocol into LVNone before the Bambu agent has been installed.
+    return !m_printer_agent || m_printer_agent->supports_remote_liveview(printer_type);
+}
+
 int NetworkAgent::get_file_transfer_url(std::string dev_id, std::function<void(FileTransferURLResult)> callback,
                                         FileTransferURLParams params)
 {

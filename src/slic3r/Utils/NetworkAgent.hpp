@@ -207,6 +207,7 @@ public:
     int send_message_to_printer(std::string dev_id, std::string json_str, int qos, int flag);
     std::string get_local_camera_url(CameraURLParams params);
     std::string get_local_file_transfer_url(const FileTransferURLParams& params);
+    bool supports_remote_liveview(const std::string& printer_type) const;
     int get_file_transfer_url(std::string dev_id, std::function<void(FileTransferURLResult)> callback,
                               FileTransferURLParams params = {});
     std::string default_lan_username() const;

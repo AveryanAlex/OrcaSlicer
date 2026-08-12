@@ -207,7 +207,6 @@ MediaFilePanel::MediaFilePanel(wxWindow * parent)
     Bind(wxEVT_SHOW, onShowHide);
     parent->GetParent()->Bind(wxEVT_SHOW, onShowHide);
 
-    m_lan_user = wxGetApp().getAgent()->default_lan_username();
 }
 
 MediaFilePanel::~MediaFilePanel()
@@ -467,7 +466,7 @@ void MediaFilePanel::fetchUrl(boost::weak_ptr<PrinterFileSystem> wfs)
     m_waiting_support = false;
     NetworkAgent *agent = wxGetApp().getAgent();
     if (agent && (m_lan_mode || !m_remote_proto) && m_local_proto && !m_lan_ip.empty()) {
-        std::string url = agent->get_local_camera_url({m_lan_ip, m_lan_user, m_lan_passwd, LVL_None,
+        std::string url = agent->get_local_camera_url({m_lan_ip, agent->default_lan_username(), m_lan_passwd, LVL_None,
             m_machine, agent->get_version(), m_dev_ver, "", wxGetApp().app_config->get("slicer_uuid"), SLIC3R_VERSION});
         fs->SetUrl(url);
         return;

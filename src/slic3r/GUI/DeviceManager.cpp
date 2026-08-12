@@ -2569,7 +2569,7 @@ void MachineObject::set_print_state(std::string status)
 int MachineObject::connect(bool use_openssl)
 {
     if (get_dev_ip().empty()) return -1;
-    std::string username = "bblp";
+    std::string username = m_agent ? m_agent->default_lan_username() : std::string();
     std::string password = get_access_code();
 
     if (m_agent) {

@@ -197,6 +197,14 @@ public:
      */
     virtual std::string get_local_file_transfer_url(const FileTransferURLParams& params) { return ""; }
 
+    /**
+     * Whether remote live view is available for the selected printer and agent
+     * protocol. Implementations may use their plugin/version compatibility
+     * rules; the neutral default keeps existing agents permissive.
+     */
+    virtual bool supports_remote_liveview(const std::string& printer_type) const
+    { (void) printer_type; return true; }
+
     virtual int get_file_transfer_url(std::string, std::function<void(FileTransferURLResult)> callback, FileTransferURLParams)
     {
         if (callback)

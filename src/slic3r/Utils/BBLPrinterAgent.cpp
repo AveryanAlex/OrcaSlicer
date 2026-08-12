@@ -468,6 +468,15 @@ std::string BBLPrinterAgent::get_local_file_transfer_url(const FileTransferURLPa
     return "bambu:///local/" + params.ip_address + "?port=6000&user=" + params.username + "&passwd=" + params.password;
 }
 
+bool BBLPrinterAgent::supports_remote_liveview(const std::string& printer_type) const
+{
+    // The legacy Bambu networking plugin cannot provide remote live view for
+    // the O-series printers. Keep this compatibility rule in the Bambu agent
+    // instead of exposing plugin/version details to GUI code.
+    return !(DevPrinterConfigUtil::get_printer_series_str(printer_type) == "series_o" &&
+             BBLNetworkPlugin::instance().use_legacy_network());
+}
+
 int BBLPrinterAgent::get_file_transfer_url(std::string dev_id, std::function<void(FileTransferURLResult)> callback,
                                            FileTransferURLParams params)
 {
@@ -490,14 +499,14 @@ int BBLPrinterAgent::get_file_transfer_url(std::string dev_id, std::function<voi
     const std::string protocols = "\"tutk\",\"agora\"";
     return m_cloud_agent->get_camera_url(
         std::move(dev_id) + "|" + params.device_version + "|" + protocols,
-        [callback = std::move(callback)](CameraURLResult camera_result) {
+        [callback = std::move(callback)](CameraURLResult result) {
             if (!callback)
                 return;
-            FileTransferURLResult result;
-            result.is_success = camera_result.is_success;
-            result.url        = std::move(camera_result.url);
-            result.error_code = camera_result.error_code;
-            callback(std::move(result));
+            FileTransferURLResult transfer_result;
+            transfer_result.is_success = result.is_success;
+            transfer_result.url = std::move(result.url);
+            transfer_result.error_code = result.error_code;
+            callback(std::move(transfer_result));
         },
         CameraURLParams{
             "",
