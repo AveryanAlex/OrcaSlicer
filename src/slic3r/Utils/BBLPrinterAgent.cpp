@@ -490,7 +490,15 @@ int BBLPrinterAgent::get_file_transfer_url(std::string dev_id, std::function<voi
     const std::string protocols = "\"tutk\",\"agora\"";
     return m_cloud_agent->get_camera_url(
         std::move(dev_id) + "|" + params.device_version + "|" + protocols,
-        std::move(callback),
+        [callback = std::move(callback)](CameraURLResult camera_result) {
+            if (!callback)
+                return;
+            FileTransferURLResult result;
+            result.is_success = camera_result.is_success;
+            result.url        = std::move(camera_result.url);
+            result.error_code = camera_result.error_code;
+            callback(std::move(result));
+        },
         CameraURLParams{
             "",
             "",
