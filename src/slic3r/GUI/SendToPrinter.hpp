@@ -170,9 +170,6 @@ private:
     enum ConnectionStatus { NOT_START, CONNECTING, CONNECTED, CONNECTION_FAILED, DISCONNECTED };
     ConnectionStatus m_connection_status{ConnectionStatus::NOT_START};
 
-    std::unique_ptr<IFileTransferTunnel> m_filetransfer_tunnel;
-    std::unique_ptr<IFileTransferJob>    m_filetransfer_mediability_job;
-    std::unique_ptr<IFileTransferJob>    m_filetransfer_uploadfile_job;
     wxDateTime                          m_last_refresh_time;
 
 public:
@@ -226,7 +223,6 @@ private:
     void OnConnection(bool is_success, int error_code, std::string error_msg);
     void CreateMediaAbilityJob();
     void CreateUploadFileJob(const std::string &path, const std::string &name);
-    void ChangeConnectMethod();
     void UploadFileProgressCallback(int progress);
     void UploadFileRessultCallback(int res, int resp_ec, std::string json_res, std::vector<std::byte> bin_res);
     void Reset();

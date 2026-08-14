@@ -425,32 +425,55 @@ public:
      */
     virtual bool fetch_filament_info(std::string dev_id) { return false; }
 
-    /**
-     * Build a local eMMC transfer tunnel for this agent's protocol, if it has one.
-     * Returns nullptr if the agent has no local file-transfer tunnel concept
-     * (matches the inert-default pattern used by get_local_camera_url() etc. above -
-     * this stays non-pure so adding it doesn't force every IPrinterAgent implementation,
-     * including the Python plugin capability bridge, to override a Bambu-only concept).
-     */
-    virtual std::unique_ptr<IFileTransferTunnel> create_file_transfer_tunnel(std::string& dev_ip, std::string& access_code)
-    { return nullptr; }
+    struct FileTransferRequest
+    {
+        std::string device_id;
+        std::string device_ip;
+        std::string access_code;
+        std::string network_version;
+        std::string device_version;
+        std::string refresh_url;
+        std::string client_id;
+        std::string client_version;
+        bool        lan_mode{false};
+    };
+
+    struct FileTransferCallbacks
+    {
+        std::function<void(bool is_success, int error_code, std::string error_msg)> on_connection;
+        std::function<void(int result, int response_error, std::string json_result)> on_destinations;
+        std::function<void(int progress)> on_progress;
+        std::function<void(int result, int response_error, std::string json_result, std::vector<std::byte> binary_result)> on_result;
+        std::function<void()> file_transfer_error;
+    };
 
     /**
-     * Wrap an already-resolved transfer URL (e.g. a cloud-relay/TUTK URL obtained via
-     * a camera-url lookup) in a local transfer tunnel. Same inert-default reasoning as
-     * create_file_transfer_tunnel() above; use that one instead when building a tunnel
-     * straight from dev_ip/access_code.
+     * Prepare the agent's file-transfer session. The transport is agent-owned;
+     * callers must not need to know whether it is a tunnel, HTTP connection,
+     * or another protocol.
      */
-    virtual std::unique_ptr<IFileTransferTunnel> create_file_transfer_tunnel_from_url(std::string url)
-    { return nullptr; }
+    virtual void prepare_file_transfer(const FileTransferRequest&, FileTransferCallbacks cb)
+    {
+        if (cb.file_transfer_error)
+            cb.file_transfer_error();
+    }
 
-    /**
-     * Build a file-transfer job (media-ability query, upload, ...) to run on a tunnel
-     * from create_file_transfer_tunnel()/create_file_transfer_tunnel_from_url(). Same
-     * inert-default reasoning as the tunnel factories above.
-     */
-    virtual std::unique_ptr<IFileTransferJob> create_file_transfer_job(std::string params_json)
-    { return nullptr; }
+    /** Query the destinations available for the prepared transfer session. */
+    virtual void get_file_destinations(FileTransferCallbacks cb)
+    {
+        if (cb.file_transfer_error)
+            cb.file_transfer_error();
+    }
+
+    /** Upload a file using the prepared transfer session. */
+    virtual void upload_file(const std::string&, const std::string&, const std::string&, FileTransferCallbacks cb)
+    {
+        if (cb.file_transfer_error)
+            cb.file_transfer_error();
+    }
+
+    /** Cancel the current file-transfer operation and release its resources. */
+    virtual void cancel_file_transfer() {}
 };
 
 } // namespace Slic3r

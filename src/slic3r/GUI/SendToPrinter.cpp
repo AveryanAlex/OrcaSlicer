@@ -845,11 +845,8 @@ void SendToPrinterDialog::on_ok(wxCommandEvent &event)
             m_task_timer.reset();
         }
 
-        if (m_filetransfer_uploadfile_job) {
-            m_filetransfer_uploadfile_job->cancel();
-            m_filetransfer_uploadfile_job.reset();
-            m_filetransfer_uploadfile_job = nullptr;
-        }
+        if (auto agent = wxGetApp().getAgent(); agent && agent->get_printer_agent())
+            agent->get_printer_agent()->cancel_file_transfer();
 
         m_is_canceled = true;
         wxCommandEvent* event = new wxCommandEvent(EVT_PRINT_JOB_CANCEL);
@@ -868,16 +865,16 @@ void SendToPrinterDialog::on_ok(wxCommandEvent &event)
     if (wxGetApp().plater()->using_exported_file()) {
         m_plater->set_print_job_plate_idx(m_print_plate_idx);
         result = 0;
+    } else {
+        result = m_plater->send_gcode(m_print_plate_idx, [this](int export_stage, int current, int total, bool& cancel) {
+            if (this->m_is_canceled)
+                return;
+            bool cancelled = false;
+            wxString msg   = _L("Preparing print job");
+            m_status_bar->update_status(msg, cancelled, 10, true);
+            m_export_3mf_cancel = cancel = cancelled;
+        });
     }
-     else {
-         result = m_plater->send_gcode(m_print_plate_idx, [this](int export_stage, int current, int total, bool &cancel) {
-             if (this->m_is_canceled) return;
-             bool     cancelled = false;
-             wxString msg       = _L("Preparing print job");
-             m_status_bar->update_status(msg, cancelled, 10, true);
-             m_export_3mf_cancel = cancel = cancelled;
-         });
-     }
 
     if (m_is_canceled || m_export_3mf_cancel) {
         BOOST_LOG_TRIVIAL(info) << __FUNCTION__ << ": send progress 10";
@@ -941,7 +938,8 @@ void SendToPrinterDialog::on_ok(wxCommandEvent &event)
 
         this->Bind(wxEVT_TIMER, [this](auto e){
                 show_status(PrintDialogStatus::PrintStatusPublicUploadFiled);
-                m_filetransfer_uploadfile_job->cancel();
+                if (auto agent = wxGetApp().getAgent(); agent && agent->get_printer_agent())
+                    agent->get_printer_agent()->cancel_file_transfer();
                 update_print_status_msg(_L("Upload file timeout, please check if the firmware version supports it."), false, true);
         },m_task_timer->GetId());
         m_task_timer->StartOnce(timeout_period);
@@ -1297,10 +1295,8 @@ void SendToPrinterDialog::update_show_status()
                 else
                     m_if_has_sdcard = true;
 
-                if (m_filetransfer_tunnel) {
-                    m_filetransfer_tunnel.reset();
-                    m_filetransfer_tunnel = nullptr;
-                }
+                if (auto agent = wxGetApp().getAgent(); agent && agent->get_printer_agent())
+                    agent->get_printer_agent()->cancel_file_transfer();
 
                 GetConnection();
             }
@@ -1659,7 +1655,6 @@ bool SendToPrinterDialog::Show(bool show)
     return DPIDialog::Show(show);
 }
 
-extern wxString hide_passwd(wxString url, std::vector<wxString> const &passwords);
 extern void     refresh_agora_url(char const *device, char const *dev_ver, char const *channel, void *context, void (*callback)(void *context, char const *url));
 
 void SendToPrinterDialog::GetConnection()
@@ -1670,126 +1665,71 @@ void SendToPrinterDialog::GetConnection()
     if (obj == nullptr) {
         BOOST_LOG_TRIVIAL(error) << __FUNCTION__ << " : obj is empty";
         m_connection_status = ConnectionStatus::NOT_START;
+        return;
     }
 
     int remote_proto = obj->get_file_remote();
     if (!remote_proto) {
         BOOST_LOG_TRIVIAL(error) << __FUNCTION__ << " : remote_proto is not support";
         m_connection_status = ConnectionStatus::NOT_START;
+        return;
     }
 
     if (obj->is_camera_busy_off()) {
         BOOST_LOG_TRIVIAL(error) << __FUNCTION__ << " : camera is busy";
         m_connection_status = ConnectionStatus::NOT_START;
+        return;
     }
 
-    NetworkAgent *agent         = wxGetApp().getAgent();
-    std::string   agent_version = agent ? agent->get_version() : "";
-    std::string   dev_ver       = obj->get_ota_version();
-    std::string   dev_id        = obj->get_dev_id();
-
-     if (m_url_timer && m_url_timer->IsRunning())
-     {
-         m_url_timer->Stop();
-     }
-
-     m_url_timer.reset(new wxTimer());
-     m_url_timer->SetOwner(this);
-     this->Bind(
-         wxEVT_TIMER,
-         [this](wxTimerEvent &e) {
-             BOOST_LOG_TRIVIAL(info) << "Timer callback triggered!";
-             m_connection_status = ConnectionStatus::CONNECTION_FAILED;
-             m_ftp_try_connect   = true;
-             if (m_filetransfer_tunnel)
-             {
-                 m_filetransfer_tunnel.reset();
-                 m_filetransfer_tunnel = nullptr;
-             }
-
-         },
-         m_url_timer->GetId());
-     m_url_timer->StartOnce(8000);
-
-    if (agent) {
-        if (m_tcp_try_connect) {
-            std::string devIP      = obj->get_dev_ip();
-            std::string accessCode = obj->get_access_code();
-            BOOST_LOG_TRIVIAL(info) << __FUNCTION__ << ": Connect method tcp";
-
-            if (agent->get_printer_agent()) {
-                try {
-                    m_filetransfer_tunnel  = agent->get_printer_agent()->create_file_transfer_tunnel(devIP, accessCode);
-                } catch (const std::exception& e) {
-                    BOOST_LOG_TRIVIAL(error) << __FUNCTION__ << ": failed to create TCP file-transfer tunnel: " << e.what();
-                }
-
-                if (m_filetransfer_tunnel && m_filetransfer_tunnel->check_valid()) {
-                    m_filetransfer_tunnel->on_connection([this](bool is_success, int err_code, std::string error_msg) {
-                        CallAfter([this, is_success, err_code, error_msg]() {
-                               OnConnection(is_success, err_code, error_msg);
-                        });
-                    });
-                    m_filetransfer_tunnel->start_connect();
-                } else {
-                    show_file_transfer_error(PrintDialogStatus::PrintStatusNotSupportedSendToSDCard,
-                                             _L("The selected printer does not support file transfer."));
-                }
-            } else {
-                show_file_transfer_error(PrintDialogStatus::PrintStatusNotSupportedSendToSDCard,
-                                         _L("The selected printer does not support file transfer."));
-            }
-        }
-        else if (m_tutk_try_connect)
-        {
-            std::string protocols[] = {"", "\"tutk\"", "\"agora\"", "\"tutk\",\"agora\""};
-            agent->get_camera_url(
-                obj->get_dev_id() + "|" + dev_ver + "|" + protocols[1],
-                [this, pa = agent->get_printer_agent()](CameraURLResult result) {
-                    std::string url = std::move(result.url);
-                    if (m_url_timer && m_url_timer->IsRunning()) {
-                        m_url_timer->Stop();
-                    }
-
-#if !BBL_RELEASE_TO_PUBLIC
-                    BOOST_LOG_TRIVIAL(info) << "SendToPrinter::camera_url: " << hide_passwd(url, {"?uid=", "authkey=", "passwd="});
-#endif
-
-                    if (result.is_success) {
-                        BOOST_LOG_TRIVIAL(info) << __FUNCTION__ << ": Connect method tutk";
-                        if (!pa) {
-                            show_file_transfer_error(PrintDialogStatus::PrintStatusNotSupportedSendToSDCard,
-                                                     _L("The selected printer does not support file transfer."));
-                            return;
-                        }
-
-                        try {
-                            m_filetransfer_tunnel = pa->create_file_transfer_tunnel_from_url(url);
-                        } catch (const std::exception& e) {
-                            BOOST_LOG_TRIVIAL(error) << __FUNCTION__ << ": failed to create TUTK file-transfer tunnel: " << e.what();
-                        }
-                        if (!m_filetransfer_tunnel || !m_filetransfer_tunnel->check_valid()) {
-                            show_file_transfer_error(PrintDialogStatus::PrintStatusNotSupportedSendToSDCard,
-                                                     _L("The selected printer does not support file transfer."));
-                            return;
-                        }
-
-                        m_filetransfer_tunnel->on_connection([this](bool is_success, int err_code, std::string error_msg) {
-                            CallAfter([this, is_success, err_code, error_msg]() { OnConnection(is_success, err_code, error_msg); });
-                        });
-                        m_filetransfer_tunnel->start_connect();
-                    } else {
-                        std::string res = result.error_code >= 0 ? std::to_string(result.error_code) : "";
-                        BOOST_LOG_TRIVIAL(error) << __FUNCTION__ << " : Tutk url error: ress = " << res;
-                        show_file_transfer_error(PrintDialogStatus::PrintStatusPublicInitFailed,
-                                                 _L("Connection failed. Please check your network and try again."));
-                    }
-                },
-                wxGetApp().get_printer_cloud_provider(),
-                CameraURLParams{"", "", "", LVL_None, dev_id, agent->get_version(), dev_ver,
-                                boost::lexical_cast<std::string>(&refresh_agora_url), wxGetApp().app_config->get("slicer_uuid"), SLIC3R_VERSION, true});
-        }
+    NetworkAgent *agent = wxGetApp().getAgent();
+    if (!agent || !agent->get_printer_agent()) {
+        show_file_transfer_error(PrintDialogStatus::PrintStatusNotSupportedSendToSDCard,
+                                 _L("The selected printer does not support file transfer."));
+        return;
     }
+
+    if (m_url_timer && m_url_timer->IsRunning()) {
+        m_url_timer->Stop();
+    }
+
+    m_url_timer.reset(new wxTimer());
+    m_url_timer->SetOwner(this);
+    this->Bind(
+        wxEVT_TIMER,
+        [this](wxTimerEvent& e) {
+            BOOST_LOG_TRIVIAL(info) << "Timer callback triggered!";
+            m_connection_status = ConnectionStatus::CONNECTION_FAILED;
+            m_ftp_try_connect   = true;
+            if (auto agent = wxGetApp().getAgent(); agent && agent->get_printer_agent())
+                agent->get_printer_agent()->cancel_file_transfer();
+        },
+        m_url_timer->GetId());
+    m_url_timer->StartOnce(8000);
+
+    IPrinterAgent::FileTransferRequest request;
+    request.device_id       = obj->get_dev_id();
+    request.device_ip       = obj->get_dev_ip();
+    request.access_code     = obj->get_access_code();
+    request.network_version = agent->get_version();
+    request.device_version  = obj->get_ota_version();
+    request.refresh_url     = boost::lexical_cast<std::string>(&refresh_agora_url);
+    request.client_id       = wxGetApp().app_config->get("slicer_uuid");
+    request.client_version  = SLIC3R_VERSION;
+    request.lan_mode        = obj->connection_type() == "lan";
+
+    IPrinterAgent::FileTransferCallbacks callbacks;
+    callbacks.on_connection = [this](bool is_success, int error_code, std::string error_msg) {
+        CallAfter([this, is_success, error_code, error_msg = std::move(error_msg)] {
+            OnConnection(is_success, error_code, std::move(error_msg));
+        });
+    };
+    callbacks.file_transfer_error = [this] {
+        CallAfter([this] {
+            show_file_transfer_error(PrintDialogStatus::PrintStatusNotSupportedSendToSDCard,
+                                     _L("The selected printer does not support file transfer."));
+        });
+    };
+    agent->get_printer_agent()->prepare_file_transfer(request, std::move(callbacks));
 }
 
 void SendToPrinterDialog::show_file_transfer_error(PrintDialogStatus status, wxString message)
@@ -1813,41 +1753,11 @@ void SendToPrinterDialog::OnConnection(bool is_success, int error_code, std::str
     {
         BOOST_LOG_TRIVIAL(error) << __FUNCTION__ << "Connect failed, error_code is:" << error_code << "error_msg is :" << error_msg;
         m_connection_status = ConnectionStatus::CONNECTION_FAILED;
-        ChangeConnectMethod();
-        if (!m_tcp_try_connect && !m_tutk_try_connect) {
-             show_status(PrintDialogStatus::PrintStatusPublicInitFailed);
-             return;
-        }
-        m_filetransfer_tunnel.reset();
-        m_filetransfer_tunnel = nullptr;
-        GetConnection();
-    }
-}
-
-void SendToPrinterDialog::ChangeConnectMethod()
-{
-    DeviceManager *dev = Slic3r::GUI::wxGetApp().getDeviceManager();
-    if (!dev) return;
-    MachineObject *obj = dev->get_my_machine(m_printer_last_select);
-    if (!obj) return;
-
-    bool is_lan = (obj->connection_type() == "lan");
-
-    m_tcp_try_connect = false;
-
-    if (is_lan) {
-        m_ftp_try_connect  = true;
+        m_tcp_try_connect  = false;
         m_tutk_try_connect = false;
-    } else {
-        if (m_connect_try_times == 0) {
-            m_ftp_try_connect  = false;
-            m_tutk_try_connect = true;
-        } else {
-            m_ftp_try_connect  = true;
-            m_tutk_try_connect = false;
-        }
+        m_ftp_try_connect  = true;
+        show_status(PrintDialogStatus::PrintStatusPublicInitFailed);
     }
-    m_connect_try_times++;
 }
 
 void SendToPrinterDialog::ResetConnectMethod()
@@ -1861,48 +1771,21 @@ void SendToPrinterDialog::ResetConnectMethod()
 
 void SendToPrinterDialog::ResetTunnelAndJob()
 {
-    if (m_filetransfer_uploadfile_job)
-    {
-        m_filetransfer_uploadfile_job->cancel();
-        m_filetransfer_uploadfile_job.reset();
-        m_filetransfer_uploadfile_job = nullptr;
-    }
-    if (m_filetransfer_mediability_job)
-    {
-        m_filetransfer_mediability_job->cancel();
-        m_filetransfer_mediability_job.reset();
-        m_filetransfer_mediability_job = nullptr;
-    }
-    if (m_filetransfer_tunnel)
-    {
-        m_filetransfer_tunnel.reset();
-        m_filetransfer_tunnel = nullptr;
-    }
+    if (auto agent = wxGetApp().getAgent(); agent && agent->get_printer_agent())
+        agent->get_printer_agent()->cancel_file_transfer();
 }
 
 void SendToPrinterDialog::CreateMediaAbilityJob()
 {
-     NetworkAgent *agent = wxGetApp().getAgent();
-     if (!agent || !agent->get_printer_agent()) {
-         BOOST_LOG_TRIVIAL(error) << __FUNCTION__ << ": no printer agent available";
-         show_file_transfer_error(PrintDialogStatus::PrintStatusNotSupportedSendToSDCard,
-                                  _L("The selected printer does not support file transfer."));
-         return;
-     }
-     nlohmann::json media_ability = {{"cmd_type", 7}};
-     try {
-         m_filetransfer_mediability_job = agent->get_printer_agent()->create_file_transfer_job(std::string(media_ability.dump()));
-     } catch (const std::exception& e) {
-         BOOST_LOG_TRIVIAL(error) << __FUNCTION__ << ": failed to create media-ability job: " << e.what();
-     }
-     if (!m_filetransfer_mediability_job || !m_filetransfer_mediability_job->check_valid()) {
-         show_file_transfer_error(PrintDialogStatus::PrintStatusNotSupportedSendToSDCard,
-                                  _L("The selected printer does not support file transfer."));
-         return;
-     }
-     m_filetransfer_mediability_job->on_result([this](int res, int resp_ec, std::string json_res, std::vector<std::byte> bin_res) {
-         //this pl
-         CallAfter([this, res, resp_ec, json_res] {
+    NetworkAgent *agent = wxGetApp().getAgent();
+    if (!agent || !agent->get_printer_agent()) {
+        show_file_transfer_error(PrintDialogStatus::PrintStatusNotSupportedSendToSDCard,
+                                 _L("The selected printer does not support file transfer."));
+        return;
+    }
+    IPrinterAgent::FileTransferCallbacks callbacks;
+    callbacks.on_destinations = [this](int res, int resp_ec, std::string json_res) {
+        CallAfter([this, res, resp_ec, json_res = std::move(json_res)] {
              if (res == 0) // 0 is success
              {
                  show_status(PrintDialogStatus::PrintStatusReadingFinished);
@@ -1938,78 +1821,41 @@ void SendToPrinterDialog::CreateMediaAbilityJob()
                  show_status(PrintDialogStatus::PrintStatusPublicInitFailed);
                  update_print_status_msg(ParseErrorCode(resp_ec), false, true);
              }
-         });
-     });
-     // Guard against a null transfer tunnel before dereferencing.
-     if (m_filetransfer_tunnel && m_filetransfer_tunnel->check_valid()) {
-        m_filetransfer_mediability_job->start_on(*m_filetransfer_tunnel);
-     } else {
+        });
+    };
+    callbacks.file_transfer_error = [this] {
+        CallAfter([this] {
         show_file_transfer_error(PrintDialogStatus::PrintStatusNotSupportedSendToSDCard,
                                  _L("The selected printer does not support file transfer."));
-     }
+        });
+    };
+    agent->get_printer_agent()->get_file_destinations(std::move(callbacks));
 }
 
 void SendToPrinterDialog::CreateUploadFileJob(const std::string &path, const std::string &name)
 {
-    nlohmann::json upload_params = {
-        {"cmd_type", 5},
-    };
-    upload_params["dest_storage"] = m_selected_storage;
-    upload_params["dest_name"]    = name; // filenme no path
-    upload_params["file_path"]    = path;
-
     NetworkAgent *agent = wxGetApp().getAgent();
     if (!agent || !agent->get_printer_agent()) {
-        BOOST_LOG_TRIVIAL(error) << __FUNCTION__ << ": no printer agent available";
         show_file_transfer_error(PrintDialogStatus::PrintStatusPublicUploadFiled,
                                  _L("The selected printer does not support file transfer."));
         return;
     }
-
-      BOOST_LOG_TRIVIAL(info) << __FUNCTION__ << ": Begin CreateUploadFileJob";
-    try {
-        m_filetransfer_uploadfile_job = agent->get_printer_agent()->create_file_transfer_job(std::string(upload_params.dump()));
-    } catch (const std::exception& e) {
-        BOOST_LOG_TRIVIAL(error) << __FUNCTION__ << ": failed to create upload job: " << e.what();
-    }
-    if (!m_filetransfer_uploadfile_job || !m_filetransfer_uploadfile_job->check_valid()) {
-        show_file_transfer_error(PrintDialogStatus::PrintStatusPublicUploadFiled,
-                                 _L("The selected printer does not support file transfer."));
-        return;
-    }
-    m_filetransfer_uploadfile_job->on_result([this](int res, int resp_ec, std::string json_res, std::vector<std::byte> bin_res) { //
-        CallAfter([this, res, resp_ec, json_res, bin_res] {
-            UploadFileRessultCallback(res, resp_ec,json_res, bin_res);
+    IPrinterAgent::FileTransferCallbacks callbacks;
+    callbacks.on_progress = [this](int progress) {
+        CallAfter([this, progress] { UploadFileProgressCallback(progress); });
+    };
+    callbacks.on_result = [this](int res, int resp_ec, std::string json_res, std::vector<std::byte> bin_res) {
+        CallAfter([this, res, resp_ec, json_res = std::move(json_res), bin_res = std::move(bin_res)] {
+            UploadFileRessultCallback(res, resp_ec, std::move(json_res), std::move(bin_res));
         });
-    });
-
-    m_filetransfer_uploadfile_job->on_msg([this](int kind, std::string json_res) {
-        CallAfter([this, kind, json_res] {
-            if (kind == 0) {
-                try
-                {
-                    auto js       = nlohmann::json::parse(json_res);
-                    int  progress = js["progress"].get<int>();
-                    UploadFileProgressCallback(progress);
-                }
-                catch (const nlohmann::json::exception& e)
-                {
-                    BOOST_LOG_TRIVIAL(error) << __FUNCTION__ << ": " << e.what();
-                }
-                catch (...)
-                {
-                    BOOST_LOG_TRIVIAL(error) << __FUNCTION__ << ": " << "parse_json failed! ";
-                }
-            }
+    };
+    callbacks.file_transfer_error = [this] {
+        CallAfter([this] {
+            show_file_transfer_error(PrintDialogStatus::PrintStatusPublicUploadFiled,
+                                     _L("The selected printer does not support file transfer."));
         });
-    });
-    // Guard against a null transfer tunnel before dereferencing.
-    if (m_filetransfer_tunnel && m_filetransfer_tunnel->check_valid()) {
-        m_filetransfer_uploadfile_job->start_on(*m_filetransfer_tunnel);
-    } else {
-        show_file_transfer_error(PrintDialogStatus::PrintStatusPublicUploadFiled,
-                                 _L("The selected printer does not support file transfer."));
-    }
+    };
+    agent->get_printer_agent()->upload_file(path, name, m_selected_storage, std::move(callbacks));
 }
 
 void SendToPrinterDialog::UploadFileProgressCallback(int progress)
@@ -2028,6 +1874,8 @@ void SendToPrinterDialog::UploadFileProgressCallback(int progress)
             wxEVT_TIMER,
             [this](auto e) {
                 show_status(PrintDialogStatus::PrintStatusPublicUploadFiled);
+                if (auto agent = wxGetApp().getAgent(); agent && agent->get_printer_agent())
+                    agent->get_printer_agent()->cancel_file_transfer();
                 update_print_status_msg(
                     _L("File upload timed out. Please check if the firmware version supports this operation or verify if the printer is functioning properly."), false, true);
             },
@@ -2056,8 +1904,6 @@ void SendToPrinterDialog::UploadFileRessultCallback(int res, int resp_ec, std::s
                 update_print_status_msg(ParseErrorCode(resp_ec), false, true);
             else
                 update_print_status_msg(_L("Sending failed, please try again!"), false, true);
-            m_filetransfer_uploadfile_job.reset();
-            m_filetransfer_uploadfile_job = nullptr;
         }
 }
 

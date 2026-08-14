@@ -207,6 +207,199 @@ BBLPrinterAgent::BBLPrinterAgent() = default;
 
 BBLPrinterAgent::~BBLPrinterAgent() = default;
 
+void BBLPrinterAgent::prepare_file_transfer(const FileTransferRequest& request, FileTransferCallbacks cb)
+{
+    cancel_file_transfer();
+    m_file_transfer_request  = request;
+    m_file_transfer_callbacks = std::move(cb);
+    m_file_transfer_tcp       = true;
+    m_file_transfer_try_count = 0;
+    start_file_transfer_attempt(++m_file_transfer_generation);
+}
+
+void BBLPrinterAgent::start_file_transfer_attempt(uint64_t generation)
+{
+    FileTransferURLParams params;
+    params.url_state       = m_file_transfer_tcp ? URL_TCP : URL_TUTK;
+    params.ip_address      = m_file_transfer_request.device_ip;
+    params.username        = default_lan_username();
+    params.password        = m_file_transfer_request.access_code;
+    params.device_id       = m_file_transfer_request.device_id;
+    params.network_version = m_file_transfer_request.network_version;
+    params.device_version  = m_file_transfer_request.device_version;
+    params.refresh_url     = m_file_transfer_request.refresh_url;
+    params.client_id       = m_file_transfer_request.client_id;
+    params.client_version  = m_file_transfer_request.client_version;
+
+    auto handle_url = [this, generation](FileTransferURLResult result) {
+            if (generation != m_file_transfer_generation)
+                return;
+            if (!result.is_success) {
+                handle_file_transfer_connection(generation, false, result.error_code, "file-transfer URL unavailable");
+                return;
+            }
+
+            try {
+                m_file_transfer_tunnel = std::make_unique<BBLFileTransferTunnel>(result.url);
+            } catch (const std::exception& e) {
+                BOOST_LOG_TRIVIAL(error) << "BBLPrinterAgent: failed to create file-transfer tunnel: " << e.what();
+                m_file_transfer_tunnel.reset();
+            }
+
+            if (!m_file_transfer_tunnel || !m_file_transfer_tunnel->check_valid()) {
+                handle_file_transfer_connection(generation, false, -1, "file-transfer tunnel unavailable");
+                return;
+            }
+
+            m_file_transfer_tunnel->on_connection([this, generation](bool is_success, int error_code, std::string error_msg) {
+                handle_file_transfer_connection(generation, is_success, error_code, std::move(error_msg));
+            });
+            m_file_transfer_tunnel->start_connect();
+        };
+
+    if (m_file_transfer_tcp) {
+        get_file_transfer_url(m_file_transfer_request.device_id, std::move(handle_url), params);
+        return;
+    }
+
+    if (!m_cloud_agent) {
+        handle_file_transfer_connection(generation, false, -1, "cloud file-transfer URL unavailable");
+        return;
+    }
+
+    const std::string protocols = "\"tutk\"";
+    m_cloud_agent->get_camera_url(
+        m_file_transfer_request.device_id + "|" + m_file_transfer_request.device_version + "|" + protocols,
+        [handle_url = std::move(handle_url)](CameraURLResult result) mutable {
+            FileTransferURLResult transfer_result;
+            transfer_result.is_success = result.is_success;
+            transfer_result.url         = std::move(result.url);
+            transfer_result.error_code  = result.error_code;
+            handle_url(std::move(transfer_result));
+        },
+        CameraURLParams{
+            "", "", "", LVL_None,
+            m_file_transfer_request.device_id,
+            m_file_transfer_request.network_version,
+            m_file_transfer_request.device_version,
+            m_file_transfer_request.refresh_url,
+            m_file_transfer_request.client_id,
+            m_file_transfer_request.client_version,
+            true
+        });
+}
+
+void BBLPrinterAgent::handle_file_transfer_connection(uint64_t generation, bool is_success, int error_code, std::string error_msg)
+{
+    if (generation != m_file_transfer_generation)
+        return;
+    if (is_success) {
+        if (m_file_transfer_callbacks.on_connection)
+            m_file_transfer_callbacks.on_connection(true, error_code, std::move(error_msg));
+        return;
+    }
+
+    // Preserve the existing dialog fallback order: TCP, then TUTK for cloud
+    // printers, and finally the legacy FTP path handled by SendJob.
+    m_file_transfer_tunnel.reset();
+    if (!m_file_transfer_request.lan_mode && m_file_transfer_tcp && m_file_transfer_try_count == 0) {
+        m_file_transfer_tcp = false;
+        ++m_file_transfer_try_count;
+        start_file_transfer_attempt(generation);
+        return;
+    }
+
+    if (m_file_transfer_callbacks.on_connection)
+        m_file_transfer_callbacks.on_connection(false, error_code, std::move(error_msg));
+}
+
+void BBLPrinterAgent::get_file_destinations(FileTransferCallbacks cb)
+{
+    if (!m_file_transfer_tunnel || !m_file_transfer_tunnel->check_valid()) {
+        if (cb.file_transfer_error)
+            cb.file_transfer_error();
+        return;
+    }
+
+    nlohmann::json params = {{"cmd_type", 7}};
+    try {
+        m_file_transfer_job = std::make_unique<BBLFileTransferJob>(params.dump());
+    } catch (const std::exception& e) {
+        BOOST_LOG_TRIVIAL(error) << "BBLPrinterAgent: failed to create media-ability job: " << e.what();
+        m_file_transfer_job.reset();
+    }
+
+    if (!m_file_transfer_job || !m_file_transfer_job->check_valid()) {
+        if (cb.file_transfer_error)
+            cb.file_transfer_error();
+        return;
+    }
+
+    m_file_transfer_job->on_result([cb = std::move(cb)](int result, int response_error, std::string json_result,
+                                                         std::vector<std::byte>) {
+        if (cb.on_destinations)
+            cb.on_destinations(result, response_error, std::move(json_result));
+    });
+    m_file_transfer_job->start_on(*m_file_transfer_tunnel);
+}
+
+void BBLPrinterAgent::upload_file(const std::string& path, const std::string& name, const std::string& destination,
+                                  FileTransferCallbacks cb)
+{
+    if (!m_file_transfer_tunnel || !m_file_transfer_tunnel->check_valid()) {
+        if (cb.file_transfer_error)
+            cb.file_transfer_error();
+        return;
+    }
+
+    nlohmann::json params = {
+        {"cmd_type", 5},
+        {"dest_storage", destination},
+        {"dest_name", name},
+        {"file_path", path}
+    };
+
+    try {
+        m_file_transfer_job = std::make_unique<BBLFileTransferJob>(params.dump());
+    } catch (const std::exception& e) {
+        BOOST_LOG_TRIVIAL(error) << "BBLPrinterAgent: failed to create upload job: " << e.what();
+        m_file_transfer_job.reset();
+    }
+
+    if (!m_file_transfer_job || !m_file_transfer_job->check_valid()) {
+        if (cb.file_transfer_error)
+            cb.file_transfer_error();
+        return;
+    }
+
+    auto callbacks = std::make_shared<FileTransferCallbacks>(std::move(cb));
+    m_file_transfer_job->on_result([callbacks](int result, int response_error, std::string json_result,
+                                                std::vector<std::byte> binary_result) {
+        if (callbacks->on_result)
+            callbacks->on_result(result, response_error, std::move(json_result), std::move(binary_result));
+    });
+    m_file_transfer_job->on_msg([callbacks](int kind, std::string json_result) {
+        if (kind == 0 && callbacks->on_progress) {
+            try {
+                callbacks->on_progress(nlohmann::json::parse(json_result).at("progress").get<int>());
+            } catch (...) {
+                BOOST_LOG_TRIVIAL(error) << "BBLPrinterAgent: failed to parse upload progress";
+            }
+        }
+    });
+    m_file_transfer_job->start_on(*m_file_transfer_tunnel);
+}
+
+void BBLPrinterAgent::cancel_file_transfer()
+{
+    ++m_file_transfer_generation;
+    if (m_file_transfer_job)
+        m_file_transfer_job->cancel();
+    m_file_transfer_job.reset();
+    m_file_transfer_tunnel.reset();
+    m_file_transfer_callbacks = {};
+}
+
 void BBLPrinterAgent::set_cloud_agent(std::shared_ptr<ICloudServiceAgent> cloud)
 {
     m_cloud_agent = cloud;
@@ -928,19 +1121,6 @@ FilamentSyncMode BBLPrinterAgent::get_filament_sync_mode() const
 {
     // BBL uses MQTT subscription for real-time filament updates
     return FilamentSyncMode::subscription;
-}
-
-std::unique_ptr<IFileTransferTunnel> BBLPrinterAgent::create_file_transfer_tunnel(std::string& dev_ip, std::string& access_code) {
-    std::string url        = "bambu:///local/" + dev_ip + "?port=6000&user=" + default_lan_username() + "&passwd=" + access_code;
-    return std::make_unique<BBLFileTransferTunnel>(url);
-}
-
-std::unique_ptr<IFileTransferTunnel> BBLPrinterAgent::create_file_transfer_tunnel_from_url(std::string url) {
-    return std::make_unique<BBLFileTransferTunnel>(url);
-}
-
-std::unique_ptr<IFileTransferJob> BBLPrinterAgent::create_file_transfer_job(std::string params_json) {
-    return std::make_unique<BBLFileTransferJob>(params_json);
 }
 
 } // namespace Slic3r

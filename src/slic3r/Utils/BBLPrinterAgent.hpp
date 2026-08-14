@@ -175,9 +175,12 @@ public:
     int set_queue_on_main_fn(QueueOnMainFn fn) override;
     FilamentSyncMode get_filament_sync_mode() const override;
 
-    std::unique_ptr<IFileTransferTunnel> create_file_transfer_tunnel(std::string& dev_ip, std::string& access_code) override;
-    std::unique_ptr<IFileTransferTunnel> create_file_transfer_tunnel_from_url(std::string url) override;
-    std::unique_ptr<IFileTransferJob> create_file_transfer_job(std::string params_json) override;
+    void prepare_file_transfer(const FileTransferRequest& request, FileTransferCallbacks cb) override;
+    void get_file_destinations(FileTransferCallbacks cb) override;
+    void upload_file(const std::string& path, const std::string& name, const std::string& destination,
+                     FileTransferCallbacks cb) override;
+    void cancel_file_transfer() override;
+
 
 private:
     int verify_local_print_access(PrintParams params);
@@ -186,6 +189,16 @@ private:
     int publish(const std::string& dev_id, const nlohmann::json& j, bool lan_mode);
 
     std::shared_ptr<ICloudServiceAgent> m_cloud_agent;
+    std::unique_ptr<IFileTransferTunnel> m_file_transfer_tunnel;
+    std::unique_ptr<IFileTransferJob>    m_file_transfer_job;
+    FileTransferCallbacks               m_file_transfer_callbacks;
+    FileTransferRequest                 m_file_transfer_request;
+    bool                                m_file_transfer_tcp{true};
+    int                                 m_file_transfer_try_count{0};
+    uint64_t                            m_file_transfer_generation{0};
+
+    void start_file_transfer_attempt(uint64_t generation);
+    void handle_file_transfer_connection(uint64_t generation, bool is_success, int error_code, std::string error_msg);
 };
 
 } // namespace Slic3r

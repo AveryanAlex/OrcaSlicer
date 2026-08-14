@@ -466,9 +466,18 @@ void MediaFilePanel::fetchUrl(boost::weak_ptr<PrinterFileSystem> wfs)
     m_waiting_support = false;
     NetworkAgent *agent = wxGetApp().getAgent();
     if (agent && (m_lan_mode || !m_remote_proto) && m_local_proto && !m_lan_ip.empty()) {
-        std::string url = agent->get_local_camera_url({m_lan_ip, agent->default_lan_username(), m_lan_passwd, LVL_None,
-            m_machine, agent->get_version(), m_dev_ver, "", wxGetApp().app_config->get("slicer_uuid"), SLIC3R_VERSION});
-        fs->SetUrl(url);
+        agent->get_file_transfer_url(
+            m_machine,
+            [this, wfs](FileTransferURLResult result) {
+                CallAfter([this, wfs, result = std::move(result)] {
+                    auto fs = wfs.lock();
+                    if (!fs || fs != m_image_grid->GetFileSystem())
+                        return;
+                    fs->SetUrl(result.is_success ? result.url : std::to_string(result.error_code));
+                });
+            },
+            {URL_TCP, m_lan_ip, agent->default_lan_username(), m_lan_passwd,
+             m_machine, agent->get_version(), m_dev_ver, "", wxGetApp().app_config->get("slicer_uuid"), SLIC3R_VERSION});
         return;
     }
     if (!m_remote_proto && m_local_proto) { // not support tutk
@@ -487,11 +496,11 @@ void MediaFilePanel::fetchUrl(boost::weak_ptr<PrinterFileSystem> wfs)
         return;
     }
     if (agent) {
-        std::string protocols[] = {"", "\"tutk\"", "\"agora\"", "\"tutk\",\"agora\""};
-        agent->get_camera_url(m_machine + "|" + m_dev_ver + "|" + protocols[m_remote_proto],
-            [this, wfs, m = m_machine](CameraURLResult result) {
+        agent->get_file_transfer_url(
+            m_machine,
+            [this, wfs, m = m_machine](FileTransferURLResult result) {
             std::string url = std::move(result.url);
-            BOOST_LOG_TRIVIAL(info) << "MediaFilePanel::fetchUrl: camera_url: " << hide_passwd(url, {"?uid=", "authkey=", "passwd="});
+            BOOST_LOG_TRIVIAL(info) << "MediaFilePanel::fetchUrl: file_system_url: " << hide_passwd(url, {"?uid=", "authkey=", "passwd="});
             CallAfter([=] {
                 boost::shared_ptr fs(wfs.lock());
                 if (!fs || fs != m_image_grid->GetFileSystem()) return;
@@ -503,8 +512,9 @@ void MediaFilePanel::fetchUrl(boost::weak_ptr<PrinterFileSystem> wfs)
                     fs->SetUrl(res);
                 }
             });
-        }, wxGetApp().get_printer_cloud_provider(), CameraURLParams{"", "", "", LVL_None, m_machine, agent->get_version(), m_dev_ver,
-            boost::lexical_cast<std::string>(&refresh_agora_url), wxGetApp().app_config->get("slicer_uuid"), SLIC3R_VERSION, true});
+        },
+        {URL_TUTK, "", "", "", m_machine, agent->get_version(), m_dev_ver,
+         boost::lexical_cast<std::string>(&refresh_agora_url), wxGetApp().app_config->get("slicer_uuid"), SLIC3R_VERSION});
     }
 }
 
