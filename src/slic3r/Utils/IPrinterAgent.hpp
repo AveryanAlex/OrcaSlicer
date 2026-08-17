@@ -10,7 +10,6 @@
 // -70xx is free: the vendor occupies -1..-25 and -10xx through -60xx.
 #define ORCA_NETWORK_ERR_CMD_NOT_SUPPORTED -7010 // no translation exists for this command
 #define ORCA_NETWORK_ERR_CAP_NOT_AVAILABLE -7020 // a translation exists; this printer lacks the capability
-#define ORCA_NETWORK_ERR_ACCESS_VERIFICATION_FAILED -7030 // printer access preflight failed before printing
 #include <string>
 #include <memory>
 #include <vector>
@@ -48,77 +47,6 @@ enum class FilamentSyncMode {
     none = 0,     ///< Filament synchronization not supported
     subscription, ///< Real-time push updates via subscription (e.g., MQTT)
     pull          ///< On-demand fetch via REST API (blocking call)
-};
-
-class IFileTransferTunnel
-{
-public:
-    using ConnectionCb   = std::function<void(bool is_success, int err_code, std::string error_msg)>;
-    using TunnelStatusCb = std::function<void(int old_status, int new_status, int err_code, std::string error_msg)>;
-
-    explicit IFileTransferTunnel(const std::string& url) : url_(url) {}
-    virtual ~IFileTransferTunnel() = default;
-
-    IFileTransferTunnel(const IFileTransferTunnel&)            = delete;
-    IFileTransferTunnel& operator=(const IFileTransferTunnel&) = delete;
-    IFileTransferTunnel(IFileTransferTunnel&&)                 = delete;
-    IFileTransferTunnel& operator=(IFileTransferTunnel&&)      = delete;
-
-    virtual void start_connect() = 0;
-    virtual bool sync_start_connect() = 0;
-    virtual void on_connection(ConnectionCb cb) { conn_cb_ = std::move(cb); }
-    virtual void on_status(TunnelStatusCb cb) { status_cb_ = std::move(cb); }
-
-    virtual void shutdown() = 0;
-
-    virtual int get_status() const { return status_; }
-    virtual bool check_valid() const = 0;
-
-    // why: IFileTransferJob::start_on() only ever sees a tunnel through this interface,
-    // but needs the concrete backend handle to hand to its own start-job call - native()
-    // is the type-erased escape hatch, same pattern IFileTransferJob::native() already uses.
-    virtual void *native() const noexcept { return nullptr; }
-
-protected:
-    std::string url_;
-    int status_{};
-    ConnectionCb conn_cb_{};
-    TunnelStatusCb status_cb_{};
-};
-
-class IFileTransferJob {
-public:
-    using ResultCb = std::function<void(int res, int resp_ec, std::string json_res, std::vector<std::byte> bin_res)>;
-    using MsgCb = std::function<void(int kind, std::string json)>;
-
-    explicit IFileTransferJob(const std::string &params_json) : params_json_(params_json) {}
-    virtual ~IFileTransferJob() = default;
-
-    IFileTransferJob(const IFileTransferJob &)            = delete;
-    IFileTransferJob &operator=(const IFileTransferJob &) = delete;
-    IFileTransferJob(IFileTransferJob &&)                 = delete;
-    IFileTransferJob &operator=(IFileTransferJob &&)      = delete;
-
-    virtual void on_result(ResultCb cb) { result_cb_ = std::move(cb); }
-    virtual bool get_result(int &ec, int &resp_ec, std::string &json, std::vector<std::byte> &bin, uint32_t timeout_ms) = 0;
-    virtual void start_on(IFileTransferTunnel &t) = 0;
-    virtual void on_msg(MsgCb cb) { msg_cb_ = std::move(cb); }
-    virtual bool try_get_msg(int &kind, std::string &json) = 0;
-    virtual bool get_msg(uint32_t timeout_ms, int &kind, std::string &json) = 0;
-    virtual void *native() const noexcept { return nullptr; }
-    virtual bool          check_valid() const = 0;
-    virtual bool          finished() const { return finished_; }
-    virtual void cancel() = 0;
-
-protected:
-    std::string             params_json_;
-    ResultCb                result_cb_{};
-    MsgCb                   msg_cb_{};
-    bool                    finished_ = false;
-    int                     res_      = 0;
-    int                     resp_ec_  = 0;
-    std::string             res_json_;
-    std::vector<std::byte>  res_bin_;
 };
 
 /**
@@ -425,55 +353,6 @@ public:
      */
     virtual bool fetch_filament_info(std::string dev_id) { return false; }
 
-    struct FileTransferRequest
-    {
-        std::string device_id;
-        std::string device_ip;
-        std::string access_code;
-        std::string network_version;
-        std::string device_version;
-        std::string refresh_url;
-        std::string client_id;
-        std::string client_version;
-        bool        lan_mode{false};
-    };
-
-    struct FileTransferCallbacks
-    {
-        std::function<void(bool is_success, int error_code, std::string error_msg)> on_connection;
-        std::function<void(int result, int response_error, std::string json_result)> on_destinations;
-        std::function<void(int progress)> on_progress;
-        std::function<void(int result, int response_error, std::string json_result, std::vector<std::byte> binary_result)> on_result;
-        std::function<void()> file_transfer_error;
-    };
-
-    /**
-     * Prepare the agent's file-transfer session. The transport is agent-owned;
-     * callers must not need to know whether it is a tunnel, HTTP connection,
-     * or another protocol.
-     */
-    virtual void prepare_file_transfer(const FileTransferRequest&, FileTransferCallbacks cb)
-    {
-        if (cb.file_transfer_error)
-            cb.file_transfer_error();
-    }
-
-    /** Query the destinations available for the prepared transfer session. */
-    virtual void get_file_destinations(FileTransferCallbacks cb)
-    {
-        if (cb.file_transfer_error)
-            cb.file_transfer_error();
-    }
-
-    /** Upload a file using the prepared transfer session. */
-    virtual void upload_file(const std::string&, const std::string&, const std::string&, FileTransferCallbacks cb)
-    {
-        if (cb.file_transfer_error)
-            cb.file_transfer_error();
-    }
-
-    /** Cancel the current file-transfer operation and release its resources. */
-    virtual void cancel_file_transfer() {}
 };
 
 } // namespace Slic3r

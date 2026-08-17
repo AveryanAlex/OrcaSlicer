@@ -12,7 +12,9 @@
 #include "slic3r/GUI/DeviceCore/DevManager.h"
 #include "slic3r/GUI/DeviceCore/DevUtil.h"
 
-#include "IPrinterAgent.hpp"
+#include "slic3r/Utils/FileTransferUtils.hpp"
+#include "slic3r/Utils/BBLNetworkPlugin.hpp"
+#include "NetworkAgent.hpp"
 
 namespace Slic3r {
 namespace GUI {
@@ -205,6 +207,51 @@ void PrintJob::process(Ctl &ctl)
     params.use_ssl_for_mqtt  = m_local_use_ssl;
     params.username = m_agent->default_lan_username();
     params.password = m_access_code;
+
+    // check access code and ip address
+    if (this->connection_type == "lan" && m_print_type == "from_normal") {
+        bool emmc_ok = false;
+        bool ftp_ok = false;
+        if (could_emmc_print) {
+            std::string devIP = m_dev_ip;
+            std::string accessCode = m_access_code;
+            std::string url = "bambu:///local/" + devIP + "?port=6000&user=" + "bblp" + "&passwd=" + accessCode;
+            try {
+                std::unique_ptr<FileTransferTunnel> tunnel = std::make_unique<FileTransferTunnel>(module(), url);
+                emmc_ok = tunnel->sync_start_connect();
+            } catch (const std::exception &e) {
+                BOOST_LOG_TRIVIAL(warning) << "eMMC tunnel unavailable, falling back to FTP: " << e.what();
+                emmc_ok = false;
+            }
+        }
+        {
+            params.dev_id = m_dev_id;
+            params.project_name = "verify_job";
+            params.filename = job_data._temp_path.string();
+            params.connection_type = this->connection_type;
+
+            result = m_agent->start_send_gcode_to_sdcard(params, nullptr, nullptr, nullptr);
+
+            ftp_ok = result == 0;
+        }
+        if (!emmc_ok && !ftp_ok) {
+            bool legacy_mode = BBLNetworkPlugin::instance().use_legacy_network();
+            BOOST_LOG_TRIVIAL(error) << "LAN connection verification failed:"
+                << " emmc_ok=" << emmc_ok
+                << ", ftp_ok=" << ftp_ok
+                << ", ftp_result=" << result
+                << ", dev_ip=" << m_dev_ip
+                << ", dev_id=" << m_dev_id
+                << ", password_length=" << m_access_code.size()
+                << ", legacy_mode=" << (legacy_mode ? "true" : "false");
+            m_enter_ip_address_fun_fail();
+            m_job_finished = true;
+            return;
+        }
+
+        params.project_name = "";
+        params.filename = "";
+    }
 
     params.dev_id               = m_dev_id;
     params.ftp_folder           = m_ftp_folder;
@@ -596,13 +643,6 @@ void PrintJob::process(Ctl &ctl)
     }
 
     if (result < 0) {
-        if (result == ORCA_NETWORK_ERR_ACCESS_VERIFICATION_FAILED) {
-            if (m_enter_ip_address_fun_fail)
-                m_enter_ip_address_fun_fail();
-            m_job_finished = true;
-            return;
-        }
-
         curr_percent = -1;
 
         // The printer is still fetching its encryption flag (a transient state), so ask the

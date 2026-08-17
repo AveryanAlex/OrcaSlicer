@@ -3,82 +3,11 @@
 
 #include "IPrinterAgent.hpp"
 #include "ICloudServiceAgent.hpp"
-#include "FileTransferUtils.hpp"
 #include <string>
 #include <memory>
 #include <nlohmann/json.hpp>
 
 namespace Slic3r {
-
-/**
- * BBLFileTransferTunnel - Bambu eMMC tunnel, backed by the Bambu network
- * plugin's ft_tunnel_* ABI (see FileTransferUtils.hpp). Only BBLPrinterAgent
- * constructs these; callers only ever see them through IFileTransferTunnel.
- */
-class BBLFileTransferTunnel : public IFileTransferTunnel
-{
-public:
-    BBLFileTransferTunnel(const std::string &url);
-    ~BBLFileTransferTunnel() override { reset(); }
-
-    void start_connect() override;
-    bool sync_start_connect() override;
-    void shutdown() override;
-    bool check_valid() const override { return h_ != nullptr; }
-    void *native() const noexcept override { return h_; }
-
-private:
-    void reset() noexcept
-    {
-        if (h_) {
-            m_->ft_tunnel_release(h_);
-            h_ = nullptr;
-        }
-    }
-
-    FileTransferModule *m_{};
-    FT_TunnelHandle    *h_{};
-};
-
-/**
- * BBLFileTransferJob - a single ft_job_* operation (media-ability query,
- * file upload, ...) run on a BBLFileTransferTunnel. Same ABI-wrapper role
- * as BBLFileTransferTunnel; only BBLPrinterAgent constructs these.
- */
-class BBLFileTransferJob : public IFileTransferJob
-{
-public:
-    explicit BBLFileTransferJob(const std::string &params_json);
-    ~BBLFileTransferJob() override { reset(); }
-
-    bool get_result(int &ec, int &resp_ec, std::string &json, std::vector<std::byte> &bin, uint32_t timeout_ms) override;
-    void start_on(IFileTransferTunnel &t) override;
-    // why: unlike on_result() (fires from a trampoline registered once in the ctor),
-    // ft_job_set_msg_cb is only wired up here, lazily, on first real subscriber -
-    // that ABI call has to happen in the concrete class, not the vendor-neutral base.
-    void on_msg(MsgCb cb) override;
-    bool try_get_msg(int &kind, std::string &json) override;
-    bool get_msg(uint32_t timeout_ms, int &kind, std::string &json) override;
-    void *native() const noexcept override { return h_; }
-    bool check_valid() const override { return h_ != nullptr; }
-    void cancel() override
-    {
-        if (m_->ft_job_cancel && h_) m_->ft_job_cancel(h_);
-    }
-
-private:
-    void reset() noexcept
-    {
-        if (h_) {
-            m_->ft_job_release(h_);
-            h_ = nullptr;
-        }
-    }
-    void solve_result(ft_job_result result);
-
-    FileTransferModule *m_{};
-    FT_JobHandle        *h_{};
-};
 
 /**
  * BBLPrinterAgent - BBL DLL wrapper implementation of IPrinterAgent.
@@ -175,30 +104,11 @@ public:
     int set_queue_on_main_fn(QueueOnMainFn fn) override;
     FilamentSyncMode get_filament_sync_mode() const override;
 
-    void prepare_file_transfer(const FileTransferRequest& request, FileTransferCallbacks cb) override;
-    void get_file_destinations(FileTransferCallbacks cb) override;
-    void upload_file(const std::string& path, const std::string& name, const std::string& destination,
-                     FileTransferCallbacks cb) override;
-    void cancel_file_transfer() override;
-
-
 private:
-    int verify_local_print_access(PrintParams params);
-
     // why: the lan/cloud DECISION stays machine-side; keep this mechanical branch in sync with publish_json.
     int publish(const std::string& dev_id, const nlohmann::json& j, bool lan_mode);
 
     std::shared_ptr<ICloudServiceAgent> m_cloud_agent;
-    std::unique_ptr<IFileTransferTunnel> m_file_transfer_tunnel;
-    std::unique_ptr<IFileTransferJob>    m_file_transfer_job;
-    FileTransferCallbacks               m_file_transfer_callbacks;
-    FileTransferRequest                 m_file_transfer_request;
-    bool                                m_file_transfer_tcp{true};
-    int                                 m_file_transfer_try_count{0};
-    uint64_t                            m_file_transfer_generation{0};
-
-    void start_file_transfer_attempt(uint64_t generation);
-    void handle_file_transfer_connection(uint64_t generation, bool is_success, int error_code, std::string error_msg);
 };
 
 } // namespace Slic3r

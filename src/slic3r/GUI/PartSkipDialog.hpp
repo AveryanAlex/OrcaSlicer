@@ -14,6 +14,7 @@
 #include <wx/dcgraph.h>
 #include <wx/simplebook.h>
 
+#include "NetworkAgent.hpp"
 #include "Widgets/Label.hpp"
 #include "Widgets/CheckBox.hpp"
 #include "Widgets/Button.hpp"
@@ -117,7 +118,7 @@ private:
     std::map<uint32_t, std::string> m_parts_name;
     std::vector<int>                m_partskip_ids;
 
-    enum URL_STATE m_url_state = URL_STATE::URL_TCP;
+    URL_STATE m_url_state = URL_STATE::URL_TCP;
 
     PartsInfo GetPartsInfo();
     bool      is_drag_mode();
