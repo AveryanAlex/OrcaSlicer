@@ -16,9 +16,8 @@
 using namespace nlohmann;
 
 namespace {
-    // Orca: access_code and the now-removed user_access_code field used to be persisted under
-    // separate AppConfig keys. Fall back to the legacy key so upgrading users don't lose a
-    // previously-saved code.
+    // Orca: access_code and user_access_code used to be separate AppConfig keys before the two
+    // fields were merged; fall back to the legacy key so existing users' saved codes aren't lost.
     std::string get_access_code_with_legacy_fallback(Slic3r::AppConfig* config, const std::string& dev_id)
     {
         std::string code = config->get("access_code", dev_id);
@@ -588,7 +587,6 @@ namespace Slic3r
             }
             else
             {
-                Slic3r::GUI::wxGetApp().reset_unsigned_plugin_warning();
                 if (m_agent)
                 {
                     if (it->second->connection_type() != "lan" || it->second->connection_type().empty())
