@@ -8,6 +8,9 @@
 #include <pybind11/embed.h>
 #include <pybind11/pybind11.h>
 
+#include <atomic>
+#include <chrono>
+#include <future>
 #include <memory>
 #include <string>
 
@@ -67,6 +70,45 @@ TEST_CASE("unit: Moonraker reports untranslated commands as not supported", "[un
     // why: malformed input is a different failure than an untranslated command, and the
     // default must not swallow it into a misleading not-supported verdict.
     CHECK(agent.send_message("dev", "{not json", 0, 0) == BAMBU_NETWORK_ERR_INVALID_RESULT);
+}
+
+TEST_CASE("unit: MoonrakerPrinterAgent::fetch_filament_info is fire-and-forget and dispatches to the derived override",
+          "[unit][moonraker]")
+{
+    class RecordingAgent : public Slic3r::MoonrakerPrinterAgent
+    {
+    public:
+        explicit RecordingAgent(std::string log_dir) : MoonrakerPrinterAgent(std::move(log_dir)) {}
+
+        std::atomic<bool>  invoked{false};
+        std::promise<void> release_gate;
+        std::promise<void> done_promise;
+
+        bool do_fetch_filament_info(std::string /*dev_id*/) override
+        {
+            invoked.store(true);
+            // Block here until the test explicitly releases us, proving the caller
+            // (fetch_filament_info) does not wait for this to run.
+            release_gate.get_future().wait();
+            done_promise.set_value();
+            return true;
+        }
+    };
+
+    auto agent = std::make_shared<RecordingAgent>(std::string{});
+    auto done_future = agent->done_promise.get_future();
+
+    bool immediate_result = agent->fetch_filament_info("test-dev");
+
+    // fetch_filament_info must return before do_fetch_filament_info completes — prove
+    // it by confirming the background call is still blocked on the gate right now.
+    REQUIRE(immediate_result == true);
+    REQUIRE(done_future.wait_for(std::chrono::milliseconds(100)) == std::future_status::timeout);
+
+    // Now let the background call finish and confirm it actually ran (polymorphic dispatch).
+    agent->release_gate.set_value();
+    REQUIRE(done_future.wait_for(std::chrono::seconds(2)) == std::future_status::ready);
+    REQUIRE(agent->invoked.load() == true);
 }
 
 // ===========================================================================
