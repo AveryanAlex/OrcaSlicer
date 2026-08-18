@@ -1,5 +1,6 @@
 #include "MoonrakerPrinterAgent.hpp"
 #include "Http.hpp"
+#include "IPrinterAgent.hpp"
 #include "libslic3r/Preset.hpp"
 #include "libslic3r/PresetBundle.hpp"
 #include "slic3r/GUI/GUI_App.hpp"
@@ -117,6 +118,13 @@ MoonrakerPrinterAgent::MoonrakerPrinterAgent(std::string log_dir) : m_cloud_agen
 
 MoonrakerPrinterAgent::~MoonrakerPrinterAgent()
 {
+    // Detached fetch_filament_info() threads (see QidiPrinterAgent::fetch_filament_info)
+    // hold a raw `this` with no other lifetime protection — wait for them to finish before
+    // any part of this object is torn down, so they never touch freed memory.
+    while (filament_fetch_in_flight.load() > 0) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    }
+
     {
         std::lock_guard<std::recursive_mutex> lock(connect_mutex);
         device_info = MoonrakerDeviceInfo{};
@@ -570,13 +578,28 @@ int MoonrakerPrinterAgent::set_queue_on_main_fn(QueueOnMainFn fn)
 
 void MoonrakerPrinterAgent::build_ams_payload(int ams_count, int max_lane_index, const std::vector<AmsTrayData>& trays)
 {
+    // This may be called from a background thread (e.g. run_status_stream's read loop,
+    // for subscription-mode agents) as well as from the GUI thread (Sidebar's pull-mode
+    // path). Everything below touches MachineObject/DevFilaSystem, which the GUI thread
+    // reads without locking — so the actual mutation must run on the main thread. Snapshot
+    // queue_on_main_fn and the two device_info fields we need up front, then defer the rest,
+    // mirroring dispatch_message's existing queue_fn ? queue_fn(x) : x() idiom.
+    QueueOnMainFn queue_fn;
+    {
+        std::lock_guard<std::recursive_mutex> lock(state_mutex);
+        queue_fn = queue_on_main_fn;
+    }
 
+    std::string dev_id   = device_info.dev_id;
+    std::string model_id = device_info.model_id;
+
+    auto apply = [dev_id, model_id, ams_count, max_lane_index, trays]() {
     // Look up MachineObject via DeviceManager
     auto* dev_manager = GUI::wxGetApp().getDeviceManager();
     if (!dev_manager) {
         return;
     }
-    MachineObject* obj = dev_manager->get_my_machine(device_info.dev_id);
+    MachineObject* obj = dev_manager->get_my_machine(dev_id);
     if (!obj) {
         return;
     }
@@ -661,7 +684,7 @@ void MoonrakerPrinterAgent::build_ams_payload(int ams_count, int max_lane_index,
 
     // Set printer_type so update_sync_status() can match it against the preset's printer type.
     // Without this, the comparison fails and all sync badges are cleared.
-    obj->printer_type = device_info.model_id;
+    obj->printer_type = model_id;
 
     // Set push counters so is_info_ready() returns true for pull-mode agents.
     if (obj->m_push_count == 0) {
@@ -684,10 +707,20 @@ void MoonrakerPrinterAgent::build_ams_payload(int ams_count, int max_lane_index,
         ota_info.sw_ver = "1.0.0";  // Placeholder version for Moonraker printers
         obj->module_vers.emplace("ota", ota_info);
     }
+    };
+
+    if (queue_fn) {
+        queue_fn(apply);
+    } else {
+        apply();
+    }
 }
 
-bool MoonrakerPrinterAgent::fetch_filament_info(std::string dev_id)
+bool MoonrakerPrinterAgent::fetch_filament_info(std::string dev_id, FilamentSyncMode sync_mode)
 {
+    if (sync_mode != get_filament_sync_mode())
+        return false;
+
     std::vector<AmsTrayData> trays;
     int max_lane_index = 0;
 
@@ -2068,6 +2101,8 @@ void MoonrakerPrinterAgent::run_status_stream(std::string dev_id, std::string ba
                         std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now().time_since_epoch()).count());
                     const auto last_ms = ws_last_emit_ms.load();
                     if (last_ms == 0 || now_ms - last_ms >= 10000) {
+                        fetch_filament_info(dev_id, FilamentSyncMode::subscription);
+
                         nlohmann::json message;
                         {
                             std::lock_guard<std::recursive_mutex> lock(payload_mutex);

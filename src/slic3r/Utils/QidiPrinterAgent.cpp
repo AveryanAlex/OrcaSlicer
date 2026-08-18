@@ -8,6 +8,7 @@
 #include <boost/log/trivial.hpp>
 #include <cctype>
 #include <sstream>
+#include <thread>
 
 namespace Slic3r {
 
@@ -25,6 +26,15 @@ bool has_visible_base_preset(const PresetCollection& filaments, const std::strin
     return false;
 }
 
+// RAII decrement for MoonrakerPrinterAgent::filament_fetch_in_flight — guarantees the
+// counter drops back down on every exit path (early return or fall-through) inside the
+// detached fetch thread below, so ~MoonrakerPrinterAgent()'s wait loop can't stall forever.
+struct InFlightGuard
+{
+    std::atomic<int>& counter;
+    ~InFlightGuard() { counter.fetch_sub(1, std::memory_order_relaxed); }
+};
+
 } // anonymous namespace
 
 const std::string QidiPrinterAgent_VERSION = "0.0.1";
@@ -38,39 +48,56 @@ AgentInfo QidiPrinterAgent::get_agent_info_static()
     return AgentInfo{"qidi", "Qidi", QidiPrinterAgent_VERSION, "Qidi printer agent"};
 }
 
-bool QidiPrinterAgent::fetch_filament_info(std::string dev_id)
+bool QidiPrinterAgent::fetch_filament_info(std::string dev_id, FilamentSyncMode sync_mode)
 {
-    std::string error;
-
-    // 1. Fetch device info and infer series_id
-    std::string series_id;
-    {
-        MoonrakerDeviceInfo info;
-        if (fetch_device_info(device_info.base_url, device_info.api_key, info, error)) {
-            series_id = infer_series_id(info.model_id, info.dev_name);
-        }
-    }
-    if (series_id.empty()) {
-        // Fall back to the configured Orca model if Moonraker doesn't expose a usable identifier.
-        series_id = infer_series_id(device_info.model_id, device_info.model_name);
-    }
-
-    // 2. Fetch filament dictionary
-    QidiFilamentDict dict;
-    if (!fetch_filament_dict(device_info.base_url, device_info.api_key, dict, error)) {
-        BOOST_LOG_TRIVIAL(warning) << "QidiPrinterAgent::fetch_filament_info: Failed to fetch filament dict: " << error;
-    }
-
-    // 3. Fetch slot info and build AmsTrayData directly
-    std::vector<AmsTrayData> trays;
-    int                      box_count = 0;
-    if (!fetch_slot_info(device_info.base_url, device_info.api_key, dict, series_id, trays, box_count, error)) {
-        BOOST_LOG_TRIVIAL(warning) << "QidiPrinterAgent::fetch_filament_info: Failed to fetch slot info: " << error;
+    if (sync_mode != get_filament_sync_mode())
         return false;
-    }
 
-    // 4. Build the AMS payload
-    build_ams_payload(box_count, box_count * 4 - 1, trays);
+    // Snapshot only what the fetch needs, rather than reading device_info live from the
+    // background thread below — device_info can be concurrently rewritten by a reconnect
+    // on another thread while this fetch is still in flight.
+    std::string base_url   = device_info.base_url;
+    std::string api_key    = device_info.api_key;
+    std::string model_id   = device_info.model_id;
+    std::string model_name = device_info.model_name;
+
+    filament_fetch_in_flight.fetch_add(1, std::memory_order_relaxed);
+
+    std::thread([this, base_url, api_key, model_id, model_name]() {
+        InFlightGuard guard{filament_fetch_in_flight};
+
+        std::string error;
+
+        // 1. Fetch device info and infer series_id
+        std::string series_id;
+        {
+            MoonrakerDeviceInfo info;
+            if (fetch_device_info(base_url, api_key, info, error)) {
+                series_id = infer_series_id(info.model_id, info.dev_name);
+            }
+        }
+        if (series_id.empty()) {
+            // Fall back to the configured Orca model if Moonraker doesn't expose a usable identifier.
+            series_id = infer_series_id(model_id, model_name);
+        }
+
+        // 2. Fetch filament dictionary
+        QidiFilamentDict dict;
+        if (!fetch_filament_dict(base_url, api_key, dict, error)) {
+            BOOST_LOG_TRIVIAL(warning) << "QidiPrinterAgent::fetch_filament_info: Failed to fetch filament dict: " << error;
+        }
+
+        // 3. Fetch slot info and build AmsTrayData directly
+        std::vector<AmsTrayData> trays;
+        int box_count = 0;
+        if (!fetch_slot_info(base_url, api_key, dict, series_id, trays, box_count, error)) {
+            BOOST_LOG_TRIVIAL(warning) << "QidiPrinterAgent::fetch_filament_info: Failed to fetch slot info: " << error;
+            return;
+        }
+
+        // 4. Build the AMS payload
+        build_ams_payload(box_count, box_count * 4 - 1, trays);
+    }).detach();
     return true;
 }
 

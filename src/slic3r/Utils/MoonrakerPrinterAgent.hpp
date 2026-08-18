@@ -76,7 +76,7 @@ public:
 
     // Pull-mode agent (on-demand filament sync)
     FilamentSyncMode get_filament_sync_mode() const override { return FilamentSyncMode::pull; }
-    bool fetch_filament_info(std::string dev_id) override;
+    bool fetch_filament_info(std::string dev_id, FilamentSyncMode sync_mode = FilamentSyncMode::pull) override;
 
 protected:
     struct MoonrakerDeviceInfo
@@ -113,6 +113,12 @@ protected:
 
     // State access for derived classes
     mutable std::recursive_mutex       state_mutex;
+
+    // Counts detached fetch_filament_info() background threads currently touching `this`
+    // (see QidiPrinterAgent::fetch_filament_info). Those threads hold a raw `this` with no
+    // other lifetime protection, so the destructor waits for this to reach 0 before any part
+    // of the object is torn down — see ~MoonrakerPrinterAgent().
+    std::atomic<int> filament_fetch_in_flight{0};
 
     // Helpers
     bool        is_numeric(const std::string& value);

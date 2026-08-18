@@ -168,7 +168,7 @@ public:
     int start_local_print(PrintParams params, OnUpdateStatusFn update_fn, WasCancelledFn cancel_fn);
     int start_sdcard_print(PrintParams params, OnUpdateStatusFn update_fn, WasCancelledFn cancel_fn);
     FilamentSyncMode get_filament_sync_mode() const;
-    bool fetch_filament_info(std::string dev_id);
+    bool fetch_filament_info(std::string dev_id, FilamentSyncMode sync_mode = FilamentSyncMode::pull);
     int request_bind_ticket(std::string* ticket);
     int get_hms_snapshot(std::string dev_id, std::string file_name, std::function<void(std::string, int)> callback);
 

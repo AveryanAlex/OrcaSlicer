@@ -949,10 +949,10 @@ FilamentSyncMode NetworkAgent::get_filament_sync_mode() const
     return FilamentSyncMode::none;
 }
 
-bool NetworkAgent::fetch_filament_info(std::string dev_id)
+bool NetworkAgent::fetch_filament_info(std::string dev_id, FilamentSyncMode sync_mode)
 {
     if (m_printer_agent) {
-        return m_printer_agent->fetch_filament_info(dev_id);
+        return m_printer_agent->fetch_filament_info(dev_id, sync_mode);
     }
     return false;
 }
