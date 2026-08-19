@@ -246,6 +246,7 @@ int MoonrakerPrinterAgent::connect_printer(std::string dev_id, std::string dev_i
     }
     ws_last_emit_ms.store(0);
     ws_last_dispatch_ms.store(0);
+    ams_last_fetch_ms.store(0);
     last_print_state.clear();
 
     // Launch connection in background thread (capture by value to avoid data races)
@@ -2090,6 +2091,12 @@ void MoonrakerPrinterAgent::run_status_stream(std::string dev_id, std::string ba
             subscribe["id"]                = 1;
             ws.write(net::buffer(subscribe.dump()));
 
+            // Eager fetch so AMS data is available immediately after connecting,
+            // without waiting on the loop's own refresh clock below.
+            fetch_filament_info(dev_id, FilamentSyncMode::subscription);
+            ams_last_fetch_ms.store(static_cast<uint64_t>(
+                std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now().time_since_epoch()).count()));
+
             // Read loop
             while (!ws_stop.load()) {
                 ws.next_layer().expires_after(std::chrono::seconds(2));
@@ -2101,8 +2108,6 @@ void MoonrakerPrinterAgent::run_status_stream(std::string dev_id, std::string ba
                         std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now().time_since_epoch()).count());
                     const auto last_ms = ws_last_emit_ms.load();
                     if (last_ms == 0 || now_ms - last_ms >= 10000) {
-                        fetch_filament_info(dev_id, FilamentSyncMode::subscription);
-
                         nlohmann::json message;
                         {
                             std::lock_guard<std::recursive_mutex> lock(payload_mutex);
@@ -2122,8 +2127,19 @@ void MoonrakerPrinterAgent::run_status_stream(std::string dev_id, std::string ba
                     connection_lost = true;
                     break;
                 }
+                // AMS/filament refresh on its own clock: gated independently of
+                // ws_last_emit_ms so a steady telemetry stream can't starve it.
+                {
+                    const auto now_ms = static_cast<uint64_t>(
+                        std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now().time_since_epoch()).count());
+                    const auto last_ams_ms = ams_last_fetch_ms.load();
+                    if (last_ams_ms == 0 || now_ms - last_ams_ms >= AMS_REFRESH_INTERVAL_MS) {
+                        fetch_filament_info(dev_id, FilamentSyncMode::subscription);
+                        ams_last_fetch_ms.store(now_ms);
+                    }
+                }
                 handle_ws_message(dev_id, beast::buffers_to_string(buffer.data()), base_url, api_key);
-                // Check if handle_ws_message triggered reconnection request
+                // Check if handle_ws_message triggered reconnection request`
                 if (ws_reconnect_requested.exchange(false)) {
                     connection_lost = true;
                     break;

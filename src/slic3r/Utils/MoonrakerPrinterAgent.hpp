@@ -233,6 +233,11 @@ private:
     std::atomic<uint64_t> ws_last_emit_ms{0};
     std::thread         ws_thread;
 
+    // AMS/filament refresh cadence, independent of telemetry dispatch so a steady
+    // stream of status updates can't starve it (ws_last_emit_ms is reset by those).
+    static constexpr uint64_t AMS_REFRESH_INTERVAL_MS = 10000;
+    std::atomic<uint64_t> ams_last_fetch_ms{0};
+
     // Throttling configuration for WebSocket updates
     // Critical changes (state transitions) dispatch immediately; telemetry is throttled
     static constexpr uint64_t STATUS_UPDATE_INTERVAL_MS = 1000;  // 1 update/sec for telemetry
