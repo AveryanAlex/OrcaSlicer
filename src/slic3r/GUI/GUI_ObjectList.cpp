@@ -9,6 +9,7 @@
 #include "BitmapComboBox.hpp"
 #include "MainFrame.hpp"
 #include "slic3r/Utils/UndoRedo.hpp"
+#include "slic3r/plugin/PluginManager.hpp"
 
 #include "OptionsGroup.hpp"
 #include "Tab.hpp"
@@ -3530,7 +3531,14 @@ void ObjectList::delete_all_connectors_for_object(int obj_idx)
             obj->delete_connectors();
 
             if (obj->volumes.empty() || !obj->has_solid_mesh()) {
+                const std::string deleted_obj_name = obj->name;
                 model.delete_object(idx);
+                {
+                    Slic3r::LifecycleEventContext ctx;
+                    ctx.name = deleted_obj_name;
+                    ctx.code = Slic3r::LifecycleEvtCode::Ok;
+                    Slic3r::fire_lifecycle_event(Slic3r::LifecycleEvent::ObjectDeleted, ctx);
+                }
                 m_objects_model->Delete(m_objects_model->GetItemById(idx));
                 continue;
             }
@@ -4098,6 +4106,13 @@ void ObjectList::add_object_to_list(size_t obj_idx, bool call_selection_changed,
     std::string warning_bitmap = get_warning_icon_name(model_object->mesh().stats());
     const auto item = m_objects_model->AddObject(model_object, warning_bitmap, model_object->is_cut());
     Expand(m_objects_model->GetParent(item));
+
+    {
+        Slic3r::LifecycleEventContext ctx;
+        ctx.name = model_object->name;
+        ctx.code = Slic3r::LifecycleEvtCode::Ok;
+        Slic3r::fire_lifecycle_event(Slic3r::LifecycleEvent::ObjectAdded, ctx);
+    }
 
     if (!do_info_update)
         return;
