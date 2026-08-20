@@ -90,6 +90,7 @@ protected:
         std::string dev_name;
         std::string version;
         std::string klippy_state;
+        float       nozzle_diameter = 0.0f;
         bool        use_ssl = false;
     } device_info;
 
@@ -110,6 +111,7 @@ protected:
     // Methods that derived classes may need to override or access
     virtual bool init_device_info(std::string dev_id, std::string dev_ip, std::string username, std::string password, bool use_ssl);
     virtual bool fetch_device_info(const std::string& base_url, const std::string& api_key, MoonrakerDeviceInfo& info, std::string& error) const;
+    static float parse_nozzle_diameter(const nlohmann::json& response);
 
     // State access for derived classes
     mutable std::recursive_mutex       state_mutex;

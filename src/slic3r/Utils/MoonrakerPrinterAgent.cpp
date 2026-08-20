@@ -1364,12 +1364,57 @@ bool MoonrakerPrinterAgent::init_device_info(std::string dev_id, std::string dev
     return true;
 }
 
+float MoonrakerPrinterAgent::parse_nozzle_diameter(const nlohmann::json& response)
+{
+    const nlohmann::json* status = nullptr;
+    if (response.contains("result") && response["result"].is_object()) {
+        status = response["result"].contains("status") ? &response["result"]["status"] : &response["result"];
+    } else if (response.contains("status")) {
+        status = &response["status"];
+    }
+
+    if (status == nullptr || !status->is_object() || !status->contains("configfile") || !(*status)["configfile"].is_object()) {
+        return 0.0f;
+    }
+
+    const auto& configfile = (*status)["configfile"];
+    for (const char* key : {"settings", "config"}) {
+        if (!configfile.contains(key) || !configfile[key].is_object()) {
+            continue;
+        }
+
+        for (const auto& item : configfile[key].items()) {
+            if (item.key() != "extruder" && item.key().rfind("extruder", 0) != 0) {
+                continue;
+            }
+            const auto& section = item.value();
+            if (!section.is_object() || !section.contains("nozzle_diameter")) {
+                continue;
+            }
+
+            const auto& value = section["nozzle_diameter"];
+            try {
+                if (value.is_number()) {
+                    return value.get<float>();
+                }
+                if (value.is_string()) {
+                    return std::stof(value.get<std::string>());
+                }
+            } catch (...) {
+                return 0.0f;
+            }
+        }
+    }
+
+    return 0.0f;
+}
+
 bool MoonrakerPrinterAgent::fetch_device_info(const std::string&   base_url,
                                               const std::string&   api_key,
                                               MoonrakerDeviceInfo& info,
                                               std::string&         error) const
 {
-    auto fetch_json = [&](const std::string& url, nlohmann::json& out) {
+    auto fetch_json = [&](const std::string& url, nlohmann::json& out, std::string& fetch_error) {
         std::string response_body;
         bool        success = false;
         std::string http_error;
@@ -1397,13 +1442,13 @@ bool MoonrakerPrinterAgent::fetch_device_info(const std::string&   base_url,
             .perform_sync();
 
         if (!success) {
-            error = http_error.empty() ? "Connection failed" : http_error;
+            fetch_error = http_error.empty() ? "Connection failed" : http_error;
             return false;
         }
 
         out = nlohmann::json::parse(response_body, nullptr, false, true);
         if (out.is_discarded()) {
-            error = "Invalid JSON response";
+            fetch_error = "Invalid JSON response";
             return false;
         }
         return true;
@@ -1411,7 +1456,7 @@ bool MoonrakerPrinterAgent::fetch_device_info(const std::string&   base_url,
 
     nlohmann::json json;
     std::string    url = join_url(base_url, "/server/info");
-    if (!fetch_json(url, json)) {
+    if (!fetch_json(url, json, error)) {
         return false;
     }
 
@@ -1419,6 +1464,17 @@ bool MoonrakerPrinterAgent::fetch_device_info(const std::string&   base_url,
     info.dev_name         = result.value("machine_name", result.value("hostname", ""));
     info.version          = result.value("moonraker_version", "");
     info.klippy_state     = result.value("klippy_state", "");
+
+    // nozzle_diameter is part of Klipper's configfile object rather than the live
+    // extruder status object. Keep this optional so older/custom Moonraker builds
+    // remain connectable when they do not expose configfile through the API.
+    nlohmann::json config_response;
+    std::string    config_error;
+    if (fetch_json(join_url(base_url, "/printer/objects/query?configfile"), config_response, config_error)) {
+        info.nozzle_diameter = parse_nozzle_diameter(config_response);
+    } else {
+        BOOST_LOG_TRIVIAL(debug) << "MoonrakerPrinterAgent: nozzle configuration unavailable: " << config_error;
+    }
 
     return true;
 }
@@ -2461,6 +2517,14 @@ nlohmann::json MoonrakerPrinterAgent::build_print_payload_locked() const
     payload["print"]["nozzle_temp_range"] = {100, 370}; // Typical Klipper range
     payload["print"]["bed_temp_range"]    = {0, 120};   // Typical bed range
 
+    // MachineObject::parse_json routes nozzle_diameter through the legacy nozzle
+    // parser only when nozzle_type is present as well. Moonraker/Klipper exposes
+    // the diameter but not Bambu's nozzle type, so use the parser's neutral value.
+    if (device_info.nozzle_diameter > 0.0f) {
+        payload["print"]["nozzle_diameter"] = device_info.nozzle_diameter;
+        payload["print"]["nozzle_type"]     = "N/A";
+    }
+
     payload["print"]["support_send_to_sd"] = true;
     if (!webcam_stream_url.empty()) {
         payload["print"]["ipcam"]["ipcam_dev"] = "1";
@@ -2816,6 +2880,7 @@ void MoonrakerPrinterAgent::perform_connection_async(const std::string& dev_id, 
             device_info.dev_name     = fetched_info.dev_name;
             device_info.version      = fetched_info.version;
             device_info.klippy_state = fetched_info.klippy_state;
+            device_info.nozzle_diameter = fetched_info.nozzle_diameter;
         }
 
 // Orca todo: disable websocket for now, as we don't use MonitorPanel for Moonraker printers yet

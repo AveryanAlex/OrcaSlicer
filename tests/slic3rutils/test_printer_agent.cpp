@@ -17,6 +17,54 @@
 using namespace Slic3r;
 namespace py = pybind11;
 
+class MoonrakerParserProbe : public MoonrakerPrinterAgent
+{
+public:
+    using MoonrakerPrinterAgent::parse_nozzle_diameter;
+
+    explicit MoonrakerParserProbe(std::string log_dir) : MoonrakerPrinterAgent(std::move(log_dir)) {}
+};
+
+TEST_CASE("Moonraker parses nozzle diameter from configfile settings", "[unit][moonraker]")
+{
+    const auto response = nlohmann::json::parse(R"({
+        "result": {
+            "status": {
+                "configfile": {
+                    "settings": {
+                        "extruder": {
+                            "nozzle_diameter": 0.6
+                        }
+                    }
+                }
+            }
+        }
+    })");
+
+    CHECK(MoonrakerParserProbe::parse_nozzle_diameter(response) == Catch::Approx(0.6f));
+}
+
+TEST_CASE("Moonraker parses nozzle diameter from raw config and tolerates missing data", "[unit][moonraker]")
+{
+    const auto raw_config_response = nlohmann::json::parse(R"({
+        "result": {
+            "status": {
+                "configfile": {
+                    "config": {
+                        "extruder": {
+                            "nozzle_diameter": "0.8"
+                        }
+                    }
+                }
+            }
+        }
+    })");
+    const auto missing_response = nlohmann::json::object();
+
+    CHECK(MoonrakerParserProbe::parse_nozzle_diameter(raw_config_response) == Catch::Approx(0.8f));
+    CHECK(MoonrakerParserProbe::parse_nozzle_diameter(missing_response) == 0.0f);
+}
+
 // why: these builders preserve the Bambu firmware dialect byte-for-byte, including its trailing space.
 TEST_CASE("unit: BBL AMS gcode builders preserve command bytes", "[unit][bbl]")
 {
