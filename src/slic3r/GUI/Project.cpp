@@ -70,7 +70,18 @@ ProjectPanel::ProjectPanel(wxWindow *parent, wxWindowID id, const wxPoint &pos, 
     Fit();
 }
 
-ProjectPanel::~ProjectPanel() {}
+ProjectPanel::~ProjectPanel()
+{
+    shutdown();
+}
+
+void ProjectPanel::shutdown()
+{
+    m_reload_cancel_token->store(true, std::memory_order_release);
+    if (m_reload_task && m_reload_task->joinable())
+        m_reload_task->join();
+    m_reload_task.reset();
+}
 
 void ProjectPanel::create_browser()
 {
@@ -127,7 +138,17 @@ void ProjectPanel::onWebNavigating(wxWebViewEvent& evt)
 
 void ProjectPanel::on_reload(wxCommandEvent& evt)
 {
-    boost::thread reload = boost::thread([this] {
+    if (wxTheApp == nullptr || wxGetApp().is_closing() ||
+        m_reload_cancel_token->load(std::memory_order_acquire))
+        return;
+
+    if (m_reload_task && m_reload_task->joinable())
+        m_reload_task->join();
+
+    const auto cancel_token = m_reload_cancel_token;
+    m_reload_task = std::make_unique<boost::thread>([this, cancel_token] {
+        if (cancel_token->load(std::memory_order_acquire) || wxTheApp == nullptr || wxGetApp().is_closing())
+            return;
         std::string update_type;
         std::string license;
         std::string model_name;
@@ -140,6 +161,9 @@ void ProjectPanel::on_reload(wxCommandEvent& evt)
         std::string p_cover_file;
 
         std::map<std::string, std::vector<json>> files;
+
+        if (wxGetApp().plater() == nullptr)
+            return;
 
         Model model = wxGetApp().plater()->model();
 
@@ -182,7 +206,14 @@ void ProjectPanel::on_reload(wxCommandEvent& evt)
         std::string file_path = encode_path(wxGetApp().plater()->model().get_auxiliary_file_temp_path().c_str());
         if (!file_path.empty()) {
             files = Reload(file_path);
-            wxGetApp().CallAfter([this, file_path, files] { m_auxiliary->Reload(file_path, files); });
+            if (cancel_token->load(std::memory_order_acquire) || wxTheApp == nullptr || wxGetApp().is_closing())
+                return;
+
+            wxGetApp().CallAfter([this, cancel_token, file_path, files] {
+                if (cancel_token->load(std::memory_order_acquire) || wxTheApp == nullptr || wxGetApp().is_closing())
+                    return;
+                m_auxiliary->Reload(file_path, files);
+            });
         } else {
             clear_model_info();
             return;
@@ -241,15 +272,18 @@ void ProjectPanel::on_reload(wxCommandEvent& evt)
 
         json m_Res = json::object();
         m_Res["command"] = "show_3mf_info";
-        m_Res["sequence_id"] = std::to_string(ProjectPanel::m_sequence_id++);
+        m_Res["sequence_id"] = std::to_string(ProjectPanel::m_sequence_id.fetch_add(1, std::memory_order_relaxed));
         m_Res["model"] = j;
 
         wxString strJS = wxString::Format("HandleStudio(%s)", m_Res.dump(-1, ' ', false, json::error_handler_t::ignore));
 
-        if (m_web_init_completed) {
-            wxGetApp().CallAfter([this, strJS] {
+        if (m_web_init_completed.load(std::memory_order_acquire) &&
+            !cancel_token->load(std::memory_order_acquire) && wxTheApp != nullptr && !wxGetApp().is_closing()) {
+            wxGetApp().CallAfter([this, cancel_token, strJS] {
+                if (cancel_token->load(std::memory_order_acquire) || wxTheApp == nullptr || wxGetApp().is_closing())
+                    return;
                 RunScript(strJS.ToStdString());
-                });
+            });
         }
     });
 }
@@ -290,7 +324,7 @@ void ProjectPanel::OnScriptMessage(wxWebViewEvent& evt)
             }
         }
         else if (strCmd == "request_3mf_info") {
-            m_web_init_completed = true;
+            m_web_init_completed.store(true, std::memory_order_release);
         }
         else if (strCmd == "edit_project_info") {
             show_info_editor(true);
@@ -333,13 +367,20 @@ void ProjectPanel::update_model_data()
 
 void ProjectPanel::clear_model_info()
 {
+    if (wxTheApp == nullptr || wxGetApp().is_closing() ||
+        m_reload_cancel_token->load(std::memory_order_acquire))
+        return;
+
     json m_Res = json::object();
     m_Res["command"] = "clear_3mf_info";
-    m_Res["sequence_id"] = std::to_string(ProjectPanel::m_sequence_id++);
+    m_Res["sequence_id"] = std::to_string(ProjectPanel::m_sequence_id.fetch_add(1, std::memory_order_relaxed));
 
     wxString strJS = wxString::Format("HandleStudio(%s)", m_Res.dump(-1, ' ', false, json::error_handler_t::ignore));
 
-    wxGetApp().CallAfter([this, strJS] {
+    const auto cancel_token = m_reload_cancel_token;
+    wxGetApp().CallAfter([this, cancel_token, strJS] {
+        if (cancel_token->load(std::memory_order_acquire) || wxTheApp == nullptr || wxGetApp().is_closing())
+            return;
         RunScript(strJS.ToStdString());
     });
 }
