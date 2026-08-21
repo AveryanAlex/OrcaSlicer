@@ -163,6 +163,33 @@
   "Artillery/Artillery TPU",
   "Artillery/Artillery TPU @Artillery M1 Pro 0.4 nozzle",
   "BBL/Generic SBS",
+  "BBL/addnorth ABS rABS",
+  "BBL/addnorth PA Adura",
+  "BBL/addnorth PA Adura FDA",
+  "BBL/addnorth PA-CF Adura X",
+  "BBL/addnorth PA6 Addlantis",
+  "BBL/addnorth PC BLend HT LCF",
+  "BBL/addnorth PETG Base",
+  "BBL/addnorth PETG ESD",
+  "BBL/addnorth PETG Economy",
+  "BBL/addnorth PETG Flame v0",
+  "BBL/addnorth PETG PRO Matte",
+  "BBL/addnorth PETG rPETG Matte",
+  "BBL/addnorth PETG-CF Rigid X",
+  "BBL/addnorth PLA E-PLA",
+  "BBL/addnorth PLA Economy",
+  "BBL/addnorth PLA HT-PLA PRO Matte",
+  "BBL/addnorth PLA Premium Silk",
+  "BBL/addnorth PLA Textura",
+  "BBL/addnorth PLA Wood",
+  "BBL/addnorth PLA X-PLA",
+  "BBL/addnorth PLA X-PLA High Speed",
+  "BBL/addnorth PLA rPLA RE-ADD",
+  "BBL/addnorth PLA-CF Carbon Fiber",
+  "BBL/addnorth PVDF Adamant S1",
+  "BBL/addnorth TPU EasyFlex",
+  "BBL/addnorth TPU Pro Matte 85A",
+  "BBL/addnorth TPU Pro Matte 95A",
   "Chuanying/Chuanying ABS @Chuanying X1 0.25 Nozzle",
   "Chuanying/Chuanying Generic HIPS",
   "Chuanying/Chuanying Generic PVA",
@@ -989,6 +1016,9 @@
   "Snapmaker/PolyTerra Dual PLA @0.2 nozzle",
   "Snapmaker/PolyTerra J1 PLA",
   "Snapmaker/PolyTerra J1 PLA @0.2 nozzle",
+  "Snapmaker/Polymaker General PLA Family @U1",
+  "Snapmaker/Polymaker Silk PLA Family @U1",
+  "Snapmaker/Polymaker Tough PLA Family @U1",
   "Snapmaker/Snapmaker ABS Benchy @U1",
   "Snapmaker/Snapmaker Dual ABS Benchy",
   "Snapmaker/Snapmaker Dual TPE",
@@ -997,7 +1027,12 @@
   "Snapmaker/Snapmaker J1 TPE",
   "Snapmaker/Snapmaker J1 TPU High-Flow",
   "Snapmaker/Snapmaker PET @Dual",
+  "Snapmaker/Snapmaker PLA Full Spectrum @U1 0.4 nozzle",
   "Snapmaker/Snapmaker PLA Matte @U1",
+  "Snapmaker/Snapmaker PLA Silk @U1",
+  "Snapmaker/Snapmaker PLA Silk @U1 0.2 nozzle",
+  "Snapmaker/Snapmaker PLA Silk @U1 0.6 nozzle",
+  "Snapmaker/Snapmaker PLA Silk @U1 0.8 nozzle",
   "Snapmaker/Snapmaker TPE",
   "Snapmaker/Snapmaker TPE @U1",
   "Snapmaker/Snapmaker TPU High-Flow @U1",
@@ -1215,6 +1250,9 @@
   ],
   "GFA18": [
    "BBL/Bambu PLA Lite"
+  ],
+  "GFA19": [
+   "BBL/Bambu PLA Pure"
   ],
   "GFA50": [
    "BBL/Bambu PLA-CF"
@@ -1574,6 +1612,87 @@
   "GFU99": [
    "BBL/Generic TPU"
   ],
+  "GF_ANAD": [
+   "BBL/addnorth PA Adura"
+  ],
+  "GF_ANAF": [
+   "BBL/addnorth PA Adura FDA"
+  ],
+  "GF_ANAX": [
+   "BBL/addnorth PA-CF Adura X"
+  ],
+  "GF_ANEF": [
+   "BBL/addnorth TPU EasyFlex"
+  ],
+  "GF_ANEG": [
+   "BBL/addnorth PETG ESD"
+  ],
+  "GF_ANEP": [
+   "BBL/addnorth PLA E-PLA"
+  ],
+  "GF_ANGE": [
+   "BBL/addnorth PETG Economy"
+  ],
+  "GF_ANHTP": [
+   "BBL/addnorth PLA HT-PLA PRO Matte"
+  ],
+  "GF_ANLA": [
+   "BBL/addnorth PA6 Addlantis"
+  ],
+  "GF_ANPBX": [
+   "BBL/addnorth PC BLend HT LCF"
+  ],
+  "GF_ANPCF": [
+   "BBL/addnorth PLA-CF Carbon Fiber"
+  ],
+  "GF_ANPE": [
+   "BBL/addnorth PETG Base"
+  ],
+  "GF_ANPF": [
+   "BBL/addnorth PETG Flame v0"
+  ],
+  "GF_ANPL": [
+   "BBL/addnorth PLA Economy"
+  ],
+  "GF_ANPLW": [
+   "BBL/addnorth PLA Wood"
+  ],
+  "GF_ANPM": [
+   "BBL/addnorth PETG PRO Matte"
+  ],
+  "GF_ANPS": [
+   "BBL/addnorth PLA Premium Silk"
+  ],
+  "GF_ANPV": [
+   "BBL/addnorth PVDF Adamant S1"
+  ],
+  "GF_ANRA": [
+   "BBL/addnorth ABS rABS"
+  ],
+  "GF_ANRM": [
+   "BBL/addnorth PETG rPETG Matte"
+  ],
+  "GF_ANRPL": [
+   "BBL/addnorth PLA rPLA RE-ADD"
+  ],
+  "GF_ANRX": [
+   "BBL/addnorth PETG-CF Rigid X"
+  ],
+  "GF_ANTA": [
+   "BBL/addnorth TPU Pro Matte 85A"
+  ],
+  "GF_ANTE": [
+   "BBL/addnorth PLA Textura"
+  ],
+  "GF_ANTM": [
+   "BBL/addnorth TPU Pro Matte 95A"
+  ],
+  "GF_ANXP": [
+   "BBL/addnorth PLA X-PLA"
+  ],
+  "GF_ANXPH": [
+   "BBL/addnorth PLA X-PLA High Speed"
+  ],
   "OF016CJw": [
    "Sovol/Sovol SV08 ABS"
   ],
@@ -1774,6 +1893,9 @@
   ],
   "OF43Raws": [
    "Snapmaker/PolyTerra J1 PLA"
+  ],
+  "OF44ERDr": [
+   "Snapmaker/Polymaker General PLA Family"
   ],
   "OF44VYzK": [
    "OrcaFilamentLibrary/FilAr PETG Azul Francia"
@@ -2256,6 +2378,9 @@
   "OFD6kN7F": [
    "OrcaArena/OrcaArena Generic PLA"
   ],
+  "OFD8loeT": [
+   "re3D/re3D rPETG"
+  ],
   "OFD9taow": [
    "FlyingBear/FlyingBear PLA Hyper"
   ],
@@ -2289,6 +2414,9 @@
    "RH3D/Generic PLA",
    "Sovol/Generic PLA",
    "Z-Bolt/Generic PLA"
+  ],
+  "OFDdEaoL": [
+   "re3D/re3D PLA"
   ],
   "OFDe8uyM": [
    "OrcaFilamentLibrary/Valment PLA"
@@ -2485,6 +2613,9 @@
   ],
   "OFH2nN08": [
    "OrcaFilamentLibrary/Eolas Prints PLA INGEO 850"
+  ],
+  "OFH57ibH": [
+   "Snapmaker/Polymaker Silk PLA Family"
   ],
   "OFH5UH6P": [
    "Flashforge/Flashforge ABS-GF"
@@ -2715,6 +2846,9 @@
   "OFKyCgaK": [
    "Anycubic/Anycubic Generic PLA"
   ],
+  "OFL9aRjN": [
+   "Snapmaker/Snapmaker PETG HF"
+  ],
   "OFLAXKqP": [
    "WonderMaker/WonderMaker TPU 95A"
   ],
@@ -2742,6 +2876,9 @@
    "Flashforge/Generic ASA",
    "OrcaFilamentLibrary/Generic ASA",
    "RH3D/Generic ASA"
+  ],
+  "OFLTYJW0": [
+   "Snapmaker/Snapmaker PLA Translucent"
   ],
   "OFLXvuMr": [
    "Elegoo/Elegoo Rapid PETG",
@@ -2953,6 +3090,9 @@
   ],
   "OFOKYhi6": [
    "Prusa/Prusa Generic PETG HF"
+  ],
+  "OFOPU1xv": [
+   "Snapmaker/Snapmaker PLA Full Spectrum"
   ],
   "OFObG16Q": [
    "InfiMech/InfiMech PLA Basic"
@@ -3188,9 +3328,6 @@
   "OFSStjay": [
    "FLSun/FLSun S1 PLA Silk"
   ],
-  "OFSTCno1": [
-   "re3D/re3D Greengate rPETG"
-  ],
   "OFSa39yP": [
    "Snapmaker/Snapmaker J1 PLA"
   ],
@@ -3352,6 +3489,9 @@
   "OFW5FqkL": [
    "Qidi/QIDI PLA Rapido Silk"
   ],
+  "OFW8lqnb": [
+   "Snapmaker/Snapmaker PETG Translucent"
+  ],
   "OFW9uIkE": [
    "Tiertime/Tiertime Generic HIPS"
   ],
@@ -3409,6 +3549,9 @@
   "OFWzr7m0": [
    "Anycubic/Anycubic Generic PETG"
   ],
+  "OFX0etlv": [
+   "re3D/re3D PETG"
+  ],
   "OFX0ycRQ": [
    "OrcaFilamentLibrary/Fiberon PA12-CF"
   ],
@@ -3423,6 +3566,9 @@
   ],
   "OFXJ9iom": [
    "iQ/Grauts HPP4GF25 P1"
+  ],
+  "OFXSvqOX": [
+   "Snapmaker/Snapmaker TPU 95A HF"
   ],
   "OFXTPuqV": [
    "OrcaFilamentLibrary/Elas PETG Basic"
@@ -3472,6 +3618,9 @@
   ],
   "OFY3AB7j": [
    "Snapmaker/Snapmaker J1 PLA Matte"
+  ],
+  "OFY7jxcS": [
+   "Snapmaker/Snapmaker TPU 90A"
   ],
   "OFY9muEs": [
    "Anycubic/Generic ABS",
@@ -3738,6 +3887,9 @@
   "OFdb8YNz": [
    "OrcaFilamentLibrary/FilAr PLA Verde Manzana"
   ],
+  "OFdd8ZqJ": [
+   "Snapmaker/Snapmaker PLA Wood"
+  ],
   "OFdkWDiy": [
    "Cubicon/Cubicon PLAi21"
   ],
@@ -3822,6 +3974,9 @@
   "OFf0MkD5": [
    "Qidi/QIDI PETG Translucent"
   ],
+  "OFf52D4e": [
+   "Snapmaker/Snapmaker PLA-CF"
+  ],
   "OFf5awy4": [
    "OrcaFilamentLibrary/Eolas Prints PLA Matte"
   ],
@@ -3837,6 +3992,9 @@
   "OFfBpSRI": [
    "OrcaFilamentLibrary/Bambu ASA"
   ],
+  "OFfD87Gy": [
+   "Snapmaker/Snapmaker PLA Glow"
+  ],
   "OFfHGM1D": [
    "re3D/re3D rPP"
   ],
@@ -3845,6 +4003,9 @@
   ],
   "OFfSqS4R": [
    "Creality/ENDER FAST PLA"
+  ],
+  "OFfYHK5z": [
+   "Qidi/Polymaker PLA-HT"
   ],
   "OFfZ0lTS": [
    "Qidi/Qidi Generic PETG-CF"
@@ -3943,6 +4104,9 @@
   "OFgcryz4": [
    "Ratrig/RatRig BigNozzle ASA"
   ],
+  "OFgdaBOt": [
+   "Snapmaker/Polymaker Tough PLA Family"
+  ],
   "OFgeM7nD": [
    "Flashforge/Flashforge PA12-CF"
   ],
@@ -4029,6 +4193,9 @@
   "OFhlCNqq": [
    "BBL/COEX PLA",
    "OrcaFilamentLibrary/COEX PLA"
+  ],
+  "OFhmxnYw": [
+   "Snapmaker/Snapmaker PLA Basic"
   ],
   "OFhuaUQB": [
    "OrcaFilamentLibrary/Bambu ABS",
@@ -4271,6 +4438,12 @@
   ],
   "OFm70lLt": [
    "CoLiDo/CoLiDo PLA"
+  ],
+  "OFm8rqoY": [
+   "re3D/re3D rPP"
+  ],
+  "OFmCOW2Y": [
+   "re3D/re3D rPETG"
   ],
   "OFmFwUWM": [
    "Prusa/Prusament ASA"
@@ -4848,6 +5021,9 @@
   ],
   "OFwaYjL6": [
    "OrcaFilamentLibrary/Fiberon PA6-GF"
+  ],
+  "OFwbsgWj": [
+   "re3D/re3D PC"
   ],
   "OFwhLMs4": [
    "Snapmaker/Snapmaker PLA SnapSpeed"
@@ -5496,20 +5672,146 @@
   ],
   "QD_3_1_8": [
    "Qidi/QIDI PLA Matte Basic"
+  ],
+  "QD_4_0_1": [
+   "Qidi/Generic PLA"
+  ],
+  "QD_4_0_11": [
+   "Qidi/Generic ABS"
+  ],
+  "QD_4_0_23": [
+   "Qidi/Generic PC"
+  ],
+  "QD_4_0_4": [
+   "Qidi/Generic PLA Silk"
+  ],
+  "QD_4_0_41": [
+   "Qidi/Generic PETG"
+  ],
+  "QD_4_0_50": [
+   "Qidi/Generic TPU 95A"
+  ],
+  "QD_4_1_1": [
+   "Qidi/QIDI PLA Rapido"
+  ],
+  "QD_4_1_11": [
+   "Qidi/QIDI ABS Rapido"
+  ],
+  "QD_4_1_12": [
+   "Qidi/QIDI ABS-GF"
+  ],
+  "QD_4_1_13": [
+   "Qidi/QIDI ABS Rapido Metal"
+  ],
+  "QD_4_1_14": [
+   "Qidi/QIDI ABS Odorless"
+  ],
+  "QD_4_1_15": [
+   "Qidi/QIDI TPU-GF"
+  ],
+  "QD_4_1_18": [
+   "Qidi/QIDI ASA"
+  ],
+  "QD_4_1_19": [
+   "Qidi/QIDI ASA-Aero"
+  ],
+  "QD_4_1_2": [
+   "Qidi/QIDI PLA Rapido Matte"
+  ],
+  "QD_4_1_20": [
+   "Qidi/QIDI ASA-CF"
+  ],
+  "QD_4_1_24": [
+   "Qidi/QIDI UltraPA"
+  ],
+  "QD_4_1_25": [
+   "Qidi/QIDI PA6-CF"
+  ],
+  "QD_4_1_26": [
+   "Qidi/QIDI UltraPA-CF25"
+  ],
+  "QD_4_1_27": [
+   "Qidi/QIDI PA12-CF"
+  ],
+  "QD_4_1_3": [
+   "Qidi/QIDI PLA Rapido Metal"
+  ],
+  "QD_4_1_30": [
+   "Qidi/QIDI PAHT-CF"
+  ],
+  "QD_4_1_31": [
+   "Qidi/QIDI PAHT-GF"
+  ],
+  "QD_4_1_32": [
+   "Qidi/QIDI Support For PAHT"
+  ],
+  "QD_4_1_33": [
+   "Qidi/QIDI Support For PET/PA"
+  ],
+  "QD_4_1_34": [
+   "Qidi/QIDI PC/ABS-FR"
+  ],
+  "QD_4_1_36": [
+   "Qidi/QIDI PEBA 95A"
+  ],
+  "QD_4_1_37": [
+   "Qidi/QIDI PET-CF"
+  ],
+  "QD_4_1_38": [
+   "Qidi/QIDI PET-GF"
+  ],
+  "QD_4_1_39": [
+   "Qidi/QIDI PETG Basic"
+  ],
+  "QD_4_1_4": [
+   "Qidi/QIDI PLA Silk"
+  ],
+  "QD_4_1_40": [
+   "Qidi/QIDI PETG Tough"
+  ],
+  "QD_4_1_41": [
+   "Qidi/QIDI PETG Rapido"
+  ],
+  "QD_4_1_42": [
+   "Qidi/QIDI PETG-CF"
+  ],
+  "QD_4_1_43": [
+   "Qidi/QIDI PETG-GF"
+  ],
+  "QD_4_1_44": [
+   "Qidi/QIDI PPS-CF"
+  ],
+  "QD_4_1_45": [
+   "Qidi/QIDI PETG Translucent"
+  ],
+  "QD_4_1_46": [
+   "Qidi/QIDI PPS-GF"
+  ],
+  "QD_4_1_49": [
+   "Qidi/QIDI TPU-Aero"
+  ],
+  "QD_4_1_5": [
+   "Qidi/QIDI PLA-CF"
+  ],
+  "QD_4_1_50": [
+   "Qidi/QIDI TPU 95A-HF"
+  ],
+  "QD_4_1_6": [
+   "Qidi/QIDI WOOD Rapido"
+  ],
+  "QD_4_1_7": [
+   "Qidi/QIDI PLA Basic"
+  ],
+  "QD_4_1_8": [
+   "Qidi/QIDI PLA Matte Basic"
   ]
  },
  "instantiated_with_id": [
-  "Afinia/Afinia ABS",
-  "Afinia/Afinia ABS+",
   "Afinia/Afinia ABS+@HS",
   "Afinia/Afinia ABS@HS",
-  "Afinia/Afinia PLA",
   "Afinia/Afinia PLA@HS",
-  "Afinia/Afinia TPU",
   "Afinia/Afinia TPU@HS",
-  "Afinia/Afinia Value ABS",
   "Afinia/Afinia Value ABS@HS",
-  "Afinia/Afinia Value PLA",
   "Afinia/Afinia Value PLA@HS",
   "Anycubic/Anycubic ABS @Anycubic Kobra 3 Max 0.4 nozzle",
   "Anycubic/Anycubic ABS @Anycubic Kobra 3 Max 0.6 nozzle",
@@ -5720,6 +6022,33 @@
   "Artillery/Artillery TPU @Artillery M1 Pro 0.6 nozzle",
   "Artillery/Artillery TPU @Artillery M1 Pro 0.8 nozzle",
   "BBL/Generic SBS",
+  "BBL/addnorth ABS rABS",
+  "BBL/addnorth PA Adura",
+  "BBL/addnorth PA Adura FDA",
+  "BBL/addnorth PA-CF Adura X",
+  "BBL/addnorth PA6 Addlantis",
+  "BBL/addnorth PC BLend HT LCF",
+  "BBL/addnorth PETG Base",
+  "BBL/addnorth PETG ESD",
+  "BBL/addnorth PETG Economy",
+  "BBL/addnorth PETG Flame v0",
+  "BBL/addnorth PETG PRO Matte",
+  "BBL/addnorth PETG rPETG Matte",
+  "BBL/addnorth PETG-CF Rigid X",
+  "BBL/addnorth PLA E-PLA",
+  "BBL/addnorth PLA Economy",
+  "BBL/addnorth PLA HT-PLA PRO Matte",
+  "BBL/addnorth PLA Premium Silk",
+  "BBL/addnorth PLA Textura",
+  "BBL/addnorth PLA Wood",
+  "BBL/addnorth PLA X-PLA",
+  "BBL/addnorth PLA X-PLA High Speed",
+  "BBL/addnorth PLA rPLA RE-ADD",
+  "BBL/addnorth PLA-CF Carbon Fiber",
+  "BBL/addnorth PVDF Adamant S1",
+  "BBL/addnorth TPU EasyFlex",
+  "BBL/addnorth TPU Pro Matte 85A",
+  "BBL/addnorth TPU Pro Matte 95A",
   "Blocks/Blocks Generic ABS",
   "Blocks/Blocks Generic ASA",
   "Blocks/Blocks Generic ASA-CF",
@@ -7881,6 +8210,9 @@
   "Snapmaker/PolyTerra Dual PLA @0.2 nozzle",
   "Snapmaker/PolyTerra J1 PLA",
   "Snapmaker/PolyTerra J1 PLA @0.2 nozzle",
+  "Snapmaker/Polymaker General PLA Family @U1",
+  "Snapmaker/Polymaker Silk PLA Family @U1",
+  "Snapmaker/Polymaker Tough PLA Family @U1",
   "Snapmaker/Snapmaker ABS Benchy @U1",
   "Snapmaker/Snapmaker Dual ABS Benchy",
   "Snapmaker/Snapmaker Dual TPE",
@@ -7889,9 +8221,26 @@
   "Snapmaker/Snapmaker J1 TPE",
   "Snapmaker/Snapmaker J1 TPU High-Flow",
   "Snapmaker/Snapmaker PET @Dual",
+  "Snapmaker/Snapmaker PLA Full Spectrum @U1 0.4 nozzle",
   "Snapmaker/Snapmaker PLA Matte @U1",
+  "Snapmaker/Snapmaker PLA Silk @U1",
+  "Snapmaker/Snapmaker PLA Silk @U1 0.2 nozzle",
+  "Snapmaker/Snapmaker PLA Silk @U1 0.6 nozzle",
+  "Snapmaker/Snapmaker PLA Silk @U1 0.8 nozzle",
+  "Snapmaker/Snapmaker PLA Wood @U1 0.4 nozzle",
+  "Snapmaker/Snapmaker PLA Wood @U1 0.6 nozzle",
+  "Snapmaker/Snapmaker PLA Wood @U1 0.8 nozzle",
+  "Snapmaker/Snapmaker PLA-CF @U1 0.4 nozzle",
+  "Snapmaker/Snapmaker PLA-CF @U1 0.6 nozzle",
+  "Snapmaker/Snapmaker PLA-CF @U1 0.8 nozzle",
   "Snapmaker/Snapmaker TPE",
   "Snapmaker/Snapmaker TPE @U1",
+  "Snapmaker/Snapmaker TPU 90A @U1",
+  "Snapmaker/Snapmaker TPU 90A @U1 0.6 nozzle",
+  "Snapmaker/Snapmaker TPU 90A @U1 0.8 nozzle",
+  "Snapmaker/Snapmaker TPU 95A HF @U1",
+  "Snapmaker/Snapmaker TPU 95A HF @U1 0.6 nozzle",
+  "Snapmaker/Snapmaker TPU 95A HF @U1 0.8 nozzle",
   "Snapmaker/Snapmaker TPU High-Flow @U1",
   "Sovol/Generic PLA Silk @Sovol SV08 MAX",
   "Sovol/Polymaker PETG @Sovol SV08 MAX",
@@ -8070,9 +8419,6 @@
   "iQ/Material4Print ABS Natur P1 @iQ TiQ8 0.4 Nozzle",
   "iQ/Polymaker PETG Polymax black P1 @iQ TiQ2 0.4 Nozzle",
   "iQ/VXL90 TiQ2 P2 @iQ TiQ2 0.4 Nozzle",
-  "re3D/re3D Greengate rPETG",
-  "re3D/re3D Greengate rPETG @0.8 nozzle",
-  "re3D/re3D Greengate rPETG @1.75 nozzle",
   "re3D/re3D PC",
   "re3D/re3D PC @0.4 nozzle",
   "re3D/re3D PC @0.8 nozzle",
@@ -8082,6 +8428,9 @@
   "re3D/re3D PLA",
   "re3D/re3D PLA @0.4 nozzle",
   "re3D/re3D PLA @0.8 nozzle",
+  "re3D/re3D rPETG",
+  "re3D/re3D rPETG @0.8 nozzle",
+  "re3D/re3D rPETG @1.75 nozzle",
   "re3D/re3D rPP",
   "re3D/re3D rPP @0.8 nozzle",
   "re3D/re3D rPP @1.75 nozzle"
@@ -8520,6 +8869,13 @@
     "Polymaker",
     "PLA",
     "PolyTerra J1 PLA"
+   ]
+  ],
+  "OF44ERDr": [
+   [
+    "Polymaker",
+    "PLA",
+    "Polymaker General PLA Family"
    ]
   ],
   "OF44VYzK": [
@@ -9628,6 +9984,13 @@
     "OrcaArena Generic PLA"
    ]
   ],
+  "OFD8loeT": [
+   [
+    "re3D",
+    "PETG",
+    "re3D rPETG"
+   ]
+  ],
   "OFD9taow": [
    [
     "FlyingBear",
@@ -9682,6 +10045,13 @@
     "Generic",
     "PLA",
     "Generic PLA"
+   ]
+  ],
+  "OFDdEaoL": [
+   [
+    "re3D",
+    "PLA",
+    "re3D PLA"
    ]
   ],
   "OFDe8uyM": [
@@ -10130,6 +10500,13 @@
     "Eolas Prints",
     "PLA",
     "Eolas Prints PLA INGEO 850"
+   ]
+  ],
+  "OFH57ibH": [
+   [
+    "Polymaker",
+    "PLA",
+    "Polymaker Silk PLA Family"
    ]
   ],
   "OFH5UH6P": [
@@ -10657,6 +11034,13 @@
     "Anycubic Generic PLA"
    ]
   ],
+  "OFL9aRjN": [
+   [
+    "Snapmaker",
+    "PETG",
+    "Snapmaker PETG HF"
+   ]
+  ],
   "OFLAXKqP": [
    [
     "WonderMaker",
@@ -10711,6 +11095,13 @@
     "Generic",
     "ASA",
     "Generic ASA"
+   ]
+  ],
+  "OFLTYJW0": [
+   [
+    "Snapmaker",
+    "PLA",
+    "Snapmaker PLA Translucent"
    ]
   ],
   "OFLXvuMr": [
@@ -11173,6 +11564,13 @@
     "Generic",
     "PETG",
     "Prusa Generic PETG HF"
+   ]
+  ],
+  "OFOPU1xv": [
+   [
+    "Snapmaker",
+    "PLA",
+    "Snapmaker PLA Full Spectrum"
    ]
   ],
   "OFObG16Q": [
@@ -11693,13 +12091,6 @@
     "FLSun S1 PLA Silk"
    ]
   ],
-  "OFSTCno1": [
-   [
-    "GreenGate3D",
-    "PETG",
-    "re3D Greengate rPETG"
-   ]
-  ],
   "OFSa39yP": [
    [
     "Snapmaker",
@@ -12071,6 +12462,13 @@
     "QIDI PLA Rapido Silk"
    ]
   ],
+  "OFW8lqnb": [
+   [
+    "Snapmaker",
+    "PETG",
+    "Snapmaker PETG Translucent"
+   ]
+  ],
   "OFW9uIkE": [
    [
     "Generic",
@@ -12197,6 +12595,13 @@
     "Anycubic Generic PETG"
    ]
   ],
+  "OFX0etlv": [
+   [
+    "re3D",
+    "PETG",
+    "re3D PETG"
+   ]
+  ],
   "OFX0ycRQ": [
    [
     "Polymaker",
@@ -12230,6 +12635,13 @@
     "iQ Materials",
     "HPP4GF25",
     "Grauts HPP4GF25 P1"
+   ]
+  ],
+  "OFXSvqOX": [
+   [
+    "Snapmaker",
+    "TPU",
+    "Snapmaker TPU 95A HF"
    ]
   ],
   "OFXTPuqV": [
@@ -12335,6 +12747,13 @@
     "Snapmaker",
     "PLA",
     "Snapmaker J1 PLA Matte"
+   ]
+  ],
+  "OFY7jxcS": [
+   [
+    "Snapmaker",
+    "TPU",
+    "Snapmaker TPU 90A"
    ]
   ],
   "OFY9muEs": [
@@ -12904,6 +13323,13 @@
     "FilAr PLA Verde Manzana"
    ]
   ],
+  "OFdd8ZqJ": [
+   [
+    "Snapmaker",
+    "PLA",
+    "Snapmaker PLA Wood"
+   ]
+  ],
   "OFdkWDiy": [
    [
     "Cubicon",
@@ -13093,6 +13519,13 @@
     "QIDI PETG Translucent"
    ]
   ],
+  "OFf52D4e": [
+   [
+    "Snapmaker",
+    "PLA-CF",
+    "Snapmaker PLA-CF"
+   ]
+  ],
   "OFf5awy4": [
    [
     "Eolas Prints",
@@ -13128,6 +13561,13 @@
     "Bambu ASA"
    ]
   ],
+  "OFfD87Gy": [
+   [
+    "Snapmaker",
+    "PLA",
+    "Snapmaker PLA Glow"
+   ]
+  ],
   "OFfHGM1D": [
    [
     "re3D",
@@ -13147,6 +13587,13 @@
     "Creality",
     "PLA",
     "ENDER FAST PLA"
+   ]
+  ],
+  "OFfYHK5z": [
+   [
+    "Polymaker",
+    "PLA",
+    "Polymaker PLA-HT"
    ]
   ],
   "OFfZ0lTS": [
@@ -13345,6 +13792,13 @@
     "RatRig BigNozzle ASA"
    ]
   ],
+  "OFgdaBOt": [
+   [
+    "Polymaker",
+    "PLA",
+    "Polymaker Tough PLA Family"
+   ]
+  ],
   "OFgeM7nD": [
    [
     "Flashforge",
@@ -13532,6 +13986,13 @@
     "COEX 3D",
     "PLA",
     "COEX PLA"
+   ]
+  ],
+  "OFhmxnYw": [
+   [
+    "Snapmaker",
+    "PLA",
+    "Snapmaker PLA Basic"
    ]
   ],
   "OFhuaUQB": [
@@ -14071,6 +14532,20 @@
     "CoLiDo",
     "PLA",
     "CoLiDo PLA"
+   ]
+  ],
+  "OFm8rqoY": [
+   [
+    "re3D",
+    "PP",
+    "re3D rPP"
+   ]
+  ],
+  "OFmCOW2Y": [
+   [
+    "re3D",
+    "PETG",
+    "re3D rPETG"
    ]
   ],
   "OFmFwUWM": [
@@ -15359,6 +15834,13 @@
     "Polymaker",
     "PA-GF",
     "Fiberon PA6-GF"
+   ]
+  ],
+  "OFwbsgWj": [
+   [
+    "re3D",
+    "PC",
+    "re3D PC"
    ]
   ],
   "OFwhLMs4": [
