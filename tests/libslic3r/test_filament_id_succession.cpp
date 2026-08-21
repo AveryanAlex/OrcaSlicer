@@ -34,6 +34,14 @@ TEST_CASE("filament_id succession follows forwarding chains", "[Preset][filament
         CHECK(follow_filament_id_succession("OFchainB", forwards) == "OFlive00");
         CHECK(follow_filament_id_succession("OFchainC", forwards) == "OFlive00");
     }
+
+    // QidiPrinterAgent resolves device-composed QD_* protocol ids through this same walk;
+    // the map key format carries no OF assumption.
+    SECTION("device-protocol QD_* keys forward like any other id") {
+        const std::map<std::string, std::string> qd = {{"QD_2_1_11", "OFnew001"}};
+        CHECK(follow_filament_id_succession("QD_2_1_11", qd) == "OFnew001");
+        CHECK(follow_filament_id_succession("QD_2_1_12", qd).empty());
+    }
 }
 
 // Cycles are a ledger-validation error (script check 9) and never ship, but the client
