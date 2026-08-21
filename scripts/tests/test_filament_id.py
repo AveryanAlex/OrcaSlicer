@@ -1485,7 +1485,6 @@ class TestRealTree(unittest.TestCase):
     # QidiPrinterAgent::map_filament_type_to_setting_id returns must stay
     # retired ledger keys whose chains end at a live preset id, because the
     # agent resolves them through resolve_filament_id_succession() at runtime.
-    @unittest.skip("enable with plan v4.2: QD_* ids are not retired yet")
     def test_qidi_agent_fallback_ids_resolve_through_ledger(self):
         cpp = os.path.join(REPO_ROOT, "src", "slic3r", "Utils", "QidiPrinterAgent.cpp")
         with open(cpp, encoding="utf-8") as f:

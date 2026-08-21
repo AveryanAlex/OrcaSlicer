@@ -889,87 +889,11 @@
   "Qidi/QIDI ABS Rapido 0.2 nozzle",
   "Qidi/QIDI ABS Rapido 0.6 nozzle",
   "Qidi/QIDI ABS Rapido 0.8 nozzle",
-  "Qidi/QIDI ASA-CF @Qidi Q1 Pro 0.4 nozzle",
-  "Qidi/QIDI ASA-CF @Qidi Q1 Pro 0.6 nozzle",
-  "Qidi/QIDI ASA-CF @Qidi Q1 Pro 0.8 nozzle",
-  "Qidi/QIDI ASA-CF @Qidi X-Max 3 0.4 nozzle",
-  "Qidi/QIDI ASA-CF @Qidi X-Max 3 0.6 nozzle",
-  "Qidi/QIDI ASA-CF @Qidi X-Max 3 0.8 nozzle",
-  "Qidi/QIDI ASA-CF @Qidi X-Plus 3 0.4 nozzle",
-  "Qidi/QIDI ASA-CF @Qidi X-Plus 3 0.6 nozzle",
-  "Qidi/QIDI ASA-CF @Qidi X-Plus 3 0.8 nozzle",
-  "Qidi/QIDI ASA-CF @Qidi X-Smart 3 0.4 nozzle",
-  "Qidi/QIDI ASA-CF @Qidi X-Smart 3 0.6 nozzle",
-  "Qidi/QIDI ASA-CF @Qidi X-Smart 3 0.8 nozzle",
-  "Qidi/QIDI PA-Ultra @Qidi X-Plus 4 0.4 nozzle",
-  "Qidi/QIDI PA-Ultra @Qidi X-Plus 4 0.6 nozzle",
-  "Qidi/QIDI PA-Ultra @Qidi X-Plus 4 0.8 nozzle",
-  "Qidi/QIDI PA12-CF @Qidi X-Plus 4 0.4 nozzle",
-  "Qidi/QIDI PA12-CF @Qidi X-Plus 4 0.6 nozzle",
-  "Qidi/QIDI PA12-CF @Qidi X-Plus 4 0.8 nozzle",
-  "Qidi/QIDI PAHT-CF @Qidi X-Plus 4 0.4 nozzle",
-  "Qidi/QIDI PAHT-CF @Qidi X-Plus 4 0.6 nozzle",
-  "Qidi/QIDI PAHT-CF @Qidi X-Plus 4 0.8 nozzle",
-  "Qidi/QIDI PAHT-GF @Qidi X-Plus 4 0.4 nozzle",
-  "Qidi/QIDI PAHT-GF @Qidi X-Plus 4 0.6 nozzle",
-  "Qidi/QIDI PAHT-GF @Qidi X-Plus 4 0.8 nozzle",
-  "Qidi/QIDI PEBA 95A @Qidi Q1 Pro 0.4 nozzle",
-  "Qidi/QIDI PEBA 95A @Qidi Q1 Pro 0.6 nozzle",
-  "Qidi/QIDI PET-CF @Qidi X-Plus 4 0.4 nozzle",
-  "Qidi/QIDI PET-CF @Qidi X-Plus 4 0.6 nozzle",
-  "Qidi/QIDI PET-CF @Qidi X-Plus 4 0.8 nozzle",
-  "Qidi/QIDI PET-GF @Qidi X-Plus 4 0.4 nozzle",
-  "Qidi/QIDI PET-GF @Qidi X-Plus 4 0.6 nozzle",
-  "Qidi/QIDI PET-GF @Qidi X-Plus 4 0.8 nozzle",
-  "Qidi/QIDI PETG Basic @Qidi X-Plus 4 0.2 nozzle",
-  "Qidi/QIDI PETG Basic @Qidi X-Plus 4 0.4 nozzle",
-  "Qidi/QIDI PETG Basic @Qidi X-Plus 4 0.6 nozzle",
-  "Qidi/QIDI PETG Basic @Qidi X-Plus 4 0.8 nozzle",
-  "Qidi/QIDI PETG Rapido @Qidi X-Plus 4 0.2 nozzle",
-  "Qidi/QIDI PETG Rapido @Qidi X-Plus 4 0.4 nozzle",
-  "Qidi/QIDI PETG Rapido @Qidi X-Plus 4 0.6 nozzle",
-  "Qidi/QIDI PETG Rapido @Qidi X-Plus 4 0.8 nozzle",
   "Qidi/QIDI PETG Tough 0.2 nozzle",
   "Qidi/QIDI PETG Tough 0.6 nozzle",
   "Qidi/QIDI PETG Tough 0.8 nozzle",
-  "Qidi/QIDI PETG Tough @Qidi X-Plus 4 0.2 nozzle",
-  "Qidi/QIDI PETG Tough @Qidi X-Plus 4 0.4 nozzle",
-  "Qidi/QIDI PETG Tough @Qidi X-Plus 4 0.6 nozzle",
-  "Qidi/QIDI PETG Tough @Qidi X-Plus 4 0.8 nozzle",
-  "Qidi/QIDI PETG Translucent @Qidi X-Plus 4 0.2 nozzle",
-  "Qidi/QIDI PETG Translucent @Qidi X-Plus 4 0.4 nozzle",
-  "Qidi/QIDI PETG Translucent @Qidi X-Plus 4 0.6 nozzle",
-  "Qidi/QIDI PETG Translucent @Qidi X-Plus 4 0.8 nozzle",
-  "Qidi/QIDI PETG-CF @Qidi X-Plus 4 0.4 nozzle",
-  "Qidi/QIDI PETG-CF @Qidi X-Plus 4 0.6 nozzle",
-  "Qidi/QIDI PETG-CF @Qidi X-Plus 4 0.8 nozzle",
-  "Qidi/QIDI PETG-GF @Qidi X-Plus 4 0.4 nozzle",
-  "Qidi/QIDI PETG-GF @Qidi X-Plus 4 0.6 nozzle",
-  "Qidi/QIDI PETG-GF @Qidi X-Plus 4 0.8 nozzle",
-  "Qidi/QIDI PLA Basic @Qidi X-Plus 4 0.2 nozzle",
-  "Qidi/QIDI PLA Basic @Qidi X-Plus 4 0.4 nozzle",
-  "Qidi/QIDI PLA Basic @Qidi X-Plus 4 0.6 nozzle",
-  "Qidi/QIDI PLA Basic @Qidi X-Plus 4 0.8 nozzle",
-  "Qidi/QIDI PLA Matte Basic @Qidi X-Plus 4 0.2 nozzle",
-  "Qidi/QIDI PLA Matte Basic @Qidi X-Plus 4 0.4 nozzle",
-  "Qidi/QIDI PLA Matte Basic @Qidi X-Plus 4 0.6 nozzle",
-  "Qidi/QIDI PLA Matte Basic @Qidi X-Plus 4 0.8 nozzle",
   "Qidi/QIDI PLA Rapido 0.2 nozzle",
   "Qidi/QIDI PLA Rapido 0.8 nozzle",
-  "Qidi/QIDI PLA Rapido @Qidi X-Plus 4 0.2 nozzle",
-  "Qidi/QIDI PLA Rapido @Qidi X-Plus 4 0.4 nozzle",
-  "Qidi/QIDI PLA Rapido @Qidi X-Plus 4 0.6 nozzle",
-  "Qidi/QIDI PLA Rapido @Qidi X-Plus 4 0.8 nozzle",
-  "Qidi/QIDI PLA Rapido Matte @Qidi X-Plus 4 0.2 nozzle",
-  "Qidi/QIDI PLA Rapido Matte @Qidi X-Plus 4 0.4 nozzle",
-  "Qidi/QIDI PLA Rapido Matte @Qidi X-Plus 4 0.6 nozzle",
-  "Qidi/QIDI PLA Rapido Matte @Qidi X-Plus 4 0.8 nozzle",
-  "Qidi/QIDI PLA Rapido Metal @Qidi X-Plus 4 0.2 nozzle",
-  "Qidi/QIDI PLA Rapido Metal @Qidi X-Plus 4 0.4 nozzle",
-  "Qidi/QIDI PLA Rapido Metal @Qidi X-Plus 4 0.6 nozzle",
-  "Qidi/QIDI PLA Rapido Metal @Qidi X-Plus 4 0.8 nozzle",
-  "Qidi/QIDI PLA Rapido Silk @Qidi X-Plus 4 0.4 nozzle",
-  "Qidi/QIDI PLA Rapido Silk @Qidi X-Plus 4 0.6 nozzle",
   "Qidi/QIDI PLA-CF @0.6 nozzle",
   "Qidi/QIDI PLA-CF @0.8 nozzle",
   "Qidi/QIDI PLA-CF @Qidi Q1 Pro 0.4 nozzle",
@@ -978,38 +902,10 @@
   "Qidi/QIDI PLA-CF @Qidi X-Plus 4 0.4 nozzle",
   "Qidi/QIDI PLA-CF @Qidi X-Plus 4 0.6 nozzle",
   "Qidi/QIDI PLA-CF @Qidi X-Plus 4 0.8 nozzle",
-  "Qidi/QIDI PPS-CF @Qidi X-Plus 4 0.4 nozzle",
-  "Qidi/QIDI PPS-CF @Qidi X-Plus 4 0.6 nozzle",
-  "Qidi/QIDI PPS-CF @Qidi X-Plus 4 0.8 nozzle",
-  "Qidi/QIDI PPS-GF @Qidi Q1 Pro 0.4 nozzle",
-  "Qidi/QIDI PPS-GF @Qidi Q1 Pro 0.6 nozzle",
-  "Qidi/QIDI PPS-GF @Qidi Q1 Pro 0.8 nozzle",
-  "Qidi/QIDI Support For PAHT @Qidi X-Plus 4 0.4 nozzle",
-  "Qidi/QIDI Support For PAHT @Qidi X-Plus 4 0.6 nozzle",
-  "Qidi/QIDI Support For PAHT @Qidi X-Plus 4 0.8 nozzle",
-  "Qidi/QIDI Support For PET/PA @Qidi X-Plus 4 0.4 nozzle",
-  "Qidi/QIDI Support For PET/PA @Qidi X-Plus 4 0.6 nozzle",
-  "Qidi/QIDI Support For PET/PA @Qidi X-Plus 4 0.8 nozzle",
-  "Qidi/QIDI TPU-Aero @Qidi X-Plus 4 0.4 nozzle",
-  "Qidi/QIDI TPU-Aero @Qidi X-Plus 4 0.6 nozzle",
-  "Qidi/QIDI TPU-GF @Qidi Q1 Pro 0.4 nozzle",
-  "Qidi/QIDI TPU-GF @Qidi Q1 Pro 0.6 nozzle",
-  "Qidi/QIDI TPU-GF @Qidi Q1 Pro 0.8 nozzle",
-  "Qidi/QIDI UltraPA-CF25 @Qidi X-Plus 4 0.4 nozzle",
-  "Qidi/QIDI UltraPA-CF25 @Qidi X-Plus 4 0.6 nozzle",
-  "Qidi/QIDI UltraPA-CF25 @Qidi X-Plus 4 0.8 nozzle",
-  "Qidi/QIDI WOOD Rapido @Qidi X-Plus 4 0.4 nozzle",
-  "Qidi/QIDI WOOD Rapido @Qidi X-Plus 4 0.6 nozzle",
-  "Qidi/QIDI WOOD Rapido @Qidi X-Plus 4 0.8 nozzle",
   "Qidi/Qidi Generic PLA High Speed @Qidi X-Plus 4 0.2 nozzle",
   "Qidi/Qidi Generic PLA High Speed @Qidi X-Plus 4 0.4 nozzle",
   "Qidi/Qidi Generic PLA High Speed @Qidi X-Plus 4 0.6 nozzle",
   "Qidi/Qidi Generic PLA High Speed @Qidi X-Plus 4 0.8 nozzle",
-  "Qidi/Qidi PC-ABS-FR @Qidi X-Plus 4 0.4 nozzle",
-  "Qidi/Qidi PC-ABS-FR @Qidi X-Plus 4 0.6 nozzle",
-  "Qidi/Qidi PC-ABS-FR @Qidi X-Plus 4 0.8 nozzle",
-  "Qidi/Qidi TPU 95A-HF @Qidi X-Plus 4 0.4 nozzle",
-  "Qidi/Qidi TPU 95A-HF @Qidi X-Plus 4 0.8 nozzle",
   "Snapmaker/PolyLite Dual PLA @0.2 nozzle",
   "Snapmaker/PolyLite J1 PLA",
   "Snapmaker/PolyLite J1 PLA @0.2 nozzle",
@@ -1822,6 +1718,9 @@
   "OF2RjrWH": [
    "Flashforge/FusRock Generic PAHT-GF"
   ],
+  "OF2TQpOO": [
+   "Qidi/QIDI PLA Silk"
+  ],
   "OF2VFe4J": [
    "OrcaFilamentLibrary/Bambu PAHT-CF"
   ],
@@ -2391,6 +2290,9 @@
   "OFDGigEI": [
    "OrcaFilamentLibrary/Bambu PLA Dynamic"
   ],
+  "OFDIrhbu": [
+   "Qidi/QIDI PC/ABS-FR"
+  ],
   "OFDJU6R3": [
    "Afinia/Afinia TPU"
   ],
@@ -2411,6 +2313,7 @@
    "Flashforge/Generic PLA",
    "LONGER/Generic PLA",
    "OrcaFilamentLibrary/Generic PLA",
+   "Qidi/Generic PLA",
    "RH3D/Generic PLA",
    "Sovol/Generic PLA",
    "Z-Bolt/Generic PLA"
@@ -2519,6 +2422,9 @@
   ],
   "OFF9cgY5": [
    "Snapmaker/Snapmaker PLA Matte"
+  ],
+  "OFFAWVf0": [
+   "Qidi/QIDI PC-ABS-FR"
   ],
   "OFFC0VqZ": [
    "Ratrig/RatRig BigNozzle PCTG"
@@ -2895,6 +2801,7 @@
    "Custom/Generic PC",
    "Elegoo/Generic PC",
    "OrcaFilamentLibrary/Generic PC",
+   "Qidi/Generic PC",
    "Sovol/Generic PC"
   ],
   "OFLbXwoL": [
@@ -3246,6 +3153,9 @@
   "OFR0gODA": [
    "SeeMeCNC/SeeMeCNC ABS"
   ],
+  "OFR1XLMN": [
+   "Qidi/QIDI TPU 95A-HF"
+  ],
   "OFRDLNM9": [
    "Peopoly/Peopoly Generic PLA"
   ],
@@ -3495,6 +3405,9 @@
   "OFW9uIkE": [
    "Tiertime/Tiertime Generic HIPS"
   ],
+  "OFWDe7YH": [
+   "Qidi/QIDI UltraPA"
+  ],
   "OFWIr7ZE": [
    "CoLiDo/CoLiDo Generic ABS"
   ],
@@ -3629,6 +3542,7 @@
    "Elegoo/Generic ABS",
    "Flashforge/Generic ABS",
    "OrcaFilamentLibrary/Generic ABS",
+   "Qidi/Generic ABS",
    "RH3D/Generic ABS",
    "Sovol/Generic ABS",
    "Z-Bolt/Generic ABS"
@@ -3654,6 +3568,7 @@
    "Flashforge/Generic PETG",
    "LONGER/Generic PETG",
    "OrcaFilamentLibrary/Generic PETG",
+   "Qidi/Generic PETG",
    "RH3D/Generic PETG",
    "Sovol/Generic PETG",
    "Z-Bolt/Generic PETG"
@@ -3689,6 +3604,9 @@
   ],
   "OFZ2LuAi": [
    "Wanhao France/YUMI PLA Bowden"
+  ],
+  "OFZ3K2cL": [
+   "Qidi/QIDI PA6-CF"
   ],
   "OFZ4QbfK": [
    "OrcaFilamentLibrary/FilAr PLA Rosa Flamenco"
@@ -3963,6 +3881,7 @@
   "OFesA6rF": [
    "Flashforge/Generic PLA Silk",
    "OrcaFilamentLibrary/Generic PLA Silk",
+   "Qidi/Generic PLA Silk",
    "Sovol/Generic PLA Silk"
   ],
   "OFetENFF": [
@@ -4298,6 +4217,9 @@
   ],
   "OFjcwUEm": [
    "Cubicon/Cubicon PLA"
+  ],
+  "OFjiXpyf": [
+   "Qidi/Generic TPU 95A"
   ],
   "OFjkdnyN": [
    "Snapmaker/Snapmaker Dual TPU"
@@ -4889,6 +4811,9 @@
   "OFu0fjPJ": [
    "LH/LHS PC CF"
   ],
+  "OFu1E4ur": [
+   "Qidi/QIDI ASA-Aero"
+  ],
   "OFu1evlr": [
    "Creality/Generic PCTG",
    "OrcaFilamentLibrary/Generic PCTG"
@@ -5192,618 +5117,6 @@
   ],
   "OFzzmK2Q": [
    "FLSun/FLSun S1 ABS"
-  ],
-  "QD_0_1_1": [
-   "Qidi/QIDI PLA Rapido"
-  ],
-  "QD_0_1_15": [
-   "Qidi/QIDI TPU-GF"
-  ],
-  "QD_0_1_2": [
-   "Qidi/QIDI PLA Rapido Matte"
-  ],
-  "QD_0_1_20": [
-   "Qidi/QIDI ASA-CF"
-  ],
-  "QD_0_1_24": [
-   "Qidi/QIDI PA-Ultra"
-  ],
-  "QD_0_1_26": [
-   "Qidi/QIDI UltraPA-CF25"
-  ],
-  "QD_0_1_27": [
-   "Qidi/QIDI PA12-CF"
-  ],
-  "QD_0_1_3": [
-   "Qidi/QIDI PLA Rapido Metal"
-  ],
-  "QD_0_1_30": [
-   "Qidi/QIDI PAHT-CF"
-  ],
-  "QD_0_1_31": [
-   "Qidi/QIDI PAHT-GF"
-  ],
-  "QD_0_1_32": [
-   "Qidi/QIDI Support For PAHT"
-  ],
-  "QD_0_1_33": [
-   "Qidi/QIDI Support For PET/PA"
-  ],
-  "QD_0_1_34": [
-   "Qidi/Qidi PC-ABS-FR"
-  ],
-  "QD_0_1_36": [
-   "Qidi/QIDI PEBA 95A"
-  ],
-  "QD_0_1_37": [
-   "Qidi/QIDI PET-CF"
-  ],
-  "QD_0_1_38": [
-   "Qidi/QIDI PET-GF"
-  ],
-  "QD_0_1_39": [
-   "Qidi/QIDI PETG Basic"
-  ],
-  "QD_0_1_4": [
-   "Qidi/QIDI PLA Rapido Silk"
-  ],
-  "QD_0_1_40": [
-   "Qidi/QIDI PETG Tough"
-  ],
-  "QD_0_1_41": [
-   "Qidi/QIDI PETG Rapido"
-  ],
-  "QD_0_1_42": [
-   "Qidi/QIDI PETG-CF"
-  ],
-  "QD_0_1_43": [
-   "Qidi/QIDI PETG-GF"
-  ],
-  "QD_0_1_44": [
-   "Qidi/QIDI PPS-CF"
-  ],
-  "QD_0_1_45": [
-   "Qidi/QIDI PETG Translucent"
-  ],
-  "QD_0_1_46": [
-   "Qidi/QIDI PPS-GF"
-  ],
-  "QD_0_1_49": [
-   "Qidi/QIDI TPU-Aero"
-  ],
-  "QD_0_1_5": [
-   "Qidi/QIDI PLA-CF"
-  ],
-  "QD_0_1_50": [
-   "Qidi/Qidi TPU 95A-HF"
-  ],
-  "QD_0_1_6": [
-   "Qidi/QIDI WOOD Rapido"
-  ],
-  "QD_0_1_7": [
-   "Qidi/QIDI PLA Basic"
-  ],
-  "QD_0_1_8": [
-   "Qidi/QIDI PLA Matte Basic"
-  ],
-  "QD_1_0_1": [
-   "Qidi/Generic PLA"
-  ],
-  "QD_1_0_11": [
-   "Qidi/Generic ABS"
-  ],
-  "QD_1_0_23": [
-   "Qidi/Generic PC"
-  ],
-  "QD_1_0_4": [
-   "Qidi/Generic PLA Silk"
-  ],
-  "QD_1_0_41": [
-   "Qidi/Generic PETG"
-  ],
-  "QD_1_0_50": [
-   "Qidi/Generic TPU 95A"
-  ],
-  "QD_1_1_1": [
-   "Qidi/QIDI PLA Rapido"
-  ],
-  "QD_1_1_11": [
-   "Qidi/QIDI ABS Rapido"
-  ],
-  "QD_1_1_12": [
-   "Qidi/QIDI ABS-GF"
-  ],
-  "QD_1_1_13": [
-   "Qidi/QIDI ABS Rapido Metal"
-  ],
-  "QD_1_1_14": [
-   "Qidi/QIDI ABS Odorless"
-  ],
-  "QD_1_1_15": [
-   "Qidi/QIDI TPU-GF"
-  ],
-  "QD_1_1_18": [
-   "Qidi/QIDI ASA"
-  ],
-  "QD_1_1_19": [
-   "Qidi/QIDI ASA-Aero"
-  ],
-  "QD_1_1_2": [
-   "Qidi/QIDI PLA Rapido Matte"
-  ],
-  "QD_1_1_20": [
-   "Qidi/QIDI ASA-CF"
-  ],
-  "QD_1_1_24": [
-   "Qidi/QIDI UltraPA"
-  ],
-  "QD_1_1_26": [
-   "Qidi/QIDI UltraPA-CF25"
-  ],
-  "QD_1_1_27": [
-   "Qidi/QIDI PA12-CF"
-  ],
-  "QD_1_1_3": [
-   "Qidi/QIDI PLA Rapido Metal"
-  ],
-  "QD_1_1_30": [
-   "Qidi/QIDI PAHT-CF"
-  ],
-  "QD_1_1_31": [
-   "Qidi/QIDI PAHT-GF"
-  ],
-  "QD_1_1_32": [
-   "Qidi/QIDI Support For PAHT"
-  ],
-  "QD_1_1_33": [
-   "Qidi/QIDI Support For PET/PA"
-  ],
-  "QD_1_1_34": [
-   "Qidi/QIDI PC-ABS-FR"
-  ],
-  "QD_1_1_36": [
-   "Qidi/QIDI PEBA 95A"
-  ],
-  "QD_1_1_37": [
-   "Qidi/QIDI PET-CF"
-  ],
-  "QD_1_1_38": [
-   "Qidi/QIDI PET-GF"
-  ],
-  "QD_1_1_39": [
-   "Qidi/QIDI PETG Basic"
-  ],
-  "QD_1_1_4": [
-   "Qidi/QIDI PLA Rapido Silk"
-  ],
-  "QD_1_1_40": [
-   "Qidi/QIDI PETG Tough"
-  ],
-  "QD_1_1_41": [
-   "Qidi/QIDI PETG Rapido"
-  ],
-  "QD_1_1_42": [
-   "Qidi/QIDI PETG-CF"
-  ],
-  "QD_1_1_43": [
-   "Qidi/QIDI PETG-GF"
-  ],
-  "QD_1_1_44": [
-   "Qidi/QIDI PPS-CF"
-  ],
-  "QD_1_1_45": [
-   "Qidi/QIDI PETG Translucent"
-  ],
-  "QD_1_1_46": [
-   "Qidi/QIDI PPS-GF"
-  ],
-  "QD_1_1_49": [
-   "Qidi/QIDI TPU-Aero"
-  ],
-  "QD_1_1_5": [
-   "Qidi/QIDI PLA-CF"
-  ],
-  "QD_1_1_50": [
-   "Qidi/QIDI TPU 95A-HF"
-  ],
-  "QD_1_1_6": [
-   "Qidi/QIDI WOOD Rapido"
-  ],
-  "QD_1_1_7": [
-   "Qidi/QIDI PLA Basic"
-  ],
-  "QD_1_1_8": [
-   "Qidi/QIDI PLA Matte Basic"
-  ],
-  "QD_2_0_1": [
-   "Qidi/Generic PLA"
-  ],
-  "QD_2_0_11": [
-   "Qidi/Generic ABS"
-  ],
-  "QD_2_0_23": [
-   "Qidi/Generic PC"
-  ],
-  "QD_2_0_4": [
-   "Qidi/Generic PLA Silk"
-  ],
-  "QD_2_0_41": [
-   "Qidi/Generic PETG"
-  ],
-  "QD_2_0_50": [
-   "Qidi/Generic TPU 95A"
-  ],
-  "QD_2_1_1": [
-   "Qidi/QIDI PLA Rapido"
-  ],
-  "QD_2_1_11": [
-   "Qidi/QIDI ABS Rapido"
-  ],
-  "QD_2_1_12": [
-   "Qidi/QIDI ABS-GF"
-  ],
-  "QD_2_1_13": [
-   "Qidi/QIDI ABS Rapido Metal"
-  ],
-  "QD_2_1_14": [
-   "Qidi/QIDI ABS Odorless"
-  ],
-  "QD_2_1_15": [
-   "Qidi/QIDI TPU-GF"
-  ],
-  "QD_2_1_18": [
-   "Qidi/QIDI ASA"
-  ],
-  "QD_2_1_19": [
-   "Qidi/QIDI ASA-Aero"
-  ],
-  "QD_2_1_2": [
-   "Qidi/QIDI PLA Rapido Matte"
-  ],
-  "QD_2_1_20": [
-   "Qidi/QIDI ASA-CF"
-  ],
-  "QD_2_1_24": [
-   "Qidi/QIDI UltraPA"
-  ],
-  "QD_2_1_26": [
-   "Qidi/QIDI UltraPA-CF25"
-  ],
-  "QD_2_1_27": [
-   "Qidi/QIDI PA12-CF"
-  ],
-  "QD_2_1_3": [
-   "Qidi/QIDI PLA Rapido Metal"
-  ],
-  "QD_2_1_30": [
-   "Qidi/QIDI PAHT-CF"
-  ],
-  "QD_2_1_31": [
-   "Qidi/QIDI PAHT-GF"
-  ],
-  "QD_2_1_32": [
-   "Qidi/QIDI Support For PAHT"
-  ],
-  "QD_2_1_33": [
-   "Qidi/QIDI Support For PET/PA"
-  ],
-  "QD_2_1_34": [
-   "Qidi/QIDI PC-ABS-FR"
-  ],
-  "QD_2_1_36": [
-   "Qidi/QIDI PEBA 95A"
-  ],
-  "QD_2_1_37": [
-   "Qidi/QIDI PET-CF"
-  ],
-  "QD_2_1_38": [
-   "Qidi/QIDI PET-GF"
-  ],
-  "QD_2_1_39": [
-   "Qidi/QIDI PETG Basic"
-  ],
-  "QD_2_1_4": [
-   "Qidi/QIDI PLA Rapido Silk"
-  ],
-  "QD_2_1_40": [
-   "Qidi/QIDI PETG Tough"
-  ],
-  "QD_2_1_41": [
-   "Qidi/QIDI PETG Rapido"
-  ],
-  "QD_2_1_42": [
-   "Qidi/QIDI PETG-CF"
-  ],
-  "QD_2_1_43": [
-   "Qidi/QIDI PETG-GF"
-  ],
-  "QD_2_1_44": [
-   "Qidi/QIDI PPS-CF"
-  ],
-  "QD_2_1_45": [
-   "Qidi/QIDI PETG Translucent"
-  ],
-  "QD_2_1_46": [
-   "Qidi/QIDI PPS-GF"
-  ],
-  "QD_2_1_49": [
-   "Qidi/QIDI TPU-Aero"
-  ],
-  "QD_2_1_5": [
-   "Qidi/QIDI PLA-CF"
-  ],
-  "QD_2_1_50": [
-   "Qidi/QIDI TPU 95A-HF"
-  ],
-  "QD_2_1_6": [
-   "Qidi/QIDI WOOD Rapido"
-  ],
-  "QD_2_1_7": [
-   "Qidi/QIDI PLA Basic"
-  ],
-  "QD_2_1_8": [
-   "Qidi/QIDI PLA Matte Basic"
-  ],
-  "QD_3_0_1": [
-   "Qidi/Generic PLA"
-  ],
-  "QD_3_0_11": [
-   "Qidi/Generic ABS"
-  ],
-  "QD_3_0_23": [
-   "Qidi/Generic PC"
-  ],
-  "QD_3_0_4": [
-   "Qidi/Generic PLA Silk"
-  ],
-  "QD_3_0_41": [
-   "Qidi/Generic PETG"
-  ],
-  "QD_3_0_50": [
-   "Qidi/Generic TPU 95A"
-  ],
-  "QD_3_1_1": [
-   "Qidi/QIDI PLA Rapido"
-  ],
-  "QD_3_1_11": [
-   "Qidi/QIDI ABS Rapido"
-  ],
-  "QD_3_1_12": [
-   "Qidi/QIDI ABS-GF"
-  ],
-  "QD_3_1_13": [
-   "Qidi/QIDI ABS Rapido Metal"
-  ],
-  "QD_3_1_14": [
-   "Qidi/QIDI ABS Odorless"
-  ],
-  "QD_3_1_15": [
-   "Qidi/QIDI TPU-GF"
-  ],
-  "QD_3_1_18": [
-   "Qidi/QIDI ASA"
-  ],
-  "QD_3_1_19": [
-   "Qidi/QIDI ASA-Aero"
-  ],
-  "QD_3_1_2": [
-   "Qidi/QIDI PLA Rapido Matte"
-  ],
-  "QD_3_1_20": [
-   "Qidi/QIDI ASA-CF"
-  ],
-  "QD_3_1_24": [
-   "Qidi/QIDI UltraPA"
-  ],
-  "QD_3_1_26": [
-   "Qidi/QIDI UltraPA-CF25"
-  ],
-  "QD_3_1_27": [
-   "Qidi/QIDI PA12-CF"
-  ],
-  "QD_3_1_3": [
-   "Qidi/QIDI PLA Rapido Metal"
-  ],
-  "QD_3_1_30": [
-   "Qidi/QIDI PAHT-CF"
-  ],
-  "QD_3_1_31": [
-   "Qidi/QIDI PAHT-GF"
-  ],
-  "QD_3_1_32": [
-   "Qidi/QIDI Support For PAHT"
-  ],
-  "QD_3_1_33": [
-   "Qidi/QIDI Support For PET/PA"
-  ],
-  "QD_3_1_34": [
-   "Qidi/QIDI PC/ABS-FR"
-  ],
-  "QD_3_1_36": [
-   "Qidi/QIDI PEBA 95A"
-  ],
-  "QD_3_1_37": [
-   "Qidi/QIDI PET-CF"
-  ],
-  "QD_3_1_38": [
-   "Qidi/QIDI PET-GF"
-  ],
-  "QD_3_1_39": [
-   "Qidi/QIDI PETG Basic"
-  ],
-  "QD_3_1_4": [
-   "Qidi/QIDI PLA Rapido Silk"
-  ],
-  "QD_3_1_40": [
-   "Qidi/QIDI PETG Tough"
-  ],
-  "QD_3_1_41": [
-   "Qidi/QIDI PETG Rapido"
-  ],
-  "QD_3_1_42": [
-   "Qidi/QIDI PETG-CF"
-  ],
-  "QD_3_1_43": [
-   "Qidi/QIDI PETG-GF"
-  ],
-  "QD_3_1_44": [
-   "Qidi/QIDI PPS-CF"
-  ],
-  "QD_3_1_45": [
-   "Qidi/QIDI PETG Translucent"
-  ],
-  "QD_3_1_46": [
-   "Qidi/QIDI PPS-GF"
-  ],
-  "QD_3_1_49": [
-   "Qidi/QIDI TPU-Aero"
-  ],
-  "QD_3_1_5": [
-   "Qidi/QIDI PLA-CF"
-  ],
-  "QD_3_1_50": [
-   "Qidi/QIDI TPU 95A-HF"
-  ],
-  "QD_3_1_6": [
-   "Qidi/QIDI WOOD Rapido"
-  ],
-  "QD_3_1_7": [
-   "Qidi/QIDI PLA Basic"
-  ],
-  "QD_3_1_8": [
-   "Qidi/QIDI PLA Matte Basic"
-  ],
-  "QD_4_0_1": [
-   "Qidi/Generic PLA"
-  ],
-  "QD_4_0_11": [
-   "Qidi/Generic ABS"
-  ],
-  "QD_4_0_23": [
-   "Qidi/Generic PC"
-  ],
-  "QD_4_0_4": [
-   "Qidi/Generic PLA Silk"
-  ],
-  "QD_4_0_41": [
-   "Qidi/Generic PETG"
-  ],
-  "QD_4_0_50": [
-   "Qidi/Generic TPU 95A"
-  ],
-  "QD_4_1_1": [
-   "Qidi/QIDI PLA Rapido"
-  ],
-  "QD_4_1_11": [
-   "Qidi/QIDI ABS Rapido"
-  ],
-  "QD_4_1_12": [
-   "Qidi/QIDI ABS-GF"
-  ],
-  "QD_4_1_13": [
-   "Qidi/QIDI ABS Rapido Metal"
-  ],
-  "QD_4_1_14": [
-   "Qidi/QIDI ABS Odorless"
-  ],
-  "QD_4_1_15": [
-   "Qidi/QIDI TPU-GF"
-  ],
-  "QD_4_1_18": [
-   "Qidi/QIDI ASA"
-  ],
-  "QD_4_1_19": [
-   "Qidi/QIDI ASA-Aero"
-  ],
-  "QD_4_1_2": [
-   "Qidi/QIDI PLA Rapido Matte"
-  ],
-  "QD_4_1_20": [
-   "Qidi/QIDI ASA-CF"
-  ],
-  "QD_4_1_24": [
-   "Qidi/QIDI UltraPA"
-  ],
-  "QD_4_1_25": [
-   "Qidi/QIDI PA6-CF"
-  ],
-  "QD_4_1_26": [
-   "Qidi/QIDI UltraPA-CF25"
-  ],
-  "QD_4_1_27": [
-   "Qidi/QIDI PA12-CF"
-  ],
-  "QD_4_1_3": [
-   "Qidi/QIDI PLA Rapido Metal"
-  ],
-  "QD_4_1_30": [
-   "Qidi/QIDI PAHT-CF"
-  ],
-  "QD_4_1_31": [
-   "Qidi/QIDI PAHT-GF"
-  ],
-  "QD_4_1_32": [
-   "Qidi/QIDI Support For PAHT"
-  ],
-  "QD_4_1_33": [
-   "Qidi/QIDI Support For PET/PA"
-  ],
-  "QD_4_1_34": [
-   "Qidi/QIDI PC/ABS-FR"
-  ],
-  "QD_4_1_36": [
-   "Qidi/QIDI PEBA 95A"
-  ],
-  "QD_4_1_37": [
-   "Qidi/QIDI PET-CF"
-  ],
-  "QD_4_1_38": [
-   "Qidi/QIDI PET-GF"
-  ],
-  "QD_4_1_39": [
-   "Qidi/QIDI PETG Basic"
-  ],
-  "QD_4_1_4": [
-   "Qidi/QIDI PLA Silk"
-  ],
-  "QD_4_1_40": [
-   "Qidi/QIDI PETG Tough"
-  ],
-  "QD_4_1_41": [
-   "Qidi/QIDI PETG Rapido"
-  ],
-  "QD_4_1_42": [
-   "Qidi/QIDI PETG-CF"
-  ],
-  "QD_4_1_43": [
-   "Qidi/QIDI PETG-GF"
-  ],
-  "QD_4_1_44": [
-   "Qidi/QIDI PPS-CF"
-  ],
-  "QD_4_1_45": [
-   "Qidi/QIDI PETG Translucent"
-  ],
-  "QD_4_1_46": [
-   "Qidi/QIDI PPS-GF"
-  ],
-  "QD_4_1_49": [
-   "Qidi/QIDI TPU-Aero"
-  ],
-  "QD_4_1_5": [
-   "Qidi/QIDI PLA-CF"
-  ],
-  "QD_4_1_50": [
-   "Qidi/QIDI TPU 95A-HF"
-  ],
-  "QD_4_1_6": [
-   "Qidi/QIDI WOOD Rapido"
-  ],
-  "QD_4_1_7": [
-   "Qidi/QIDI PLA Basic"
-  ],
-  "QD_4_1_8": [
-   "Qidi/QIDI PLA Matte Basic"
   ]
  },
  "instantiated_with_id": [
@@ -8710,6 +8023,13 @@
     "FusRock Generic PAHT-GF"
    ]
   ],
+  "OF2TQpOO": [
+   [
+    "QIDI",
+    "PLA",
+    "QIDI PLA Silk"
+   ]
+  ],
   "OF2VFe4J": [
    [
     "Bambu Lab",
@@ -10012,6 +9332,13 @@
     "Bambu PLA Dynamic"
    ]
   ],
+  "OFDIrhbu": [
+   [
+    "QIDI",
+    "PC-ABS-FR",
+    "QIDI PC/ABS-FR"
+   ]
+  ],
   "OFDJU6R3": [
    [
     "Afinia",
@@ -10283,6 +9610,13 @@
     "Snapmaker",
     "PLA",
     "Snapmaker PLA Matte"
+   ]
+  ],
+  "OFFAWVf0": [
+   [
+    "QIDI",
+    "PC-ABS-FR",
+    "QIDI PC-ABS-FR"
    ]
   ],
   "OFFC0VqZ": [
@@ -11909,6 +11243,13 @@
     "SeeMeCNC ABS"
    ]
   ],
+  "OFR1XLMN": [
+   [
+    "QIDI",
+    "TPU",
+    "QIDI TPU 95A-HF"
+   ]
+  ],
   "OFRDLNM9": [
    [
     "Generic",
@@ -12476,6 +11817,13 @@
     "Tiertime Generic HIPS"
    ]
   ],
+  "OFWDe7YH": [
+   [
+    "QIDI",
+    "UltraPA",
+    "QIDI UltraPA"
+   ]
+  ],
   "OFWIr7ZE": [
    [
     "CoLiDo",
@@ -12873,6 +12221,13 @@
     "Yumi",
     "PLA",
     "YUMI PLA Bowden"
+   ]
+  ],
+  "OFZ3K2cL": [
+   [
+    "QIDI",
+    "PA6-CF",
+    "QIDI PA6-CF"
    ]
   ],
   "OFZ4QbfK": [
@@ -14226,6 +13581,13 @@
     "Cubicon PLA"
    ]
   ],
+  "OFjiXpyf": [
+   [
+    "Generic",
+    "TPU",
+    "Generic TPU 95A"
+   ]
+  ],
   "OFjkdnyN": [
    [
     "Snapmaker",
@@ -15535,6 +14897,13 @@
     "LHS PC CF"
    ]
   ],
+  "OFu1E4ur": [
+   [
+    "QIDI",
+    "ASA-AERO",
+    "QIDI ASA-Aero"
+   ]
+  ],
   "OFu1evlr": [
    [
     "Generic",
@@ -16226,1434 +15595,6 @@
     "Generic",
     "ABS",
     "FLSun S1 ABS"
-   ]
-  ],
-  "QD_0_1_1": [
-   [
-    "QIDI",
-    "PLA",
-    "QIDI PLA Rapido"
-   ]
-  ],
-  "QD_0_1_15": [
-   [
-    "QIDI",
-    "TPU-GF",
-    "QIDI TPU-GF"
-   ]
-  ],
-  "QD_0_1_2": [
-   [
-    "QIDI",
-    "PLA",
-    "QIDI PLA Rapido Matte"
-   ]
-  ],
-  "QD_0_1_20": [
-   [
-    "QIDI",
-    "ASA-CF",
-    "QIDI ASA-CF"
-   ]
-  ],
-  "QD_0_1_24": [
-   [
-    "QIDI",
-    "UltraPA",
-    "QIDI PA-Ultra"
-   ]
-  ],
-  "QD_0_1_26": [
-   [
-    "QIDI",
-    "UltraPA-CF25",
-    "QIDI UltraPA-CF25"
-   ]
-  ],
-  "QD_0_1_27": [
-   [
-    "QIDI",
-    "PA12-CF",
-    "QIDI PA12-CF"
-   ]
-  ],
-  "QD_0_1_3": [
-   [
-    "QIDI",
-    "PLA",
-    "QIDI PLA Rapido Metal"
-   ]
-  ],
-  "QD_0_1_30": [
-   [
-    "QIDI",
-    "PAHT-CF",
-    "QIDI PAHT-CF"
-   ]
-  ],
-  "QD_0_1_31": [
-   [
-    "QIDI",
-    "PAHT-GF",
-    "QIDI PAHT-GF"
-   ]
-  ],
-  "QD_0_1_32": [
-   [
-    "QIDI",
-    "PAHT-S",
-    "QIDI Support For PAHT"
-   ]
-  ],
-  "QD_0_1_33": [
-   [
-    "QIDI",
-    "PA-S",
-    "QIDI Support For PET/PA"
-   ]
-  ],
-  "QD_0_1_34": [
-   [
-    "QIDI",
-    "PC-ABS-FR",
-    "Qidi PC-ABS-FR"
-   ]
-  ],
-  "QD_0_1_36": [
-   [
-    "QIDI",
-    "PEBA",
-    "QIDI PEBA 95A"
-   ]
-  ],
-  "QD_0_1_37": [
-   [
-    "QIDI",
-    "PET-CF",
-    "QIDI PET-CF"
-   ]
-  ],
-  "QD_0_1_38": [
-   [
-    "QIDI",
-    "PET-GF",
-    "QIDI PET-GF"
-   ]
-  ],
-  "QD_0_1_39": [
-   [
-    "QIDI",
-    "PETG",
-    "QIDI PETG Basic"
-   ]
-  ],
-  "QD_0_1_4": [
-   [
-    "QIDI",
-    "PLA",
-    "QIDI PLA Rapido Silk"
-   ]
-  ],
-  "QD_0_1_40": [
-   [
-    "QIDI",
-    "PETG",
-    "QIDI PETG Tough"
-   ]
-  ],
-  "QD_0_1_41": [
-   [
-    "QIDI",
-    "PETG",
-    "QIDI PETG Rapido"
-   ]
-  ],
-  "QD_0_1_42": [
-   [
-    "QIDI",
-    "PETG-CF",
-    "QIDI PETG-CF"
-   ]
-  ],
-  "QD_0_1_43": [
-   [
-    "QIDI",
-    "PETG-GF",
-    "QIDI PETG-GF"
-   ]
-  ],
-  "QD_0_1_44": [
-   [
-    "QIDI",
-    "PPS-CF",
-    "QIDI PPS-CF"
-   ]
-  ],
-  "QD_0_1_45": [
-   [
-    "QIDI",
-    "PETG",
-    "QIDI PETG Translucent"
-   ]
-  ],
-  "QD_0_1_46": [
-   [
-    "QIDI",
-    "PPS-GF",
-    "QIDI PPS-GF"
-   ]
-  ],
-  "QD_0_1_49": [
-   [
-    "QIDI",
-    "TPU-AERO",
-    "QIDI TPU-Aero"
-   ]
-  ],
-  "QD_0_1_5": [
-   [
-    "QIDI",
-    "PLA-CF",
-    "QIDI PLA-CF"
-   ]
-  ],
-  "QD_0_1_50": [
-   [
-    "QIDI",
-    "TPU",
-    "Qidi TPU 95A-HF"
-   ]
-  ],
-  "QD_0_1_6": [
-   [
-    "QIDI",
-    "PLA",
-    "QIDI WOOD Rapido"
-   ]
-  ],
-  "QD_0_1_7": [
-   [
-    "QIDI",
-    "PLA",
-    "QIDI PLA Basic"
-   ]
-  ],
-  "QD_0_1_8": [
-   [
-    "QIDI",
-    "PLA",
-    "QIDI PLA Matte Basic"
-   ]
-  ],
-  "QD_1_0_1": [
-   [
-    "Generic",
-    "PLA",
-    "Generic PLA"
-   ]
-  ],
-  "QD_1_0_11": [
-   [
-    "Generic",
-    "ABS",
-    "Generic ABS"
-   ]
-  ],
-  "QD_1_0_23": [
-   [
-    "Generic",
-    "PC",
-    "Generic PC"
-   ]
-  ],
-  "QD_1_0_4": [
-   [
-    "Generic",
-    "PLA",
-    "Generic PLA Silk"
-   ]
-  ],
-  "QD_1_0_41": [
-   [
-    "Generic",
-    "PETG",
-    "Generic PETG"
-   ]
-  ],
-  "QD_1_0_50": [
-   [
-    "Generic",
-    "TPU",
-    "Generic TPU 95A"
-   ]
-  ],
-  "QD_1_1_1": [
-   [
-    "QIDI",
-    "PLA",
-    "QIDI PLA Rapido"
-   ]
-  ],
-  "QD_1_1_11": [
-   [
-    "QIDI",
-    "ABS",
-    "QIDI ABS Rapido"
-   ]
-  ],
-  "QD_1_1_12": [
-   [
-    "QIDI",
-    "ABS-GF",
-    "QIDI ABS-GF"
-   ]
-  ],
-  "QD_1_1_13": [
-   [
-    "QIDI",
-    "ABS",
-    "QIDI ABS Rapido Metal"
-   ]
-  ],
-  "QD_1_1_14": [
-   [
-    "QIDI",
-    "ABS",
-    "QIDI ABS Odorless"
-   ]
-  ],
-  "QD_1_1_15": [
-   [
-    "QIDI",
-    "TPU-GF",
-    "QIDI TPU-GF"
-   ]
-  ],
-  "QD_1_1_18": [
-   [
-    "QIDI",
-    "ASA",
-    "QIDI ASA"
-   ]
-  ],
-  "QD_1_1_19": [
-   [
-    "QIDI",
-    "ASA-AERO",
-    "QIDI ASA-Aero"
-   ]
-  ],
-  "QD_1_1_2": [
-   [
-    "QIDI",
-    "PLA",
-    "QIDI PLA Rapido Matte"
-   ]
-  ],
-  "QD_1_1_20": [
-   [
-    "QIDI",
-    "ASA-CF",
-    "QIDI ASA-CF"
-   ]
-  ],
-  "QD_1_1_24": [
-   [
-    "QIDI",
-    "UltraPA",
-    "QIDI UltraPA"
-   ]
-  ],
-  "QD_1_1_26": [
-   [
-    "QIDI",
-    "UltraPA-CF25",
-    "QIDI UltraPA-CF25"
-   ]
-  ],
-  "QD_1_1_27": [
-   [
-    "QIDI",
-    "PA12-CF",
-    "QIDI PA12-CF"
-   ]
-  ],
-  "QD_1_1_3": [
-   [
-    "QIDI",
-    "PLA",
-    "QIDI PLA Rapido Metal"
-   ]
-  ],
-  "QD_1_1_30": [
-   [
-    "QIDI",
-    "PAHT-CF",
-    "QIDI PAHT-CF"
-   ]
-  ],
-  "QD_1_1_31": [
-   [
-    "QIDI",
-    "PAHT-GF",
-    "QIDI PAHT-GF"
-   ]
-  ],
-  "QD_1_1_32": [
-   [
-    "QIDI",
-    "PAHT-S",
-    "QIDI Support For PAHT"
-   ]
-  ],
-  "QD_1_1_33": [
-   [
-    "QIDI",
-    "PA-S",
-    "QIDI Support For PET/PA"
-   ]
-  ],
-  "QD_1_1_34": [
-   [
-    "QIDI",
-    "PC-ABS-FR",
-    "QIDI PC-ABS-FR"
-   ]
-  ],
-  "QD_1_1_36": [
-   [
-    "QIDI",
-    "PEBA",
-    "QIDI PEBA 95A"
-   ]
-  ],
-  "QD_1_1_37": [
-   [
-    "QIDI",
-    "PET-CF",
-    "QIDI PET-CF"
-   ]
-  ],
-  "QD_1_1_38": [
-   [
-    "QIDI",
-    "PET-GF",
-    "QIDI PET-GF"
-   ]
-  ],
-  "QD_1_1_39": [
-   [
-    "QIDI",
-    "PETG",
-    "QIDI PETG Basic"
-   ]
-  ],
-  "QD_1_1_4": [
-   [
-    "QIDI",
-    "PLA",
-    "QIDI PLA Rapido Silk"
-   ]
-  ],
-  "QD_1_1_40": [
-   [
-    "QIDI",
-    "PETG",
-    "QIDI PETG Tough"
-   ]
-  ],
-  "QD_1_1_41": [
-   [
-    "QIDI",
-    "PETG",
-    "QIDI PETG Rapido"
-   ]
-  ],
-  "QD_1_1_42": [
-   [
-    "QIDI",
-    "PETG-CF",
-    "QIDI PETG-CF"
-   ]
-  ],
-  "QD_1_1_43": [
-   [
-    "QIDI",
-    "PETG-GF",
-    "QIDI PETG-GF"
-   ]
-  ],
-  "QD_1_1_44": [
-   [
-    "QIDI",
-    "PPS-CF",
-    "QIDI PPS-CF"
-   ]
-  ],
-  "QD_1_1_45": [
-   [
-    "QIDI",
-    "PETG",
-    "QIDI PETG Translucent"
-   ]
-  ],
-  "QD_1_1_46": [
-   [
-    "QIDI",
-    "PPS-GF",
-    "QIDI PPS-GF"
-   ]
-  ],
-  "QD_1_1_49": [
-   [
-    "QIDI",
-    "TPU-AERO",
-    "QIDI TPU-Aero"
-   ]
-  ],
-  "QD_1_1_5": [
-   [
-    "QIDI",
-    "PLA-CF",
-    "QIDI PLA-CF"
-   ]
-  ],
-  "QD_1_1_50": [
-   [
-    "QIDI",
-    "TPU",
-    "QIDI TPU 95A-HF"
-   ]
-  ],
-  "QD_1_1_6": [
-   [
-    "QIDI",
-    "PLA",
-    "QIDI WOOD Rapido"
-   ]
-  ],
-  "QD_1_1_7": [
-   [
-    "QIDI",
-    "PLA",
-    "QIDI PLA Basic"
-   ]
-  ],
-  "QD_1_1_8": [
-   [
-    "QIDI",
-    "PLA",
-    "QIDI PLA Matte Basic"
-   ]
-  ],
-  "QD_2_0_1": [
-   [
-    "Generic",
-    "PLA",
-    "Generic PLA"
-   ]
-  ],
-  "QD_2_0_11": [
-   [
-    "Generic",
-    "ABS",
-    "Generic ABS"
-   ]
-  ],
-  "QD_2_0_23": [
-   [
-    "Generic",
-    "PC",
-    "Generic PC"
-   ]
-  ],
-  "QD_2_0_4": [
-   [
-    "Generic",
-    "PLA",
-    "Generic PLA Silk"
-   ]
-  ],
-  "QD_2_0_41": [
-   [
-    "Generic",
-    "PETG",
-    "Generic PETG"
-   ]
-  ],
-  "QD_2_0_50": [
-   [
-    "Generic",
-    "TPU",
-    "Generic TPU 95A"
-   ]
-  ],
-  "QD_2_1_1": [
-   [
-    "QIDI",
-    "PLA",
-    "QIDI PLA Rapido"
-   ]
-  ],
-  "QD_2_1_11": [
-   [
-    "QIDI",
-    "ABS",
-    "QIDI ABS Rapido"
-   ]
-  ],
-  "QD_2_1_12": [
-   [
-    "QIDI",
-    "ABS-GF",
-    "QIDI ABS-GF"
-   ]
-  ],
-  "QD_2_1_13": [
-   [
-    "QIDI",
-    "ABS",
-    "QIDI ABS Rapido Metal"
-   ]
-  ],
-  "QD_2_1_14": [
-   [
-    "QIDI",
-    "ABS",
-    "QIDI ABS Odorless"
-   ]
-  ],
-  "QD_2_1_15": [
-   [
-    "QIDI",
-    "TPU-GF",
-    "QIDI TPU-GF"
-   ]
-  ],
-  "QD_2_1_18": [
-   [
-    "QIDI",
-    "ASA",
-    "QIDI ASA"
-   ]
-  ],
-  "QD_2_1_19": [
-   [
-    "QIDI",
-    "ASA-AERO",
-    "QIDI ASA-Aero"
-   ]
-  ],
-  "QD_2_1_2": [
-   [
-    "QIDI",
-    "PLA",
-    "QIDI PLA Rapido Matte"
-   ]
-  ],
-  "QD_2_1_20": [
-   [
-    "QIDI",
-    "ASA-CF",
-    "QIDI ASA-CF"
-   ]
-  ],
-  "QD_2_1_24": [
-   [
-    "QIDI",
-    "UltraPA",
-    "QIDI UltraPA"
-   ]
-  ],
-  "QD_2_1_26": [
-   [
-    "QIDI",
-    "UltraPA-CF25",
-    "QIDI UltraPA-CF25"
-   ]
-  ],
-  "QD_2_1_27": [
-   [
-    "QIDI",
-    "PA12-CF",
-    "QIDI PA12-CF"
-   ]
-  ],
-  "QD_2_1_3": [
-   [
-    "QIDI",
-    "PLA",
-    "QIDI PLA Rapido Metal"
-   ]
-  ],
-  "QD_2_1_30": [
-   [
-    "QIDI",
-    "PAHT-CF",
-    "QIDI PAHT-CF"
-   ]
-  ],
-  "QD_2_1_31": [
-   [
-    "QIDI",
-    "PAHT-GF",
-    "QIDI PAHT-GF"
-   ]
-  ],
-  "QD_2_1_32": [
-   [
-    "QIDI",
-    "PAHT-S",
-    "QIDI Support For PAHT"
-   ]
-  ],
-  "QD_2_1_33": [
-   [
-    "QIDI",
-    "PA-S",
-    "QIDI Support For PET/PA"
-   ]
-  ],
-  "QD_2_1_34": [
-   [
-    "QIDI",
-    "PC-ABS-FR",
-    "QIDI PC-ABS-FR"
-   ]
-  ],
-  "QD_2_1_36": [
-   [
-    "QIDI",
-    "PEBA",
-    "QIDI PEBA 95A"
-   ]
-  ],
-  "QD_2_1_37": [
-   [
-    "QIDI",
-    "PET-CF",
-    "QIDI PET-CF"
-   ]
-  ],
-  "QD_2_1_38": [
-   [
-    "QIDI",
-    "PET-GF",
-    "QIDI PET-GF"
-   ]
-  ],
-  "QD_2_1_39": [
-   [
-    "QIDI",
-    "PETG",
-    "QIDI PETG Basic"
-   ]
-  ],
-  "QD_2_1_4": [
-   [
-    "QIDI",
-    "PLA",
-    "QIDI PLA Rapido Silk"
-   ]
-  ],
-  "QD_2_1_40": [
-   [
-    "QIDI",
-    "PETG",
-    "QIDI PETG Tough"
-   ]
-  ],
-  "QD_2_1_41": [
-   [
-    "QIDI",
-    "PETG",
-    "QIDI PETG Rapido"
-   ]
-  ],
-  "QD_2_1_42": [
-   [
-    "QIDI",
-    "PETG-CF",
-    "QIDI PETG-CF"
-   ]
-  ],
-  "QD_2_1_43": [
-   [
-    "QIDI",
-    "PETG-GF",
-    "QIDI PETG-GF"
-   ]
-  ],
-  "QD_2_1_44": [
-   [
-    "QIDI",
-    "PPS-CF",
-    "QIDI PPS-CF"
-   ]
-  ],
-  "QD_2_1_45": [
-   [
-    "QIDI",
-    "PETG",
-    "QIDI PETG Translucent"
-   ]
-  ],
-  "QD_2_1_46": [
-   [
-    "QIDI",
-    "PPS-GF",
-    "QIDI PPS-GF"
-   ]
-  ],
-  "QD_2_1_49": [
-   [
-    "QIDI",
-    "TPU-AERO",
-    "QIDI TPU-Aero"
-   ]
-  ],
-  "QD_2_1_5": [
-   [
-    "QIDI",
-    "PLA-CF",
-    "QIDI PLA-CF"
-   ]
-  ],
-  "QD_2_1_50": [
-   [
-    "QIDI",
-    "TPU",
-    "QIDI TPU 95A-HF"
-   ]
-  ],
-  "QD_2_1_6": [
-   [
-    "QIDI",
-    "PLA",
-    "QIDI WOOD Rapido"
-   ]
-  ],
-  "QD_2_1_7": [
-   [
-    "QIDI",
-    "PLA",
-    "QIDI PLA Basic"
-   ]
-  ],
-  "QD_2_1_8": [
-   [
-    "QIDI",
-    "PLA",
-    "QIDI PLA Matte Basic"
-   ]
-  ],
-  "QD_3_0_1": [
-   [
-    "Generic",
-    "PLA",
-    "Generic PLA"
-   ]
-  ],
-  "QD_3_0_11": [
-   [
-    "Generic",
-    "ABS",
-    "Generic ABS"
-   ]
-  ],
-  "QD_3_0_23": [
-   [
-    "Generic",
-    "PC",
-    "Generic PC"
-   ]
-  ],
-  "QD_3_0_4": [
-   [
-    "Generic",
-    "PLA",
-    "Generic PLA Silk"
-   ]
-  ],
-  "QD_3_0_41": [
-   [
-    "Generic",
-    "PETG",
-    "Generic PETG"
-   ]
-  ],
-  "QD_3_0_50": [
-   [
-    "Generic",
-    "TPU",
-    "Generic TPU 95A"
-   ]
-  ],
-  "QD_3_1_1": [
-   [
-    "QIDI",
-    "PLA",
-    "QIDI PLA Rapido"
-   ]
-  ],
-  "QD_3_1_11": [
-   [
-    "QIDI",
-    "ABS",
-    "QIDI ABS Rapido"
-   ]
-  ],
-  "QD_3_1_12": [
-   [
-    "QIDI",
-    "ABS-GF",
-    "QIDI ABS-GF"
-   ]
-  ],
-  "QD_3_1_13": [
-   [
-    "QIDI",
-    "ABS",
-    "QIDI ABS Rapido Metal"
-   ]
-  ],
-  "QD_3_1_14": [
-   [
-    "QIDI",
-    "ABS",
-    "QIDI ABS Odorless"
-   ]
-  ],
-  "QD_3_1_15": [
-   [
-    "QIDI",
-    "TPU-GF",
-    "QIDI TPU-GF"
-   ]
-  ],
-  "QD_3_1_18": [
-   [
-    "QIDI",
-    "ASA",
-    "QIDI ASA"
-   ]
-  ],
-  "QD_3_1_19": [
-   [
-    "QIDI",
-    "ASA-AERO",
-    "QIDI ASA-Aero"
-   ]
-  ],
-  "QD_3_1_2": [
-   [
-    "QIDI",
-    "PLA",
-    "QIDI PLA Rapido Matte"
-   ]
-  ],
-  "QD_3_1_20": [
-   [
-    "QIDI",
-    "ASA-CF",
-    "QIDI ASA-CF"
-   ]
-  ],
-  "QD_3_1_24": [
-   [
-    "QIDI",
-    "UltraPA",
-    "QIDI UltraPA"
-   ]
-  ],
-  "QD_3_1_26": [
-   [
-    "QIDI",
-    "UltraPA-CF25",
-    "QIDI UltraPA-CF25"
-   ]
-  ],
-  "QD_3_1_27": [
-   [
-    "QIDI",
-    "PA12-CF",
-    "QIDI PA12-CF"
-   ]
-  ],
-  "QD_3_1_3": [
-   [
-    "QIDI",
-    "PLA",
-    "QIDI PLA Rapido Metal"
-   ]
-  ],
-  "QD_3_1_30": [
-   [
-    "QIDI",
-    "PAHT-CF",
-    "QIDI PAHT-CF"
-   ]
-  ],
-  "QD_3_1_31": [
-   [
-    "QIDI",
-    "PAHT-GF",
-    "QIDI PAHT-GF"
-   ]
-  ],
-  "QD_3_1_32": [
-   [
-    "QIDI",
-    "PAHT-S",
-    "QIDI Support For PAHT"
-   ]
-  ],
-  "QD_3_1_33": [
-   [
-    "QIDI",
-    "PA-S",
-    "QIDI Support For PET/PA"
-   ]
-  ],
-  "QD_3_1_34": [
-   [
-    "QIDI",
-    "PC-ABS-FR",
-    "QIDI PC/ABS-FR"
-   ]
-  ],
-  "QD_3_1_36": [
-   [
-    "QIDI",
-    "PEBA",
-    "QIDI PEBA 95A"
-   ]
-  ],
-  "QD_3_1_37": [
-   [
-    "QIDI",
-    "PET-CF",
-    "QIDI PET-CF"
-   ]
-  ],
-  "QD_3_1_38": [
-   [
-    "QIDI",
-    "PET-GF",
-    "QIDI PET-GF"
-   ]
-  ],
-  "QD_3_1_39": [
-   [
-    "QIDI",
-    "PETG",
-    "QIDI PETG Basic"
-   ]
-  ],
-  "QD_3_1_4": [
-   [
-    "QIDI",
-    "PLA",
-    "QIDI PLA Rapido Silk"
-   ]
-  ],
-  "QD_3_1_40": [
-   [
-    "QIDI",
-    "PETG",
-    "QIDI PETG Tough"
-   ]
-  ],
-  "QD_3_1_41": [
-   [
-    "QIDI",
-    "PETG",
-    "QIDI PETG Rapido"
-   ]
-  ],
-  "QD_3_1_42": [
-   [
-    "QIDI",
-    "PETG-CF",
-    "QIDI PETG-CF"
-   ]
-  ],
-  "QD_3_1_43": [
-   [
-    "QIDI",
-    "PETG-GF",
-    "QIDI PETG-GF"
-   ]
-  ],
-  "QD_3_1_44": [
-   [
-    "QIDI",
-    "PPS-CF",
-    "QIDI PPS-CF"
-   ]
-  ],
-  "QD_3_1_45": [
-   [
-    "QIDI",
-    "PETG",
-    "QIDI PETG Translucent"
-   ]
-  ],
-  "QD_3_1_46": [
-   [
-    "QIDI",
-    "PPS-GF",
-    "QIDI PPS-GF"
-   ]
-  ],
-  "QD_3_1_49": [
-   [
-    "QIDI",
-    "TPU-AERO",
-    "QIDI TPU-Aero"
-   ]
-  ],
-  "QD_3_1_5": [
-   [
-    "QIDI",
-    "PLA-CF",
-    "QIDI PLA-CF"
-   ]
-  ],
-  "QD_3_1_50": [
-   [
-    "QIDI",
-    "TPU",
-    "QIDI TPU 95A-HF"
-   ]
-  ],
-  "QD_3_1_6": [
-   [
-    "QIDI",
-    "PLA",
-    "QIDI WOOD Rapido"
-   ]
-  ],
-  "QD_3_1_7": [
-   [
-    "QIDI",
-    "PLA",
-    "QIDI PLA Basic"
-   ]
-  ],
-  "QD_3_1_8": [
-   [
-    "QIDI",
-    "PLA",
-    "QIDI PLA Matte Basic"
-   ]
-  ],
-  "QD_4_0_1": [
-   [
-    "Generic",
-    "PLA",
-    "Generic PLA"
-   ]
-  ],
-  "QD_4_0_11": [
-   [
-    "Generic",
-    "ABS",
-    "Generic ABS"
-   ]
-  ],
-  "QD_4_0_23": [
-   [
-    "Generic",
-    "PC",
-    "Generic PC"
-   ]
-  ],
-  "QD_4_0_4": [
-   [
-    "Generic",
-    "PLA",
-    "Generic PLA Silk"
-   ]
-  ],
-  "QD_4_0_41": [
-   [
-    "Generic",
-    "PETG",
-    "Generic PETG"
-   ]
-  ],
-  "QD_4_0_50": [
-   [
-    "Generic",
-    "TPU",
-    "Generic TPU 95A"
-   ]
-  ],
-  "QD_4_1_1": [
-   [
-    "QIDI",
-    "PLA",
-    "QIDI PLA Rapido"
-   ]
-  ],
-  "QD_4_1_11": [
-   [
-    "QIDI",
-    "ABS",
-    "QIDI ABS Rapido"
-   ]
-  ],
-  "QD_4_1_12": [
-   [
-    "QIDI",
-    "ABS-GF",
-    "QIDI ABS-GF"
-   ]
-  ],
-  "QD_4_1_13": [
-   [
-    "QIDI",
-    "ABS",
-    "QIDI ABS Rapido Metal"
-   ]
-  ],
-  "QD_4_1_14": [
-   [
-    "QIDI",
-    "ABS",
-    "QIDI ABS Odorless"
-   ]
-  ],
-  "QD_4_1_15": [
-   [
-    "QIDI",
-    "TPU-GF",
-    "QIDI TPU-GF"
-   ]
-  ],
-  "QD_4_1_18": [
-   [
-    "QIDI",
-    "ASA",
-    "QIDI ASA"
-   ]
-  ],
-  "QD_4_1_19": [
-   [
-    "QIDI",
-    "ASA-AERO",
-    "QIDI ASA-Aero"
-   ]
-  ],
-  "QD_4_1_2": [
-   [
-    "QIDI",
-    "PLA",
-    "QIDI PLA Rapido Matte"
-   ]
-  ],
-  "QD_4_1_20": [
-   [
-    "QIDI",
-    "ASA-CF",
-    "QIDI ASA-CF"
-   ]
-  ],
-  "QD_4_1_24": [
-   [
-    "QIDI",
-    "UltraPA",
-    "QIDI UltraPA"
-   ]
-  ],
-  "QD_4_1_25": [
-   [
-    "QIDI",
-    "PA6-CF",
-    "QIDI PA6-CF"
-   ]
-  ],
-  "QD_4_1_26": [
-   [
-    "QIDI",
-    "UltraPA-CF25",
-    "QIDI UltraPA-CF25"
-   ]
-  ],
-  "QD_4_1_27": [
-   [
-    "QIDI",
-    "PA12-CF",
-    "QIDI PA12-CF"
-   ]
-  ],
-  "QD_4_1_3": [
-   [
-    "QIDI",
-    "PLA",
-    "QIDI PLA Rapido Metal"
-   ]
-  ],
-  "QD_4_1_30": [
-   [
-    "QIDI",
-    "PAHT-CF",
-    "QIDI PAHT-CF"
-   ]
-  ],
-  "QD_4_1_31": [
-   [
-    "QIDI",
-    "PAHT-GF",
-    "QIDI PAHT-GF"
-   ]
-  ],
-  "QD_4_1_32": [
-   [
-    "QIDI",
-    "PAHT-S",
-    "QIDI Support For PAHT"
-   ]
-  ],
-  "QD_4_1_33": [
-   [
-    "QIDI",
-    "PA-S",
-    "QIDI Support For PET/PA"
-   ]
-  ],
-  "QD_4_1_34": [
-   [
-    "QIDI",
-    "PC-ABS-FR",
-    "QIDI PC/ABS-FR"
-   ]
-  ],
-  "QD_4_1_36": [
-   [
-    "QIDI",
-    "PEBA",
-    "QIDI PEBA 95A"
-   ]
-  ],
-  "QD_4_1_37": [
-   [
-    "QIDI",
-    "PET-CF",
-    "QIDI PET-CF"
-   ]
-  ],
-  "QD_4_1_38": [
-   [
-    "QIDI",
-    "PET-GF",
-    "QIDI PET-GF"
-   ]
-  ],
-  "QD_4_1_39": [
-   [
-    "QIDI",
-    "PETG",
-    "QIDI PETG Basic"
-   ]
-  ],
-  "QD_4_1_4": [
-   [
-    "QIDI",
-    "PLA",
-    "QIDI PLA Silk"
-   ]
-  ],
-  "QD_4_1_40": [
-   [
-    "QIDI",
-    "PETG",
-    "QIDI PETG Tough"
-   ]
-  ],
-  "QD_4_1_41": [
-   [
-    "QIDI",
-    "PETG",
-    "QIDI PETG Rapido"
-   ]
-  ],
-  "QD_4_1_42": [
-   [
-    "QIDI",
-    "PETG-CF",
-    "QIDI PETG-CF"
-   ]
-  ],
-  "QD_4_1_43": [
-   [
-    "QIDI",
-    "PETG-GF",
-    "QIDI PETG-GF"
-   ]
-  ],
-  "QD_4_1_44": [
-   [
-    "QIDI",
-    "PPS-CF",
-    "QIDI PPS-CF"
-   ]
-  ],
-  "QD_4_1_45": [
-   [
-    "QIDI",
-    "PETG",
-    "QIDI PETG Translucent"
-   ]
-  ],
-  "QD_4_1_46": [
-   [
-    "QIDI",
-    "PPS-GF",
-    "QIDI PPS-GF"
-   ]
-  ],
-  "QD_4_1_49": [
-   [
-    "QIDI",
-    "TPU-AERO",
-    "QIDI TPU-Aero"
-   ]
-  ],
-  "QD_4_1_5": [
-   [
-    "QIDI",
-    "PLA-CF",
-    "QIDI PLA-CF"
-   ]
-  ],
-  "QD_4_1_50": [
-   [
-    "QIDI",
-    "TPU",
-    "QIDI TPU 95A-HF"
-   ]
-  ],
-  "QD_4_1_6": [
-   [
-    "QIDI",
-    "PLA",
-    "QIDI WOOD Rapido"
-   ]
-  ],
-  "QD_4_1_7": [
-   [
-    "QIDI",
-    "PLA",
-    "QIDI PLA Basic"
-   ]
-  ],
-  "QD_4_1_8": [
-   [
-    "QIDI",
-    "PLA",
-    "QIDI PLA Matte Basic"
    ]
   ]
  }

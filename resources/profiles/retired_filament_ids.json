@@ -3603,6 +3603,1230 @@
    ],
    "successor": "OFWRITFw"
   },
+  "QD_0_1_1": {
+   "claims": [
+    "Qidi/QIDI PLA Rapido"
+   ],
+   "successor": "OFKIQO2W"
+  },
+  "QD_0_1_15": {
+   "claims": [
+    "Qidi/QIDI TPU-GF"
+   ],
+   "successor": "OF9EHUKK"
+  },
+  "QD_0_1_2": {
+   "claims": [
+    "Qidi/QIDI PLA Rapido Matte"
+   ],
+   "successor": "OF3IKafc"
+  },
+  "QD_0_1_20": {
+   "claims": [
+    "Qidi/QIDI ASA-CF"
+   ],
+   "successor": "OF1W7c76"
+  },
+  "QD_0_1_24": {
+   "claims": [
+    "Qidi/QIDI PA-Ultra"
+   ],
+   "successor": "OFlN6DL1"
+  },
+  "QD_0_1_26": {
+   "claims": [
+    "Qidi/QIDI UltraPA-CF25"
+   ],
+   "successor": "OF9PELEb"
+  },
+  "QD_0_1_27": {
+   "claims": [
+    "Qidi/QIDI PA12-CF"
+   ],
+   "successor": "OFn6WpN7"
+  },
+  "QD_0_1_3": {
+   "claims": [
+    "Qidi/QIDI PLA Rapido Metal"
+   ],
+   "successor": "OFANFm4x"
+  },
+  "QD_0_1_30": {
+   "claims": [
+    "Qidi/QIDI PAHT-CF"
+   ],
+   "successor": "OFKgmsqE"
+  },
+  "QD_0_1_31": {
+   "claims": [
+    "Qidi/QIDI PAHT-GF"
+   ],
+   "successor": "OFo15hcT"
+  },
+  "QD_0_1_32": {
+   "claims": [
+    "Qidi/QIDI Support For PAHT"
+   ],
+   "successor": "OFXn3Vd9"
+  },
+  "QD_0_1_33": {
+   "claims": [
+    "Qidi/QIDI Support For PET/PA"
+   ],
+   "successor": "OFqcL5UF"
+  },
+  "QD_0_1_34": {
+   "claims": [
+    "Qidi/Qidi PC-ABS-FR"
+   ],
+   "successor": "OFjD3YTW"
+  },
+  "QD_0_1_36": {
+   "claims": [
+    "Qidi/QIDI PEBA 95A"
+   ],
+   "successor": "OFhiJE7Y"
+  },
+  "QD_0_1_37": {
+   "claims": [
+    "Qidi/QIDI PET-CF"
+   ],
+   "successor": "OFKfJTwL"
+  },
+  "QD_0_1_38": {
+   "claims": [
+    "Qidi/QIDI PET-GF"
+   ],
+   "successor": "OFhx4uOG"
+  },
+  "QD_0_1_39": {
+   "claims": [
+    "Qidi/QIDI PETG Basic"
+   ],
+   "successor": "OFuJ49uH"
+  },
+  "QD_0_1_4": {
+   "claims": [
+    "Qidi/QIDI PLA Rapido Silk"
+   ],
+   "successor": "OFW5FqkL"
+  },
+  "QD_0_1_40": {
+   "claims": [
+    "Qidi/QIDI PETG Tough"
+   ],
+   "successor": "OFQ40XeN"
+  },
+  "QD_0_1_41": {
+   "claims": [
+    "Qidi/QIDI PETG Rapido"
+   ],
+   "successor": "OF4S3To3"
+  },
+  "QD_0_1_42": {
+   "claims": [
+    "Qidi/QIDI PETG-CF"
+   ],
+   "successor": "OF4iWKrE"
+  },
+  "QD_0_1_43": {
+   "claims": [
+    "Qidi/QIDI PETG-GF"
+   ],
+   "successor": "OFdtPd9h"
+  },
+  "QD_0_1_44": {
+   "claims": [
+    "Qidi/QIDI PPS-CF"
+   ],
+   "successor": "OFZOuWrO"
+  },
+  "QD_0_1_45": {
+   "claims": [
+    "Qidi/QIDI PETG Translucent"
+   ],
+   "successor": "OFf0MkD5"
+  },
+  "QD_0_1_46": {
+   "claims": [
+    "Qidi/QIDI PPS-GF"
+   ],
+   "successor": "OFp57RRC"
+  },
+  "QD_0_1_49": {
+   "claims": [
+    "Qidi/QIDI TPU-Aero"
+   ],
+   "successor": "OFMDHOcT"
+  },
+  "QD_0_1_5": {
+   "claims": [
+    "Qidi/QIDI PLA-CF"
+   ],
+   "successor": "OFhWrAuP"
+  },
+  "QD_0_1_50": {
+   "claims": [
+    "Qidi/Qidi TPU 95A-HF"
+   ],
+   "successor": "OFzAWsca"
+  },
+  "QD_0_1_6": {
+   "claims": [
+    "Qidi/QIDI WOOD Rapido"
+   ],
+   "successor": "OFvdZ2bx"
+  },
+  "QD_0_1_7": {
+   "claims": [
+    "Qidi/QIDI PLA Basic"
+   ],
+   "successor": "OF4nQ62r"
+  },
+  "QD_0_1_8": {
+   "claims": [
+    "Qidi/QIDI PLA Matte Basic"
+   ],
+   "successor": "OFughwKn"
+  },
+  "QD_1_0_1": {
+   "claims": [
+    "Qidi/Generic PLA"
+   ],
+   "successor": "OFDSrzZ8"
+  },
+  "QD_1_0_11": {
+   "claims": [
+    "Qidi/Generic ABS"
+   ],
+   "successor": "OFY9muEs"
+  },
+  "QD_1_0_23": {
+   "claims": [
+    "Qidi/Generic PC"
+   ],
+   "successor": "OFLakOUI"
+  },
+  "QD_1_0_4": {
+   "claims": [
+    "Qidi/Generic PLA Silk"
+   ],
+   "successor": "OFesA6rF"
+  },
+  "QD_1_0_41": {
+   "claims": [
+    "Qidi/Generic PETG"
+   ],
+   "successor": "OFYPdQJh"
+  },
+  "QD_1_0_50": {
+   "claims": [
+    "Qidi/Generic TPU 95A"
+   ],
+   "successor": "OFjiXpyf"
+  },
+  "QD_1_1_1": {
+   "claims": [
+    "Qidi/QIDI PLA Rapido"
+   ],
+   "successor": "OFKIQO2W"
+  },
+  "QD_1_1_11": {
+   "claims": [
+    "Qidi/QIDI ABS Rapido"
+   ],
+   "successor": "OFT2jon4"
+  },
+  "QD_1_1_12": {
+   "claims": [
+    "Qidi/QIDI ABS-GF"
+   ],
+   "successor": "OFt3HtlG"
+  },
+  "QD_1_1_13": {
+   "claims": [
+    "Qidi/QIDI ABS Rapido Metal"
+   ],
+   "successor": "OFeCJqxx"
+  },
+  "QD_1_1_14": {
+   "claims": [
+    "Qidi/QIDI ABS Odorless"
+   ],
+   "successor": "OFma5TXH"
+  },
+  "QD_1_1_15": {
+   "claims": [
+    "Qidi/QIDI TPU-GF"
+   ],
+   "successor": "OF9EHUKK"
+  },
+  "QD_1_1_18": {
+   "claims": [
+    "Qidi/QIDI ASA"
+   ],
+   "successor": "OFTsHNQi"
+  },
+  "QD_1_1_19": {
+   "claims": [
+    "Qidi/QIDI ASA-Aero"
+   ],
+   "successor": "OFu1E4ur"
+  },
+  "QD_1_1_2": {
+   "claims": [
+    "Qidi/QIDI PLA Rapido Matte"
+   ],
+   "successor": "OF3IKafc"
+  },
+  "QD_1_1_20": {
+   "claims": [
+    "Qidi/QIDI ASA-CF"
+   ],
+   "successor": "OF1W7c76"
+  },
+  "QD_1_1_24": {
+   "claims": [
+    "Qidi/QIDI UltraPA"
+   ],
+   "successor": "OFWDe7YH"
+  },
+  "QD_1_1_26": {
+   "claims": [
+    "Qidi/QIDI UltraPA-CF25"
+   ],
+   "successor": "OF9PELEb"
+  },
+  "QD_1_1_27": {
+   "claims": [
+    "Qidi/QIDI PA12-CF"
+   ],
+   "successor": "OFn6WpN7"
+  },
+  "QD_1_1_3": {
+   "claims": [
+    "Qidi/QIDI PLA Rapido Metal"
+   ],
+   "successor": "OFANFm4x"
+  },
+  "QD_1_1_30": {
+   "claims": [
+    "Qidi/QIDI PAHT-CF"
+   ],
+   "successor": "OFKgmsqE"
+  },
+  "QD_1_1_31": {
+   "claims": [
+    "Qidi/QIDI PAHT-GF"
+   ],
+   "successor": "OFo15hcT"
+  },
+  "QD_1_1_32": {
+   "claims": [
+    "Qidi/QIDI Support For PAHT"
+   ],
+   "successor": "OFXn3Vd9"
+  },
+  "QD_1_1_33": {
+   "claims": [
+    "Qidi/QIDI Support For PET/PA"
+   ],
+   "successor": "OFqcL5UF"
+  },
+  "QD_1_1_34": {
+   "claims": [
+    "Qidi/QIDI PC-ABS-FR"
+   ],
+   "successor": "OFFAWVf0"
+  },
+  "QD_1_1_36": {
+   "claims": [
+    "Qidi/QIDI PEBA 95A"
+   ],
+   "successor": "OFhiJE7Y"
+  },
+  "QD_1_1_37": {
+   "claims": [
+    "Qidi/QIDI PET-CF"
+   ],
+   "successor": "OFKfJTwL"
+  },
+  "QD_1_1_38": {
+   "claims": [
+    "Qidi/QIDI PET-GF"
+   ],
+   "successor": "OFhx4uOG"
+  },
+  "QD_1_1_39": {
+   "claims": [
+    "Qidi/QIDI PETG Basic"
+   ],
+   "successor": "OFuJ49uH"
+  },
+  "QD_1_1_4": {
+   "claims": [
+    "Qidi/QIDI PLA Rapido Silk"
+   ],
+   "successor": "OFW5FqkL"
+  },
+  "QD_1_1_40": {
+   "claims": [
+    "Qidi/QIDI PETG Tough"
+   ],
+   "successor": "OFQ40XeN"
+  },
+  "QD_1_1_41": {
+   "claims": [
+    "Qidi/QIDI PETG Rapido"
+   ],
+   "successor": "OF4S3To3"
+  },
+  "QD_1_1_42": {
+   "claims": [
+    "Qidi/QIDI PETG-CF"
+   ],
+   "successor": "OF4iWKrE"
+  },
+  "QD_1_1_43": {
+   "claims": [
+    "Qidi/QIDI PETG-GF"
+   ],
+   "successor": "OFdtPd9h"
+  },
+  "QD_1_1_44": {
+   "claims": [
+    "Qidi/QIDI PPS-CF"
+   ],
+   "successor": "OFZOuWrO"
+  },
+  "QD_1_1_45": {
+   "claims": [
+    "Qidi/QIDI PETG Translucent"
+   ],
+   "successor": "OFf0MkD5"
+  },
+  "QD_1_1_46": {
+   "claims": [
+    "Qidi/QIDI PPS-GF"
+   ],
+   "successor": "OFp57RRC"
+  },
+  "QD_1_1_49": {
+   "claims": [
+    "Qidi/QIDI TPU-Aero"
+   ],
+   "successor": "OFMDHOcT"
+  },
+  "QD_1_1_5": {
+   "claims": [
+    "Qidi/QIDI PLA-CF"
+   ],
+   "successor": "OFhWrAuP"
+  },
+  "QD_1_1_50": {
+   "claims": [
+    "Qidi/QIDI TPU 95A-HF"
+   ],
+   "successor": "OFR1XLMN"
+  },
+  "QD_1_1_6": {
+   "claims": [
+    "Qidi/QIDI WOOD Rapido"
+   ],
+   "successor": "OFvdZ2bx"
+  },
+  "QD_1_1_7": {
+   "claims": [
+    "Qidi/QIDI PLA Basic"
+   ],
+   "successor": "OF4nQ62r"
+  },
+  "QD_1_1_8": {
+   "claims": [
+    "Qidi/QIDI PLA Matte Basic"
+   ],
+   "successor": "OFughwKn"
+  },
+  "QD_2_0_1": {
+   "claims": [
+    "Qidi/Generic PLA"
+   ],
+   "successor": "OFDSrzZ8"
+  },
+  "QD_2_0_11": {
+   "claims": [
+    "Qidi/Generic ABS"
+   ],
+   "successor": "OFY9muEs"
+  },
+  "QD_2_0_23": {
+   "claims": [
+    "Qidi/Generic PC"
+   ],
+   "successor": "OFLakOUI"
+  },
+  "QD_2_0_4": {
+   "claims": [
+    "Qidi/Generic PLA Silk"
+   ],
+   "successor": "OFesA6rF"
+  },
+  "QD_2_0_41": {
+   "claims": [
+    "Qidi/Generic PETG"
+   ],
+   "successor": "OFYPdQJh"
+  },
+  "QD_2_0_50": {
+   "claims": [
+    "Qidi/Generic TPU 95A"
+   ],
+   "successor": "OFjiXpyf"
+  },
+  "QD_2_1_1": {
+   "claims": [
+    "Qidi/QIDI PLA Rapido"
+   ],
+   "successor": "OFKIQO2W"
+  },
+  "QD_2_1_11": {
+   "claims": [
+    "Qidi/QIDI ABS Rapido"
+   ],
+   "successor": "OFT2jon4"
+  },
+  "QD_2_1_12": {
+   "claims": [
+    "Qidi/QIDI ABS-GF"
+   ],
+   "successor": "OFt3HtlG"
+  },
+  "QD_2_1_13": {
+   "claims": [
+    "Qidi/QIDI ABS Rapido Metal"
+   ],
+   "successor": "OFeCJqxx"
+  },
+  "QD_2_1_14": {
+   "claims": [
+    "Qidi/QIDI ABS Odorless"
+   ],
+   "successor": "OFma5TXH"
+  },
+  "QD_2_1_15": {
+   "claims": [
+    "Qidi/QIDI TPU-GF"
+   ],
+   "successor": "OF9EHUKK"
+  },
+  "QD_2_1_18": {
+   "claims": [
+    "Qidi/QIDI ASA"
+   ],
+   "successor": "OFTsHNQi"
+  },
+  "QD_2_1_19": {
+   "claims": [
+    "Qidi/QIDI ASA-Aero"
+   ],
+   "successor": "OFu1E4ur"
+  },
+  "QD_2_1_2": {
+   "claims": [
+    "Qidi/QIDI PLA Rapido Matte"
+   ],
+   "successor": "OF3IKafc"
+  },
+  "QD_2_1_20": {
+   "claims": [
+    "Qidi/QIDI ASA-CF"
+   ],
+   "successor": "OF1W7c76"
+  },
+  "QD_2_1_24": {
+   "claims": [
+    "Qidi/QIDI UltraPA"
+   ],
+   "successor": "OFWDe7YH"
+  },
+  "QD_2_1_26": {
+   "claims": [
+    "Qidi/QIDI UltraPA-CF25"
+   ],
+   "successor": "OF9PELEb"
+  },
+  "QD_2_1_27": {
+   "claims": [
+    "Qidi/QIDI PA12-CF"
+   ],
+   "successor": "OFn6WpN7"
+  },
+  "QD_2_1_3": {
+   "claims": [
+    "Qidi/QIDI PLA Rapido Metal"
+   ],
+   "successor": "OFANFm4x"
+  },
+  "QD_2_1_30": {
+   "claims": [
+    "Qidi/QIDI PAHT-CF"
+   ],
+   "successor": "OFKgmsqE"
+  },
+  "QD_2_1_31": {
+   "claims": [
+    "Qidi/QIDI PAHT-GF"
+   ],
+   "successor": "OFo15hcT"
+  },
+  "QD_2_1_32": {
+   "claims": [
+    "Qidi/QIDI Support For PAHT"
+   ],
+   "successor": "OFXn3Vd9"
+  },
+  "QD_2_1_33": {
+   "claims": [
+    "Qidi/QIDI Support For PET/PA"
+   ],
+   "successor": "OFqcL5UF"
+  },
+  "QD_2_1_34": {
+   "claims": [
+    "Qidi/QIDI PC-ABS-FR"
+   ],
+   "successor": "OFFAWVf0"
+  },
+  "QD_2_1_36": {
+   "claims": [
+    "Qidi/QIDI PEBA 95A"
+   ],
+   "successor": "OFhiJE7Y"
+  },
+  "QD_2_1_37": {
+   "claims": [
+    "Qidi/QIDI PET-CF"
+   ],
+   "successor": "OFKfJTwL"
+  },
+  "QD_2_1_38": {
+   "claims": [
+    "Qidi/QIDI PET-GF"
+   ],
+   "successor": "OFhx4uOG"
+  },
+  "QD_2_1_39": {
+   "claims": [
+    "Qidi/QIDI PETG Basic"
+   ],
+   "successor": "OFuJ49uH"
+  },
+  "QD_2_1_4": {
+   "claims": [
+    "Qidi/QIDI PLA Rapido Silk"
+   ],
+   "successor": "OFW5FqkL"
+  },
+  "QD_2_1_40": {
+   "claims": [
+    "Qidi/QIDI PETG Tough"
+   ],
+   "successor": "OFQ40XeN"
+  },
+  "QD_2_1_41": {
+   "claims": [
+    "Qidi/QIDI PETG Rapido"
+   ],
+   "successor": "OF4S3To3"
+  },
+  "QD_2_1_42": {
+   "claims": [
+    "Qidi/QIDI PETG-CF"
+   ],
+   "successor": "OF4iWKrE"
+  },
+  "QD_2_1_43": {
+   "claims": [
+    "Qidi/QIDI PETG-GF"
+   ],
+   "successor": "OFdtPd9h"
+  },
+  "QD_2_1_44": {
+   "claims": [
+    "Qidi/QIDI PPS-CF"
+   ],
+   "successor": "OFZOuWrO"
+  },
+  "QD_2_1_45": {
+   "claims": [
+    "Qidi/QIDI PETG Translucent"
+   ],
+   "successor": "OFf0MkD5"
+  },
+  "QD_2_1_46": {
+   "claims": [
+    "Qidi/QIDI PPS-GF"
+   ],
+   "successor": "OFp57RRC"
+  },
+  "QD_2_1_49": {
+   "claims": [
+    "Qidi/QIDI TPU-Aero"
+   ],
+   "successor": "OFMDHOcT"
+  },
+  "QD_2_1_5": {
+   "claims": [
+    "Qidi/QIDI PLA-CF"
+   ],
+   "successor": "OFhWrAuP"
+  },
+  "QD_2_1_50": {
+   "claims": [
+    "Qidi/QIDI TPU 95A-HF"
+   ],
+   "successor": "OFR1XLMN"
+  },
+  "QD_2_1_6": {
+   "claims": [
+    "Qidi/QIDI WOOD Rapido"
+   ],
+   "successor": "OFvdZ2bx"
+  },
+  "QD_2_1_7": {
+   "claims": [
+    "Qidi/QIDI PLA Basic"
+   ],
+   "successor": "OF4nQ62r"
+  },
+  "QD_2_1_8": {
+   "claims": [
+    "Qidi/QIDI PLA Matte Basic"
+   ],
+   "successor": "OFughwKn"
+  },
+  "QD_3_0_1": {
+   "claims": [
+    "Qidi/Generic PLA"
+   ],
+   "successor": "OFDSrzZ8"
+  },
+  "QD_3_0_11": {
+   "claims": [
+    "Qidi/Generic ABS"
+   ],
+   "successor": "OFY9muEs"
+  },
+  "QD_3_0_23": {
+   "claims": [
+    "Qidi/Generic PC"
+   ],
+   "successor": "OFLakOUI"
+  },
+  "QD_3_0_4": {
+   "claims": [
+    "Qidi/Generic PLA Silk"
+   ],
+   "successor": "OFesA6rF"
+  },
+  "QD_3_0_41": {
+   "claims": [
+    "Qidi/Generic PETG"
+   ],
+   "successor": "OFYPdQJh"
+  },
+  "QD_3_0_50": {
+   "claims": [
+    "Qidi/Generic TPU 95A"
+   ],
+   "successor": "OFjiXpyf"
+  },
+  "QD_3_1_1": {
+   "claims": [
+    "Qidi/QIDI PLA Rapido"
+   ],
+   "successor": "OFKIQO2W"
+  },
+  "QD_3_1_11": {
+   "claims": [
+    "Qidi/QIDI ABS Rapido"
+   ],
+   "successor": "OFT2jon4"
+  },
+  "QD_3_1_12": {
+   "claims": [
+    "Qidi/QIDI ABS-GF"
+   ],
+   "successor": "OFt3HtlG"
+  },
+  "QD_3_1_13": {
+   "claims": [
+    "Qidi/QIDI ABS Rapido Metal"
+   ],
+   "successor": "OFeCJqxx"
+  },
+  "QD_3_1_14": {
+   "claims": [
+    "Qidi/QIDI ABS Odorless"
+   ],
+   "successor": "OFma5TXH"
+  },
+  "QD_3_1_15": {
+   "claims": [
+    "Qidi/QIDI TPU-GF"
+   ],
+   "successor": "OF9EHUKK"
+  },
+  "QD_3_1_18": {
+   "claims": [
+    "Qidi/QIDI ASA"
+   ],
+   "successor": "OFTsHNQi"
+  },
+  "QD_3_1_19": {
+   "claims": [
+    "Qidi/QIDI ASA-Aero"
+   ],
+   "successor": "OFu1E4ur"
+  },
+  "QD_3_1_2": {
+   "claims": [
+    "Qidi/QIDI PLA Rapido Matte"
+   ],
+   "successor": "OF3IKafc"
+  },
+  "QD_3_1_20": {
+   "claims": [
+    "Qidi/QIDI ASA-CF"
+   ],
+   "successor": "OF1W7c76"
+  },
+  "QD_3_1_24": {
+   "claims": [
+    "Qidi/QIDI UltraPA"
+   ],
+   "successor": "OFWDe7YH"
+  },
+  "QD_3_1_26": {
+   "claims": [
+    "Qidi/QIDI UltraPA-CF25"
+   ],
+   "successor": "OF9PELEb"
+  },
+  "QD_3_1_27": {
+   "claims": [
+    "Qidi/QIDI PA12-CF"
+   ],
+   "successor": "OFn6WpN7"
+  },
+  "QD_3_1_3": {
+   "claims": [
+    "Qidi/QIDI PLA Rapido Metal"
+   ],
+   "successor": "OFANFm4x"
+  },
+  "QD_3_1_30": {
+   "claims": [
+    "Qidi/QIDI PAHT-CF"
+   ],
+   "successor": "OFKgmsqE"
+  },
+  "QD_3_1_31": {
+   "claims": [
+    "Qidi/QIDI PAHT-GF"
+   ],
+   "successor": "OFo15hcT"
+  },
+  "QD_3_1_32": {
+   "claims": [
+    "Qidi/QIDI Support For PAHT"
+   ],
+   "successor": "OFXn3Vd9"
+  },
+  "QD_3_1_33": {
+   "claims": [
+    "Qidi/QIDI Support For PET/PA"
+   ],
+   "successor": "OFqcL5UF"
+  },
+  "QD_3_1_34": {
+   "claims": [
+    "Qidi/QIDI PC/ABS-FR"
+   ],
+   "successor": "OFDIrhbu"
+  },
+  "QD_3_1_36": {
+   "claims": [
+    "Qidi/QIDI PEBA 95A"
+   ],
+   "successor": "OFhiJE7Y"
+  },
+  "QD_3_1_37": {
+   "claims": [
+    "Qidi/QIDI PET-CF"
+   ],
+   "successor": "OFKfJTwL"
+  },
+  "QD_3_1_38": {
+   "claims": [
+    "Qidi/QIDI PET-GF"
+   ],
+   "successor": "OFhx4uOG"
+  },
+  "QD_3_1_39": {
+   "claims": [
+    "Qidi/QIDI PETG Basic"
+   ],
+   "successor": "OFuJ49uH"
+  },
+  "QD_3_1_4": {
+   "claims": [
+    "Qidi/QIDI PLA Rapido Silk"
+   ],
+   "successor": "OFW5FqkL"
+  },
+  "QD_3_1_40": {
+   "claims": [
+    "Qidi/QIDI PETG Tough"
+   ],
+   "successor": "OFQ40XeN"
+  },
+  "QD_3_1_41": {
+   "claims": [
+    "Qidi/QIDI PETG Rapido"
+   ],
+   "successor": "OF4S3To3"
+  },
+  "QD_3_1_42": {
+   "claims": [
+    "Qidi/QIDI PETG-CF"
+   ],
+   "successor": "OF4iWKrE"
+  },
+  "QD_3_1_43": {
+   "claims": [
+    "Qidi/QIDI PETG-GF"
+   ],
+   "successor": "OFdtPd9h"
+  },
+  "QD_3_1_44": {
+   "claims": [
+    "Qidi/QIDI PPS-CF"
+   ],
+   "successor": "OFZOuWrO"
+  },
+  "QD_3_1_45": {
+   "claims": [
+    "Qidi/QIDI PETG Translucent"
+   ],
+   "successor": "OFf0MkD5"
+  },
+  "QD_3_1_46": {
+   "claims": [
+    "Qidi/QIDI PPS-GF"
+   ],
+   "successor": "OFp57RRC"
+  },
+  "QD_3_1_49": {
+   "claims": [
+    "Qidi/QIDI TPU-Aero"
+   ],
+   "successor": "OFMDHOcT"
+  },
+  "QD_3_1_5": {
+   "claims": [
+    "Qidi/QIDI PLA-CF"
+   ],
+   "successor": "OFhWrAuP"
+  },
+  "QD_3_1_50": {
+   "claims": [
+    "Qidi/QIDI TPU 95A-HF"
+   ],
+   "successor": "OFR1XLMN"
+  },
+  "QD_3_1_6": {
+   "claims": [
+    "Qidi/QIDI WOOD Rapido"
+   ],
+   "successor": "OFvdZ2bx"
+  },
+  "QD_3_1_7": {
+   "claims": [
+    "Qidi/QIDI PLA Basic"
+   ],
+   "successor": "OF4nQ62r"
+  },
+  "QD_3_1_8": {
+   "claims": [
+    "Qidi/QIDI PLA Matte Basic"
+   ],
+   "successor": "OFughwKn"
+  },
+  "QD_4_0_1": {
+   "claims": [
+    "Qidi/Generic PLA"
+   ],
+   "successor": "OFDSrzZ8"
+  },
+  "QD_4_0_11": {
+   "claims": [
+    "Qidi/Generic ABS"
+   ],
+   "successor": "OFY9muEs"
+  },
+  "QD_4_0_23": {
+   "claims": [
+    "Qidi/Generic PC"
+   ],
+   "successor": "OFLakOUI"
+  },
+  "QD_4_0_4": {
+   "claims": [
+    "Qidi/Generic PLA Silk"
+   ],
+   "successor": "OFesA6rF"
+  },
+  "QD_4_0_41": {
+   "claims": [
+    "Qidi/Generic PETG"
+   ],
+   "successor": "OFYPdQJh"
+  },
+  "QD_4_0_50": {
+   "claims": [
+    "Qidi/Generic TPU 95A"
+   ],
+   "successor": "OFjiXpyf"
+  },
+  "QD_4_1_1": {
+   "claims": [
+    "Qidi/QIDI PLA Rapido"
+   ],
+   "successor": "OFKIQO2W"
+  },
+  "QD_4_1_11": {
+   "claims": [
+    "Qidi/QIDI ABS Rapido"
+   ],
+   "successor": "OFT2jon4"
+  },
+  "QD_4_1_12": {
+   "claims": [
+    "Qidi/QIDI ABS-GF"
+   ],
+   "successor": "OFt3HtlG"
+  },
+  "QD_4_1_13": {
+   "claims": [
+    "Qidi/QIDI ABS Rapido Metal"
+   ],
+   "successor": "OFeCJqxx"
+  },
+  "QD_4_1_14": {
+   "claims": [
+    "Qidi/QIDI ABS Odorless"
+   ],
+   "successor": "OFma5TXH"
+  },
+  "QD_4_1_15": {
+   "claims": [
+    "Qidi/QIDI TPU-GF"
+   ],
+   "successor": "OF9EHUKK"
+  },
+  "QD_4_1_18": {
+   "claims": [
+    "Qidi/QIDI ASA"
+   ],
+   "successor": "OFTsHNQi"
+  },
+  "QD_4_1_19": {
+   "claims": [
+    "Qidi/QIDI ASA-Aero"
+   ],
+   "successor": "OFu1E4ur"
+  },
+  "QD_4_1_2": {
+   "claims": [
+    "Qidi/QIDI PLA Rapido Matte"
+   ],
+   "successor": "OF3IKafc"
+  },
+  "QD_4_1_20": {
+   "claims": [
+    "Qidi/QIDI ASA-CF"
+   ],
+   "successor": "OF1W7c76"
+  },
+  "QD_4_1_24": {
+   "claims": [
+    "Qidi/QIDI UltraPA"
+   ],
+   "successor": "OFWDe7YH"
+  },
+  "QD_4_1_25": {
+   "claims": [
+    "Qidi/QIDI PA6-CF"
+   ],
+   "successor": "OFZ3K2cL"
+  },
+  "QD_4_1_26": {
+   "claims": [
+    "Qidi/QIDI UltraPA-CF25"
+   ],
+   "successor": "OF9PELEb"
+  },
+  "QD_4_1_27": {
+   "claims": [
+    "Qidi/QIDI PA12-CF"
+   ],
+   "successor": "OFn6WpN7"
+  },
+  "QD_4_1_3": {
+   "claims": [
+    "Qidi/QIDI PLA Rapido Metal"
+   ],
+   "successor": "OFANFm4x"
+  },
+  "QD_4_1_30": {
+   "claims": [
+    "Qidi/QIDI PAHT-CF"
+   ],
+   "successor": "OFKgmsqE"
+  },
+  "QD_4_1_31": {
+   "claims": [
+    "Qidi/QIDI PAHT-GF"
+   ],
+   "successor": "OFo15hcT"
+  },
+  "QD_4_1_32": {
+   "claims": [
+    "Qidi/QIDI Support For PAHT"
+   ],
+   "successor": "OFXn3Vd9"
+  },
+  "QD_4_1_33": {
+   "claims": [
+    "Qidi/QIDI Support For PET/PA"
+   ],
+   "successor": "OFqcL5UF"
+  },
+  "QD_4_1_34": {
+   "claims": [
+    "Qidi/QIDI PC/ABS-FR"
+   ],
+   "successor": "OFDIrhbu"
+  },
+  "QD_4_1_36": {
+   "claims": [
+    "Qidi/QIDI PEBA 95A"
+   ],
+   "successor": "OFhiJE7Y"
+  },
+  "QD_4_1_37": {
+   "claims": [
+    "Qidi/QIDI PET-CF"
+   ],
+   "successor": "OFKfJTwL"
+  },
+  "QD_4_1_38": {
+   "claims": [
+    "Qidi/QIDI PET-GF"
+   ],
+   "successor": "OFhx4uOG"
+  },
+  "QD_4_1_39": {
+   "claims": [
+    "Qidi/QIDI PETG Basic"
+   ],
+   "successor": "OFuJ49uH"
+  },
+  "QD_4_1_4": {
+   "claims": [
+    "Qidi/QIDI PLA Silk"
+   ],
+   "successor": "OF2TQpOO"
+  },
+  "QD_4_1_40": {
+   "claims": [
+    "Qidi/QIDI PETG Tough"
+   ],
+   "successor": "OFQ40XeN"
+  },
+  "QD_4_1_41": {
+   "claims": [
+    "Qidi/QIDI PETG Rapido"
+   ],
+   "successor": "OF4S3To3"
+  },
+  "QD_4_1_42": {
+   "claims": [
+    "Qidi/QIDI PETG-CF"
+   ],
+   "successor": "OF4iWKrE"
+  },
+  "QD_4_1_43": {
+   "claims": [
+    "Qidi/QIDI PETG-GF"
+   ],
+   "successor": "OFdtPd9h"
+  },
+  "QD_4_1_44": {
+   "claims": [
+    "Qidi/QIDI PPS-CF"
+   ],
+   "successor": "OFZOuWrO"
+  },
+  "QD_4_1_45": {
+   "claims": [
+    "Qidi/QIDI PETG Translucent"
+   ],
+   "successor": "OFf0MkD5"
+  },
+  "QD_4_1_46": {
+   "claims": [
+    "Qidi/QIDI PPS-GF"
+   ],
+   "successor": "OFp57RRC"
+  },
+  "QD_4_1_49": {
+   "claims": [
+    "Qidi/QIDI TPU-Aero"
+   ],
+   "successor": "OFMDHOcT"
+  },
+  "QD_4_1_5": {
+   "claims": [
+    "Qidi/QIDI PLA-CF"
+   ],
+   "successor": "OFhWrAuP"
+  },
+  "QD_4_1_50": {
+   "claims": [
+    "Qidi/QIDI TPU 95A-HF"
+   ],
+   "successor": "OFR1XLMN"
+  },
+  "QD_4_1_6": {
+   "claims": [
+    "Qidi/QIDI WOOD Rapido"
+   ],
+   "successor": "OFvdZ2bx"
+  },
+  "QD_4_1_7": {
+   "claims": [
+    "Qidi/QIDI PLA Basic"
+   ],
+   "successor": "OF4nQ62r"
+  },
+  "QD_4_1_8": {
+   "claims": [
+    "Qidi/QIDI PLA Matte Basic"
+   ],
+   "successor": "OFughwKn"
+  },
   "SMCFB001": {
    "claims": [
     "SeeMeCNC/SeeMeCNC ABS"
