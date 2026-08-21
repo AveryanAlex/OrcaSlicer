@@ -26,7 +26,11 @@ Policy (companion to assign_vendor_setting_ids.py; see filament_id_plan_v3.md):
     resolving.
   * Reserved id spaces that are never minted into or altered:
       - GF*                    Bambu AMS/RFID catalog (vendor BBL untouchable)
-      - QD_*                   Qidi device protocol
+      - QD_*                   Qidi device protocol (dissolved island, plan v4:
+                               every shipped QD_* id is retired in the ledger and
+                               the QidiPrinterAgent translates device-composed
+                               QD_* ids through the succession walk; no preset
+                               may ever declare one again)
       - P + 7 hex chars (case-insensitive) and the literal "null"
                                user-custom presets (CreatePresetsDialog.cpp)
       - every already-shipped id, grandfathered via scripts/filament_id_snapshot.json
@@ -40,7 +44,7 @@ Policy (companion to assign_vendor_setting_ids.py; see filament_id_plan_v3.md):
     rule over the vanished id's old claims — and the runtime follows those
     chains (plus cross-island "hints" for ids Orca cannot retire, e.g. GF*)
     on resolution miss. A retired id may never be used again for anything.
-    Vanished ids in a FOREIGN island's space (GF*/QD_*) are released with a
+    Vanished ids in a FOREIGN island's space (GF*) are released with a
     hint instead of retired: the island's catalog owns them and may
     legitimately (re)ship them.
 
@@ -325,8 +329,9 @@ def resolve_triple(name, filaments, ofl_filaments):
 
 
 def is_island_declaration(vendor, fid):
-    """Declarations frozen outside the OF mint domain: all of BBL, QD_* in Qidi."""
-    return vendor == "BBL" or (vendor == "Qidi" and fid.startswith("QD_"))
+    """Declarations frozen outside the OF mint domain: all of BBL (the QD_*
+    island was dissolved by plan v4 — Qidi declarations mint like any other)."""
+    return vendor == "BBL"
 
 
 def analyze_tree(profiles_dir):
@@ -598,10 +603,19 @@ def reserved_space_owner(fid):
     if fid.startswith("GF"):
         return True, "BBL"
     if fid.startswith("QD_"):
-        return True, "Qidi"
+        return True, None  # dissolved Qidi device-protocol space: NO vendor may declare it
     if USER_CUSTOM_ID_RE.match(fid) or fid == "null":
         return True, None  # user-custom space: no system vendor may own it
     return False, None
+
+
+def reserved_space_desc(fid, owner):
+    """Human description of a reserved space for error messages."""
+    if owner:
+        return f"owned by {owner}"
+    if fid.startswith("QD_"):
+        return "Qidi device protocol; dissolved island — ids are retired, never declarable"
+    return "reserved for user-custom presets"
 
 
 # ---------------------------------------------------------------------------
@@ -613,8 +627,7 @@ def check_filament_ids(profiles_dir=PROFILES_DIR, snapshot_path=SNAPSHOT_PATH,
     """Validate filament_id state across every vendor. Returns the error count.
 
     1. Format: every id occurring in the tree (declared or effective) must be in
-       the snapshot, or match ^OF[0-9A-Za-z]{6}$, or belong to vendor BBL, or be
-       a QD_* id within vendor Qidi.
+       the snapshot, or match ^OF[0-9A-Za-z]{6}$, or belong to vendor BBL.
     2. Snapshot equality, both directions: the tree-derived id->families multimap
        AND the id->triples map of the declarers must equal the snapshot exactly
        (the snapshot diff is the maintainer gate).
@@ -625,8 +638,8 @@ def check_filament_ids(profiles_dir=PROFILES_DIR, snapshot_path=SNAPSHOT_PATH,
     5. Alias hygiene: a vendor preset riding an OFL family must keep the OFL
        base name, claim printers via non-empty compatible_printers, and declare
        no filament_id key of its own.
-    6. Reserved namespaces (GF*/QD_*/P-hex/"null") only for their owner vendors,
-       except claims grandfathered in the snapshot.
+    6. Reserved namespaces (GF* for BBL; QD_*/P-hex/"null" for nobody) must not
+       be claimed by other vendors, except claims grandfathered in the snapshot.
     7. Structure ratchet: (a) no NEW instantiated preset carries its own
        filament_id key; (b) no NEW declared-vs-inherited id drift; (c) every
        instantiated filament resolves an effective id (a hard load error in C++).
@@ -663,8 +676,6 @@ def check_filament_ids(profiles_dir=PROFILES_DIR, snapshot_path=SNAPSHOT_PATH,
             if fid in snap_ids or OF_ID_RE.match(fid):
                 continue
             if vendor == "BBL":
-                continue
-            if vendor == "Qidi" and fid.startswith("QD_"):
                 continue
             print_error(
                 f'filament_id "{fid}" ({vendor}) is neither grandfathered in the '
@@ -765,7 +776,7 @@ def check_filament_ids(profiles_dir=PROFILES_DIR, snapshot_path=SNAPSHOT_PATH,
                 continue
             if claim in snap_ids.get(fid, []):
                 continue  # grandfathered
-            space = f"owned by {owner}" if owner else "reserved for user-custom presets"
+            space = reserved_space_desc(fid, owner)
             print_error(
                 f'filament_id "{fid}" of "{claim}" is in a reserved id space '
                 f"({space}) and must not be claimed by system presets of other vendors")
@@ -861,7 +872,7 @@ def check_filament_ids(profiles_dir=PROFILES_DIR, snapshot_path=SNAPSHOT_PATH,
         if island is None:
             print_error(
                 f'hint key "{key}" ({RETIRED_REL}) is not in an island id space '
-                f"(GF*/QD_*); non-island ids are retired with a successor instead")
+                f"(GF*); non-island ids are retired with a successor instead")
             errors += 1
             continue
         if key in retired:
@@ -902,7 +913,7 @@ def update_snapshot(profiles_dir=PROFILES_DIR, snapshot_path=SNAPSHOT_PATH,
 
     Vanished ids gain a succession-ledger entry whose successor is picked by
     the mode rule over their old claims (None when the family died heirless);
-    vanished ids in a foreign island's space (GF*/QD_*) are released with a
+    vanished ids in a foreign island's space (GF*) are released with a
     hint instead — the island catalog owns them, so they must stay mintable
     there and must never be blocked by check 4.
     --forget-never-shipped lists ids to drop from lineage instead of retiring
@@ -955,7 +966,7 @@ def update_snapshot(profiles_dir=PROFILES_DIR, snapshot_path=SNAPSHOT_PATH,
                     refusals.append((fid, f"{vendor}/(declared only)", owner))
     if refusals and not allow_shared_catalog:
         for fid, claim, owner in refusals:
-            space = f"owned by {owner}" if owner else "reserved for user-custom presets"
+            space = reserved_space_desc(fid, owner)
             print_error(
                 f'refusing to sanction new claim "{claim}" on reserved-namespace id '
                 f'"{fid}" ({space}); pass --allow-shared-catalog only for '
@@ -977,7 +988,7 @@ def update_snapshot(profiles_dir=PROFILES_DIR, snapshot_path=SNAPSHOT_PATH,
 
     # Retire ids that fully vanished from the tree (append-only ledger), with a
     # mode-rule successor so devices and user presets keep resolving. Vanished
-    # ids in a FOREIGN island's reserved space (GF*/QD_*) are never retired —
+    # ids in a FOREIGN island's reserved space (GF*) are never retired —
     # the island's catalog still owns them and may legitimately (re)ship them —
     # they are RELEASED, with a succession hint so they keep resolving on miss.
     claim_ids = claim_effective_ids(analysis)
@@ -1073,7 +1084,7 @@ def update_snapshot(profiles_dir=PROFILES_DIR, snapshot_path=SNAPSHOT_PATH,
 def add_hints(pairs, profiles_dir=PROFILES_DIR, retired_path=RETIRED_PATH):
     """--add-hint "OLD=NEW": forward an island-space id to a live id.
 
-    OLD must sit in an island id space (GF*/QD_*), must not be retired, and —
+    OLD must sit in an island id space (GF*), must not be retired, and —
     when live in the tree — may be declared only by island vendors (Orca cannot
     retire it). An absent OLD is fine: island catalogs own ids Orca never
     shipped or has released. NEW must be live in the tree. All pairs validate
@@ -1103,7 +1114,7 @@ def add_hints(pairs, profiles_dir=PROFILES_DIR, retired_path=RETIRED_PATH):
             errors += 1
         elif island is None:
             print_error(
-                f'--add-hint: "{old}" is not in an island id space (GF*/QD_*); '
+                f'--add-hint: "{old}" is not in an island id space (GF*); '
                 f"non-island ids are retired with a successor by --update-snapshot")
             errors += 1
         elif outsiders:

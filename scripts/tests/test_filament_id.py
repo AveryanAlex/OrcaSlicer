@@ -8,6 +8,7 @@ import contextlib
 import io
 import json
 import os
+import re
 import shutil
 import sys
 import tempfile
@@ -400,7 +401,8 @@ class TestTripleResolution(unittest.TestCase):
 class TestReservedSpaces(unittest.TestCase):
     def test_owners(self):
         self.assertEqual(afi.reserved_space_owner("GFL99"), (True, "BBL"))
-        self.assertEqual(afi.reserved_space_owner("QD_X4_PLA"), (True, "Qidi"))
+        # dissolved island (plan v4): reserved, but no vendor may declare it
+        self.assertEqual(afi.reserved_space_owner("QD_X4_PLA"), (True, None))
         self.assertEqual(afi.reserved_space_owner("P1234abc"), (True, None))
         self.assertEqual(afi.reserved_space_owner("pAbCdEf1"), (True, None))  # case-insensitive
         self.assertEqual(afi.reserved_space_owner("null"), (True, None))
@@ -410,7 +412,8 @@ class TestReservedSpaces(unittest.TestCase):
     def test_island_declarations(self):
         self.assertTrue(afi.is_island_declaration("BBL", "GFL99"))
         self.assertTrue(afi.is_island_declaration("BBL", "OF5CgdDq"))
-        self.assertTrue(afi.is_island_declaration("Qidi", "QD_X4_PLA"))
+        # dissolved island (plan v4): Qidi declarations mint like any other
+        self.assertFalse(afi.is_island_declaration("Qidi", "QD_X4_PLA"))
         self.assertFalse(afi.is_island_declaration("Qidi", "OF5CgdDq"))
         self.assertFalse(afi.is_island_declaration("VendorA", "GFL99"))
 
@@ -567,7 +570,7 @@ class TestChecks(SyntheticTreeCase):
 
     def test_check6_reserved_namespace_claims(self):
         for fid, marker in [("GFX99", "owned by BBL"),
-                            ("QD_X_PLA", "owned by Qidi"),
+                            ("QD_X_PLA", "dissolved island"),
                             ("P1a2b3c4", "user-custom"),
                             ("null", "user-custom")]:
             with self.subTest(fid=fid):
@@ -1477,6 +1480,31 @@ class TestRealTree(unittest.TestCase):
         analysis = afi.analyze_tree(REAL_PROFILES)
         self.assertEqual(analysis["missing_effective"], [])
         self.assertEqual(analysis["read_errors"], [])
+
+    # Code<->ledger lockstep for the Qidi box (plan v4 SS2): the QD_* literals
+    # QidiPrinterAgent::map_filament_type_to_setting_id returns must stay
+    # retired ledger keys whose chains end at a live preset id, because the
+    # agent resolves them through resolve_filament_id_succession() at runtime.
+    @unittest.skip("enable with plan v4.2: QD_* ids are not retired yet")
+    def test_qidi_agent_fallback_ids_resolve_through_ledger(self):
+        cpp = os.path.join(REPO_ROOT, "src", "slic3r", "Utils", "QidiPrinterAgent.cpp")
+        with open(cpp, encoding="utf-8") as f:
+            src = f.read()
+        m = re.search(
+            r"map_filament_type_to_setting_id\(const std::string& filament_type\)"
+            r"\s*\{(.*?)\n\}", src, re.DOTALL)
+        self.assertIsNotNone(m, "map_filament_type_to_setting_id not found in QidiPrinterAgent.cpp")
+        qd_ids = re.findall(r'return "(QD_[0-9_]+)";', m.group(1))
+        self.assertTrue(qd_ids, "no QD_* literals parsed from map_filament_type_to_setting_id")
+        ledger = afi.load_ledger(afi.RETIRED_PATH)
+        live = set(afi.analyze_tree(REAL_PROFILES)["ids"])
+        for fid in qd_ids:
+            self.assertIn(fid, ledger["retired"], f'"{fid}" must be a retired ledger key')
+            status, node = afi.follow_succession(
+                fid, set(), ledger["retired"], ledger["hints"], live)
+            self.assertEqual(
+                status, "live",
+                f'"{fid}" succession must end at a live id (got {status} at "{node}")')
 
 
 # ---------------------------------------------------------------------------
