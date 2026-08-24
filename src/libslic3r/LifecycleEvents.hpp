@@ -2,8 +2,8 @@
 
 // LifecycleEvents.hpp
 // --------------------
-// Application lifecycle events (project, slicing, plate editing, preset, printer connection
-// activity) that other subsystems -- chiefly the plugin layer above libslic3r -- may want to
+// Application lifecycle events (project, slicing, plate editing, preset, printer connection, and
+// job activity) that other subsystems -- chiefly the plugin layer above libslic3r -- may want to
 // observe. Lives in libslic3r rather than the plugin layer because some events fire from inside
 // the slicing engine itself; see fire_lifecycle_event() below.
 
@@ -20,6 +20,7 @@ namespace Slic3r
         ProjectBeforeSave,
         ProjectAfterSave,
         ProjectClosed,
+        ProjectDirtyChanged,
 
         // Slicing pipeline
         SliceStarted,
@@ -32,6 +33,12 @@ namespace Slic3r
         ObjectAdded,
         ObjectDeleted,
         ObjectTransformed,
+        ObjectChanged,
+        ObjectRenamed,
+        PlateCreated,
+        PlateDeleted,
+        PlateSelected,
+        PlateRenamed,
 
         // Preset
         PresetSelected,
@@ -46,6 +53,12 @@ namespace Slic3r
         DeviceDisconnected,
         UploadStarted,
         UploadFinished,
+
+        // Print/send jobs
+        PrintJobStarted,
+        PrintJobFinished,
+        SendJobStarted,
+        SendJobFinished,
     };
 
     // Scoped so callers must qualify (LifecycleEvtCode::Error, not ERROR) -- ERROR/OK collide with
@@ -66,6 +79,28 @@ namespace Slic3r
         // Optional human-readable detail or diagnostic text. It is not a stable parsing contract;
         // machine-readable data should be represented by a dedicated field or event instead.
         std::string msg;
+
+        // Stable subject/object identifier, when the source model provides one.
+        std::string id;
+
+        // Previous value for rename and other before/after events.
+        std::string previous_name;
+
+        // Device identifier for printer and job events.
+        std::string device_id;
+
+        // Job identifier when the originating queue/task provides one.
+        std::string job_id;
+
+        // Source subsystem or operation detail, suitable for filtering but not guaranteed to be
+        // exhaustive across versions.
+        std::string source;
+
+        // Plate, object, or volume index when the source uses an index rather than a stable id.
+        int index = -1;
+
+        // Aggregate project dirty state for ProjectDirtyChanged.
+        bool dirty = false;
     };
 
     inline std::string lifecycle_event_to_string(LifecycleEvent event)
@@ -76,6 +111,7 @@ namespace Slic3r
         case LifecycleEvent::ProjectBeforeSave: return "ProjectBeforeSave";
         case LifecycleEvent::ProjectAfterSave: return "ProjectAfterSave";
         case LifecycleEvent::ProjectClosed: return "ProjectClosed";
+        case LifecycleEvent::ProjectDirtyChanged: return "ProjectDirtyChanged";
 
         case LifecycleEvent::SliceStarted: return "SliceStarted";
         case LifecycleEvent::SliceGeometryFinished: return "SliceGeometryFinished";
@@ -86,6 +122,12 @@ namespace Slic3r
         case LifecycleEvent::ObjectAdded: return "ObjectAdded";
         case LifecycleEvent::ObjectDeleted: return "ObjectDeleted";
         case LifecycleEvent::ObjectTransformed: return "ObjectTransformed";
+        case LifecycleEvent::ObjectChanged: return "ObjectChanged";
+        case LifecycleEvent::ObjectRenamed: return "ObjectRenamed";
+        case LifecycleEvent::PlateCreated: return "PlateCreated";
+        case LifecycleEvent::PlateDeleted: return "PlateDeleted";
+        case LifecycleEvent::PlateSelected: return "PlateSelected";
+        case LifecycleEvent::PlateRenamed: return "PlateRenamed";
 
         case LifecycleEvent::PresetSelected: return "PresetSelected";
         case LifecycleEvent::PresetSaved: return "PresetSaved";
@@ -99,6 +141,10 @@ namespace Slic3r
 
         case LifecycleEvent::UploadStarted: return "UploadStarted";
         case LifecycleEvent::UploadFinished: return "UploadFinished";
+        case LifecycleEvent::PrintJobStarted: return "PrintJobStarted";
+        case LifecycleEvent::PrintJobFinished: return "PrintJobFinished";
+        case LifecycleEvent::SendJobStarted: return "SendJobStarted";
+        case LifecycleEvent::SendJobFinished: return "SendJobFinished";
         default: return "Unknown";
         }
     }

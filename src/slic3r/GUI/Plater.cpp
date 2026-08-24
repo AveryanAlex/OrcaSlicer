@@ -61,6 +61,7 @@
 #include <wx/aui/aui.h>
 
 #include "libslic3r/libslic3r.h"
+#include "libslic3r/LifecycleEvents.hpp"
 #include "libslic3r/Format/STL.hpp"
 #include "libslic3r/Format/DRC.hpp"
 #include "libslic3r/Format/STEP.hpp"
@@ -8470,6 +8471,11 @@ void Plater::priv::delete_all_objects_from_model()
 
 void Plater::priv::reset(bool apply_presets_change)
 {
+    // TakeSnapshot below and load_current_presets() further down each re-evaluate the
+    // aggregate dirty flag against a baseline that hasn't been reset yet, so they can toggle
+    // is_dirty() back and forth several times before it settles; coalesce those into one event.
+    ProjectDirtyStateManager::NotificationSuppressor dirty_notify_suppressor(dirty_state);
+
     Plater::TakeSnapshot snapshot(q, _u8L("Reset Project"), UndoRedo::SnapshotType::ProjectSeparator);
 
     clear_warnings();
@@ -13118,21 +13124,28 @@ int Plater::new_project(bool skip_confirm, bool silent, const wxString& project_
         ctx.code = Slic3r::LifecycleEvtCode::Ok;
         Slic3r::fire_lifecycle_event(Slic3r::LifecycleEvent::NewProject, ctx);
     }
-    reset(transfer_preset_changes);
-    reset_project_dirty_after_save();
-    reset_project_dirty_initial_presets();
-    wxGetApp().update_saved_preset_from_current_preset();
-    update_project_dirty_from_presets();
+    {
+        // Same rationale as in Plater::priv::reset(): the whole reset + preset-reload +
+        // baseline-reset sequence below settles into its final dirty state only once it
+        // completes, so hold notifications until then to avoid firing on transient flips.
+        ProjectDirtyStateManager::NotificationSuppressor dirty_notify_suppressor(p->dirty_state);
 
-    //reset project
-    p->project.reset();
-    //set project name
-    if (project_name.empty())
-        p->set_project_name(_L("Untitled"));
-    else
-        p->set_project_name(project_name);
+        reset(transfer_preset_changes);
+        reset_project_dirty_after_save();
+        reset_project_dirty_initial_presets();
+        wxGetApp().update_saved_preset_from_current_preset();
+        update_project_dirty_from_presets();
 
-    Plater::TakeSnapshot snapshot(this, "New Project", UndoRedo::SnapshotType::ProjectSeparator);
+        //reset project
+        p->project.reset();
+        //set project name
+        if (project_name.empty())
+            p->set_project_name(_L("Untitled"));
+        else
+            p->set_project_name(project_name);
+
+        Plater::TakeSnapshot snapshot(this, "New Project", UndoRedo::SnapshotType::ProjectSeparator);
+    }
 
     Model m;
     model().load_from(m); // new id avoid same path name
@@ -18339,6 +18352,14 @@ void Plater::changed_object(ModelObject &object){
         
     // Check outside bed
     get_current_canvas3D()->requires_check_outside_state();
+
+    if (!is_loading_project()) {
+        LifecycleEventContext ctx;
+        ctx.name = object.name;
+        ctx.id = std::to_string(object.id().id);
+        ctx.source = "geometry";
+        fire_lifecycle_event(LifecycleEvent::ObjectChanged, ctx);
+    }
 }
 
 void Plater::changed_object(int obj_idx)
@@ -18375,6 +18396,20 @@ void Plater::changed_objects(const std::vector<size_t>& object_idxs)
 
     // update print
     this->p->schedule_background_process();
+
+    if (!is_loading_project()) {
+        for (size_t obj_idx : object_idxs) {
+            if (obj_idx >= p->model.objects.size() || p->model.objects[obj_idx] == nullptr)
+                continue;
+
+            LifecycleEventContext ctx;
+            ctx.name = p->model.objects[obj_idx]->name;
+            ctx.id = std::to_string(p->model.objects[obj_idx]->id().id);
+            ctx.index = static_cast<int>(obj_idx);
+            ctx.source = "geometry";
+            fire_lifecycle_event(LifecycleEvent::ObjectChanged, ctx);
+        }
+    }
 }
 
 void Plater::schedule_background_process(bool schedule/* = true*/)

@@ -1,5 +1,6 @@
 #include "libslic3r/libslic3r.h"
 #include "libslic3r/PresetBundle.hpp"
+#include "libslic3r/LifecycleEvents.hpp"
 #include "GUI_ObjectList.hpp"
 #include "GUI_Factories.hpp"
 //#include "GUI_ObjectLayers.hpp"
@@ -1200,17 +1201,39 @@ void ObjectList::update_name_in_model(const wxDataViewItem& item) const
     if (m_objects_model->GetItemType(item) & itObject) {
         std::string name = m_objects_model->GetName(item).ToUTF8().data();
         if (obj->name != name) {
+            const std::string previous_name = obj->name;
             obj->name = name;
             // if object has just one volume, rename this volume too
             if (obj->volumes.size() == 1)
                 obj->volumes[0]->name = obj->name;
             Slic3r::save_object_mesh(*obj);
+
+            LifecycleEventContext ctx;
+            ctx.name = name;
+            ctx.previous_name = previous_name;
+            ctx.id = std::to_string(obj->id().id);
+            ctx.index = obj_idx;
+            ctx.source = "object";
+            fire_lifecycle_event(LifecycleEvent::ObjectRenamed, ctx);
         }
         return;
     }
 
     if (volume_id < 0) return;
-    obj->volumes[volume_id]->name = m_objects_model->GetName(item).ToUTF8().data();
+    std::string name = m_objects_model->GetName(item).ToUTF8().data();
+    if (obj->volumes[volume_id]->name == name)
+        return;
+
+    const std::string previous_name = obj->volumes[volume_id]->name;
+    obj->volumes[volume_id]->name = name;
+
+    LifecycleEventContext ctx;
+    ctx.name = name;
+    ctx.previous_name = previous_name;
+    ctx.id = std::to_string(obj->volumes[volume_id]->id().id);
+    ctx.index = volume_id;
+    ctx.source = "volume";
+    fire_lifecycle_event(LifecycleEvent::ObjectRenamed, ctx);
 }
 
 void ObjectList::update_name_in_list(int obj_idx, int vol_idx) const
