@@ -45,11 +45,6 @@ public:
     int connect_printer(std::string dev_id, std::string dev_ip, std::string username, std::string password, bool use_ssl) override;
     int disconnect_printer() override;
     int send_message_to_printer(std::string dev_id, std::string json_str, int qos, int flag) override;
-    std::string get_local_camera_url(CameraURLParams params) override;
-    std::string get_local_file_transfer_url(const FileTransferURLParams& params) override;
-    bool supports_remote_liveview(const std::string& printer_type) const override;
-    int get_file_transfer_url(std::string dev_id, std::function<void(FileTransferURLResult)> callback,
-                              FileTransferURLParams params) override;
     std::string default_lan_username() const override { return "bblp"; }
 
     // Certificates
@@ -108,7 +103,6 @@ private:
     // why: the lan/cloud DECISION stays machine-side; keep this mechanical branch in sync with publish_json.
     int publish(const std::string& dev_id, const nlohmann::json& j, bool lan_mode);
 
-    std::shared_ptr<ICloudServiceAgent> m_cloud_agent;
 };
 
 } // namespace Slic3r

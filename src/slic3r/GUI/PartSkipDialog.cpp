@@ -27,6 +27,7 @@
 #include "PartSkipDialog.hpp"
 #include "SkipPartCanvas.hpp"
 #include "MediaPlayCtrl.h"
+#include "slic3r/Utils/NetworkAgent.hpp"
 
 #include "DeviceCore/DevManager.h"
 
@@ -434,37 +435,41 @@ void PartSkipDialog::fetchUrl(boost::weak_ptr<PrinterFileSystem> wfs)
     std::string dev_ver = obj->get_ota_version();
     std::string dev_id  = obj->get_dev_id();
 
+    auto url_state = m_url_state;
+    if (obj->is_lan_mode_printer()) { url_state = URL_TCP; }
+
     NetworkAgent *agent = wxGetApp().getAgent();
     if (!agent) {
         fs->SetUrl("3");
         return;
     }
 
-    auto url_state = m_url_state;
-    if (obj->is_lan_mode_printer()) { url_state = URL_TCP; }
-
-    FileTransferURLParams params;
-    params.url_state = url_state;
-    params.ip_address = obj->get_dev_ip();
-    params.username = agent->default_lan_username();
-    params.password = obj->get_access_code();
-    params.device_id = dev_id;
-    params.network_version = agent->get_version();
-    params.device_version = dev_ver;
-    params.refresh_url = boost::lexical_cast<std::string>(&refresh_agora_url);
-    params.client_id = wxGetApp().app_config->get("slicer_uuid");
-    params.client_version = SLIC3R_VERSION;
-
-    agent->get_file_transfer_url(
-        dev_id,
-        [this, wfs](FileTransferURLResult result) {
+    switch (url_state) {
+    case URL_TCP: {
+        std::string tcp_url = "bambu:///local/" + obj->get_dev_ip() + "?port=6000&user=bblp&passwd=" + obj->get_access_code();
+        CallAfter([wfs, tcp_url = std::move(tcp_url)] {
+            if (auto fs = wfs.lock())
+                fs->SetUrl(boost::algorithm::starts_with(tcp_url, "bambu:///") ? tcp_url : "3");
+        });
+        break;
+    }
+    case URL_TUTK: {
+        std::string protocols[] = {"", "\"tutk\"", "\"agora\"", "\"tutk\",\"agora\""};
+        agent->get_camera_url(dev_id + "|" + dev_ver + "|" + protocols[3],
+            [this, wfs](CameraURLResult result) {
             CallAfter([wfs, result = std::move(result)]() mutable {
                 boost::shared_ptr fs(wfs.lock());
                 if (!fs) return;
-                fs->SetUrl(result.is_success ? result.url : "3");
+                fs->SetUrl(result.is_success && boost::algorithm::starts_with(result.url, "bambu:///") ? result.url : "3");
             });
-        },
-        std::move(params));
+        }, wxGetApp().get_printer_cloud_provider(),
+        CameraURLParams{"", "", "", LVL_None, dev_id, agent->get_version(), dev_ver,
+                        boost::lexical_cast<std::string>(&refresh_agora_url), wxGetApp().app_config->get("slicer_uuid"), SLIC3R_VERSION, true});
+        break;
+    }
+    default:
+        break;
+    }
 }
 // controller
 void PartSkipDialog::OnFileSystemEvent(wxCommandEvent &e)

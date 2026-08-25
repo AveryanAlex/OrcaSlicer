@@ -15,8 +15,6 @@
 #include <functional>
 #include <cstdint>
 
-#include "PrinterNetworkTypes.hpp"
-
 namespace Slic3r {
 
 class ICloudServiceAgent;
@@ -111,33 +109,6 @@ public:
     virtual int command_axis_control(std::string dev_id, std::string axis, double unit, double input_val, int speed,
                                       bool is_core_xy, bool supports_mqtt_axis_control, int sequence_id, bool lan_mode)
     { return ORCA_NETWORK_ERR_CMD_NOT_SUPPORTED; }
-
-    /**
-     * Build a ready-to-use local (LAN) camera stream URL for this agent's protocol.
-     * Returns an empty string if the agent has no local camera stream support.
-     */
-    virtual std::string get_local_camera_url(CameraURLParams params) { return ""; }
-
-    /**
-     * Build a ready-to-use local (LAN) file transfer URL for this agent's protocol.
-     * Returns an empty string if the agent has no local file transfer support.
-     */
-    virtual std::string get_local_file_transfer_url(const FileTransferURLParams& params) { return ""; }
-
-    /**
-     * Whether remote live view is available for the selected printer and agent
-     * protocol. Implementations may use their plugin/version compatibility
-     * rules; the neutral default keeps existing agents permissive.
-     */
-    virtual bool supports_remote_liveview(const std::string& printer_type) const
-    { (void) printer_type; return true; }
-
-    virtual int get_file_transfer_url(std::string, std::function<void(FileTransferURLResult)> callback, FileTransferURLParams)
-    {
-        if (callback)
-            callback({});
-        return ORCA_NETWORK_ERR_CMD_NOT_SUPPORTED;
-    }
 
     /**
      * Default LAN account username for this agent's protocol, if it has a fixed one.

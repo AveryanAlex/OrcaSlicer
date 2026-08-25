@@ -14,7 +14,6 @@
 #include <wx/dcgraph.h>
 #include <wx/simplebook.h>
 
-#include "NetworkAgent.hpp"
 #include "Widgets/Label.hpp"
 #include "Widgets/CheckBox.hpp"
 #include "Widgets/Button.hpp"
@@ -29,6 +28,11 @@
 namespace Slic3r { namespace GUI {
 
 class SkipPartCanvas;
+
+enum URL_STATE {
+    URL_TCP,
+    URL_TUTK,
+};
 
 class PartSkipConfirmDialog : public DPIDialog
 {
@@ -118,7 +122,7 @@ private:
     std::map<uint32_t, std::string> m_parts_name;
     std::vector<int>                m_partskip_ids;
 
-    URL_STATE m_url_state = URL_STATE::URL_TCP;
+    enum URL_STATE m_url_state = URL_STATE::URL_TCP;
 
     PartsInfo GetPartsInfo();
     bool      is_drag_mode();

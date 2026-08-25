@@ -31,11 +31,6 @@ enum FileRemote {
     FR_TutkAgora
 };
 
-enum URL_STATE {
-    URL_TCP,
-    URL_TUTK,
-};
-
 struct CameraURLParams {
     std::string ip_address;
     std::string user;
@@ -51,25 +46,6 @@ struct CameraURLParams {
 };
 
 struct CameraURLResult {
-    bool        is_success{false};
-    std::string url;
-    int         error_code{-1};
-};
-
-struct FileTransferURLParams {
-    URL_STATE   url_state{URL_TCP};
-    std::string ip_address;
-    std::string username;
-    std::string password;
-    std::string device_id;
-    std::string network_version;
-    std::string device_version;
-    std::string refresh_url;
-    std::string client_id;
-    std::string client_version;
-};
-
-struct FileTransferURLResult {
     bool        is_success{false};
     std::string url;
     int         error_code{-1};

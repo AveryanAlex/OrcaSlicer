@@ -19,7 +19,7 @@ BBLPrinterAgent::~BBLPrinterAgent() = default;
 
 void BBLPrinterAgent::set_cloud_agent(std::shared_ptr<ICloudServiceAgent> cloud)
 {
-    m_cloud_agent = cloud;
+    (void) cloud;
     // BBL DLL manages tokens internally, so this is just for interface compliance
 }
 
@@ -248,86 +248,6 @@ int BBLPrinterAgent::send_message_to_printer(std::string dev_id, std::string jso
         }
     }
     return -1;
-}
-
-std::string BBLPrinterAgent::get_local_camera_url(CameraURLParams params)
-{
-    std::string url;
-    if (params.protocol == LVL_Local)
-        url = "bambu:///local/" + params.ip_address + ".?port=6000&user=" + params.user + "&passwd=" + params.password;
-    else if (params.protocol == LVL_Rtsps)
-        url = "bambu:///rtsps___" + params.user + ":" + params.password + "@" + params.ip_address + "/streaming/live/1?proto=rtsps";
-    else if (params.protocol == LVL_Rtsp)
-        url = "bambu:///rtsp___" + params.user + ":" + params.password + "@" + params.ip_address + "/streaming/live/1?proto=rtsp";
-    else
-        url = "bambu:///local/" + params.ip_address + ".?port=6000&user=" + params.user + "&passwd=" + params.password;
-
-    url += "&device=" + params.device;
-    url += "&net_ver=" + params.network_version;
-    url += "&dev_ver=" + params.device_version;
-    url += "&cli_id=" + params.client_id;
-    url += "&cli_ver=" + params.client_version;
-    return url;
-}
-
-std::string BBLPrinterAgent::get_local_file_transfer_url(const FileTransferURLParams& params)
-{
-    // Keep the historical PartSkipDialog URL unchanged. It is a file-transfer
-    // tunnel URL, not a camera URL, so it intentionally has no camera metadata
-    // suffix and no dot before the query string.
-    return "bambu:///local/" + params.ip_address + "?port=6000&user=" + params.username + "&passwd=" + params.password;
-}
-
-bool BBLPrinterAgent::supports_remote_liveview(const std::string& printer_type) const
-{
-    // The legacy Bambu networking plugin cannot provide remote live view for
-    // the O-series printers. Keep this compatibility rule in the Bambu agent
-    // instead of exposing plugin/version details to GUI code.
-    return !(DevPrinterConfigUtil::get_printer_series_str(printer_type) == "series_o" &&
-             BBLNetworkPlugin::instance().use_legacy_network());
-}
-
-int BBLPrinterAgent::get_file_transfer_url(std::string dev_id, std::function<void(FileTransferURLResult)> callback,
-                                           FileTransferURLParams params)
-{
-    if (params.url_state == URL_TCP) {
-        FileTransferURLResult result;
-        result.url = get_local_file_transfer_url(params);
-        result.is_success = !result.url.empty();
-        result.error_code = result.is_success ? 0 : -1;
-        if (callback)
-            callback(std::move(result));
-        return result.is_success ? 0 : -1;
-    }
-
-    if (!m_cloud_agent) {
-        if (callback)
-            callback({});
-        return -1;
-    }
-
-    const std::string protocols = "\"tutk\",\"agora\"";
-    return m_cloud_agent->get_camera_url(
-        std::move(dev_id) + "|" + params.device_version + "|" + protocols,
-        [callback = std::move(callback)](CameraURLResult result) {
-            if (!callback)
-                return;
-            FileTransferURLResult transfer_result;
-            transfer_result.is_success = result.is_success;
-            transfer_result.url = std::move(result.url);
-            transfer_result.error_code = result.error_code;
-            callback(std::move(transfer_result));
-        },
-        CameraURLParams{
-            "", "", "", LVL_None,
-            params.device_id,
-            params.network_version,
-            params.device_version,
-            params.refresh_url,
-            params.client_id,
-            params.client_version,
-            true
-        });
 }
 
 // ============================================================================

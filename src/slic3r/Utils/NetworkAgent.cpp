@@ -854,38 +854,6 @@ int NetworkAgent::send_message_to_printer(std::string dev_id, std::string json_s
     return -1;
 }
 
-std::string NetworkAgent::get_local_camera_url(CameraURLParams params)
-{
-    if (m_printer_agent)
-        return m_printer_agent->get_local_camera_url(params);
-    return {};
-}
-
-std::string NetworkAgent::get_local_file_transfer_url(const FileTransferURLParams& params)
-{
-    if (m_printer_agent)
-        return m_printer_agent->get_local_file_transfer_url(params);
-    return {};
-}
-
-bool NetworkAgent::supports_remote_liveview(const std::string& printer_type) const
-{
-    // Preserve the historical permissive behavior while the printer agent is
-    // being selected.  A missing agent must not turn a supported remote
-    // protocol into LVNone before the Bambu agent has been installed.
-    return !m_printer_agent || m_printer_agent->supports_remote_liveview(printer_type);
-}
-
-int NetworkAgent::get_file_transfer_url(std::string dev_id, std::function<void(FileTransferURLResult)> callback,
-                                        FileTransferURLParams params)
-{
-    if (m_printer_agent)
-        return m_printer_agent->get_file_transfer_url(std::move(dev_id), std::move(callback), std::move(params));
-    if (callback)
-        callback({});
-    return -1;
-}
-
 std::string NetworkAgent::default_lan_username() const
 {
     if (m_printer_agent)

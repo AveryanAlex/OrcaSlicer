@@ -207,6 +207,8 @@ MediaFilePanel::MediaFilePanel(wxWindow * parent)
     Bind(wxEVT_SHOW, onShowHide);
     parent->GetParent()->Bind(wxEVT_SHOW, onShowHide);
 
+    m_lan_user = "bblp";
+
 }
 
 MediaFilePanel::~MediaFilePanel()
@@ -465,19 +467,15 @@ void MediaFilePanel::fetchUrl(boost::weak_ptr<PrinterFileSystem> wfs)
     BOOST_LOG_TRIVIAL(info) << "MediaFilePanel::fetchUrl: " << m_local_proto << m_remote_proto;
     m_waiting_support = false;
     NetworkAgent *agent = wxGetApp().getAgent();
-    if (agent && (m_lan_mode || !m_remote_proto) && m_local_proto && !m_lan_ip.empty()) {
-        agent->get_file_transfer_url(
-            m_machine,
-            [this, wfs](FileTransferURLResult result) {
-                CallAfter([this, wfs, result = std::move(result)] {
-                    auto fs = wfs.lock();
-                    if (!fs || fs != m_image_grid->GetFileSystem())
-                        return;
-                    fs->SetUrl(result.is_success ? result.url : std::to_string(result.error_code));
-                });
-            },
-            {URL_TCP, m_lan_ip, agent->default_lan_username(), m_lan_passwd,
-             m_machine, agent->get_version(), m_dev_ver, "", wxGetApp().app_config->get("slicer_uuid"), SLIC3R_VERSION});
+    std::string agent_version = agent ? agent->get_version() : "";
+    if ((m_lan_mode || !m_remote_proto) && m_local_proto && !m_lan_ip.empty()) {
+        std::string url = "bambu:///local/" + m_lan_ip + ".?port=6000&user=" + m_lan_user + "&passwd=" + m_lan_passwd;
+        url += "&device=" + m_machine;
+        url += "&net_ver=" + agent_version;
+        url += "&dev_ver=" + m_dev_ver;
+        url += "&cli_id=" + wxGetApp().app_config->get("slicer_uuid");
+        url += "&cli_ver=" + std::string(SLIC3R_VERSION);
+        fs->SetUrl(url);
         return;
     }
     if (!m_remote_proto && m_local_proto) { // not support tutk
@@ -496,15 +494,15 @@ void MediaFilePanel::fetchUrl(boost::weak_ptr<PrinterFileSystem> wfs)
         return;
     }
     if (agent) {
-        agent->get_file_transfer_url(
-            m_machine,
-            [this, wfs, m = m_machine](FileTransferURLResult result) {
+        std::string protocols[] = {"", "\"tutk\"", "\"agora\"", "\"tutk\",\"agora\""};
+        agent->get_camera_url(m_machine + "|" + m_dev_ver + "|" + protocols[m_remote_proto],
+            [this, wfs](CameraURLResult result) {
             std::string url = std::move(result.url);
-            BOOST_LOG_TRIVIAL(info) << "MediaFilePanel::fetchUrl: file_system_url: " << hide_passwd(url, {"?uid=", "authkey=", "passwd="});
+            BOOST_LOG_TRIVIAL(info) << "MediaFilePanel::fetchUrl: camera_url: " << hide_passwd(url, {"?uid=", "authkey=", "passwd="});
             CallAfter([=] {
                 boost::shared_ptr fs(wfs.lock());
                 if (!fs || fs != m_image_grid->GetFileSystem()) return;
-                if (result.is_success) {
+                if (result.is_success && boost::algorithm::starts_with(url, "bambu:///")) {
                     fs->SetUrl(url);
                 } else {
                     m_image_grid->SetStatus(m_bmp_failed, _L("Connection Failed. Please check the network and try again"));
@@ -512,9 +510,9 @@ void MediaFilePanel::fetchUrl(boost::weak_ptr<PrinterFileSystem> wfs)
                     fs->SetUrl(res);
                 }
             });
-        },
-        {URL_TUTK, "", "", "", m_machine, agent->get_version(), m_dev_ver,
-         boost::lexical_cast<std::string>(&refresh_agora_url), wxGetApp().app_config->get("slicer_uuid"), SLIC3R_VERSION});
+        }, wxGetApp().get_printer_cloud_provider(),
+        CameraURLParams{"", "", "", LVL_None, m_machine, agent->get_version(), m_dev_ver,
+                        boost::lexical_cast<std::string>(&refresh_agora_url), wxGetApp().app_config->get("slicer_uuid"), SLIC3R_VERSION, true});
     }
 }
 

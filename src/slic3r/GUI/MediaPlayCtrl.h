@@ -80,6 +80,7 @@ private:
     std::string m_machine;
     int m_lan_proto = 0;
     std::string m_lan_ip;
+    std::string m_lan_user;
     std::string m_lan_passwd;
     std::string m_dev_ver;
     std::string m_tutk_state;
