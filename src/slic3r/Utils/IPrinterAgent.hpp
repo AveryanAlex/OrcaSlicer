@@ -2,7 +2,6 @@
 #define __I_PRINTER_AGENT_HPP__
 
 #include "bambu_networking.hpp"
-#include <slic3r/GUI/DeviceManager.hpp>
 // why: these extend the BAMBU_NETWORK_* return space rather than opening a new one - the value
 // flows through the same int domain callers already compare against BAMBU_NETWORK_SUCCESS.
 // They live here and not in bambu_networking.hpp because that file is a vendor header replaced
@@ -16,7 +15,7 @@
 #include <functional>
 #include <cstdint>
 
-#include "NetworkAgent.hpp"
+#include "PrinterNetworkTypes.hpp"
 
 namespace Slic3r {
 

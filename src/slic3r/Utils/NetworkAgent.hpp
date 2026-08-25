@@ -5,7 +5,7 @@
 
 #include "libslic3r/ProjectTask.hpp"
 #include "ICloudServiceAgent.hpp"
-#include "slic3r/GUI/DeviceManager.hpp"
+#include "PrinterNetworkTypes.hpp"
 
 #include <map>
 #include <memory>
@@ -16,50 +16,6 @@ namespace Slic3r {
 
 class IPrinterAgent;
 enum class FilamentSyncMode;
-
-enum URL_STATE {
-    URL_TCP,
-    URL_TUTK,
-};
-
-struct CameraURLParams {
-    std::string ip_address;
-    std::string user;
-    std::string password;
-    LiveviewLocal protocol;
-    std::string device;
-    std::string network_version;
-    std::string device_version;
-    std::string refresh_url;
-    std::string client_id;
-    std::string client_version;
-    bool        apply_meta{false};
-};
-
-struct FileTransferURLParams {
-    URL_STATE   url_state{URL_TCP};
-    std::string ip_address;
-    std::string username;
-    std::string password;
-    std::string device_id;
-    std::string network_version;
-    std::string device_version;
-    std::string refresh_url;
-    std::string client_id;
-    std::string client_version;
-};
-
-struct FileTransferURLResult {
-    bool        is_success{false};
-    std::string url;
-    int         error_code{-1};
-};
-
-struct CameraURLResult {
-    bool        is_success{false};
-    std::string url;
-    int         error_code{-1};
-};
 
 // Forward declaration
 class BBLNetworkPlugin;
