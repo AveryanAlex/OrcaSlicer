@@ -13,6 +13,7 @@
 #include <future>
 #include <memory>
 #include <string>
+#include <thread>
 
 using namespace Slic3r;
 namespace py = pybind11;
@@ -120,7 +121,11 @@ TEST_CASE("unit: Moonraker reports untranslated commands as not supported", "[un
     CHECK(agent.send_message("dev", "{not json", 0, 0) == BAMBU_NETWORK_ERR_INVALID_RESULT);
 }
 
-TEST_CASE("unit: MoonrakerPrinterAgent::fetch_filament_info is fire-and-forget and dispatches to the derived override",
+// why: IPrinterAgent::fetch_filament_info is the single virtual hook derived agents override
+// (MoonrakerPrinterAgent's own override is synchronous, but QidiPrinterAgent's override is
+// fire-and-forget: it spawns a detached thread and returns immediately). QidiPrinterAgent is
+// `final`, so this probes the same contract with a controllable double instead.
+TEST_CASE("unit: a fire-and-forget override of fetch_filament_info is not waited on by the caller",
           "[unit][moonraker]")
 {
     class RecordingAgent : public Slic3r::MoonrakerPrinterAgent
@@ -132,13 +137,15 @@ TEST_CASE("unit: MoonrakerPrinterAgent::fetch_filament_info is fire-and-forget a
         std::promise<void> release_gate;
         std::promise<void> done_promise;
 
-        bool do_fetch_filament_info(std::string /*dev_id*/) override
+        bool fetch_filament_info(std::string /*dev_id*/, FilamentSyncMode /*sync_mode*/ = FilamentSyncMode::pull) override
         {
-            invoked.store(true);
-            // Block here until the test explicitly releases us, proving the caller
-            // (fetch_filament_info) does not wait for this to run.
-            release_gate.get_future().wait();
-            done_promise.set_value();
+            std::thread([this]() {
+                invoked.store(true);
+                // Block here until the test explicitly releases us, proving the caller
+                // (fetch_filament_info) does not wait for this to run.
+                release_gate.get_future().wait();
+                done_promise.set_value();
+            }).detach();
             return true;
         }
     };
@@ -148,7 +155,7 @@ TEST_CASE("unit: MoonrakerPrinterAgent::fetch_filament_info is fire-and-forget a
 
     bool immediate_result = agent->fetch_filament_info("test-dev");
 
-    // fetch_filament_info must return before do_fetch_filament_info completes — prove
+    // fetch_filament_info must return before its background work completes — prove
     // it by confirming the background call is still blocked on the gate right now.
     REQUIRE(immediate_result == true);
     REQUIRE(done_future.wait_for(std::chrono::milliseconds(100)) == std::future_status::timeout);
