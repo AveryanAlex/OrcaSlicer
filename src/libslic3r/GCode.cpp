@@ -2449,8 +2449,9 @@ void GCode::do_export(Print* print, const char* path, GCodeProcessorResult* resu
 
     {
         LifecycleEventContext ctx;
-        ctx.name = path;
+        ctx.name = std::to_string(print->model().id().id);
         ctx.code = LifecycleEvtCode::Ok;
+        ctx.msg  = path;
         fire_lifecycle_event(LifecycleEvent::GCodeExportStarted, ctx);
     }
 
@@ -2499,9 +2500,9 @@ void GCode::do_export(Print* print, const char* path, GCodeProcessorResult* resu
         }
         {
             LifecycleEventContext ctx;
-            ctx.name = path;
+            ctx.name = std::to_string(print->model().id().id);
             ctx.code = LifecycleEvtCode::Error;
-            ctx.msg  = err_msg;
+            ctx.msg  = std::string(path) + "\n" + err_msg;
             fire_lifecycle_event(LifecycleEvent::GCodeExportFinished, ctx);
         }
         throw Slic3r::RuntimeError(err_msg);
@@ -2522,9 +2523,9 @@ void GCode::do_export(Print* print, const char* path, GCodeProcessorResult* resu
         boost::nowide::remove(path_tmp.c_str());
         {
             LifecycleEventContext ctx;
-            ctx.name = path;
+            ctx.name = std::to_string(print->model().id().id);
             ctx.code = LifecycleEvtCode::Error;
-            ctx.msg  = ex.what();
+            ctx.msg  = std::string(path) + "\n" + ex.what();
             fire_lifecycle_event(LifecycleEvent::GCodeExportFinished, ctx);
         }
         throw;
@@ -2634,9 +2635,9 @@ void GCode::do_export(Print* print, const char* path, GCodeProcessorResult* resu
     if (ret) {
         {
             LifecycleEventContext ctx;
-            ctx.name = path;
+            ctx.name = std::to_string(print->model().id().id);
             ctx.code = LifecycleEvtCode::Error;
-            ctx.msg  = "Failed to rename the output G-code file: " + ret.message();
+            ctx.msg  = std::string(path) + "\nFailed to rename the output G-code file: " + ret.message();
             fire_lifecycle_event(LifecycleEvent::GCodeExportFinished, ctx);
         }
         throw Slic3r::RuntimeError(
@@ -2652,8 +2653,9 @@ void GCode::do_export(Print* print, const char* path, GCodeProcessorResult* resu
 
     {
         LifecycleEventContext ctx;
-        ctx.name = path;
+        ctx.name = std::to_string(print->model().id().id);
         ctx.code = LifecycleEvtCode::Ok;
+        ctx.msg  = path;
         fire_lifecycle_event(LifecycleEvent::GCodeExportFinished, ctx);
     }
 
