@@ -91,9 +91,15 @@ public:
      */
     virtual int send_message(std::string dev_id, std::string json_str, int qos, int flag) = 0;
 
-    // why: some printers emit camera frames only while explicitly asked, and retire the
-    // capture task on their own - the camera view starts it and renews it. Printers with an
-    // always-on stream need nothing here, hence the honest refusal by default.
+    // why: gcode is firmware dialect, not a waist concept - commands whose body is Bambu-dialect
+    // gcode live on the agent that speaks it; the default is an honest refusal that MachineObject's
+    // publish funnel turns into a dialog.
+    virtual int command_ams_refresh_rfid(std::string, std::string, int, bool)
+    { return ORCA_NETWORK_ERR_CMD_NOT_SUPPORTED; }
+    virtual int command_ams_calibrate(std::string, int, int, bool)
+    { return ORCA_NETWORK_ERR_CMD_NOT_SUPPORTED; }
+    virtual int command_ams_select_tray(std::string, std::string, int, bool)
+    { return ORCA_NETWORK_ERR_CMD_NOT_SUPPORTED; }
     virtual int command_start_camera(std::string)
     { return ORCA_NETWORK_ERR_CMD_NOT_SUPPORTED; }
 
@@ -310,7 +316,7 @@ public:
      * Should only be called when get_filament_sync_mode() returns FilamentSyncMode::pull.
      * Populates the MachineObject's DevFilaSystem with fetched filament data.
      */
-    virtual bool fetch_filament_info(std::string dev_id) { return false; }
+    virtual bool fetch_filament_info(std::string dev_id, FilamentSyncMode sync_mode = FilamentSyncMode::pull) { return false; }
 
     /**
      * Get the current camera stream URL for this agent's active machine.

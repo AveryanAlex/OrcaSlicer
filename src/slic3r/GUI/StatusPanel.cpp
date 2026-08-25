@@ -12,6 +12,7 @@
 
 #include "MsgDialog.hpp"
 #include "slic3r/Utils/Http.hpp"
+#include "slic3r/Utils/MoonrakerPrinterAgent.hpp"
 #include "libslic3r/Thread.hpp"
 #include "DeviceErrorDialog.hpp"
 
@@ -2315,26 +2316,10 @@ void StatusPanel::update_camera_state(MachineObject* obj)
             m_custom_camera_view->Show();
             m_media_ctrl->Hide();
         }
-        // why: printers like the U1 capture only while asked and retire the capture task ~362 s
-        // after each start, so the open camera view has to renew ahead of that. 300 s matches
-        // Snapmaker's own client. Agents that do not need it refuse the call silently.
-        // A dev_id change forces an immediate renew rather than inheriting the previous
-        // printer's cooldown, so switching printers doesn't leave the new one's view blank
-        // for up to 300s.
-        const auto now = std::chrono::steady_clock::now();
-        if (obj->get_dev_id() != m_camera_start_dev_id ||
-            m_camera_start_sent == std::chrono::steady_clock::time_point{} ||
-            now - m_camera_start_sent >= std::chrono::seconds(300)) {
-            obj->command_start_camera();
-            m_camera_start_sent = now;
-            m_camera_start_dev_id = obj->get_dev_id();
-        }
     } else if (m_custom_camera_view->IsShown()) {
         m_custom_camera_view->Hide();
         m_media_ctrl->Show();
         m_media_play_ctrl->StopWebStream();
-        m_camera_start_sent = std::chrono::steady_clock::time_point{};
-        m_camera_start_dev_id.clear();
     }
 
     //sdcard
@@ -2719,13 +2704,21 @@ void StatusPanel::on_subtask_partskip(wxCommandEvent &event)
 void StatusPanel::on_subtask_pause_resume(wxCommandEvent &event)
 {
     if (obj) {
-        if (obj->can_resume()) {
+        const bool was_resume = obj->can_resume();
+        if (was_resume) {
             BOOST_LOG_TRIVIAL(info) << "monitor: resume current print task dev_id =" << obj->get_dev_id();
             obj->command_task_resume();
         }
         else {
             BOOST_LOG_TRIVIAL(info) << "monitor: pause current print task dev_id =" << obj->get_dev_id();
             obj->command_task_pause();
+        }
+        if (is_moonraker_agent()) {
+            m_pause_resume_pending = true;
+            m_pause_resume_was_resume = was_resume;
+            m_pause_resume_deadline = std::chrono::steady_clock::now() + std::chrono::seconds(6);
+            m_pause_resume_machine_id = obj->get_dev_id();
+            m_project_task_panel->enable_pause_resume_button(false, was_resume ? "resume_disable" : "pause_disable");
         }
     }
 }
@@ -2738,6 +2731,12 @@ void StatusPanel::on_subtask_abort(wxCommandEvent &event)
             if (obj) {
                 BOOST_LOG_TRIVIAL(info) << "monitor: stop current print task dev_id =" << obj->get_dev_id();
                 obj->command_task_abort();
+                if (is_moonraker_agent()) {
+                    m_abort_pending = true;
+                    m_abort_deadline = std::chrono::steady_clock::now() + std::chrono::seconds(6);
+                    m_abort_machine_id = obj->get_dev_id();
+                    m_project_task_panel->enable_abort_button(false);
+                }
             }
         });
     }
@@ -3711,6 +3710,25 @@ void StatusPanel::update_model_info()
 void StatusPanel::update_subtask(MachineObject *obj)
 {
     if (!obj) return;
+    const auto now = std::chrono::steady_clock::now();
+    if (m_pause_resume_pending) {
+        if (!is_moonraker_agent() || m_pause_resume_machine_id != obj->get_dev_id() ||
+            obj->can_resume() != m_pause_resume_was_resume) {
+            m_pause_resume_pending = false;
+        } else if (now >= m_pause_resume_deadline) {
+            BOOST_LOG_TRIVIAL(warning) << "StatusPanel: Moonraker pause/resume command did not change printer state";
+            m_pause_resume_pending = false;
+        }
+    }
+    if (m_abort_pending) {
+        if (!is_moonraker_agent() || m_abort_machine_id != obj->get_dev_id() || obj->print_status == "FAILED" ||
+            obj->print_status == "FINISH" || obj->print_status == "IDLE") {
+            m_abort_pending = false;
+        } else if (now >= m_abort_deadline) {
+            BOOST_LOG_TRIVIAL(warning) << "StatusPanel: Moonraker abort command did not change printer state";
+            m_abort_pending = false;
+        }
+    }
     if (m_current_print_mode != PRINGINT) {
         if (calib_bitmap == nullptr) {
             m_calib_mode = get_obj_calibration_mode(obj, m_calib_method, cali_stage);
@@ -3818,10 +3836,12 @@ void StatusPanel::update_subtask(MachineObject *obj)
             }
             update_basic_print_data(false);
         } else {
-            if (obj->can_resume()) {
-                m_project_task_panel->enable_pause_resume_button(true, "resume");
-            } else {
-                 m_project_task_panel->enable_pause_resume_button(true, "pause");
+            if (!m_pause_resume_pending) {
+                if (obj->can_resume()) {
+                    m_project_task_panel->enable_pause_resume_button(true, "resume");
+                } else {
+                     m_project_task_panel->enable_pause_resume_button(true, "pause");
+                }
             }
             m_project_task_panel->enable_partskip_button(obj, true);
             // update printing stage
@@ -3878,7 +3898,9 @@ void StatusPanel::update_subtask(MachineObject *obj)
                     m_project_task_panel->market_scoring_hide();
                 }
             } else { // model printing is not finished, hide scoring page
-                m_project_task_panel->enable_abort_button(true);
+                if (!m_abort_pending) {
+                    m_project_task_panel->enable_abort_button(true);
+                }
                 m_project_task_panel->market_scoring_hide();
                 m_project_task_panel->get_request_failed_panel()->Hide();
             }
@@ -3953,39 +3975,61 @@ void StatusPanel::update_cloud_subtask(MachineObject *obj)
         update_calib_bitmap();
         if (obj->slice_info) {
             m_request_url = wxString(obj->slice_info->thumbnail_url);
-            if (!m_request_url.IsEmpty()) {
-                wxImage                               img;
-                std::map<wxString, wxImage>::iterator it = img_list.find(m_request_url);
-                if (it != img_list.end()) {
-                    if (m_current_print_mode != PrintingTaskType::CALIBRATION  ||(m_calib_mode == CalibMode::Calib_Flow_Rate && m_calib_method == CalibrationMethod::CALI_METHOD_MANUAL)) {
-                        img = it->second;
-                        wxImage resize_img = img.Scale(m_project_task_panel->get_bitmap_thumbnail()->GetSize().x, m_project_task_panel->get_bitmap_thumbnail()->GetSize().y);
-                        m_project_task_panel->set_thumbnail_img(resize_img, "");
-                        m_project_task_panel->set_brightness_value(get_brightness_value(resize_img));
-                    }
-                    if (this->obj) {
-                        m_project_task_panel->set_plate_index(obj->m_plate_index);
-                    } else {
-                        m_project_task_panel->set_plate_index(-1);
-                    }
-                    task_thumbnail_state = ThumbnailState::TASK_THUMBNAIL;
-                    BOOST_LOG_TRIVIAL(trace) << "web_request: use cache image";
-                } else {
-                    web_request = wxWebSession::GetDefault().CreateRequest(this, m_request_url);
-                    BOOST_LOG_TRIVIAL(trace) << "monitor: start request thumbnail, url = " << m_request_url;
-                    web_request.Start();
-                    m_start_loading_thumbnail = false;
-                }
-            }
+            load_thumbnail_from_url(m_request_url, obj);
         }
     }
+}
+
+bool StatusPanel::load_thumbnail_from_url(const wxString &url, MachineObject *obj)
+{
+    if (url.IsEmpty())
+        return false;
+
+    wxImage                               img;
+    std::map<wxString, wxImage>::iterator it = img_list.find(url);
+    if (it != img_list.end()) {
+        if (m_current_print_mode != PrintingTaskType::CALIBRATION  ||(m_calib_mode == CalibMode::Calib_Flow_Rate && m_calib_method == CalibrationMethod::CALI_METHOD_MANUAL)) {
+            img = it->second;
+            wxImage resize_img = img.Scale(m_project_task_panel->get_bitmap_thumbnail()->GetSize().x, m_project_task_panel->get_bitmap_thumbnail()->GetSize().y);
+            m_project_task_panel->set_thumbnail_img(resize_img, "");
+            m_project_task_panel->set_brightness_value(get_brightness_value(resize_img));
+        }
+        if (this->obj) {
+            m_project_task_panel->set_plate_index(obj->m_plate_index);
+        } else {
+            m_project_task_panel->set_plate_index(-1);
+        }
+        task_thumbnail_state = ThumbnailState::TASK_THUMBNAIL;
+        BOOST_LOG_TRIVIAL(trace) << "web_request: use cache image";
+    } else {
+        m_request_url = url;
+        web_request = wxWebSession::GetDefault().CreateRequest(this, m_request_url);
+        BOOST_LOG_TRIVIAL(trace) << "monitor: start request thumbnail, url = " << m_request_url;
+        web_request.Start();
+        m_start_loading_thumbnail = false;
+    }
+    return true;
 }
 
 void StatusPanel::update_sdcard_subtask(MachineObject *obj)
 {
     if (!obj) return;
 
-    if (!m_load_sdcard_thumbnail) {
+    const wxString thumbnail_url = wxString(obj->m_agent_thumbnail_url);
+    if (!thumbnail_url.IsEmpty()) {
+        // why: Moonraker has no prediction or weight data, so keep it on the sdcard path.
+        if (m_request_url != thumbnail_url || !m_load_sdcard_thumbnail) {
+            if (web_request.IsOk() && web_request.GetState() == wxWebRequest::State_Active)
+                web_request.Cancel();
+            update_calib_bitmap();
+            m_request_url = thumbnail_url;
+            load_thumbnail_from_url(thumbnail_url, obj);
+            m_load_sdcard_thumbnail = true;
+        }
+        return;
+    }
+
+    if (!m_load_sdcard_thumbnail || !m_request_url.IsEmpty()) {
         update_calib_bitmap();
         if (m_current_print_mode != PrintingTaskType::CALIBRATION) {
             m_project_task_panel->get_bitmap_thumbnail()->SetBitmap(m_thumbnail_sdcard.bmp());
@@ -3993,11 +4037,14 @@ void StatusPanel::update_sdcard_subtask(MachineObject *obj)
         }
         task_thumbnail_state = ThumbnailState::SDCARD_THUMBNAIL;
         m_load_sdcard_thumbnail = true;
+        m_request_url.clear();
     }
 }
 
 void StatusPanel::reset_printing_values()
 {
+    m_pause_resume_pending = false;
+    m_abort_pending = false;
     m_project_task_panel->enable_partskip_button(nullptr, false);
     m_project_task_panel->enable_pause_resume_button(false, "pause_disable");
     m_project_task_panel->enable_abort_button(false);
@@ -4021,6 +4068,12 @@ void StatusPanel::reset_printing_values()
     m_load_sdcard_thumbnail   = false;
     skip_print_error = 0;
     this->Layout();
+}
+
+bool StatusPanel::is_moonraker_agent() const
+{
+    auto* agent = wxGetApp().getAgent();
+    return agent && std::dynamic_pointer_cast<Slic3r::MoonrakerPrinterAgent>(agent->get_printer_agent()) != nullptr;
 }
 
 void StatusPanel::on_axis_ctrl_xy(wxCommandEvent &event)
@@ -5159,8 +5212,6 @@ void StatusPanel::set_default()
         m_custom_camera_view->Hide();
         m_media_ctrl->Show();
         m_media_play_ctrl->StopWebStream();
-        m_camera_start_sent = std::chrono::steady_clock::time_point{};
-        m_camera_start_dev_id.clear();
     }
     obj                  = nullptr;
     last_subtask         = nullptr;
