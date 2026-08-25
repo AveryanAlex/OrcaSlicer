@@ -71,6 +71,12 @@ public:
     void set_layer_tools_ptr(const LayerTools* lt) { m_layer_tools = lt; }
 
 private:
+    // Returns true if entity is not printed with its usual extruder for a given copy.
+    bool is_entity_overridden(const ExtrusionEntity* entity, const PrintObject *object, size_t copy_id) const {
+        auto it = entity_map.find(std::make_tuple(entity, object));
+        return it != entity_map.end() && copy_id < it->second.size() && it->second[copy_id] != -1;
+    }
+
     int first_nonsoluble_extruder_on_layer(const PrintConfig& print_config) const;
     int last_nonsoluble_extruder_on_layer(const PrintConfig& print_config) const;
 
@@ -79,12 +85,6 @@ private:
     // BBS
     void set_support_extruder_override(const PrintObject* object, size_t copy_id, int extruder, size_t num_of_copies);
     void set_support_interface_extruder_override(const PrintObject* object, size_t copy_id, int extruder, size_t num_of_copies);
-
-    // Returns true in case that entity is not printed with its usual extruder for a given copy:
-    bool is_entity_overridden(const ExtrusionEntity* entity, const PrintObject *object, size_t copy_id) const {
-        auto it = entity_map.find(std::make_tuple(entity, object));
-        return it == entity_map.end() ? false : it->second[copy_id] != -1;
-    }
 
     std::map<std::tuple<const ExtrusionEntity*, const PrintObject *>, ExtruderPerCopy> entity_map;  // to keep track of who prints what
     // BBS

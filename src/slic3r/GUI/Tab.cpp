@@ -3009,6 +3009,7 @@ void TabPrint::build()
         optgroup->append_single_option_line("enable_tower_interface_cooldown_during_tower", "multimaterial_settings_prime_tower");
         optgroup->append_single_option_line("prime_tower_enable_framework", "multimaterial_settings_prime_tower");
         optgroup->append_single_option_line("prime_tower_width", "multimaterial_settings_prime_tower#width");
+        optgroup->append_single_option_line("belt_purge_tower_width", "multimaterial_settings_prime_tower");
         optgroup->append_single_option_line("prime_volume", "multimaterial_settings_prime_tower");
         optgroup->append_single_option_line("prime_tower_brim_width", "multimaterial_settings_prime_tower#brim-width");
         optgroup->append_single_option_line("prime_tower_infill_gap", "multimaterial_settings_prime_tower");
@@ -5698,6 +5699,12 @@ if (is_marlin_flavor)
         optgroup->append_single_option_line("enable_filament_ramming", "printer_multimaterial_wipe_tower#enable-filament-ramming");
         optgroup->append_single_option_line("tool_change_on_wipe_tower", "printer_multimaterial_wipe_tower#tool-change-on-wipe-tower");
 
+        // Orca-Belt: belt printers replace the classic wipe tower with an
+        // auto-generated purge prism; this is its enable (gated to belt printers
+        // in toggle_options()).
+        optgroup = page->new_optgroup(L("Belt purge tower"), "param_tower");
+        optgroup->append_single_option_line("enable_belt_purge_tower", "printer_multimaterial_wipe_tower");
+
 
         optgroup = page->new_optgroup(L("Single extruder multi-material parameters"), "param_settings");
         optgroup->append_single_option_line("cooling_tube_retraction", "printer_multimaterial_semm_parameters#cooling-tube-position");
@@ -6232,8 +6239,14 @@ void TabPrinter::toggle_options()
     }
 
     if (m_active_page->title() == L("Multimaterial")) {
+        // Orca-Belt: belt printers use the belt purge tower instead of the classic
+        // wipe tower — show its enable only on belt printers, and hide the classic
+        // wipe-tower fields there (the classic tower's G-code bypasses the belt transform).
+        const bool is_belt_printer = m_config->opt_bool("belt_printer");
+        toggle_line("enable_belt_purge_tower", is_belt_printer);
+
         const bool supports_wipe_tower_2 = !is_BBL_printer && m_config->opt_enum<WipeTowerType>("wipe_tower_type") == WipeTowerType::Type2;
-        toggle_line("wipe_tower_type", !is_BBL_printer);
+        toggle_line("wipe_tower_type", !is_BBL_printer && !is_belt_printer);
         // SoftFever: hide specific settings for BBL printer
         for (auto el : {
                  "enable_filament_ramming",

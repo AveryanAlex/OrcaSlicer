@@ -105,6 +105,7 @@
 #include "GUI_Preview.hpp"
 #include "3DBed.hpp"
 #include "PartPlate.hpp"
+#include "BeltPurgeTower.hpp"
 #include "Camera.hpp"
 #include "Mouse3DController.hpp"
 #include "Tab.hpp"
@@ -5475,6 +5476,11 @@ struct Plater::priv
     void exit_gizmo();
     void remove(size_t obj_idx);
     bool delete_object_from_model(size_t obj_idx, bool refresh_immediately = true); //BBS
+    // ORCA-Belt: keep the auto-generated belt purge prism in sync with the
+    // config and plate contents (thin wrapper over GUI::ensure_belt_purge_tower
+    // in BeltPurgeTower.cpp). Returns true when the model was mutated.
+    bool ensure_belt_purge_tower();
+    BeltPurgeSignature m_belt_purge_sig;
     void delete_all_objects_from_model();
     void reset(bool apply_presets_change = false);
     void center_selection();
@@ -8879,6 +8885,16 @@ void Plater::priv::process_validation_warnings(const std::vector<StringObjectExc
 }
 
 
+// ORCA-Belt: the actual implementation lives in BeltPurgeTower.cpp (kept out of
+// this large, frequently-touched file so it stays clear of unrelated upstream
+// changes and carries no regression risk for normal printers). This is a thin
+// wrapper that hands it the model, plates, object list, and cached signature.
+bool Plater::priv::ensure_belt_purge_tower()
+{
+    return GUI::ensure_belt_purge_tower(model, partplate_list, sidebar->obj_list(), m_belt_purge_sig);
+}
+
+
 // Update background processing thread from the current config and Model.
 // Returns a bitmask of UpdateBackgroundProcessReturnState.
 unsigned int Plater::priv::update_background_process(bool force_validation, bool postpone_error_messages, bool switch_print)
@@ -8889,6 +8905,10 @@ unsigned int Plater::priv::update_background_process(bool force_validation, bool
     // If the update_background_process() was not called by the timer, kill the timer,
     // so the update_restart_background_process() will not be called again in vain.
     background_process_timer.Stop();
+    // ORCA-Belt: sync the auto-managed belt purge prism before the model is
+    // applied to the Print below, so the prism change rides this same apply.
+    if (printer_technology == ptFFF && this->ensure_belt_purge_tower())
+        return_state |= UPDATE_BACKGROUND_PROCESS_REFRESH_SCENE;
     // Update the "out of print bed" state of ModelInstances.
     update_print_volume_state();
     // Apply new config to the possibly running background task.

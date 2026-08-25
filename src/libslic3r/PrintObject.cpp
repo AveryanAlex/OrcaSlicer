@@ -1116,6 +1116,9 @@ void PrintObject::clear_layers()
         for (Layer *l : m_layers)
             delete l;
         m_layers.clear();
+        for (Layer *l : m_belt_truncated_layers)
+            delete l;
+        m_belt_truncated_layers.clear();
     }
 }
 
@@ -1663,7 +1666,8 @@ bool PrintObject::invalidate_state_by_config_options(
         } else if (
                opt_key == "flush_into_infill"
             || opt_key == "flush_into_objects"
-            || opt_key == "flush_into_support") {
+            || opt_key == "flush_into_support"
+            || opt_key == "belt_purge_tower_object") {
             invalidated |= m_print->invalidate_step(psWipeTower);
             invalidated |= m_print->invalidate_step(psGCodeExport);
         } else {

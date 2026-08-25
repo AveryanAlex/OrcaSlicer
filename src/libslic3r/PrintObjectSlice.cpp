@@ -1392,6 +1392,7 @@ void apply_fuzzy_skin_segmentation(PrintObject &print_object, ThrowOnCancel thro
     }); // end of parallel_for
 }
 
+
 // 1) Decides Z positions of the layers,
 // 2) Initializes layers and their regions
 // 3) Slices the object meshes

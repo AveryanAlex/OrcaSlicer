@@ -86,6 +86,7 @@ set(lisbslic3r_sources
     BeltGCode.hpp
     BeltGCodeWriter.cpp
     BeltGCodeWriter.hpp
+    BeltPurge.cpp
     BeltSliceStrategy.cpp
     BeltSliceStrategy.hpp
     BeltTransform.cpp

@@ -22,6 +22,7 @@
 #include "MaterialType.hpp"
 #include "Model.hpp"
 #include "format.hpp"
+#include "LocalesUtils.hpp"
 #include <float.h>
 
 #include <algorithm>
@@ -358,6 +359,7 @@ bool Print::invalidate_state_by_config_options(const ConfigOptionResolver & /* n
             || opt_key == "hot_plate_temp"
             || opt_key == "textured_plate_temp"
             || opt_key == "enable_prime_tower"
+            || opt_key == "enable_belt_purge_tower"
             || opt_key == "enable_wrapping_detection"
             || opt_key == "prime_tower_enable_framework"
             || opt_key == "prime_tower_width"
@@ -389,6 +391,7 @@ bool Print::invalidate_state_by_config_options(const ConfigOptionResolver & /* n
             || opt_key == "prime_volume"
             || opt_key == "flush_into_infill"
             || opt_key == "flush_into_support"
+            || opt_key == "belt_purge_tower_width"
             || opt_key == "initial_layer_infill_speed"
             || opt_key == "travel_speed"
             || opt_key == "travel_speed_z"
@@ -1472,6 +1475,25 @@ StringObjectException Print::validate(std::vector<StringObjectException> *warnin
             add_warning(layer_warning);
     }
 
+    if (m_config.belt_printer.value && m_config.enable_belt_purge_tower.value
+        && m_config.print_sequence == PrintSequence::ByObject
+        && extruders.size() > 1) {
+        StringObjectException warningtemp;
+        warningtemp.string     = L("The belt purge tower is not generated in \"By object\" print sequence; "
+                                   "filament changes will not be purged.");
+        warningtemp.opt_key    = "enable_belt_purge_tower";
+        warningtemp.is_warning = true;
+        add_warning(warningtemp);
+    }
+
+    if (m_config.belt_printer.value && m_config.enable_belt_purge_tower.value) {
+        const size_t prism_count = std::count_if(m_objects.begin(), m_objects.end(), [](const PrintObject *object) {
+            return object->config().belt_purge_tower_object.value;
+        });
+        if (prism_count > 1)
+            return {L("The project contains multiple managed belt purge towers. Reload the plate or toggle the belt purge tower off and on to regenerate it.")};
+    }
+
     if (m_config.enable_prime_tower) {
         for (const PrintObject* object : m_objects) {
             if (object->config().precise_z_height.value) {
@@ -1596,7 +1618,7 @@ StringObjectException Print::validate(std::vector<StringObjectException> *warnin
                     return {_u8L("Variable layer height is not supported with Organic supports.") };
         }
 
-    if (this->has_wipe_tower() && ! m_objects.empty()) {
+    if ((this->has_wipe_tower() || this->has_belt_purge_tower()) && ! m_objects.empty()) {
         // Make sure all extruders use same diameter filament and have the same nozzle diameter
         // EPSILON comparison is used for nozzles and 10 % tolerance is used for filaments
         double first_nozzle_diam = m_config.nozzle_diameter.get_at(extruders.front());
@@ -1612,12 +1634,17 @@ StringObjectException Print::validate(std::vector<StringObjectException> *warnin
                 }
         }
 
-        if (! m_config.use_relative_e_distances)
-            return { L("The Wipe Tower is currently only supported with the relative extruder addressing (use_relative_e_distances=1).") };
+        // The following two constraints come from the classic wipe tower G-code
+        // generator; purging into the belt purge prism uses normal object
+        // extrusions and does not need them.
+        if (this->has_wipe_tower()) {
+            if (! m_config.use_relative_e_distances)
+                return { L("The Wipe Tower is currently only supported with the relative extruder addressing (use_relative_e_distances=1).") };
 
-        if (m_config.ooze_prevention && m_config.single_extruder_multi_material)
-            return {L("Ooze prevention is only supported with the wipe tower when 'single_extruder_multi_material' is off.")};
-            
+            if (m_config.ooze_prevention && m_config.single_extruder_multi_material)
+                return {L("Ooze prevention is only supported with the wipe tower when 'single_extruder_multi_material' is off.")};
+        }
+
 #if 0
         if (m_config.gcode_flavor != gcfRepRapSprinter && m_config.gcode_flavor != gcfRepRapFirmware &&
             m_config.gcode_flavor != gcfRepetier && m_config.gcode_flavor != gcfMarlinLegacy && m_config.gcode_flavor != gcfMarlinFirmware)
@@ -2708,7 +2735,10 @@ void Print::process(long long *time_cost_with_cache, bool use_cache)
 
         m_wipe_tower_data.clear();
         m_tool_ordering.clear();
-        if (this->has_wipe_tower()) {
+        if (this->has_belt_purge_tower() && this->config().print_sequence != PrintSequence::ByObject) {
+            this->_plan_belt_purge();
+        }
+        else if (this->has_wipe_tower()) {
             this->_make_wipe_tower();
         }
         else if (this->config().print_sequence != PrintSequence::ByObject) {
@@ -4085,6 +4115,13 @@ int Print::get_config_index(int filament_id, int layer_id, const std::vector<std
 // Wipe tower support.
 bool Print::has_wipe_tower() const
 {
+    // Belt printers never get the classic wipe tower: its G-code is generated
+    // directly in machine XY coordinates and bypasses the belt rotation
+    // transform. Purging is routed into the belt purge prism instead
+    // (see has_belt_purge_tower() / _plan_belt_purge()).
+    if (m_config.belt_printer.value)
+        return false;
+
     if (m_config.enable_prime_tower.value == true) {
         if (m_config.enable_wrapping_detection.value && m_config.wrapping_exclude_area.values.size() > 2)
             return true;
@@ -4096,6 +4133,7 @@ bool Print::has_wipe_tower() const
     }
     return false;
 }
+
 
 const WipeTowerData &Print::wipe_tower_data(size_t filaments_cnt) const
 {
@@ -4182,6 +4220,7 @@ bool Print::enable_timelapse_print() const
 {
     return m_config.timelapse_type.value == TimelapseType::tlSmooth;
 }
+
 
 void Print::_make_wipe_tower()
 {
