@@ -2307,7 +2307,8 @@ void StatusPanel::update_camera_state(MachineObject* obj)
     if (!obj) return;
 
     auto agent = wxGetApp().getAgent();
-    const bool has_printer_webcam = agent && agent->get_camera_stream_mode() == CameraStreamMode::http;
+    const auto camera_mode = agent ? agent->get_camera_stream_mode() : CameraStreamMode::none;
+    const bool has_printer_webcam = camera_mode == CameraStreamMode::http || camera_mode == CameraStreamMode::http_snapshot;
     if (has_printer_webcam) {
         //m_camera_switch_button->Hide();
         if (!m_custom_camera_view->IsShown()) {

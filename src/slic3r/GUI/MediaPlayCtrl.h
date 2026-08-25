@@ -73,6 +73,7 @@ private:
     static bool get_stream_url(std::string *url = nullptr);
 
     CameraStreamMode current_mode() const;
+    bool is_web_stream_mode() const;
 
 private:
     static inline const wxMediaState MEDIASTATE_IDLE = static_cast<wxMediaState>(3);

@@ -189,7 +189,8 @@ private:
     // why: a printer with no /server/webcams/list entry can still name its stream directly;
     // subclasses (e.g. printers with a fixed webcam path) can override this instead.
     virtual std::string webcam_stream_override(const std::string& base_url) const { return {}; }
-    bool fetch_webcam_info(const std::string& base_url, const std::string& api_key, uint64_t generation);
+    void refresh_webcam_info() const;
+    bool fetch_webcam_info(const std::string& base_url, const std::string& api_key, uint64_t generation) const;
 
     // System-specific filament fetch methods
     bool fetch_hh_filament_info(std::vector<AmsTrayData>& trays, int& max_lane_index);
@@ -222,8 +223,13 @@ private:
     // note: guarded by payload_mutex; filled by refresh_thumbnail_url(), empty url = looked up, none found
     std::string        thumbnail_filename;
     std::string        thumbnail_url;
-    std::string        webcam_stream_url;
+    mutable std::string        webcam_stream_url;
+    mutable CameraStreamMode   webcam_stream_mode = CameraStreamMode::none;
+    mutable uint64_t            webcam_info_last_lookup_ms = 0;
+    mutable uint64_t            webcam_info_generation = 0;
     unsigned            thumbnail_lookup_attempts = 0;
+
+    static constexpr uint64_t WEBCAM_INFO_REFRESH_INTERVAL_MS = 1000;
 
     std::atomic<int>       next_jsonrpc_id{1};
     std::set<std::string>  available_objects;  // Track for feature detection

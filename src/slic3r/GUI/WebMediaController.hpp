@@ -15,6 +15,8 @@ public:
 
     void Load(wxURI url) override;
 
+    void Load(wxURI url, CameraStreamMode mode) override;
+
     void Play() override;
 
     void Stop() override;
@@ -28,6 +30,7 @@ public:
 private:
     wxWebView * m_webview;
     std::string m_url;
+    CameraStreamMode m_stream_mode = CameraStreamMode::http;
 };
 
 }} // namespace Slic3r::GUI

@@ -47,7 +47,8 @@ enum class CameraStreamMode {
     none = 0,
     http,  // LAN or Cloud
     rtsp,  // LAN only
-    webrtc // Cloud only
+    webrtc, // Cloud only
+    http_snapshot // HTTP endpoint returning one image per request
 };
 
 /**
@@ -320,7 +321,7 @@ public:
 
     /**
      * Get the current camera stream URL for this agent's active machine.
-     * Only meaningful when get_camera_stream_mode() returns CameraStreamMode::http or CameraStreamMode::rtsp.
+     * Only meaningful when get_camera_stream_mode() returns an HTTP or RTSP mode.
      */
     virtual std::string get_camera_url() const { return {}; }
 };

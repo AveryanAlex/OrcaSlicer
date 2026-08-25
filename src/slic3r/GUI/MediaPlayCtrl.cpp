@@ -155,9 +155,15 @@ CameraStreamMode MediaPlayCtrl::current_mode() const
     return agent ? agent->get_camera_stream_mode() : CameraStreamMode::none;
 }
 
+bool MediaPlayCtrl::is_web_stream_mode() const
+{
+    const CameraStreamMode mode = current_mode();
+    return mode == CameraStreamMode::http || mode == CameraStreamMode::http_snapshot;
+}
+
 void MediaPlayCtrl::SetMachineObject(MachineObject* obj)
 {
-    if (current_mode() == CameraStreamMode::http) {
+    if (is_web_stream_mode()) {
         std::string machine = obj ? obj->get_dev_id() : "";
         auto agent = wxGetApp().getAgent();
         std::string url = agent ? agent->get_local_camera_stream_url() : "";
@@ -288,15 +294,17 @@ void refresh_agora_url(char const* device, char const* dev_ver, char const* chan
 
 void MediaPlayCtrl::Play()
 {
-    if (current_mode() == CameraStreamMode::http) {
+    if (is_web_stream_mode()) {
         if (!IsShownOnScreen()) return;
         if (m_last_state != MEDIASTATE_IDLE) return;
         if (m_machine.empty() || !IsEnabled() || !m_camera_exists || m_url.IsEmpty() || !m_web_ctrl) {
             Stop(_L("Please confirm if the printer is connected."));
             return;
         }
+        if (auto agent = wxGetApp().getAgent())
+            agent->command_start_camera(m_machine);
         m_button_play->SetIcon("media_stop");
-        m_web_ctrl->Load(wxURI(m_url));
+        m_web_ctrl->Load(wxURI(m_url), current_mode());
         m_web_ctrl->Play();
         m_last_state = wxMEDIASTATE_PLAYING;
         SetStatus(_L("Playing..."), false);
@@ -443,7 +451,7 @@ void MediaPlayCtrl::StopWebStream()
 
 void MediaPlayCtrl::Stop(wxString const &msg, wxString const &msg2)
 {
-    if (current_mode() == CameraStreamMode::http) {
+    if (is_web_stream_mode()) {
         if (m_last_state != MEDIASTATE_IDLE) {
             if (m_web_ctrl) m_web_ctrl->Stop();
             m_button_play->SetIcon("media_play");
