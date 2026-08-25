@@ -767,6 +767,13 @@ int NetworkAgent::send_message(std::string dev_id, std::string json_str, int qos
     return -1;
 }
 
+int NetworkAgent::command_start_camera(std::string dev_id)
+{
+    if (m_printer_agent)
+        return m_printer_agent->command_start_camera(dev_id);
+    return -1;
+}
+
 int NetworkAgent::connect_printer(std::string dev_id, std::string dev_ip, std::string username, std::string password, bool use_ssl)
 {
     if (m_printer_agent)
@@ -927,6 +934,20 @@ bool NetworkAgent::fetch_filament_info(std::string dev_id)
         return m_printer_agent->fetch_filament_info(dev_id);
     }
     return false;
+}
+
+CameraStreamMode NetworkAgent::get_camera_stream_mode() const
+{
+    if (m_printer_agent)
+        return m_printer_agent->get_camera_stream_mode();
+    return CameraStreamMode::none;
+}
+
+std::string NetworkAgent::get_local_camera_stream_url() const
+{
+    if (m_printer_agent)
+        return m_printer_agent->get_camera_url();
+    return {};
 }
 
 int NetworkAgent::request_bind_ticket(std::string* ticket)

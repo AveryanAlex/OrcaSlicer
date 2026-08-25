@@ -43,6 +43,13 @@ enum class FilamentSyncMode {
     pull          ///< On-demand fetch via REST API (blocking call)
 };
 
+enum class CameraStreamMode {
+    none = 0,
+    http,  // LAN or Cloud
+    rtsp,  // LAN only
+    webrtc // Cloud only
+};
+
 /**
  * IPrinterAgent - Interface for printer operations.
  *
@@ -83,6 +90,12 @@ public:
      * Publish a JSON command to a printer through cloud relay.
      */
     virtual int send_message(std::string dev_id, std::string json_str, int qos, int flag) = 0;
+
+    // why: some printers emit camera frames only while explicitly asked, and retire the
+    // capture task on their own - the camera view starts it and renews it. Printers with an
+    // always-on stream need nothing here, hence the honest refusal by default.
+    virtual int command_start_camera(std::string)
+    { return ORCA_NETWORK_ERR_CMD_NOT_SUPPORTED; }
 
     /**
      * Establish a direct LAN connection to a printer.
@@ -285,11 +298,25 @@ public:
     virtual FilamentSyncMode get_filament_sync_mode() const { return FilamentSyncMode::none; }
 
     /**
+     * Get the camera stream mode for this agent. This value can be deterministic and derived at
+     * runtime if the printer supports multiple camera stream modes. E.g. LAN => HTTP/RTSP, Cloud => WebRTC.
+     *
+     * @return CameraStreamMode indicating how the camera stream is obtained or used:
+     */
+    virtual CameraStreamMode get_camera_stream_mode() const { return CameraStreamMode::none; }
+
+    /**
      * Refresh filament info from the printer synchronously.
      * Should only be called when get_filament_sync_mode() returns FilamentSyncMode::pull.
      * Populates the MachineObject's DevFilaSystem with fetched filament data.
      */
     virtual bool fetch_filament_info(std::string dev_id) { return false; }
+
+    /**
+     * Get the current camera stream URL for this agent's active machine.
+     * Only meaningful when get_camera_stream_mode() returns CameraStreamMode::http or CameraStreamMode::rtsp.
+     */
+    virtual std::string get_camera_url() const { return {}; }
 };
 
 } // namespace Slic3r

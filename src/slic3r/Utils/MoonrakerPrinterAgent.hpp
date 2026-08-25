@@ -73,6 +73,9 @@ public:
     FilamentSyncMode get_filament_sync_mode() const override { return FilamentSyncMode::pull; }
     bool fetch_filament_info(std::string dev_id) override;
 
+    CameraStreamMode get_camera_stream_mode() const override;
+    std::string get_camera_url() const override;
+
 protected:
     struct MoonrakerDeviceInfo
     {
@@ -161,6 +164,11 @@ private:
                                    const std::string& api_key,
                                    uint64_t generation);
 
+    // why: a printer with no /server/webcams/list entry can still name its stream directly;
+    // subclasses (e.g. printers with a fixed webcam path) can override this instead.
+    virtual std::string webcam_stream_override(const std::string& base_url) const { return {}; }
+    bool fetch_webcam_info(const std::string& base_url, const std::string& api_key, uint64_t generation);
+
     // System-specific filament fetch methods
     bool fetch_hh_filament_info(std::vector<AmsTrayData>& trays, int& max_lane_index);
     bool fetch_moonraker_filament_data(std::vector<AmsTrayData>& trays, int& max_lane_index);
@@ -189,6 +197,8 @@ private:
 
     mutable std::recursive_mutex payload_mutex;
     nlohmann::json     status_cache;
+    // note: guarded by payload_mutex; filled by fetch_webcam_info()
+    std::string        webcam_stream_url;
 
     std::atomic<int>       next_jsonrpc_id{1};
     std::set<std::string>  available_objects;  // Track for feature detection

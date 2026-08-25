@@ -142,6 +142,7 @@ public:
     int set_on_local_message_fn(OnMessageFn fn);
     int set_server_callback(OnServerErrFn fn);
     int send_message(std::string dev_id, std::string json_str, int qos, int flag);
+    int command_start_camera(std::string dev_id);
     int connect_printer(std::string dev_id, std::string dev_ip, std::string username, std::string password, bool use_ssl);
     int disconnect_printer();
     int send_message_to_printer(std::string dev_id, std::string json_str, int qos, int flag);
@@ -165,6 +166,8 @@ public:
     int start_sdcard_print(PrintParams params, OnUpdateStatusFn update_fn, WasCancelledFn cancel_fn);
     FilamentSyncMode get_filament_sync_mode() const;
     bool fetch_filament_info(std::string dev_id);
+    CameraStreamMode get_camera_stream_mode() const;
+    std::string get_local_camera_stream_url() const;
     int request_bind_ticket(std::string* ticket);
     int get_hms_snapshot(std::string dev_id, std::string file_name, std::function<void(std::string, int)> callback);
 

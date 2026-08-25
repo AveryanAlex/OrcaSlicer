@@ -23,6 +23,13 @@ void PrinterAgentPluginCapability::RegisterBindings(pybind11::module_& module)
         .value("Pull", FilamentSyncMode::pull)
         .export_values();
 
+    py::enum_<CameraStreamMode>(printer_agent_module, "CameraStreamMode")
+        .value("None_", CameraStreamMode::none)
+        .value("HTTP", CameraStreamMode::http)
+        .value("RTSP", CameraStreamMode::rtsp)
+        .value("WebRTC", CameraStreamMode::webrtc)
+        .export_values();
+
     py::class_<AgentInfo>(printer_agent_module, "AgentInfo")
         .def(py::init<>())
         .def(py::init([](std::string id, std::string name, std::string version, std::string description) {
@@ -105,7 +112,9 @@ void PrinterAgentPluginCapability::RegisterBindings(pybind11::module_& module)
         .def("start_send_gcode_to_sdcard", &PrinterAgentPluginCapability::start_send_gcode_to_sdcard)
         .def("start_local_print", &PrinterAgentPluginCapability::start_local_print)
         .def("get_filament_sync_mode", &PrinterAgentPluginCapability::get_filament_sync_mode)
+        .def("get_camera_stream_mode", &PrinterAgentPluginCapability::get_camera_stream_mode)
         .def("fetch_filament_info", &PrinterAgentPluginCapability::fetch_filament_info)
+        .def("get_camera_url", &PrinterAgentPluginCapability::get_camera_url)
         .def("check_cert", &PrinterAgentPluginCapability::check_cert)
         .def("install_device_cert", &PrinterAgentPluginCapability::install_device_cert)
         .def("ping_bind", &PrinterAgentPluginCapability::ping_bind)

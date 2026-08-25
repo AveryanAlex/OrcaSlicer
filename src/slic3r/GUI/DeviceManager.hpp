@@ -765,6 +765,7 @@ public:
     int command_set_printer_nozzle(std::string nozzle_type, float diameter);
     int command_set_printer_nozzle2(int id, std::string nozzle_type, float diameter);
     int command_get_access_code();
+    int command_start_camera();
     int command_ack_proceed(json& proceed);
     int command_purification_disable();
     int command_dont_remind_next_time(json& mqtt_guard_json);

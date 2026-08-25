@@ -144,8 +144,42 @@ MediaPlayCtrl::~MediaPlayCtrl()
     BOOST_LOG_TRIVIAL(info) << __FUNCTION__ << ": " << this;
 }
 
+void MediaPlayCtrl::SetWebMediaController(IMediaController *ctrl)
+{
+    m_web_ctrl = ctrl;
+}
+
+CameraStreamMode MediaPlayCtrl::current_mode() const
+{
+    auto agent = wxGetApp().getAgent();
+    return agent ? agent->get_camera_stream_mode() : CameraStreamMode::none;
+}
+
 void MediaPlayCtrl::SetMachineObject(MachineObject* obj)
 {
+    if (current_mode() == CameraStreamMode::http) {
+        std::string machine = obj ? obj->get_dev_id() : "";
+        auto agent = wxGetApp().getAgent();
+        std::string url = agent ? agent->get_local_camera_stream_url() : "";
+        m_camera_exists = !url.empty();
+        Enable(obj && m_camera_exists);
+        bool changed = machine != m_machine || url != m_http_url;
+        m_machine   = machine;
+        m_http_url  = url;
+        m_url       = from_u8(url);
+        if (!changed) {
+            if (m_last_state == MEDIASTATE_IDLE && IsEnabled() && !m_web_user_stopped)
+                Play();
+            return;
+        }
+        m_web_user_stopped = false;
+        if (m_last_state != MEDIASTATE_IDLE)
+            Stop(" ");
+        if (IsEnabled())
+            Play();
+        return;
+    }
+
     std::string machine = obj ? obj->get_dev_id() : "";
     if (obj) {
         m_camera_exists  = obj->has_ipcam;
@@ -254,6 +288,21 @@ void refresh_agora_url(char const* device, char const* dev_ver, char const* chan
 
 void MediaPlayCtrl::Play()
 {
+    if (current_mode() == CameraStreamMode::http) {
+        if (!IsShownOnScreen()) return;
+        if (m_last_state != MEDIASTATE_IDLE) return;
+        if (m_machine.empty() || !IsEnabled() || !m_camera_exists || m_url.IsEmpty() || !m_web_ctrl) {
+            Stop(_L("Please confirm if the printer is connected."));
+            return;
+        }
+        m_button_play->SetIcon("media_stop");
+        m_web_ctrl->Load(wxURI(m_url));
+        m_web_ctrl->Play();
+        m_last_state = wxMEDIASTATE_PLAYING;
+        SetStatus(_L("Playing..."), false);
+        return;
+    }
+
     if (!m_next_retry.IsValid() || wxDateTime::Now() < m_next_retry)
         return;
     if (!IsShownOnScreen())
@@ -381,8 +430,34 @@ void MediaPlayCtrl::Play()
 
 void start_ping_test();
 
+void MediaPlayCtrl::StopWebStream()
+{
+    if (m_last_state == MEDIASTATE_IDLE)
+        return;
+    if (m_web_ctrl)
+        m_web_ctrl->Stop();
+    m_button_play->SetIcon("media_play");
+    m_last_state = MEDIASTATE_IDLE;
+    SetStatus(_L("Video Stopped."), false);
+}
+
 void MediaPlayCtrl::Stop(wxString const &msg, wxString const &msg2)
 {
+    if (current_mode() == CameraStreamMode::http) {
+        if (m_last_state != MEDIASTATE_IDLE) {
+            if (m_web_ctrl) m_web_ctrl->Stop();
+            m_button_play->SetIcon("media_play");
+            m_last_state = MEDIASTATE_IDLE;
+            if (!msg.IsEmpty())
+                SetStatus(msg);
+            else
+                SetStatus(_L("Video Stopped."), false);
+        } else if (!msg.IsEmpty()) {
+            SetStatus(msg, false);
+        }
+        return;
+    }
+
     int last_state = m_last_state;
 
     if (m_last_state != MEDIASTATE_IDLE) {
@@ -459,10 +534,12 @@ void MediaPlayCtrl::TogglePlay()
     BOOST_LOG_TRIVIAL(info) << "MediaPlayCtrl::TogglePlay";
     if (m_last_state != MEDIASTATE_IDLE) {
         m_next_retry = wxDateTime();
+        m_web_user_stopped = true;
         Stop();
     } else {
         m_failed_retry = 0;
         m_user_triggered = true;
+        m_web_user_stopped = false;
         if (m_last_user_play + wxTimeSpan::Minutes(5) < wxDateTime::Now()) {
             m_last_failed_codes.clear();
             m_last_user_play = wxDateTime::Now();

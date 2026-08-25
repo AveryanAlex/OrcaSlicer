@@ -11,6 +11,8 @@
 #include "wx/uri.h"
 #include "wx/mediactrl.h"
 
+#include <slic3r/GUI/IMediaController.hpp>
+
 wxDECLARE_EVENT(EVT_MEDIA_CTRL_STAT, wxCommandEvent);
 
 #if defined(__LINUX__) && defined(__WXGTK__)
@@ -19,26 +21,24 @@ typedef struct _GstElement GstElement;
 
 #ifdef __WXMAC__
 
-class wxMediaCtrl2 : public wxWindow
+class wxMediaCtrl2 : public wxWindow, public Slic3r::GUI::IMediaController
 {
 public:
     wxMediaCtrl2(wxWindow * parent);
     
     ~wxMediaCtrl2();
 
-    void Load(wxURI url);
+    void Load(wxURI url) override;
 
-    void Play();
+    void Play() override;
 
-    void Stop();
+    void Stop() override;
 
-    void SetIdleImage(wxString const & image);
+    wxMediaState GetState() override;
 
-    wxMediaState GetState() const;
+    int GetLastError() const override { return m_error; }
 
-    wxSize GetVideoSize() const;
-
-    int GetLastError() const { return m_error; }
+    wxSize GetVideoSize() const override;
 
     static inline const wxMediaState MEDIASTATE_BUFFERING = static_cast<wxMediaState>(6);
 
@@ -59,25 +59,23 @@ private:
 
 #else
 
-class wxMediaCtrl2 : public wxMediaCtrl
+class wxMediaCtrl2 : public wxMediaCtrl, public Slic3r::GUI::IMediaController
 {
 public:
     wxMediaCtrl2(wxWindow *parent);
     ~wxMediaCtrl2();
 
-    void Load(wxURI url);
+    void Load(wxURI url) override;
 
-    void Play();
+    void Play() override;
 
-    void Stop();
+    void Stop() override;
 
-    void SetIdleImage(wxString const & image);
+    wxMediaState GetState() override;
 
-    wxMediaState GetState();
+    int GetLastError() const override;
 
-    int GetLastError() const;
-
-    wxSize GetVideoSize() const;
+    wxSize GetVideoSize() const override;
 
 protected:
     wxSize DoGetBestSize() const override;

@@ -220,6 +220,7 @@ set(SLIC3R_GUI_SOURCES
     GUI/GLToolbar.hpp
     GUI/ImageDPIFrame.cpp
     GUI/ImageDPIFrame.hpp
+    GUI/IMediaController.hpp
     GUI/GUI_App.cpp
     GUI/GUI_App.hpp
     GUI/GUI_AuxiliaryList.cpp
@@ -518,6 +519,8 @@ set(SLIC3R_GUI_SOURCES
     GUI/WebUserLoginDialog.hpp
     GUI/WebViewDialog.cpp
     GUI/WebViewDialog.hpp
+    GUI/WebMediaController.hpp
+    GUI/WebMediaController.cpp
     GUI/Widgets/AMSControl.cpp
     GUI/Widgets/AMSControl.hpp
     GUI/Widgets/AMSItem.cpp
