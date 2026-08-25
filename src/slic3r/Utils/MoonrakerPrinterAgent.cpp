@@ -1558,9 +1558,6 @@ bool MoonrakerPrinterAgent::send_ws_rpc(const std::string& method, const nlohman
     request["id"] = next_jsonrpc_id++;
     const std::string body = request.dump();
 
-    // why: the configured address and Moonraker's own API port are both plausible websocket
-    // homes - the U1 answers on 7125 while its base_url points at port 80. Try what the user
-    // configured first, then the default API port.
     std::vector<std::string> ports{endpoint.port};
     if (endpoint.port != "7125") {
         ports.emplace_back("7125");
@@ -1590,9 +1587,6 @@ bool MoonrakerPrinterAgent::send_ws_rpc(const std::string& method, const nlohman
             ws.text(true);
             ws.write(net::buffer(body));
 
-            // why: some RPCs are answered on another transport entirely, so a reply may never
-            // come - read once with a short deadline purely to let the printer act on the
-            // request before we close, then drop the socket. A timeout here is the normal path.
             ws.next_layer().expires_after(std::chrono::seconds(2));
             beast::flat_buffer buffer;
             beast::error_code  read_ec;
@@ -1613,18 +1607,6 @@ bool MoonrakerPrinterAgent::send_ws_rpc(const std::string& method, const nlohman
 
 bool MoonrakerPrinterAgent::fetch_webcam_info(const std::string& base_url, const std::string& api_key, uint64_t generation)
 {
-    if (const std::string override_url = webcam_stream_override(base_url); !override_url.empty()) {
-        {
-            std::lock_guard<std::recursive_mutex> lock(payload_mutex);
-            if (generation != connect_generation.load()) {
-                return false;
-            }
-            webcam_stream_url = override_url;
-        }
-        BOOST_LOG_TRIVIAL(info) << "MoonrakerPrinterAgent: using printer-specific webcam URL " << override_url;
-        return true;
-    }
-
     std::string stream_url;
     std::string webcam_name;
     std::string error;
@@ -2155,6 +2137,8 @@ void MoonrakerPrinterAgent::run_status_stream(std::string dev_id, std::string ba
 
             // Read loop
             while (!ws_stop.load()) {
+                on_status_loop_tick(dev_id);
+
                 ws.next_layer().expires_after(std::chrono::seconds(2));
                 beast::flat_buffer buffer;
                 beast::error_code  ec;
@@ -2969,7 +2953,7 @@ std::string MoonrakerPrinterAgent::join_url(const std::string& base_url, const s
 
 // Sanitize filename to prevent path traversal attacks
 // Extracts only the basename, removing any path components
-std::string MoonrakerPrinterAgent::sanitize_filename(const std::string& filename) const
+std::string MoonrakerPrinterAgent::sanitize_filename(const std::string& filename)
 {
     if (filename.empty()) {
         return "print.gcode";
