@@ -5,6 +5,8 @@
 #include <slic3r/Utils/NetworkAgentFactory.hpp>
 #include <slic3r/plugin/PythonPluginBridge.hpp>
 
+#include "python_test_support.hpp"
+
 #include <pybind11/embed.h>
 #include <pybind11/pybind11.h>
 
@@ -209,29 +211,11 @@ TEST_CASE("unit: printer-agent registry register / lookup / duplicate-reject", "
 // every printer-agent plugin subclasses. If a binding is renamed or removed,
 // plugins fail at runtime even though C++ still compiles.
 // ===========================================================================
-namespace {
-
-void ensure_python_initialized()
-{
-    // why: the `orca` module is embedded in this binary, so a bare interpreter
-    // can import it without a bundled Python home. The app interpreter expects
-    // that deployed layout, which is not present beside this test binary.
-    if (!Py_IsInitialized()) {
-        static py::scoped_interpreter interpreter;
-        (void) interpreter;
-    }
-}
-
-py::module_ import_orca_module()
-{
-    ensure_python_initialized();
-    // Force PythonPluginBridge.cpp into the binary so the embedded
-    // PYBIND11_EMBEDDED_MODULE(orca, ...) registration (incl. printer_agent) exists.
-    (void) Slic3r::PythonPluginBridge::instance();
-    return py::module_::import("orca");
-}
-
-} // namespace
+// ensure_python_initialized()/import_orca_module() come from python_test_support.hpp:
+// a bare scoped_interpreter with no PyConfig.home falls back to the build-time
+// stdlib path, which doesn't exist beside this test binary, so Py_Initialize()
+// fails to load the codecs needed for the filesystem encoding. The shared helper
+// points PyConfig.home at the python/ runtime staged next to the test executable.
 
 TEST_CASE("integration: orca.printer_agent binding surface", "[integration][Python]")
 {

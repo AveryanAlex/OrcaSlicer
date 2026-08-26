@@ -31,32 +31,7 @@ set_property(TARGET ${_TEST_NAME}_tests PROPERTY FOLDER "tests")
 
 orcaslicer_copy_test_dlls()
 
-if (WIN32)
-    add_custom_command(TARGET ${_TEST_NAME}_tests POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:${_TEST_NAME}_tests>/python"
-        COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_PREFIX_PATH}/libpython" "$<TARGET_FILE_DIR:${_TEST_NAME}_tests>/python"
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            "${CMAKE_PREFIX_PATH}/libpython/python${_bundled_python_abi}.dll"
-            "${CMAKE_PREFIX_PATH}/libpython/vcruntime140.dll"
-            "${CMAKE_PREFIX_PATH}/libpython/vcruntime140_1.dll"
-            "$<TARGET_FILE_DIR:${_TEST_NAME}_tests>"
-        COMMENT "Copying Python runtime for slic3rutils plugin host API tests"
-        VERBATIM
-    )
-elseif (APPLE)
-    target_link_options(${_TEST_NAME}_tests PRIVATE
-        "LINKER:-rpath,@executable_path/python/lib")
-
-    add_custom_command(TARGET ${_TEST_NAME}_tests POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E rm -rf
-            "$<TARGET_FILE_DIR:${_TEST_NAME}_tests>/python"
-        COMMAND ${CMAKE_COMMAND} -E copy_directory
-            "${CMAKE_PREFIX_PATH}/libpython"
-            "$<TARGET_FILE_DIR:${_TEST_NAME}_tests>/python"
-        COMMENT "Copying Python runtime for macOS plugin host API tests"
-        VERBATIM
-    )
-endif()
+orcaslicer_stage_test_python_runtime(${_TEST_NAME}_tests)
 
 orcaslicer_discover_tests(${_TEST_NAME}_tests)
 
@@ -71,10 +46,12 @@ endif ()
 target_link_libraries(printer_agent_plugin_tests test_common libslic3r_gui libslic3r pybind11::embed Catch2::Catch2)
 set_property(TARGET printer_agent_plugin_tests PROPERTY FOLDER "tests")
 
-# why: the existing target stages the complete bundled Python home under
-# python/, which is the layout PythonInterpreter discovers beside the test exe.
+# why: both targets' post-build steps stage/clear the same python/ directory
+# beside the shared test output dir; serialize them so the copies can't race.
 add_dependencies(printer_agent_plugin_tests ${_TEST_NAME}_tests)
 
 orcaslicer_copy_test_dlls()
+
+orcaslicer_stage_test_python_runtime(printer_agent_plugin_tests)
 
 orcaslicer_discover_tests(printer_agent_plugin_tests)
