@@ -22,8 +22,10 @@ public:
     int command_start_camera(std::string dev_id) override;
 
     FilamentSyncMode get_filament_sync_mode() const override { return FilamentSyncMode::subscription; }
-    CameraStreamMode get_camera_stream_mode() const override { return CameraStreamMode::http_snapshot; }
-    std::string get_camera_url() const override { return device_info.base_url + "/server/files/camera/monitor.jpg"; }
+    // CameraStreamMode get_camera_stream_mode() const override { return CameraStreamMode::http_snapshot; }
+    CameraStreamMode get_camera_stream_mode() const override { return CameraStreamMode::rtsp; }
+    // std::string get_camera_url() const override { return device_info.base_url + "/server/files/camera/monitor.jpg"; }
+    std::string get_camera_url() const override { return "rtsp://100.99.196.114:8554/stream"; }
 
 private:
     // Combine filament_type + filament_sub_type into a unified type string

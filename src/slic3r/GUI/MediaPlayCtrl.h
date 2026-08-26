@@ -73,7 +73,6 @@ private:
     static bool get_stream_url(std::string *url = nullptr);
 
     CameraStreamMode current_mode() const;
-    bool is_web_stream_mode() const;
 
 private:
     static inline const wxMediaState MEDIASTATE_IDLE = static_cast<wxMediaState>(3);
@@ -86,7 +85,7 @@ private:
 
     wxMediaCtrl2 * m_media_ctrl;
     IMediaController * m_web_ctrl = nullptr;
-    std::string m_http_url;
+    std::string m_agent_camera_url;
     bool m_web_user_stopped = false;
     wxMediaState m_last_state = MEDIASTATE_IDLE;
     std::string m_machine;

@@ -322,6 +322,9 @@ void wxMediaCtrl2::PostGtkSinkStateEvent(int id)
 
 void wxMediaCtrl2::Load(wxURI url)
 {
+    const wxString scheme = url.GetScheme();
+    const bool generic_rtsp = scheme.CmpNoCase("rtsp") == 0 || scheme.CmpNoCase("rtsps") == 0;
+
 #ifdef __WIN32__
     InvalidateBestSize();
     if (m_imp == nullptr) {
@@ -342,7 +345,9 @@ void wxMediaCtrl2::Load(wxURI url)
         wxPostEvent(this, event);
         return;
     }
-    {
+    // BambuSource handles the proprietary bambu:// transport. Generic RTSP
+    // streams must go directly to the native Windows media backend.
+    if (!generic_rtsp) {
         wxRegKey key11(wxRegKey::HKCU, L"SOFTWARE\\Classes\\CLSID\\" CLSID_BAMBU_SOURCE L"\\InProcServer32");
         wxRegKey key12(wxRegKey::HKCR, L"CLSID\\" CLSID_BAMBU_SOURCE L"\\InProcServer32");
         wxString path = key11.Exists() ? key11.QueryDefaultValue() 
@@ -422,8 +427,10 @@ void wxMediaCtrl2::Load(wxURI url)
             keyWmp.SetValue("Permissions", permissions);
         }
     }
-    url = wxURI(url.BuildURI().append("&hwnd=").append(boost::lexical_cast<std::string>(GetHandle())).append("&tid=").append(
-        boost::lexical_cast<std::string>(GetCurrentThreadId())));
+    if (!generic_rtsp) {
+        url = wxURI(url.BuildURI().append("&hwnd=").append(boost::lexical_cast<std::string>(GetHandle())).append("&tid=").append(
+            boost::lexical_cast<std::string>(GetCurrentThreadId())));
+    }
 #endif
 #ifdef __WXGTK3__
     GstElementFactory *factory;
@@ -458,7 +465,10 @@ void wxMediaCtrl2::Load(wxURI url)
         gst_object_unref(factory);
     }
     
-    if (!hasplugins) {
+    // Generic RTSP streams may use codecs other than H.264; let GStreamer
+    // select the decoder from the stream caps instead of applying the Bambu
+    // liveview H.264 preflight.
+    if (!generic_rtsp && !hasplugins) {
         CallAfter([] {
             wxMessageBox(_L("Your system is missing H.264 codecs for GStreamer, which are required to play video. (Try installing the gstreamer1.0-plugins-bad or gstreamer1.0-libav packages, then restart Orca Slicer?)"), _L("Error"), wxOK);
         });
@@ -473,6 +483,10 @@ void wxMediaCtrl2::Load(wxURI url)
 #endif
     m_error = 0;
     m_loaded = false;
+#ifdef __LINUX__
+    if (generic_rtsp)
+        gst_bambu_last_error = 0;
+#endif
 #if defined(__LINUX__) && defined(__WXGTK__)
     if (m_use_gtk_sink && m_gtk_playbin) {
         const std::string uri = std::string(url.BuildURI().ToUTF8().data());

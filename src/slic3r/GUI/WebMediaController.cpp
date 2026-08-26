@@ -4,7 +4,16 @@
 
 namespace Slic3r { namespace GUI {
 
-WebMediaController::WebMediaController(wxWebView *webview) : m_webview(webview) {}
+WebMediaController::WebMediaController(wxWebView *webview) : m_webview(webview)
+{
+    if (!m_webview)
+        return;
+
+    m_webview->SetBackgroundColour(*wxBLACK);
+    m_webview->SetPage(
+        "<html><head><style>html,body{margin:0;height:100%;background:#000;}</style></head><body></body></html>",
+        "");
+}
 
 void WebMediaController::Load(wxURI url)
 {
